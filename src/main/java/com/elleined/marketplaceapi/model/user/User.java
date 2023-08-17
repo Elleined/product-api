@@ -87,7 +87,11 @@ public class User {
 
     public enum Suffix {
         JR,
-        SR
+        SR,
+        II,
+        III,
+        IV,
+        V
     }
 
     public enum Gender {

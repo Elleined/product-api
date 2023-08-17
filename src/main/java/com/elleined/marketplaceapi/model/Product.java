@@ -61,6 +61,10 @@ public class Product {
     @Column(name = "state", nullable = false)
     private State state;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state", nullable = false)
+    private Status status;
+
     @ManyToOne(optional = false)
     @JoinColumn(
             name = "seller_id",
@@ -100,5 +104,10 @@ public class Product {
         PENDING,
         LISTING,
         SOLD
+    }
+
+    public enum Status {
+        ACTIVE,
+        INACTIVE
     }
 }
