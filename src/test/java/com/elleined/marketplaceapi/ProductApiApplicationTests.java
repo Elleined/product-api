@@ -1,4 +1,4 @@
-package com.elleined.productapi;
+package com.elleined.marketplaceapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

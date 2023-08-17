@@ -1,4 +1,4 @@
-package com.elleined.productapi;
+package com.elleined.marketplaceapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
