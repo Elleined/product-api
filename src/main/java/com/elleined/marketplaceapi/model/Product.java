@@ -62,7 +62,7 @@ public class Product {
     private State state;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "state", nullable = false)
+    @Column(name = "status", nullable = false)
     private Status status;
 
     @ManyToOne(optional = false)

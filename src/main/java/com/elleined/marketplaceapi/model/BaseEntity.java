@@ -20,14 +20,16 @@ public class BaseEntity {
     @Column(
             name = "id",
             nullable = false,
-            updatable = false
+            updatable = false,
+            unique = true
     )
     private int id;
 
     @Column(
             name = "name",
             nullable = false,
-            updatable = false
+            updatable = false,
+            unique = true
     )
     private String name;
 }

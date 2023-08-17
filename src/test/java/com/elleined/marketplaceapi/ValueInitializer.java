@@ -1,4 +1,4 @@
-package Populator;
+package com.elleined.marketplaceapi;
 
 
 import org.junit.jupiter.api.Test;
