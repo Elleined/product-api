@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.model;
 
+import com.elleined.marketplaceapi.model.Crop;
+import com.elleined.marketplaceapi.model.Unit;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.VerifiedUser;

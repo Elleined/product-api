@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi;
 
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.VerifiedUser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -23,5 +24,10 @@ public class MarketplaceAPI {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		return new ObjectMapper();
 	}
 }
