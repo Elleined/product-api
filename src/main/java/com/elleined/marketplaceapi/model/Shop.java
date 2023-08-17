@@ -1,11 +1,8 @@
 package com.elleined.marketplaceapi.model;
 
-import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Set;
 
 @Entity
 @Table(name = "tbl_shop")

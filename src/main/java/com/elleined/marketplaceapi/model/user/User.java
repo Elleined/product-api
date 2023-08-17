@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.model.user;
 
-import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import jakarta.persistence.*;
@@ -10,15 +9,16 @@ import java.util.List;
 
 @Entity
 @Table(name = "tbl_user", indexes = @Index(name = "uuid_idx", columnList = "uuid"))
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class User {
+public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
             name = "user_id",
             nullable = false,

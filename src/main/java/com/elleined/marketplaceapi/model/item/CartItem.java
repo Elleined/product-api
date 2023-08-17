@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.model.item;
 
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Builder;

@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.model.item;
 
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +19,15 @@ import java.time.LocalDateTime;
 public abstract class Item {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(
+            strategy = GenerationType.TABLE,
+            generator = "itemAutoIncrement"
+    )
+    @SequenceGenerator(
+            allocationSize = 1,
+            name = "itemAutoIncrement",
+            sequenceName = "itemAutoIncrement"
+    )
     @Column(
             name = "item_id",
             nullable = false,
@@ -52,7 +59,7 @@ public abstract class Item {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-            name = "purchaser",
+            name = "purchaser_id",
             referencedColumnName = "user_id",
             nullable = false,
             updatable = false

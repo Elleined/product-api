@@ -9,7 +9,7 @@ import lombok.*;
 
 import java.util.List;
 @Entity
-@Table(name = "tbl_verified_user")
+@DiscriminatorValue("verified_user")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -25,7 +25,7 @@ public class VerifiedUser extends User {
     @Setter(AccessLevel.NONE)
     private List<Product> products;
 
-    @Builder
+    @Builder(builderMethodName = "verifiedUserBuilder")
     public VerifiedUser(int id, String uuid, Credential credential, List<OrderItem> orderedItems, List<CartItem> cartItems, Shop shop, List<Product> products) {
         super(id, uuid, credential, orderedItems, cartItems);
         this.shop = shop;
