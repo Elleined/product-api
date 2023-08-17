@@ -16,9 +16,8 @@ import java.util.Set;
 public class Shop {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
-            name = "shop_id",
+            name = "owner_id",
             nullable = false,
             updatable = false
     )
@@ -33,6 +32,8 @@ public class Shop {
     @Column(name = "picture", nullable = false)
     private String picture;
 
+    // This is the primary of this shop table
+    @MapsId
     @OneToOne
     @JoinColumn(
             name = "owner_id",

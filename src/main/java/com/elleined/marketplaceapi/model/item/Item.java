@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.model.item;
 
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,21 +19,25 @@ import java.time.LocalDateTime;
 public abstract class Item {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(
-            name = "crop_id",
+            name = "item_id",
             nullable = false,
             updatable = false
     )
     private Long id;
 
-    @Column(name = "order_item_quantity", nullable = false)
+    @Column(name = "item_quantity", nullable = false)
     private int orderQuantity;
 
-    @Column(name = "order_item_price", nullable = false)
+    @Column(name = "item_price", nullable = false)
     private double price;
 
-    @Column(name = "order_date", nullable = false, updatable = false)
+    @Column(
+            name = "order_date",
+            nullable = false,
+            updatable = false
+    )
     private LocalDateTime orderDate;
 
     @ManyToOne(optional = false)
@@ -44,11 +49,12 @@ public abstract class Item {
     )
     private Product product;
 
-    public enum OrderStatus {
-        CANCELLED,
-        FAILED,
-        PENDING,
-        ACCEPTED,
-        REJECTED
-    }
+    @ManyToOne(optional = false)
+    @JoinColumn(
+            name = "purchaser",
+            referencedColumnName = "user_id",
+            nullable = false,
+            updatable = false
+    )
+    private User purchaser;
 }

@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.model.item;
 
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 public class CartItem extends Item {
     @Builder
-    public CartItem(Long id, int orderQuantity, double price, LocalDateTime orderDate, Product product) {
-        super(id, orderQuantity, price, orderDate, product);
+    public CartItem(Long id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser) {
+        super(id, orderQuantity, price, orderDate, product, purchaser);
     }
 }

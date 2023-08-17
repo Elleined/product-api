@@ -1,9 +1,12 @@
 package com.elleined.marketplaceapi.model;
 
+import com.elleined.marketplaceapi.model.item.CartItem;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(
@@ -54,16 +57,14 @@ public class Product {
     private String keyword;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            name = "state",
-            nullable = false
-    )
+    @Column(name = "state", nullable = false)
     private State state;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(
-            name = "shop_id",
-            referencedColumnName = "shop_id"
+            name = "seller_id",
+            referencedColumnName = "owner_id",
+            nullable = false
     )
     private Shop shop;
 
@@ -83,6 +84,16 @@ public class Product {
             nullable = false
     )
     private Unit unit;
+
+    // product id is in order item table
+    @OneToMany(mappedBy = "product")
+    @Setter(AccessLevel.NONE)
+    private List<OrderItem> orderItems;
+
+    // product id is in cart item table
+    @OneToMany(mappedBy = "product")
+    @Setter(AccessLevel.NONE)
+    private List<CartItem> cartItems;
 
     public enum State {
         PENDING,
