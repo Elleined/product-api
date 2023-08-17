@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.model;
 
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -63,10 +64,10 @@ public class Product {
     @ManyToOne(optional = false)
     @JoinColumn(
             name = "seller_id",
-            referencedColumnName = "owner_id",
+            referencedColumnName = "user_id",
             nullable = false
     )
-    private Shop shop;
+    private VerifiedUser verifiedSeller;
 
     @OneToOne(optional = false)
     @JoinColumn(

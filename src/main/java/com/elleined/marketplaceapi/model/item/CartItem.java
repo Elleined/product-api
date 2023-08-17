@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.model.item;
 
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -17,6 +18,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CartItem extends Item {
+
+
     @Builder
     public CartItem(Long id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser) {
         super(id, orderQuantity, price, orderDate, product, purchaser);

@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.model;
 
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,15 +35,10 @@ public class Shop {
 
     // This is the primary of this shop table
     @MapsId
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(
             name = "owner_id",
             referencedColumnName = "user_id"
     )
-    private User owner;
-
-    // product id reference is in product table
-    @OneToMany(mappedBy = "shop")
-    @Setter(AccessLevel.NONE)
-    private Set<Product> products;
+    private VerifiedUser owner;
 }

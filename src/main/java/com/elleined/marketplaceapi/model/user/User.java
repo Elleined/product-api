@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.model.user;
 
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import jakarta.persistence.*;
@@ -10,16 +9,16 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "tbl_user")
-@Builder
+@Table(name = "tbl_user", indexes = @Index(name = "uuid_idx", columnList = "uuid"))
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
-public class User {
+public abstract class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(
             name = "user_id",
             nullable = false,
@@ -38,12 +37,6 @@ public class User {
     @Embedded
     private Credential credential;
 
-    // user id reference is in shop table
-    @OneToOne(mappedBy = "owner")
-    @PrimaryKeyJoinColumn
-    @Setter(AccessLevel.NONE)
-    private Shop shop;
-
     // user id reference is in order item table
     @OneToMany(mappedBy = "purchaser")
     @Setter(AccessLevel.NONE)
@@ -53,4 +46,24 @@ public class User {
     @OneToMany(mappedBy = "purchaser")
     @Setter(AccessLevel.NONE)
     private List<CartItem> cartItems;
+
+    @Embeddable
+    @Getter
+    @Setter
+    public static class Credential {
+
+        @Column(
+                name = "email",
+                nullable = false,
+                unique = true
+        )
+        private String email;
+
+        @Column(
+                name = "password",
+                nullable = false,
+                unique = true
+        )
+        private String password;
+    }
 }
