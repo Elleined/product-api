@@ -9,30 +9,18 @@ import lombok.*;
         name = "tbl_unit",
         indexes = @Index(name = "name_idx", columnList = "name")
 )
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
-public class Unit {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(
-            name = "unit_id",
-            nullable = false,
-            updatable = false
-    )
-    private int id;
-
-    @Column(
-            name = "name",
-            nullable = false,
-            updatable = false
-    )
-    private String name;
+public class Unit extends BaseEntity {
 
     // unit id reference is in product table
     @OneToOne(mappedBy = "unit")
     private Product product;
+
+    @Builder
+    public Unit(int id, String name, Product product) {
+        super(id, name);
+        this.product = product;
+    }
 }

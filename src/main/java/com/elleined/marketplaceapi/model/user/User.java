@@ -34,8 +34,25 @@ public class User {
     )
     private String uuid;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "middle_name")
+    private String middleName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     @Embedded
     private Credential credential;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", nullable = false, updatable = false)
+    private Gender gender;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "suffix", nullable = false)
+    private Suffix suffix;
 
     // user id reference is in order item table
     @OneToMany(mappedBy = "purchaser")
@@ -48,6 +65,7 @@ public class User {
     private List<CartItem> cartItems;
 
     @Embeddable
+    @Builder
     @Getter
     @Setter
     public static class Credential {
@@ -65,5 +83,16 @@ public class User {
                 unique = true
         )
         private String password;
+    }
+
+    public enum Suffix {
+        JR,
+        SR
+    }
+
+    public enum Gender {
+        MALE,
+        FEMALE,
+        PREFER_NOT_TO_SAY
     }
 }

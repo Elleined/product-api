@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi;
 
+import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;

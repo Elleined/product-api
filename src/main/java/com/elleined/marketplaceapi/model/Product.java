@@ -72,7 +72,7 @@ public class Product {
     @OneToOne(optional = false)
     @JoinColumn(
             name = "crop_id",
-            referencedColumnName = "crop_id",
+            referencedColumnName = "id",
             nullable = false
     )
     private Crop crop;
@@ -81,7 +81,7 @@ public class Product {
     @OneToOne(optional = false)
     @JoinColumn(
             name = "unit_id",
-            referencedColumnName = "unit_id",
+            referencedColumnName = "id",
             nullable = false
     )
     private Unit unit;

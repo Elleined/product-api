@@ -26,8 +26,8 @@ public class VerifiedUser extends User {
     private List<Product> products;
 
     @Builder(builderMethodName = "verifiedUserBuilder")
-    public VerifiedUser(int id, String uuid, Credential credential, List<OrderItem> orderedItems, List<CartItem> cartItems, Shop shop, List<Product> products) {
-        super(id, uuid, credential, orderedItems, cartItems);
+    public VerifiedUser(int id, String uuid, String firstName, String middleName, String lastName, Credential credential, Gender gender, Suffix suffix, List<OrderItem> orderedItems, List<CartItem> cartItems, Shop shop, List<Product> products) {
+        super(id, uuid, firstName, middleName, lastName, credential, gender, suffix, orderedItems, cartItems);
         this.shop = shop;
         this.products = products;
     }
