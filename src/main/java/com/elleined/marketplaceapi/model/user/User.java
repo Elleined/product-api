@@ -86,6 +86,7 @@ public class User {
     @Builder
     @Getter
     @Setter
+    @NoArgsConstructor
     public static class Credential {
 
         @Column(
