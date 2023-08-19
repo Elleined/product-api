@@ -15,4 +15,5 @@ public class UserDTO {
     private String email;
     private String gender;
     private String suffix;
+    private AddressDTO addressDTO;
 }

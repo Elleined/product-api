@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.model.user;
 
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
+import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import jakarta.persistence.*;
@@ -34,13 +36,13 @@ public class User {
     )
     private String uuid;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "middle_name")
+    @Column(name = "middle_name", nullable = false)
     private String middleName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @Embedded
@@ -50,9 +52,24 @@ public class User {
     @Column(name = "gender", nullable = false, updatable = false)
     private Gender gender;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "suffix", nullable = false)
+    // user id reference is in suffix table
+    @OneToOne(optional = false)
+    @JoinColumn(
+            name = "suffix_id",
+            referencedColumnName = "id",
+            nullable = false
+    )
+    @Setter(AccessLevel.NONE)
     private Suffix suffix;
+
+    // user id reference is in user address table
+    @OneToOne(mappedBy = "user", optional = false)
+    private UserAddress address;
+
+    // user id reference is in delivery address table
+    @OneToMany(mappedBy = "user")
+    @Setter(AccessLevel.NONE)
+    private List<DeliveryAddress> deliveryAddresses;
 
     // user id reference is in order item table
     @OneToMany(mappedBy = "purchaser")
@@ -85,14 +102,6 @@ public class User {
         private String password;
     }
 
-    public enum Suffix {
-        JR,
-        SR,
-        II,
-        III,
-        IV,
-        V
-    }
 
     public enum Gender {
         MALE,

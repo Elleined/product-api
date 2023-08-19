@@ -2,6 +2,8 @@ package com.elleined.marketplaceapi.model.user;
 
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
+import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import jakarta.persistence.*;
@@ -26,8 +28,8 @@ public class VerifiedUser extends User {
     private List<Product> products;
 
     @Builder(builderMethodName = "verifiedUserBuilder")
-    public VerifiedUser(int id, String uuid, String firstName, String middleName, String lastName, Credential credential, Gender gender, Suffix suffix, List<OrderItem> orderedItems, List<CartItem> cartItems, Shop shop, List<Product> products) {
-        super(id, uuid, firstName, middleName, lastName, credential, gender, suffix, orderedItems, cartItems);
+    public VerifiedUser(int id, String uuid, String firstName, String middleName, String lastName, Credential credential, Gender gender, Suffix suffix, UserAddress address, List<DeliveryAddress> deliveryAddresses, List<OrderItem> orderedItems, List<CartItem> cartItems, Shop shop, List<Product> products) {
+        super(id, uuid, firstName, middleName, lastName, credential, gender, suffix, address, deliveryAddresses, orderedItems, cartItems);
         this.shop = shop;
         this.products = products;
     }
