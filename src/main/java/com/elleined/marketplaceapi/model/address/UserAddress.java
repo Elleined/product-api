@@ -1,10 +1,7 @@
 package com.elleined.marketplaceapi.model.address;
 
 import com.elleined.marketplaceapi.model.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,8 +15,9 @@ import lombok.Setter;
 public class UserAddress extends Address {
 
     @OneToOne(optional = false)
+    @MapsId
     @JoinColumn(
-            name = "user_id",
+            name = "address_id", // Alias for user id
             referencedColumnName = "user_id"
     )
     private User user;

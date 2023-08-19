@@ -64,6 +64,7 @@ public class User {
 
     // user id reference is in user address table
     @OneToOne(mappedBy = "user", optional = false)
+    @PrimaryKeyJoinColumn
     private UserAddress address;
 
     // user id reference is in delivery address table

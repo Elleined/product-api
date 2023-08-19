@@ -1,11 +1,8 @@
 package com.elleined.marketplaceapi.populator;
 
-import com.elleined.marketplaceapi.model.BaseEntity;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.repository.CropRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
