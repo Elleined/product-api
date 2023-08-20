@@ -1,14 +1,13 @@
 package com.elleined.marketplaceapi.model.user;
 
 import com.elleined.marketplaceapi.model.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(
@@ -20,11 +19,12 @@ import lombok.Setter;
 @Getter
 public class Suffix extends BaseEntity {
 
-    @OneToOne(mappedBy = "suffix")
-    private User user;
+    @OneToMany(mappedBy = "suffix")
+    private List<User> user;
 
     @Builder
-    public Suffix(int id, String name, User user) {
+
+    public Suffix(int id, String name, List<User> user) {
         super(id, name);
         this.user = user;
     }

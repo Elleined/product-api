@@ -73,7 +73,7 @@ public class Product {
     )
     private User seller;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(
             name = "crop_id",
             referencedColumnName = "id",
@@ -82,7 +82,7 @@ public class Product {
     private Crop crop;
 
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(
             name = "unit_id",
             referencedColumnName = "id",

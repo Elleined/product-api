@@ -33,6 +33,7 @@ public abstract class ProductMapper {
             @Mapping(target = "sellerName", source = "product.seller.userDetails.firstName"),
             @Mapping(target = "cropName", source = "product.crop.name"),
             @Mapping(target = "unitName", source = "product.unit.name"),
+            @Mapping(target = "shopName", source = "product.seller.shop.name")
     })
     public abstract ProductDTO toDTO(Product product);
 
@@ -40,7 +41,7 @@ public abstract class ProductMapper {
             @Mapping(target = "id", ignore = true),
 
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
-            @Mapping(target = "state", expression = "java(State.LISTING)"),
+            @Mapping(target = "state", expression = "java(State.PENDING)"),
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
             @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
             @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),

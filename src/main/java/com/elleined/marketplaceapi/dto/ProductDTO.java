@@ -50,4 +50,6 @@ public class ProductDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime harvestDate;
     private LocalDateTime listingDate;
+
+    private String shopName;
 }

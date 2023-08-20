@@ -47,7 +47,7 @@ public class User {
 
 
     // user id reference is in suffix table
-    @OneToOne
+    @ManyToOne
     @JoinColumn(
             name = "suffix_id",
             referencedColumnName = "id"

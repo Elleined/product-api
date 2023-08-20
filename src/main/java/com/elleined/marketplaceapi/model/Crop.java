@@ -1,13 +1,12 @@
 package com.elleined.marketplaceapi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(
@@ -19,11 +18,11 @@ import lombok.Setter;
 @Getter
 public class Crop extends BaseEntity {
     // crop id reference is in product table
-    @OneToOne(mappedBy = "crop")
-    private Product product;
+    @OneToMany(mappedBy = "crop")
+    private List<Product> product;
 
     @Builder
-    public Crop(int id, String name, Product product) {
+    public Crop(int id, String name, List<Product> product) {
         super(id, name);
         this.product = product;
     }
