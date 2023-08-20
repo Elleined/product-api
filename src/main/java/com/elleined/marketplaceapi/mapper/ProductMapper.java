@@ -62,10 +62,10 @@ public abstract class ProductMapper {
             @Mapping(target = "state", ignore = true),
             @Mapping(target = "status", ignore = true),
             @Mapping(target = "listingDate", ignore = true),
+            @Mapping(target = "verifiedSeller", ignore = true),
 
             @Mapping(target = "crop", expression = "java(cropService.getById(productDTO.getCropId()))"),
             @Mapping(target = "unit", expression = "java(unitService.getById(productDTO.getUnitId()))"),
-            @Mapping(target = "verifiedSeller", expression = "java(userService.getVerifiedUser(productDTO.getSellerId()))"), // seller alias for currentUser
 
     })
     public abstract Product toUpdate(@MappingTarget Product product, ProductDTO productDTO);

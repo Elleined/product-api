@@ -3,6 +3,7 @@ package com.elleined.marketplaceapi.service.user;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.address.Address;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import com.elleined.marketplaceapi.service.baseservices.DeleteService;
@@ -22,6 +23,8 @@ public interface UserService
     VerifiedUser getVerifiedUser(int id);
     Address getAddress(User currentUser);
     List<Address> getAllDeliveryAddress(User currentUser);
-    Product getAllOrder(User currentUser);
+    List<Product> getAllOrderItemByStatus(VerifiedUser currentUser, OrderItem.OrderItemStatus orderItemStatus);
+    List<Product> getAllCartItemByStatus(VerifiedUser currentUser, OrderItem.OrderItemStatus orderItemStatus);
 
+    boolean hasProduct(VerifiedUser currentUser, Product product);
 }
