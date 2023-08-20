@@ -8,6 +8,7 @@ import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.service.user.SuffixService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -50,10 +51,19 @@ public abstract class UserMapper {
             @Mapping(target = "userDetailsDTO", expression = "java(toUserDetailsDTO(user.getUserDetails()))"),
     })
     public abstract UserDTO toDTO(User user);
-//
-//
+
+
 //    @Mappings({
 ////          // IGNORE PASSWORD here
+//            @Mapping(target = "address", source = ""),
+//            @Mapping(target = "cartItems", source = ""),
+//            @Mapping(target = "deliveryAddresses", source = ""),
+//            @Mapping(target = "orderedItems", source = ""),
+//            @Mapping(target = "products", source = ""),
+//            @Mapping(target = "shop", source = ""),
+//            @Mapping(target = "userCredential", source = ""),
+//            @Mapping(target = "userDetails", source = ""),
+//            @Mapping(target = "userVerification", source = "")
 //    })
 //    public abstract void toUpdate(UserDTO userDTO, @MappingTarget User user);
 

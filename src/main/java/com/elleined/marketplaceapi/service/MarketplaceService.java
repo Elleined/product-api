@@ -123,7 +123,7 @@ public class MarketplaceService {
         UserAddress userAddress = addressMapper.toUserAddressEntity(userDTO.getAddressDTO(), user);
         user.setAddress(userAddress);
         addressService.saveUserAddress(userAddress);
-        // user dto here
+
         return userMapper.toDTO(user);
     }
 
@@ -134,7 +134,9 @@ public class MarketplaceService {
 
     public UserDTO updateUser(int currentUserId, UserDTO userDTO) {
         User currentUser = userService.getById(currentUserId);
-        return null;
+        // userMapper.toUpdate(userDTO, currentUser);
+        userService.update(userDTO, currentUser);
+        return userMapper.toDTO(currentUser);
     }
 
     public UserDTO resendValidId(int currentUserId, String newValidId) {

@@ -17,7 +17,7 @@ public interface UserService {
 
     User getById(int id) throws ResourceNotFoundException;
 
-    void update(User user, UserDTO userDTO);
+    void update(UserDTO userDTO, User user);
 
     boolean hasProduct(User currentUser, Product product);
 

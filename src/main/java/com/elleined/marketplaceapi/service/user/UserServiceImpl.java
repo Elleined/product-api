@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void update(User user, UserDTO userDTO) throws ResourceNotFoundException {
+    public void update(UserDTO userDTO, User user) throws ResourceNotFoundException {
 
     }
 
