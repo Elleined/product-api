@@ -4,9 +4,9 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.address.Address;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,29 +23,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @Override
-    public void delete(int id) {
-
-    }
 
     @Override
     public User getById(int id) throws ResourceNotFoundException {
-        return null;
-    }
-
-    @Override
-    public boolean existsById(int id) {
-        return false;
-    }
-
-    @Override
-    public List<User> getAll() {
-        return null;
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id of " + id + " does not exists!"));
     }
 
 
     @Override
     public User saveByDTO(UserDTO userDTO) {
+//        User user = userMapper.toEntity(userDTO);
+//        userRepository.save(user);
+//        log.debug("User with name of {} saved successfully with id of {}", user.getFirstName(), user.getId());
+//        return user;
         return null;
     }
 
@@ -56,32 +46,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Address getAddress(User currentUser) {
-        return null;
-    }
-
-    @Override
-    public List<Address> getAllDeliveryAddress(User currentUser) {
-        return null;
-    }
-
-    @Override
-    public List<Product> getAllOrderItemByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
-        return null;
-    }
-
-    @Override
-    public List<Product> getAllCartItemByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
-        return null;
-    }
-
-    @Override
     public boolean hasProduct(User currentUser, Product product) {
         return currentUser.getProducts().stream().anyMatch(product::equals);
     }
 
     @Override
     public boolean isVerified(User currentUser) {
-        return false;
+        return currentUser.getUserVerification().getStatus() == UserVerification.Status.VERIFIED;
     }
 }

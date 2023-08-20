@@ -38,25 +38,13 @@ public class User {
     )
     private String uuid;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
-
-    @Column(name = "middle_name", nullable = false)
-    private String middleName;
-
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-
     @Embedded
-    private Credential credential;
+    private UserVerification userVerification;
+    @Embedded
+    private UserCredential userCredential;
+    @Embedded
+    private UserDetails userDetails;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "gender", nullable = false, updatable = false)
-    private Gender gender;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private Status status;
 
     // user id reference is in suffix table
     @OneToOne(optional = false)
@@ -67,7 +55,6 @@ public class User {
     )
     @Setter(AccessLevel.NONE)
     private Suffix suffix;
-
 
 
     // user id reference is in user address table
@@ -100,39 +87,4 @@ public class User {
     @OneToMany(mappedBy = "seller")
     @Setter(AccessLevel.NONE)
     private List<Product> products;
-
-    @Embeddable
-    @Builder
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Credential {
-
-        @Column(
-                name = "email",
-                nullable = false,
-                unique = true
-        )
-        private String email;
-
-        @Column(
-                name = "password",
-                nullable = false,
-                unique = true
-        )
-        private String password;
-    }
-
-
-    public enum Gender {
-        MALE,
-        FEMALE,
-        PREFER_NOT_TO_SAY
-    }
-
-    private enum Status {
-        VERIFIED,
-        NOT_VERIFIED
-    }
 }

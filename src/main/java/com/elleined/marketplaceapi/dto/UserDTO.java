@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,5 +21,5 @@ public class UserDTO {
     private String email;
     private String gender;
     private String suffix;
-    private AddressDTO addressDTO;
+    private String status;
 }

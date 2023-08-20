@@ -30,7 +30,7 @@ public abstract class ProductMapper {
             @Mapping(target = "status", source = "product.status"),
 
             @Mapping(target = "sellerId", source = "product.seller.id"),
-            @Mapping(target = "sellerName", source = "product.seller.firstName"),
+            @Mapping(target = "sellerName", source = "product.seller.userDetails.firstName"),
             @Mapping(target = "cropName", source = "product.crop.name"),
             @Mapping(target = "unitName", source = "product.unit.name"),
     })

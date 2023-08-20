@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service;
+package com.elleined.marketplaceapi.service.address;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
@@ -15,7 +15,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class AddressService {
+public class AddressServiceImpl {
+
+    private static final int DELIVERY_ADDRESS_LIMIT = 5;
 
     private final AddressRepository addressRepository;
 
@@ -29,7 +31,15 @@ public class AddressService {
         log.debug("Delivery address with id of {} saved successfully!", deliveryAddress.getId());
     }
 
+    UserAddress getUserAddress(User currentUser) {
+        return currentUser.getAddress();
+    }
+
     List<DeliveryAddress> getAllDeliveryAddress(User currentUser) {
         return currentUser.getDeliveryAddresses();
+    }
+
+    boolean isUserHas5DeliveryAddress(User currentUser) {
+        return getAllDeliveryAddress(currentUser).size() == DELIVERY_ADDRESS_LIMIT;
     }
 }

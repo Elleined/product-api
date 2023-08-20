@@ -3,7 +3,6 @@ package com.elleined.marketplaceapi.service;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.NotOwnedException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
-import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
