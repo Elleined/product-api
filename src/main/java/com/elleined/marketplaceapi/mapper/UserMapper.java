@@ -42,7 +42,7 @@ public abstract class UserMapper {
     public abstract User toEntity(UserDTO userDTO);
 
     @Mappings({
-            @Mapping(target = "validId", ignore = true),
+            @Mapping(target = "validId", source = "user.userVerification.validId"),
             @Mapping(target = "status", source = "user.userVerification.status"),
             @Mapping(target = "suffix", source = "user.suffix.name"),
 
