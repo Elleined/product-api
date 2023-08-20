@@ -1,10 +1,12 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.InvalidUserCredential;
+import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
+
+import java.util.List;
 
 // other related user marketplace here
 public interface UserService {
@@ -21,7 +23,9 @@ public interface UserService {
 
     void resendValidId(User currentUser, String validId);
 
-    int login(String email, String password) throws ResourceNotFoundException, InvalidUserCredential;
+    int login(String email, String password) throws ResourceNotFoundException, InvalidUserCredentialException;
 
     User getByEmail(String email) throws ResourceNotFoundException;
+
+    List<String> getAllEmail();
 }

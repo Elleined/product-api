@@ -1,8 +1,10 @@
 package com.elleined.marketplaceapi.dto;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,30 +21,13 @@ public class UserDTO {
 
     private int id;
     private String uuid;
-
-    @NotBlank(message = "First name cannot be blank, null, or empty")
-    private String firstName;
-    private String middleName;
-
-    @NotBlank(message = "Last name cannot be blank, null, or empty")
-    private String lastName;
-
-    private LocalDateTime registrationDate;
-
-    @NotBlank(message = "Gender cannot be blank, null, or empty")
-    private String gender;
-
-    @NotNull(message = "Birthday cannot be blank, null, or empty")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime birthDate;
-
-    @NotBlank(message = "Mobile number cannot be blank, null, or empty")
-    private String mobileNumber;
-
     private String suffix;
 
-    private String validId;
-    private String status;
+    private UserVerificationDTO userVerificationDTO;
+
+    @Valid
+    @NotNull(message = "User details cannot be null")
+    private UserDetailsDTO userDetailsDTO;
 
     @Valid
     @NotNull(message = "Address cannot be null")
@@ -51,4 +36,57 @@ public class UserDTO {
     @Valid
     @NotNull(message = "Address cannot be null")
     private UserCredentialDTO userCredentialDTO;
+
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserVerificationDTO {
+        private String validId;
+        private String status;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserDetailsDTO {
+        @NotBlank(message = "First name cannot be blank, null, or empty")
+        private String firstName;
+        private String middleName;
+
+        @NotBlank(message = "Last name cannot be blank, null, or empty")
+        private String lastName;
+
+        private LocalDateTime registrationDate;
+
+        @NotBlank(message = "Gender cannot be blank, null, or empty")
+        private String gender;
+
+        @NotNull(message = "Birthday cannot be blank, null, or empty")
+        @Past(message = "Birth Date should be in the past")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        private LocalDateTime birthDate;
+
+        @NotBlank(message = "Mobile number cannot be blank, null, or empty")
+        private String mobileNumber;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserCredentialDTO {
+
+        @NotBlank(message = "Email cannot be blank, null, or empty")
+        @Email(message = "Enter a valid email")
+        private String email;
+
+        @NotBlank(message = "Password cannot be blank, null, or empty")
+        private String password;
+
+        @NotBlank(message = "Confirm password cannot be blank, null, or empty")
+        private String confirmPassword;
+    }
 }

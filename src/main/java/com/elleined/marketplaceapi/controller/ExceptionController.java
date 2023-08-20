@@ -1,9 +1,7 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.APIResponse;
-import com.elleined.marketplaceapi.exception.InvalidUserCredential;
-import com.elleined.marketplaceapi.exception.NotOwnedException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -31,15 +29,23 @@ public class ExceptionController {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NotOwnedException.class)
-    public ResponseEntity<APIResponse> handleBadRequestExceptions(NotOwnedException ex) {
+    @ExceptionHandler({
+            NotOwnedException.class,
+            WeakPasswordException.class,
+            PasswordNotMatchException.class,
+            MobileNumberException.class,
+            MalformedEmailException.class,
+            AlreadExistException.class,
+            HasDigitException.class
+    })
+    public ResponseEntity<APIResponse> handleBadRequestExceptions(RuntimeException ex) {
         var responseMessage = new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
         return new ResponseEntity<>(responseMessage, HttpStatus.BAD_REQUEST);
     }
 
 
-    @ExceptionHandler(InvalidUserCredential.class)
-    public ResponseEntity<APIResponse> handleBadRequestExceptions(InvalidUserCredential ex) {
+    @ExceptionHandler(InvalidUserCredentialException.class)
+    public ResponseEntity<APIResponse> handleBadRequestExceptions(InvalidUserCredentialException ex) {
         var responseMessage = new APIResponse(HttpStatus.FORBIDDEN, ex.getMessage());
         return new ResponseEntity<>(responseMessage, HttpStatus.FORBIDDEN);
     }

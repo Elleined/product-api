@@ -2,8 +2,7 @@ package com.elleined.marketplaceapi.service;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.NotOwnedException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.*;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Product;
@@ -13,11 +12,11 @@ import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
-import com.elleined.marketplaceapi.service.user.SuffixService;
+import com.elleined.marketplaceapi.service.user.UserCredentialValidator;
+import com.elleined.marketplaceapi.service.user.UserDetailsValidator;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +27,8 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MarketplaceService {
+    private final UserDetailsValidator userDetailsValidator;
+    private final UserCredentialValidator userCredentialValidator;
     private final CropService cropService;
     private final UnitService unitService;
     private final ProductService productService;
@@ -92,7 +93,20 @@ public class MarketplaceService {
                 .toList();
     }
 
-    public UserDTO saveUser(UserDTO userDTO) {
+    public UserDTO saveUser(UserDTO userDTO)
+            throws ResourceNotFoundException,
+            HasDigitException,
+            PasswordNotMatchException,
+            WeakPasswordException,
+            MalformedEmailException,
+            AlreadExistException,
+            MobileNumberException {
+
+        userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
+        userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
+        userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
+        userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
+
         // super daming validation here
         User user = userService.saveByDTO(userDTO);
         UserAddress userAddress = addressMapper.toUserAddressEntity(userDTO.getAddressDTO(), user);
@@ -100,5 +114,4 @@ public class MarketplaceService {
 
         return new UserDTO();
     }
-
 }

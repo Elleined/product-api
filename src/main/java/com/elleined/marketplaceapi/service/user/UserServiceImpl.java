@@ -1,12 +1,11 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.InvalidUserCredential;
+import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.UserCredential;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -66,16 +65,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int login(String email, String password) throws ResourceNotFoundException, InvalidUserCredential {
+    public int login(String email, String password) throws ResourceNotFoundException, InvalidUserCredentialException {
         User user = getByEmail(email);
         String encodedPassword = user.getUserCredential().getPassword();
-        if (!passwordEncoder.matches(password, encodedPassword)) throw new InvalidUserCredential("You have entered an invalid username or password");
+        if (!passwordEncoder.matches(password, encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
         return user.getId();
     }
 
     @Override
     public User getByEmail(String email) throws ResourceNotFoundException {
         return userRepository.fetchByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email of " + email + " does not exists!"));
+    }
+
+    @Override
+    public List<String> getAllEmail() {
+        return userRepository.fetchAllEmail();
     }
 
     private void encodePassword(User user) {
