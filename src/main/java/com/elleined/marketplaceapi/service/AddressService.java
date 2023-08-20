@@ -2,11 +2,14 @@ package com.elleined.marketplaceapi.service;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
+import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,5 +27,9 @@ public class AddressService {
     void saveDeliveryAddress(DeliveryAddress deliveryAddress) {
         addressRepository.save(deliveryAddress);
         log.debug("Delivery address with id of {} saved successfully!", deliveryAddress.getId());
+    }
+
+    List<DeliveryAddress> getAllDeliveryAddress(User currentUser) {
+        return currentUser.getDeliveryAddresses();
     }
 }

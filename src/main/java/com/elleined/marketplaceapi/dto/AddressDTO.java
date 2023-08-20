@@ -9,9 +9,16 @@ import lombok.Data;
 public class AddressDTO {
 
     private int id;
-    @NotBlank(message = "details cannot be null, empty, or blank")
+
+    @NotBlank(message = "Details cannot be null, empty, or blank")
     private String details;
+
+    @NotBlank(message = "Province name cannot be null, empty, or blank")
     private String provinceName;
+
+    @NotBlank(message = "City name cannot be null, empty, or blank")
     private String cityName;
+
+    @NotBlank(message = "Baranggay name cannot be null, empty, or blank")
     private String baranggayName;
 }
