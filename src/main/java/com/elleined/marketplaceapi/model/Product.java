@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.model;
 
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
-import com.elleined.marketplaceapi.model.user.VerifiedUser;
+import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -71,7 +71,7 @@ public class Product {
             referencedColumnName = "user_id",
             nullable = false
     )
-    private VerifiedUser verifiedSeller;
+    private User seller;
 
     @OneToOne(optional = false)
     @JoinColumn(

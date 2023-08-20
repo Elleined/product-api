@@ -1,22 +1,22 @@
 package com.elleined.marketplaceapi.service.product;
 
-import com.elleined.marketplaceapi.dto.BaseDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.model.Unit;
 import com.elleined.marketplaceapi.repository.UnitRepository;
-import com.elleined.marketplaceapi.service.baseservices.GetService;
-import com.elleined.marketplaceapi.service.baseservices.PostService;
+import com.elleined.marketplaceapi.service.BaseEntityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class UnitService implements PostService<Unit, BaseDTO>, GetService<Unit> {
+public class UnitService implements BaseEntityService<Unit> {
     private final UnitRepository unitRepository;
     private final BaseMapper baseMapper;
 
@@ -26,22 +26,39 @@ public class UnitService implements PostService<Unit, BaseDTO>, GetService<Unit>
     }
 
     @Override
-    public boolean isExists(int id) {
+    public boolean existsById(int id) {
         return unitRepository.existsById(id);
     }
 
     @Override
-    public Unit saveByDTO(BaseDTO baseDTO) {
-        Unit unit = baseMapper.toUnitEntity(baseDTO);
+    public List<String> getAll() {
+        return unitRepository.findAll().stream()
+                .map(Unit::getName)
+                .sorted()
+                .toList();
+    }
+
+    @Override
+    public Unit getByName(String name) throws ResourceNotFoundException {
+        return unitRepository.findAll().stream()
+                .filter(unit -> unit.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Unit with name of " + name + " does not exists!"));
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return unitRepository.findAll().stream()
+                .map(Unit::getName)
+                .anyMatch(name::equalsIgnoreCase);
+    }
+
+    @Override
+    public Unit save(String name) {
+        Unit unit = baseMapper.toUnitEntity(name);
         unitRepository.save(unit);
         log.debug("Unit with name of {} saved successfully with id of {}", unit.getName(), unit.getId());
         return unit;
     }
 
-    @Override
-    public Unit save(Unit unit) {
-        unitRepository.save(unit);
-        log.debug("Unit with name of {} saved successfully with id of {}", unit.getName(), unit.getId());
-        return unit;
-    }
 }

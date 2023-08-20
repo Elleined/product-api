@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.model.user;
 
+import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.item.CartItem;
@@ -52,6 +54,10 @@ public class User {
     @Column(name = "gender", nullable = false, updatable = false)
     private Gender gender;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
+
     // user id reference is in suffix table
     @OneToOne(optional = false)
     @JoinColumn(
@@ -61,6 +67,8 @@ public class User {
     )
     @Setter(AccessLevel.NONE)
     private Suffix suffix;
+
+
 
     // user id reference is in user address table
     @OneToOne(mappedBy = "user", optional = false)
@@ -81,6 +89,17 @@ public class User {
     @OneToMany(mappedBy = "purchaser")
     @Setter(AccessLevel.NONE)
     private List<CartItem> cartItems;
+
+    // user id reference is in shop table
+    @OneToOne(mappedBy = "owner")
+    @PrimaryKeyJoinColumn
+    @Setter(AccessLevel.NONE)
+    private Shop shop;
+
+    // user id reference is in products table
+    @OneToMany(mappedBy = "seller")
+    @Setter(AccessLevel.NONE)
+    private List<Product> products;
 
     @Embeddable
     @Builder
@@ -110,5 +129,10 @@ public class User {
         MALE,
         FEMALE,
         PREFER_NOT_TO_SAY
+    }
+
+    private enum Status {
+        VERIFIED,
+        NOT_VERIFIED
     }
 }

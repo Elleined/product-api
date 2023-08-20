@@ -29,13 +29,9 @@ public abstract class ProductMapper {
             @Mapping(target = "state", source = "product.state"),
             @Mapping(target = "status", source = "product.status"),
 
-            @Mapping(target = "sellerId", source = "product.verifiedSeller.id"),
-            @Mapping(target = "sellerName", source = "product.verifiedSeller.firstName"),
-
-            @Mapping(target = "cropId", source = "product.crop.id"),
+            @Mapping(target = "sellerId", source = "product.seller.id"),
+            @Mapping(target = "sellerName", source = "product.seller.firstName"),
             @Mapping(target = "cropName", source = "product.crop.name"),
-
-            @Mapping(target = "unitId", source = "product.unit.id"),
             @Mapping(target = "unitName", source = "product.unit.name"),
     })
     public abstract ProductDTO toDTO(Product product);
@@ -46,9 +42,9 @@ public abstract class ProductMapper {
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "state", expression = "java(State.LISTING)"),
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
-            @Mapping(target = "crop", expression = "java(cropService.getById(productDTO.getCropId()))"),
-            @Mapping(target = "unit", expression = "java(unitService.getById(productDTO.getUnitId()))"),
-            @Mapping(target = "verifiedSeller", expression = "java(userService.getVerifiedUser(productDTO.getSellerId()))"), // seller alias for currentUser
+            @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
+            @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
+            @Mapping(target = "seller", expression = "java(userService.getById(productDTO.getSellerId()))"), // seller alias for currentUser
 
             @Mapping(target = "cartItems", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "orderItems", expression = "java(new java.util.ArrayList<>())")
@@ -62,10 +58,10 @@ public abstract class ProductMapper {
             @Mapping(target = "state", ignore = true),
             @Mapping(target = "status", ignore = true),
             @Mapping(target = "listingDate", ignore = true),
-            @Mapping(target = "verifiedSeller", ignore = true),
+            @Mapping(target = "seller", ignore = true),
 
-            @Mapping(target = "crop", expression = "java(cropService.getById(productDTO.getCropId()))"),
-            @Mapping(target = "unit", expression = "java(unitService.getById(productDTO.getUnitId()))"),
+            @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
+            @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
 
     })
     public abstract Product toUpdate(@MappingTarget Product product, ProductDTO productDTO);

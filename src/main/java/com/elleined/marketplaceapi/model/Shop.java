@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.model;
 
-import com.elleined.marketplaceapi.model.user.VerifiedUser;
+import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,5 +37,5 @@ public class Shop {
             name = "owner_id",
             referencedColumnName = "user_id"
     )
-    private VerifiedUser owner;
+    private User owner;
 }

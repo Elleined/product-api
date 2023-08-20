@@ -3,22 +3,25 @@ package com.elleined.marketplaceapi.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDTO {
     private int id;
 
-    @Positive(message = "Crop id cannot be negative or less than 0")
-    private int cropId;
+    @NotBlank(message = "Crop name cannot be null, blank, or empty")
     private String cropName;
 
-    @Positive(message = "Unit id cannot be negative or less than 0")
-    private int unitId;
+    @NotBlank(message = "Unit name cannot be null, blank, or empty")
     private String unitName;
 
     @NotBlank(message = "Description cannot be null, blank, or empty")
@@ -26,6 +29,8 @@ public class ProductDTO {
 
     @NotBlank(message = "Picture cannot be null, blank, or empty")
     private String picture;
+
+    @NotBlank(message = "Keyword cannot be null, blank, or empty")
     private String keyword;
     private String state;
     private String status;
@@ -42,6 +47,7 @@ public class ProductDTO {
     private int quantityPerUnit;
 
     @NotNull(message = "Harvest date cannot null")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime harvestDate;
     private LocalDateTime listingDate;
 }

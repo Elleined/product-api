@@ -1,13 +1,10 @@
 package com.elleined.marketplaceapi.service.product;
 
-import com.elleined.marketplaceapi.dto.BaseDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.repository.CropRepository;
-import com.elleined.marketplaceapi.service.baseservices.GetAllService;
-import com.elleined.marketplaceapi.service.baseservices.GetService;
-import com.elleined.marketplaceapi.service.baseservices.PostService;
+import com.elleined.marketplaceapi.service.BaseEntityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class CropService implements PostService<Crop, BaseDTO>, GetService<Crop>, GetAllService<String> {
+public class CropService implements BaseEntityService<Crop> {
 
     private final CropRepository cropRepository;
     private final BaseMapper baseMapper;
@@ -30,8 +27,15 @@ public class CropService implements PostService<Crop, BaseDTO>, GetService<Crop>
     }
 
     @Override
-    public boolean isExists(int id) {
+    public boolean existsById(int id) {
         return cropRepository.existsById(id);
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return cropRepository.findAll().stream()
+                .map(Crop::getName)
+                .anyMatch(name::equalsIgnoreCase);
     }
 
     @Override
@@ -43,8 +47,16 @@ public class CropService implements PostService<Crop, BaseDTO>, GetService<Crop>
     }
 
     @Override
-    public Crop saveByDTO(BaseDTO baseDTO) {
-        Crop crop = baseMapper.toCropEntity(baseDTO);
+    public Crop getByName(String name) throws ResourceNotFoundException {
+        return cropRepository.findAll().stream()
+                .filter(crop -> crop.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Crop with name of " + name + " does not exists!"));
+    }
+
+    @Override
+    public Crop save(String name) {
+        Crop crop = baseMapper.toCropEntity(name);
         cropRepository.save(crop);
         log.debug("Crop with name of {} saved successfully with id of {}", crop.getName(), crop.getId());
         return crop;

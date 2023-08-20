@@ -1,30 +1,33 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.address.Address;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.VerifiedUser;
-import com.elleined.marketplaceapi.service.baseservices.DeleteService;
-import com.elleined.marketplaceapi.service.baseservices.GetService;
-import com.elleined.marketplaceapi.service.baseservices.PostService;
-import com.elleined.marketplaceapi.service.baseservices.PutService;
 
 import java.util.List;
 
 // other related user marketplace here
-public interface UserService
-        extends GetService<User>,
-        PostService<User, UserDTO>,
-        PutService<User, UserDTO>,
-        DeleteService<User> {
+public interface UserService {
 
-    VerifiedUser getVerifiedUser(int id);
+    User saveByDTO(UserDTO dto);
+
+    User getById(int id) throws ResourceNotFoundException;
+    boolean existsById(int id);
+
+    List<User> getAll();
+
+    void update(User user, UserDTO userDTO);
+    void delete(int id) throws ResourceNotFoundException;
+
     Address getAddress(User currentUser);
     List<Address> getAllDeliveryAddress(User currentUser);
-    List<Product> getAllOrderItemByStatus(VerifiedUser currentUser, OrderItem.OrderItemStatus orderItemStatus);
-    List<Product> getAllCartItemByStatus(VerifiedUser currentUser, OrderItem.OrderItemStatus orderItemStatus);
+    List<Product> getAllOrderItemByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);
+    List<Product> getAllCartItemByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);
 
-    boolean hasProduct(VerifiedUser currentUser, Product product);
+    boolean hasProduct(User currentUser, Product product);
+
+    boolean isVerified(User currentUser);
 }

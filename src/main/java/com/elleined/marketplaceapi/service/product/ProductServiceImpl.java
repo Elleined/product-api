@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.user.VerifiedUser;
+import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +23,6 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    public void delete(Product product) {
-        product.setStatus(Product.Status.INACTIVE);
-        productRepository.save(product);
-
-        log.debug("Product with id of {} are now inactive", product.getId());
-    }
-
-    @Override
     public void delete(int id) throws ResourceNotFoundException {
         Product product = getById(id);
         product.setStatus(Product.Status.INACTIVE);
@@ -46,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean isExists(int id) {
+    public boolean existsById(int id) {
         return productRepository.existsById(id);
     }
 
@@ -58,14 +50,6 @@ public class ProductServiceImpl implements ProductService {
         log.debug("Product saved successfully with id of {}", product.getId());
         return product;
     }
-
-    @Override
-    public Product save(Product product) {
-        productRepository.save(product);
-        log.debug("Product saved successfully with id of {}", product.getId());
-        return product;
-    }
-
     @Override
     public void update(Product product, ProductDTO productDTO) throws ResourceNotFoundException {
         Product updatedProduct = productMapper.toUpdate(product, productDTO);
@@ -75,8 +59,8 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public List<Product> getAllExcept(VerifiedUser verifiedUser) {
-        List<Product> userProducts = verifiedUser.getProducts();
+    public List<Product> getAllExcept(User currentUser) {
+        List<Product> userProducts = currentUser.getProducts();
 
         List<Product> products = new ArrayList<>(productRepository.findAll().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
@@ -88,8 +72,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProductByState(VerifiedUser verifiedUser, com.elleined.marketplaceapi.model.Product.State state) {
-        return verifiedUser.getProducts().stream()
+    public List<Product> getAllProductByState(User currentUser, com.elleined.marketplaceapi.model.Product.State state) {
+        return currentUser.getProducts().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == state)
                 .toList();

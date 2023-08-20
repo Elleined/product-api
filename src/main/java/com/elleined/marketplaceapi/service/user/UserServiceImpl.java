@@ -7,7 +7,6 @@ import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.address.Address;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +34,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean isExists(int id) {
+    public boolean existsById(int id) {
         return false;
+    }
+
+    @Override
+    public List<User> getAll() {
+        return null;
     }
 
 
@@ -52,11 +56,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public VerifiedUser getVerifiedUser(int id) {
-        return null;
-    }
-
-    @Override
     public Address getAddress(User currentUser) {
         return null;
     }
@@ -67,17 +66,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Product> getAllOrderItemByStatus(VerifiedUser currentUser, OrderItem.OrderItemStatus orderItemStatus) {
+    public List<Product> getAllOrderItemByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
         return null;
     }
 
     @Override
-    public List<Product> getAllCartItemByStatus(VerifiedUser currentUser, OrderItem.OrderItemStatus orderItemStatus) {
+    public List<Product> getAllCartItemByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
         return null;
     }
 
     @Override
-    public boolean hasProduct(VerifiedUser currentUser, Product product) {
+    public boolean hasProduct(User currentUser, Product product) {
         return currentUser.getProducts().stream().anyMatch(product::equals);
+    }
+
+    @Override
+    public boolean isVerified(User currentUser) {
+        return false;
     }
 }
