@@ -17,6 +17,7 @@ import com.elleined.marketplaceapi.service.user.SuffixService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,6 @@ import java.util.List;
 public class MarketplaceService {
     private final CropService cropService;
     private final UnitService unitService;
-    private final SuffixService suffixService;
     private final ProductService productService;
     private final UserService userService;
     private final AddressService addressService;
@@ -98,7 +98,7 @@ public class MarketplaceService {
         UserAddress userAddress = addressMapper.toUserAddressEntity(userDTO.getAddressDTO(), user);
         addressService.saveUserAddress(userAddress);
 
-
         return new UserDTO();
     }
+
 }

@@ -20,5 +20,7 @@ public interface UserService {
 
     void resendValidId(User currentUser, String validId);
 
-    int login(String email, String password);
+    int login(String email, String password) throws ResourceNotFoundException;
+
+    User getByEmail(String email) throws ResourceNotFoundException;
 }
