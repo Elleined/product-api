@@ -16,7 +16,7 @@ public class UserDetails {
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "middle_name", nullable = false)
+    @Column(name = "middle_name")
     private String middleName;
 
     @Column(name = "last_name", nullable = false)
@@ -38,6 +38,7 @@ public class UserDetails {
     public enum Gender {
         MALE,
         FEMALE,
+        LGBTQ_MEMBER,
         PREFER_NOT_TO_SAY
     }
 }

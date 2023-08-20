@@ -47,15 +47,13 @@ public class User {
 
 
     // user id reference is in suffix table
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn(
             name = "suffix_id",
-            referencedColumnName = "id",
-            nullable = false
+            referencedColumnName = "id"
     )
     @Setter(AccessLevel.NONE)
     private Suffix suffix;
-
 
     // user id reference is in user address table
     @OneToOne(mappedBy = "user", optional = false)

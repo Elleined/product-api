@@ -17,4 +17,6 @@ public interface UserService {
     boolean hasProduct(User currentUser, Product product);
 
     boolean isVerified(User currentUser);
+
+    void resendValidId(User currentUser, String validId);
 }
