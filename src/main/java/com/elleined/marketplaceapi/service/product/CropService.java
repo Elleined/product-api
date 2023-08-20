@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.product;
 
 import com.elleined.marketplaceapi.dto.BaseDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.repository.CropRepository;
 import com.elleined.marketplaceapi.service.baseservices.GetService;
@@ -18,24 +19,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class CropService implements PostService<Crop, BaseDTO>, GetService<Crop> {
 
     private final CropRepository cropRepository;
+    private final BaseMapper baseMapper;
 
     @Override
     public Crop getById(int id) throws ResourceNotFoundException {
-        return null;
+        return cropRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Crop with id of " + id + " does not exists!"));
     }
 
     @Override
     public boolean isExists(int id) {
-        return false;
+        return cropRepository.existsById(id);
     }
 
     @Override
     public Crop saveByDTO(BaseDTO baseDTO) {
-        return null;
+        Crop crop = baseMapper.toCropEntity(baseDTO);
+        cropRepository.save(crop);
+        log.debug("Crop with name of {} saved successfully with id of {}", crop.getName(), crop.getId());
+        return crop;
     }
 
     @Override
     public Crop save(Crop crop) {
-        return null;
+        cropRepository.save(crop);
+        log.debug("Crop with name of {} saved successfully with id of {}", crop.getName(), crop.getId());
+        return crop;
     }
 }
