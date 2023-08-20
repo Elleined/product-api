@@ -49,7 +49,7 @@ public class CropService implements BaseEntityService<Crop> {
     @Override
     public Crop getByName(String name) throws ResourceNotFoundException {
         return cropRepository.findAll().stream()
-                .filter(crop -> crop.getName().equals(name))
+                .filter(crop -> crop.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Crop with name of " + name + " does not exists!"));
     }

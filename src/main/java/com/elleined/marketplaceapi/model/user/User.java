@@ -56,7 +56,7 @@ public class User {
     private Suffix suffix;
 
     // user id reference is in user address table
-    @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "user")
     private UserAddress address;
 
     // user id reference is in delivery address table

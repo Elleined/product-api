@@ -31,6 +31,11 @@ public class ProductServiceImpl implements ProductService {
         log.debug("Product with id of {} are now inactive", product.getId());
     }
 
+    @Override
+    public boolean isDeleted(Product product) {
+        return product.getStatus() == Product.Status.INACTIVE;
+    }
+
 
     @Override
     public Product getById(int id) throws ResourceNotFoundException {
@@ -50,6 +55,7 @@ public class ProductServiceImpl implements ProductService {
         log.debug("Product saved successfully with id of {}", product.getId());
         return product;
     }
+
     @Override
     public void update(Product product, ProductDTO productDTO) throws ResourceNotFoundException {
         Product updatedProduct = productMapper.toUpdate(product, productDTO);
@@ -72,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProductByState(User currentUser, com.elleined.marketplaceapi.model.Product.State state) {
+    public List<Product> getAllProductByState(User currentUser, Product.State state) {
         return currentUser.getProducts().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == state)

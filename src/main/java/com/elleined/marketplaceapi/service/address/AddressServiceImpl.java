@@ -22,6 +22,12 @@ public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
 
     @Override
+    public void saveUserAddress(UserAddress userAddress) {
+        addressRepository.save(userAddress);
+        log.debug("UserAddress with id of {} saved successfully!", userAddress.getId());
+    }
+
+    @Override
     public void saveDeliveryAddress(DeliveryAddress deliveryAddress) {
         addressRepository.save(deliveryAddress);
         log.debug("Delivery address with id of {} saved successfully!", deliveryAddress.getId());

@@ -34,11 +34,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDTO save(@Valid @RequestBody ProductDTO productDTO) {
-        return marketplaceService.saveByDTO(productDTO);
+    public ProductDTO save(@PathVariable("currentUserId") int currentUserId,
+                           @Valid @RequestBody ProductDTO productDTO) {
+
+        return marketplaceService.saveByDTO(currentUserId, productDTO);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ProductDTO update(@PathVariable("currentUserId") int currentUserId,
                              @PathVariable("id") int id,
                              @Valid @RequestBody ProductDTO productDTO) {

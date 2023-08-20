@@ -14,10 +14,11 @@ import lombok.Setter;
 @Setter
 public class UserAddress extends Address {
 
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(
             name = "user_id", // Alias for user id
-            referencedColumnName = "user_id"
+            referencedColumnName = "user_id",
+            nullable = false
     )
     private User user;
 

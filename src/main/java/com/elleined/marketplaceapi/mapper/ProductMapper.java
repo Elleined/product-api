@@ -45,7 +45,7 @@ public abstract class ProductMapper {
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
             @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
             @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
-            @Mapping(target = "seller", expression = "java(userService.getById(productDTO.getSellerId()))"), // seller alias for currentUser
+            @Mapping(target = "seller", expression = "java(userService.getById(productDTO.getSellerId()))"),
 
             @Mapping(target = "cartItems", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "orderItems", expression = "java(new java.util.ArrayList<>())")

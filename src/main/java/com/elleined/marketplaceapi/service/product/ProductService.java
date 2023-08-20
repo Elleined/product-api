@@ -17,6 +17,8 @@ public interface ProductService {
     boolean existsById(int id);
     void update(Product product, ProductDTO productDTO);
     void delete(int id) throws ResourceNotFoundException;
+
+    boolean isDeleted(Product product);
     // Use this to get all the product listing available
     List<Product> getAllExcept(User currentUser);
 

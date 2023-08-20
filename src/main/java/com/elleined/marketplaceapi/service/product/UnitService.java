@@ -41,7 +41,7 @@ public class UnitService implements BaseEntityService<Unit> {
     @Override
     public Unit getByName(String name) throws ResourceNotFoundException {
         return unitRepository.findAll().stream()
-                .filter(unit -> unit.getName().equals(name))
+                .filter(unit -> unit.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Unit with name of " + name + " does not exists!"));
     }

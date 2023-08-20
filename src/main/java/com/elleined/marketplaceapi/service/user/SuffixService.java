@@ -47,7 +47,7 @@ public class SuffixService implements BaseEntityService<Suffix> {
     @Override
     public Suffix getByName(String name) throws ResourceNotFoundException {
         return suffixRepository.findAll().stream()
-                .filter(suffix -> suffix.getName().equals(name))
+                .filter(suffix -> suffix.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Suffix with name of " + name + " does not exists!"));
     }
