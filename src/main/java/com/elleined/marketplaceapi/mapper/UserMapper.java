@@ -40,22 +40,40 @@ public abstract class UserMapper {
     })
     public abstract User toEntity(UserDTO userDTO);
 
-    public abstract UserCredential toUserCredentialEntity(UserDTO.UserCredentialDTO userCredentialDTO);
-
     @Mappings({
-            @Mapping(target = "registrationDate", expression = "java(java.time.LocalDateTime.now())"),
-            @Mapping(target = "birthDate", source = "userDetailsDTO.birthDate")
+            @Mapping(target = "validId", ignore = true),
+            @Mapping(target = "status", source = "user.userVerification.status"),
+            @Mapping(target = "suffix", source = "user.suffix.name"),
+
+            @Mapping(target = "addressDTO", source = "user.address"),
+            @Mapping(target = "userCredentialDTO", expression = "java(toUserCredentialDTO(user.getUserCredential()))"),
+            @Mapping(target = "userDetailsDTO", expression = "java(toUserDetailsDTO(user.getUserDetails()))"),
     })
-    public abstract UserDetails toUserDetailsEntity(UserDTO.UserDetailsDTO userDetailsDTO);
-//
-//    @Mappings({
-//          // IGNORE PASSWORD here
-//    })
-//    public abstract UserDTO toDTO(User user);
+    public abstract UserDTO toDTO(User user);
 //
 //
 //    @Mappings({
 ////          // IGNORE PASSWORD here
 //    })
 //    public abstract void toUpdate(UserDTO userDTO, @MappingTarget User user);
+
+    protected abstract UserCredential toUserCredentialEntity(UserDTO.UserCredentialDTO userCredentialDTO);
+
+
+    @Mappings({
+            @Mapping(target = "password", ignore = true),
+            @Mapping(target = "confirmPassword", ignore = true)
+    })
+    protected abstract UserDTO.UserCredentialDTO toUserCredentialDTO(UserCredential userCredential);
+
+
+    @Mappings({
+            @Mapping(target = "registrationDate", expression = "java(java.time.LocalDateTime.now())"),
+    })
+    protected abstract UserDetails toUserDetailsEntity(UserDTO.UserDetailsDTO userDetailsDTO);
+
+    @Mappings({
+            @Mapping(target = "gender", source = "userDetails.gender")
+    })
+    protected abstract UserDTO.UserDetailsDTO toUserDetailsDTO(UserDetails userDetails);
 }

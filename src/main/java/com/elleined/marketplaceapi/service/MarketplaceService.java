@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.*;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
@@ -37,6 +38,8 @@ public class MarketplaceService {
 
     private final ProductMapper productMapper;
     private final AddressMapper addressMapper;
+    private final UserMapper userMapper;
+
 
     public void deleteProduct(int currentUserId, int productId)
             throws ResourceNotFoundException, NotOwnedException {
@@ -68,7 +71,7 @@ public class MarketplaceService {
         return productMapper.toDTO(product);
     }
 
-    public ProductDTO update(int currentUserId, int productId, ProductDTO productDTO)
+    public ProductDTO updateProduct(int currentUserId, int productId, ProductDTO productDTO)
             throws ResourceNotFoundException, NotOwnedException {
 
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
@@ -110,6 +113,7 @@ public class MarketplaceService {
             AlreadExistException,
             MobileNumberException {
 
+        userDetailsValidator.validateAddressDetails(userDTO.getAddressDTO());
         userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
@@ -117,8 +121,30 @@ public class MarketplaceService {
 
         User user = userService.saveByDTO(userDTO);
         UserAddress userAddress = addressMapper.toUserAddressEntity(userDTO.getAddressDTO(), user);
+        user.setAddress(userAddress);
         addressService.saveUserAddress(userAddress);
         // user dto here
-        return new UserDTO();
+        return userMapper.toDTO(user);
+    }
+
+    public UserDTO getUserById(int userId) {
+        User user = userService.getById(userId);
+        return userMapper.toDTO(user);
+    }
+
+    public UserDTO updateUser(int currentUserId, UserDTO userDTO) {
+        User currentUser = userService.getById(currentUserId);
+        return null;
+    }
+
+    public UserDTO resendValidId(int currentUserId, String newValidId) {
+        User currentUser = userService.getById(currentUserId);
+        userService.resendValidId(currentUser, newValidId);
+        return userMapper.toDTO(currentUser);
+    }
+
+    public UserDTO login(UserDTO.UserCredentialDTO userCredentialDTO) {
+        User currentUser = userService.login(userCredentialDTO);
+        return userMapper.toDTO(currentUser);
     }
 }

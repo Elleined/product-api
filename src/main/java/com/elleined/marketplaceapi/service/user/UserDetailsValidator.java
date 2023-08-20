@@ -1,9 +1,11 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.dto.AddressDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.AlreadExistException;
 import com.elleined.marketplaceapi.exception.HasDigitException;
 import com.elleined.marketplaceapi.exception.MobileNumberException;
+import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,7 @@ import java.util.List;
 public class UserDetailsValidator {
 
     private final UserService userService;
+    private final AddressService addressService;
 
     public void validatePhoneNumber(UserDTO.UserDetailsDTO userDetailsDTO) {
         String mobileNumber = userDetailsDTO.getMobileNumber();
@@ -38,5 +41,9 @@ public class UserDetailsValidator {
         if (firstNameLetters.stream().anyMatch(Character::isDigit)) throw new HasDigitException("First name must not contain any digit!");
         if (middleNameLetters.stream().anyMatch(Character::isDigit)) throw new HasDigitException("Middle name must not contain any digit!");
         if (lastNameLetters.stream().anyMatch(Character::isDigit)) throw new HasDigitException("Last name must not contain any digit!");
+    }
+
+    public void validateAddressDetails(AddressDTO addressDTO) {
+        if (addressService.getAllAddressDetails().contains(addressDTO.getDetails())) throw new AlreadExistException("Address details of " + addressDTO.getDetails() + " already been taken by another user");
     }
 }

@@ -16,4 +16,6 @@ public interface AddressService {
     List<DeliveryAddress> getAllDeliveryAddress(User currentUser);
 
     boolean isUserHas5DeliveryAddress(User currentUser);
+
+    List<String> getAllAddressDetails();
 }

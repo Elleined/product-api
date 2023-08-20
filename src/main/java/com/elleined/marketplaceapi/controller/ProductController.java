@@ -45,7 +45,7 @@ public class ProductController {
                              @PathVariable("id") int id,
                              @Valid @RequestBody ProductDTO productDTO) {
 
-        return marketplaceService.update(currentUserId, id, productDTO);
+        return marketplaceService.updateProduct(currentUserId, id, productDTO);
     }
 
     @DeleteMapping("/{id}")

@@ -18,4 +18,26 @@ public class UserController {
     public UserDTO save(@Valid @RequestBody UserDTO userDTO) {
         return marketplaceService.saveUser(userDTO);
     }
+
+    @GetMapping("/{id}")
+    public UserDTO getById(@PathVariable("id") int id) {
+        return marketplaceService.getUserById(id);
+    }
+
+    @PutMapping("/{currentUserId}")
+    public UserDTO update(@PathVariable("currentUserId") int currentUserId,
+                          @Valid @RequestBody UserDTO userDTO) {
+        return marketplaceService.updateUser(currentUserId, userDTO);
+    }
+
+    @PatchMapping("/{currentUserId}/resendValidId")
+    public UserDTO resendValidId(@PathVariable("currentUserId") int currentUserId,
+                                 @RequestParam("newValidId") String newValidId) {
+        return marketplaceService.resendValidId(currentUserId, newValidId);
+    }
+
+    @PostMapping("/login")
+    public UserDTO login(@Valid @RequestBody UserDTO.UserCredentialDTO userCredentialDTO) {
+        return marketplaceService.login(userCredentialDTO);
+    }
 }

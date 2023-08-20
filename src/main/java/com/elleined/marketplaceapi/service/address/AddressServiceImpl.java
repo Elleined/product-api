@@ -47,4 +47,9 @@ public class AddressServiceImpl implements AddressService {
     public boolean isUserHas5DeliveryAddress(User currentUser) {
         return getAllDeliveryAddress(currentUser).size() == DELIVERY_ADDRESS_LIMIT;
     }
+
+    @Override
+    public List<String> getAllAddressDetails() {
+        return addressRepository.fetchAllAddressDetails();
+    }
 }
