@@ -7,8 +7,6 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.util.List;
 
 public interface AddressService {
-    void saveUserAddress(UserAddress userAddress);
-
     void saveDeliveryAddress(DeliveryAddress deliveryAddress);
 
     UserAddress getUserAddress(User currentUser);

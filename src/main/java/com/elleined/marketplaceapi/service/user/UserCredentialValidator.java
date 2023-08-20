@@ -19,7 +19,8 @@ public class UserCredentialValidator {
 
     public void validateEmail(UserDTO.UserCredentialDTO userCredentialDTO) throws MalformedEmailException, AlreadExistException {
         String email = userCredentialDTO.getEmail();
-        if (email.endsWith("@gmail.com") || email.startsWith("@")) throw new MalformedEmailException("Email must ends with @gmail.com and should not starts with @!");
+        if (!email.endsWith("@gmail.com")) throw new MalformedEmailException("Email must ends with @gmail.com!");
+        if (email.startsWith("@")) throw new MalformedEmailException("Email should not starts with @!");
         if (userService.getAllEmail().contains(email)) throw new AlreadExistException("This email is already associated with an account!");
     }
 
@@ -31,10 +32,10 @@ public class UserCredentialValidator {
 
         if (!password.equals(confirmPassword)) throw new PasswordNotMatchException("Password not match!");
         if (password.contains(" ")) throw new WeakPasswordException("Password must not contain space!");
-        if (letters.stream().anyMatch(Character::isUpperCase)) throw new WeakPasswordException("Password must contain at least 1 upper case!");
-        if (letters.stream().anyMatch(Character::isLowerCase)) throw new WeakPasswordException("Password must contain at least 1 lower case!");
-        if (letters.stream().anyMatch(Character::isDigit)) throw new WeakPasswordException("Password must contain at least 1 digit!");
-        if (specialChars.stream().anyMatch(c -> password.contains(c.toString()))) throw new WeakPasswordException("Password must contain at least 1 special character '@', '#', '$', '_', '/'!");
+        if (letters.stream().noneMatch(Character::isUpperCase)) throw new WeakPasswordException("Password must contain at least 1 upper case!");
+        if (letters.stream().noneMatch(Character::isLowerCase)) throw new WeakPasswordException("Password must contain at least 1 lower case!");
+        if (letters.stream().noneMatch(Character::isDigit)) throw new WeakPasswordException("Password must contain at least 1 digit!");
+        if (specialChars.stream().noneMatch(c -> password.contains(c.toString()))) throw new WeakPasswordException("Password must contain at least 1 special character '@', '#', '$', '_', '/'!");
         if (password.length() < 8) throw new WeakPasswordException("Password must be 8 character long!");
     }
 }

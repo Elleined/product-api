@@ -82,6 +82,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.fetchAllEmail();
     }
 
+    @Override
+    public List<String> getAllMobileNumber() {
+        return userRepository.fetchAllMobileNumber();
+    }
+
     private void encodePassword(User user) {
         String rawPassword = user.getUserCredential().getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);

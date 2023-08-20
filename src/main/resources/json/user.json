@@ -1,11 +1,13 @@
 {
-  "firstName": "Denielle Mar",
-  "middleName": "Miranda",
-  "lastName": "De Guzman",
-  "gender": "MALE",
-  "birthDate": "2018-02-05T12:59:11.332",
-  "mobileNumber": "09913929345",
-  "suffix": "WALA",
+  "suffix": "",
+  "userDetailsDTO": {
+    "firstName": "Denielle Mar",
+    "middleName": "",
+    "lastName": "De Guzman",
+    "gender": "MALE",
+    "birthDate": "2018-02-05T12:59:11.332",
+    "mobileNumber": "09913929345"
+  },
   "addressDTO": {
     "details": "#106 Purok 3",
     "provinceName": "Nueva Ecija",
@@ -13,8 +15,8 @@
     "baranggayName": "Sumacab Este"
   },
   "userCredentialDTO": {
-    "email": "demadegu@gmail.com",
-    "password": "ayokosabihin",
-    "confirmPassword": "ayokosabihinulit"
+    "email": "demadegu1@gmail.com",
+    "password": "Ayokosabihin1@",
+    "confirmPassword": "Ayokosabihin1@"
   }
 }

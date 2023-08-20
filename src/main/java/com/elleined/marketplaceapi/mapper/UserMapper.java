@@ -12,7 +12,7 @@ import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = AddressMapper.class)
 public abstract class UserMapper {
 
     @Autowired @Lazy
@@ -22,7 +22,8 @@ public abstract class UserMapper {
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "shop", ignore = true),
-            @Mapping(target = "address", ignore = true), // This will be saved after saving of user
+            @Mapping(target = "userVerification.validId", ignore = true),
+
             @Mapping(target = "uuid", expression = "java(java.util.UUID.randomUUID().toString())"),
             @Mapping(target = "suffix", expression = "java(suffixService.getByName(userDTO.getSuffix()))"),
 
@@ -31,18 +32,13 @@ public abstract class UserMapper {
             @Mapping(target = "deliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "products", expression = "java(new java.util.ArrayList<>())"),
 
-            @Mapping(target = "userVerification", expression = "java(toUserVerificationEntity(userDTO.getUserVerificationDTO()))"),
+            @Mapping(target = "userVerification.status", expression = "java(UserVerification.Status.NOT_VERIFIED)"),
+
+            @Mapping(target = "address", source = "userDTO.addressDTO"),
             @Mapping(target = "userDetails", expression = "java(toUserDetailsEntity(userDTO.getUserDetailsDTO()))"),
-            @Mapping(target = "userCredential", expression = "java(toUserCredentialEntity(userDTO.getUserCredentialDTO()))") // This will be saved after saving of user
+            @Mapping(target = "userCredential", expression = "java(toUserCredentialEntity(userDTO.getUserCredentialDTO()))"),
     })
     public abstract User toEntity(UserDTO userDTO);
-
-
-    @Mappings({
-            @Mapping(target = "validId", ignore = true),
-            @Mapping(target = "status", expression = "java(UserVerification.Status.NOT_VERIFIED)")
-    })
-    public abstract UserVerification toUserVerificationEntity(UserDTO.UserVerificationDTO userVerificationDTO);
 
     public abstract UserCredential toUserCredentialEntity(UserDTO.UserCredentialDTO userCredentialDTO);
 

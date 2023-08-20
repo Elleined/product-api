@@ -14,10 +14,9 @@ import lombok.Setter;
 @Setter
 public class UserAddress extends Address {
 
-    @OneToOne(optional = false)
-    @MapsId
+    @OneToOne
     @JoinColumn(
-            name = "address_id", // Alias for user id
+            name = "user_id", // Alias for user id
             referencedColumnName = "user_id"
     )
     private User user;

@@ -18,9 +18,9 @@ public abstract class AddressMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "user", expression = "java(registeringUser)")
+            @Mapping(target = "user", ignore = true)
     })
-    public abstract UserAddress toUserAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
+    public abstract UserAddress toUserAddressEntity(AddressDTO addressDTO);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),

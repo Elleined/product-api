@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u.userCredential.email FROM User u")
     List<String> fetchAllEmail();
+
+    @Query("SELECT u.userDetails.mobileNumber FROM User u")
+    List<String> fetchAllMobileNumber();
 }

@@ -23,7 +23,8 @@ public class UserDTO {
     private String uuid;
     private String suffix;
 
-    private UserVerificationDTO userVerificationDTO;
+    private String validId;
+    private String status;
 
     @Valid
     @NotNull(message = "User details cannot be null")
@@ -36,16 +37,6 @@ public class UserDTO {
     @Valid
     @NotNull(message = "Address cannot be null")
     private UserCredentialDTO userCredentialDTO;
-
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserVerificationDTO {
-        private String validId;
-        private String status;
-    }
 
     @Data
     @Builder

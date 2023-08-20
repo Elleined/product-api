@@ -107,10 +107,7 @@ public class MarketplaceService {
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
         userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
 
-        // super daming validation here
         User user = userService.saveByDTO(userDTO);
-        UserAddress userAddress = addressMapper.toUserAddressEntity(userDTO.getAddressDTO(), user);
-        addressService.saveUserAddress(userAddress);
 
         return new UserDTO();
     }

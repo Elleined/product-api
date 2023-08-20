@@ -6,12 +6,13 @@ import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
 
+import java.util.Collection;
 import java.util.List;
 
 // other related user marketplace here
 public interface UserService {
 
-    User saveByDTO(UserDTO dto);
+    User saveByDTO(UserDTO dto); // save also in forum api
 
     User getById(int id) throws ResourceNotFoundException;
 
@@ -28,4 +29,6 @@ public interface UserService {
     User getByEmail(String email) throws ResourceNotFoundException;
 
     List<String> getAllEmail();
+
+    List<String> getAllMobileNumber();
 }
