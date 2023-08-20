@@ -36,7 +36,7 @@ public class UserDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime birthDate;
 
-    @NotNull(message = "Mobile number cannot be blank, null, or empty")
+    @NotBlank(message = "Mobile number cannot be blank, null, or empty")
     private String mobileNumber;
 
     private String suffix;

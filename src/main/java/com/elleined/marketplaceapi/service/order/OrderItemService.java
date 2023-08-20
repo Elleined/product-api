@@ -11,4 +11,6 @@ public interface OrderItemService {
     List<Product> getAllOrderItemByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);
 
     void delete(int id);
+
+    void save(OrderItem orderItem); // Send email inside this method
 }

@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int login(String email, String password) throws ResourceNotFoundException {
+    public int login(String email, String password) throws ResourceNotFoundException, InvalidUserCredential {
         User user = getByEmail(email);
         String encodedPassword = user.getUserCredential().getPassword();
         if (!passwordEncoder.matches(password, encodedPassword)) throw new InvalidUserCredential("You have entered an invalid username or password");
