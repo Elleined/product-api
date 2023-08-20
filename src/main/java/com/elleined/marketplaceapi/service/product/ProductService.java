@@ -16,7 +16,7 @@ public interface ProductService
         extends GetService<Product>,
         PostService<Product, ProductDTO>,
         PutService<Product, ProductDTO>,
-        DeleteService<Product> {
+        DeleteService {
 
     // Use this to get all the product listing available
     List<Product> getAllExcept(VerifiedUser verifiedUser);

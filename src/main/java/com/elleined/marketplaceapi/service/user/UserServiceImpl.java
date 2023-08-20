@@ -25,11 +25,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public void delete(User user) {
-
-    }
-
-    @Override
     public void delete(int id) {
 
     }
@@ -50,10 +45,6 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    @Override
-    public User save(User user) {
-        return null;
-    }
 
     @Override
     public void update(User user, UserDTO userDTO) throws ResourceNotFoundException {
