@@ -4,7 +4,6 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.UserRepository;
@@ -12,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +50,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isVerified(User currentUser) {
         return currentUser.getUserVerification().getStatus() == UserVerification.Status.VERIFIED;
+    }
+
+    @Override
+    public void resendValidId(User currentUser, String validId) {
+
+    }
+
+    @Override
+    public int login(String email, String password) {
+        return 0;
     }
 }

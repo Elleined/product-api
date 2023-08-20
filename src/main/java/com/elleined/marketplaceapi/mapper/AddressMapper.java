@@ -27,8 +27,4 @@ public abstract class AddressMapper {
             @Mapping(target = "user", expression = "java(registeringUser)")
     })
     public abstract DeliveryAddress toDeliveryAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
-
-    protected AddressDTO toUserDeliveryAddress(DeliveryAddress deliveryAddress) {
-        return toDTO(deliveryAddress);
-    }
 }

@@ -19,4 +19,6 @@ public interface UserService {
     boolean isVerified(User currentUser);
 
     void resendValidId(User currentUser, String validId);
+
+    int login(String email, String password);
 }
