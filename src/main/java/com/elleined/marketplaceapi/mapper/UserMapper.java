@@ -20,7 +20,6 @@ public abstract class UserMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "uuid", ignore = true),
             @Mapping(target = "shop", ignore = true),
             @Mapping(target = "userVerification.validId", ignore = true),
 
@@ -29,6 +28,7 @@ public abstract class UserMapper {
             @Mapping(target = "deliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "products", expression = "java(new java.util.ArrayList<>())"),
 
+            @Mapping(target = "uuid", expression = "java(java.util.UUID.randomUUID().toString())"),
             @Mapping(target = "suffix", expression = "java(suffixService.getByName(userDTO.getSuffix()))"),
             @Mapping(target = "userDetails.firstName", source = "userDTO.firstName"),
             @Mapping(target = "userDetails.middleName", source = "userDTO.middleName"),
@@ -40,7 +40,7 @@ public abstract class UserMapper {
             @Mapping(target = "userVerification.status", expression = "java(UserVerification.Status.NOT_VERIFIED)"),
 
             @Mapping(target = "address", ignore = true), // This will be saved after saving of user
-            @Mapping(target = "userCredential", ignore = true) // This will be saved after saving of user
+            @Mapping(target = "userCredential", expression = "java(toUserCredentialEntity(userDTO.getUserCredentialDTO()))") // This will be saved after saving of user
     })
     public abstract User toEntity(UserDTO userDTO);
 

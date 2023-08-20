@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -25,12 +26,14 @@ public class UserDTO {
 
     @NotBlank(message = "Last name cannot be blank, null, or empty")
     private String lastName;
+
     private LocalDateTime registrationDate;
 
     @NotBlank(message = "Gender cannot be blank, null, or empty")
     private String gender;
 
     @NotNull(message = "Birthday cannot be blank, null, or empty")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime birthDate;
 
     @NotNull(message = "Mobile number cannot be blank, null, or empty")

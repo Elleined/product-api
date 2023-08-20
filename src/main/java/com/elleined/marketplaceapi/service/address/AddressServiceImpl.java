@@ -15,31 +15,36 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class AddressServiceImpl {
+public class AddressServiceImpl implements AddressService {
 
     private static final int DELIVERY_ADDRESS_LIMIT = 5;
 
     private final AddressRepository addressRepository;
 
-    void saveUserAddress(UserAddress userAddress) {
+    @Override
+    public void saveUserAddress(UserAddress userAddress) {
         addressRepository.save(userAddress);
         log.debug("UserAddress with id of {} saved successfully!", userAddress.getId());
     }
 
-    void saveDeliveryAddress(DeliveryAddress deliveryAddress) {
+    @Override
+    public void saveDeliveryAddress(DeliveryAddress deliveryAddress) {
         addressRepository.save(deliveryAddress);
         log.debug("Delivery address with id of {} saved successfully!", deliveryAddress.getId());
     }
 
-    UserAddress getUserAddress(User currentUser) {
+    @Override
+    public UserAddress getUserAddress(User currentUser) {
         return currentUser.getAddress();
     }
 
-    List<DeliveryAddress> getAllDeliveryAddress(User currentUser) {
+    @Override
+    public List<DeliveryAddress> getAllDeliveryAddress(User currentUser) {
         return currentUser.getDeliveryAddresses();
     }
 
-    boolean isUserHas5DeliveryAddress(User currentUser) {
+    @Override
+    public boolean isUserHas5DeliveryAddress(User currentUser) {
         return getAllDeliveryAddress(currentUser).size() == DELIVERY_ADDRESS_LIMIT;
     }
 }

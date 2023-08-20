@@ -1,11 +1,15 @@
 package com.elleined.marketplaceapi.service;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.NotOwnedException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
@@ -28,9 +32,10 @@ public class MarketplaceService {
     private final SuffixService suffixService;
     private final ProductService productService;
     private final UserService userService;
+    private final AddressService addressService;
 
     private final ProductMapper productMapper;
-
+    private final AddressMapper addressMapper;
     public void deleteProduct(int currentUserId, int productId)
             throws ResourceNotFoundException, NotOwnedException {
         User currentUser = userService.getById(currentUserId);
@@ -85,5 +90,15 @@ public class MarketplaceService {
         return productService.getAllProductByState(verifiedUser, Product.State.valueOf(state)).stream()
                 .map(productMapper::toDTO)
                 .toList();
+    }
+
+    public UserDTO saveUser(UserDTO userDTO) {
+        // super daming validation here
+        User user = userService.saveByDTO(userDTO);
+        UserAddress userAddress = addressMapper.toUserAddressEntity(userDTO.getAddressDTO(), user);
+        addressService.saveUserAddress(userAddress);
+
+
+        return new UserDTO();
     }
 }

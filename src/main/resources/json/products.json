@@ -1,12 +1,12 @@
 {
-  "cropName": "",
-  "unitName": "",
-  "description": "",
-  "picture": "",
-  "keyword": "",
+  "cropName": "Kangkong",
+  "unitName": "Sako",
+  "description": "Matigas at mahaba",
+  "picture": "kangkong.png",
+  "keyword": "kangkong nga diba",
   "sellerId": 1,
-  "availableQuantity": 1,
-  "pricePerUnit": 1,
-  "quantityPerUnit": 1,
-  "harvestDate": ""
+  "availableQuantity": 100000,
+  "pricePerUnit": 50,
+  "quantityPerUnit": 5,
+  "harvestDate": "2018-02-05T12:59:11.332"
 }

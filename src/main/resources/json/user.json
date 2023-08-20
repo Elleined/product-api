@@ -1,0 +1,20 @@
+{
+  "firstName": "Denielle Mar",
+  "middleName": "Miranda",
+  "lastName": "De Guzman",
+  "gender": "MALE",
+  "birthDate": "2018-02-05T12:59:11.332",
+  "mobileNumber": "09913929345",
+  "suffix": "WALA",
+  "addressDTO": {
+    "details": "#106 Purok 3",
+    "provinceName": "Nueva Ecija",
+    "cityName": "Cabanatuan City",
+    "baranggayName": "Sumacab Este"
+  },
+  "userCredentialDTO": {
+    "email": "demadegu@gmail.com",
+    "password": "ayokosabihin",
+    "confirmPassword": "ayokosabihinulit"
+  }
+}

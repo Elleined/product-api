@@ -29,11 +29,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveByDTO(UserDTO userDTO) {
-//        User user = userMapper.toEntity(userDTO);
-//        userRepository.save(user);
-//        log.debug("User with name of {} saved successfully with id of {}", user.getFirstName(), user.getId());
-//        return user;
-        return null;
+        User user = userMapper.toEntity(userDTO);
+        userRepository.save(user);
+        log.debug("User with name of {} saved successfully with id of {}", user.getUserDetails().getFirstName(), user.getId());
+        return user;
     }
 
 

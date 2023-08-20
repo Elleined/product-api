@@ -56,7 +56,7 @@ public class User {
     private Suffix suffix;
 
     // user id reference is in user address table
-    @OneToOne(mappedBy = "user", optional = false)
+    @OneToOne(mappedBy = "user")
     @PrimaryKeyJoinColumn
     private UserAddress address;
 
