@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.address.Address;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +43,6 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-    @Override
-    public boolean isExists(User user) {
-        return false;
-    }
 
     @Override
     public User saveByDTO(UserDTO userDTO) {
@@ -58,8 +55,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(int id, UserDTO userDTO) throws ResourceNotFoundException {
+    public void update(User user, UserDTO userDTO) throws ResourceNotFoundException {
 
+    }
+
+    @Override
+    public VerifiedUser getVerifiedUser(int id) {
+        return null;
     }
 
     @Override

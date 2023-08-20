@@ -8,7 +8,6 @@ import com.elleined.marketplaceapi.service.baseservices.GetService;
 import com.elleined.marketplaceapi.service.baseservices.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +26,6 @@ public class UnitService implements PostService<Unit, BaseDTO>, GetService<Unit>
 
     @Override
     public boolean isExists(int id) {
-        return false;
-    }
-
-    @Override
-    public boolean isExists(Unit unit) {
         return false;
     }
 

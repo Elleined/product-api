@@ -29,7 +29,7 @@ public class Product {
     )
     private int id;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Column(name = "available_quantity", nullable = false)
@@ -54,7 +54,7 @@ public class Product {
     @Column(name = "picture", nullable = false)
     private String picture;
 
-    @Column(name = "keyword", length = 40)
+    @Column(name = "keyword", length = 40, nullable = false)
     private String keyword;
 
     @Enumerated(EnumType.STRING)

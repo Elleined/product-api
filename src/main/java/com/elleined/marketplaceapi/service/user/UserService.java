@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.address.Address;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.VerifiedUser;
 import com.elleined.marketplaceapi.service.baseservices.DeleteService;
 import com.elleined.marketplaceapi.service.baseservices.GetService;
 import com.elleined.marketplaceapi.service.baseservices.PostService;
@@ -15,9 +16,10 @@ import java.util.List;
 public interface UserService
         extends GetService<User>,
         PostService<User, UserDTO>,
-        PutService<UserDTO>,
+        PutService<User, UserDTO>,
         DeleteService<User> {
 
+    VerifiedUser getVerifiedUser(int id);
     Address getAddress(User currentUser);
     List<Address> getAllDeliveryAddress(User currentUser);
     Product getAllOrder(User currentUser);

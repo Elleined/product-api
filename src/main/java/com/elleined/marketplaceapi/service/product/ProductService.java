@@ -11,7 +11,7 @@ import com.elleined.marketplaceapi.service.baseservices.PutService;
 public interface ProductService
         extends GetService<Product>,
         PostService<Product, ProductDTO>,
-        PutService<ProductDTO>,
+        PutService<Product, ProductDTO>,
         DeleteService<Product> {
 
 }

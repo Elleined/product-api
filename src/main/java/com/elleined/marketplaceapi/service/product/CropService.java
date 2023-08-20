@@ -8,7 +8,6 @@ import com.elleined.marketplaceapi.service.baseservices.GetService;
 import com.elleined.marketplaceapi.service.baseservices.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +26,6 @@ public class CropService implements PostService<Crop, BaseDTO>, GetService<Crop>
 
     @Override
     public boolean isExists(int id) {
-        return false;
-    }
-
-    @Override
-    public boolean isExists(Crop crop) {
         return false;
     }
 

@@ -20,41 +20,44 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Product product) {
-
+        productRepository.delete(product);
     }
 
     @Override
     public void delete(int id) {
-
+        productRepository.deleteById(id);
     }
 
     @Override
     public Product getById(int id) throws ResourceNotFoundException {
-        return null;
+        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product with id of " + id + " does not exists!"));
     }
 
     @Override
     public boolean isExists(int id) {
-        return false;
+        return productRepository.existsById(id);
     }
 
-    @Override
-    public boolean isExists(Product product) {
-        return false;
-    }
 
     @Override
     public Product saveByDTO(ProductDTO productDTO) {
-        return null;
+        Product product = productMapper.toEntity(productDTO);
+        productRepository.save(product);
+        log.debug("Product saved successfully with id of {}", product.getId());
+        return product;
     }
 
     @Override
     public Product save(Product product) {
-        return null;
+        productRepository.save(product);
+        log.debug("Product saved successfully with id of {}", product.getId());
+        return product;
     }
 
     @Override
-    public void update(int id, ProductDTO productDTO) throws ResourceNotFoundException {
-
+    public void update(Product product, ProductDTO productDTO) throws ResourceNotFoundException {
+        Product updatedProduct = productMapper.toUpdate(product, productDTO);
+        productRepository.save(updatedProduct);
+        log.debug("Product with id of {} updated successfully!", updatedProduct.getId());
     }
 }
