@@ -46,5 +46,5 @@ public interface ProductService {
 
     double calculatePrice(Product product, int userOrderQuantity);
 
-    boolean isProductMustBePendingAgain(Product product, ProductDTO productDTO);
+    boolean isCriticalFieldsChanged(Product product, ProductDTO productDTO);
 }

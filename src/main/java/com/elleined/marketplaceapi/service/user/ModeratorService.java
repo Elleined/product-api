@@ -12,15 +12,13 @@ public interface ModeratorService {
 
     List<Product> getAllPendingProduct();
 
-    List<Shop> getAllUnverifiedShop();
-
+    // Send email
     void verifiedUser(User userToBeVerified);
 
     void verifiedAllUser(List<User> usersToBeVerified);
 
+    // Send email to seller
     void listProduct(Product product);
 
     void listAllProduct(List<Product> products);
-
-    void verifyShop(Shop shop);
 }

@@ -88,7 +88,7 @@ public class MarketplaceService {
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
 
-        if (productService.isProductMustBePendingAgain(product, productDTO)) product.setState(Product.State.PENDING);
+        if (productService.isCriticalFieldsChanged(product, productDTO)) product.setState(Product.State.PENDING);
         productService.update(product, productDTO);
         return productMapper.toDTO(product);
     }

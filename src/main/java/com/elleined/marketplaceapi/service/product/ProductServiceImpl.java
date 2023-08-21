@@ -102,9 +102,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean isProductMustBePendingAgain(Product product, ProductDTO productDTO) {
+    public boolean isCriticalFieldsChanged(Product product, ProductDTO productDTO) {
         return product.getPricePerUnit() != productDTO.getPricePerUnit() ||
                 product.getAvailableQuantity() != productDTO.getAvailableQuantity() ||
                 product.getQuantityPerUnit() != productDTO.getQuantityPerUnit();
     }
+
 }
