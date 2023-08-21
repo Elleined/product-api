@@ -16,6 +16,7 @@ import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.address.AddressValidator;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
@@ -37,6 +38,7 @@ public class MarketplaceService {
     private final BuyerService buyerService;
     private final UserDetailsValidator userDetailsValidator;
     private final UserCredentialValidator userCredentialValidator;
+    private final AddressValidator addressValidator;
     private final ProductService productService;
     private final UserService userService;
     private final AddressService addressService;
@@ -116,7 +118,7 @@ public class MarketplaceService {
             AlreadExistException,
             MobileNumberException {
 
-        userDetailsValidator.validateAddressDetails(userDTO.getAddressDTO());
+        addressValidator.validateAddressDetails(userDTO.getAddressDTO());
         userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
@@ -144,7 +146,7 @@ public class MarketplaceService {
             MobileNumberException {
 
         User currentUser = userService.getById(currentUserId);
-        userDetailsValidator.validateAddressDetails(userDTO.getAddressDTO());
+        addressValidator.validateAddressDetails(userDTO.getAddressDTO());
         userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
@@ -218,8 +220,10 @@ public class MarketplaceService {
 
 
     public AddressDTO saveDeliveryAddress(int currentUserId, AddressDTO addressDTO)
-            throws ResourceNotFoundException {
+            throws ResourceNotFoundException, AlreadExistException {
         User currentUser = userService.getById(currentUserId);
+
+        addressValidator.validateAddressDetails(addressDTO);
         if (addressService.isUserHas5DeliveryAddress(currentUser)) throw new DeliveryAddressLimitException("Cannot save another delivery address! Because you already reached the limit which is 5");
 
         DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, addressDTO);
