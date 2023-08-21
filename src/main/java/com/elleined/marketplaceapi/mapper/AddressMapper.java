@@ -18,13 +18,17 @@ public abstract class AddressMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "user", expression = "java(registeringUser)")
+            @Mapping(target = "user", expression = "java(registeringUser)"),
+
     })
     public abstract UserAddress toUserAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "user", expression = "java(registeringUser)")
+            @Mapping(target = "user", expression = "java(registeringUser)"),
+
+            @Mapping(target = "cartItemDeliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "orderItemAddresses", expression = "java(new java.util.ArrayList<>())")
     })
     public abstract DeliveryAddress toDeliveryAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
 }

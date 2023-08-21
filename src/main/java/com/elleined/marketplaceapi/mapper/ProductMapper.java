@@ -47,15 +47,15 @@ public abstract class ProductMapper {
             @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
             @Mapping(target = "seller", expression = "java(userService.getById(productDTO.getSellerId()))"),
 
-            @Mapping(target = "cartItems", expression = "java(new java.util.ArrayList<>())"),
-            @Mapping(target = "orderItems", expression = "java(new java.util.ArrayList<>())")
+            @Mapping(target = "addedToCarts", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "orders", expression = "java(new java.util.ArrayList<>())"),
     })
     public abstract Product toEntity(ProductDTO productDTO) throws ResourceNotFoundException;
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "cartItems", ignore = true),
-            @Mapping(target = "orderItems", ignore = true),
+            @Mapping(target = "addedToCarts", ignore = true),
+            @Mapping(target = "orders", ignore = true),
             @Mapping(target = "state", ignore = true),
             @Mapping(target = "status", ignore = true),
             @Mapping(target = "listingDate", ignore = true),

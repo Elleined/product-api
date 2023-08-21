@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.service.address;
 
+import com.elleined.marketplaceapi.dto.AddressDTO;
+import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
@@ -20,11 +22,14 @@ public class AddressServiceImpl implements AddressService {
     private static final int DELIVERY_ADDRESS_LIMIT = 5;
 
     private final AddressRepository addressRepository;
+    private final AddressMapper addressMapper;
 
     @Override
-    public void saveUserAddress(UserAddress userAddress) {
+    public void saveUserAddress(User registeringUser, AddressDTO addressDTO) {
+        UserAddress userAddress = addressMapper.toUserAddressEntity(addressDTO, registeringUser);
+        registeringUser.setAddress(userAddress);
         addressRepository.save(userAddress);
-        log.debug("UserAddress with id of {} saved successfully!", userAddress.getId());
+        log.debug("User with id of {} successfully registered with address id of {}", registeringUser.getId(), userAddress.getId());
     }
 
     @Override

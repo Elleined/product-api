@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.address;
 
+import com.elleined.marketplaceapi.dto.AddressDTO;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
@@ -7,7 +8,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.util.List;
 
 public interface AddressService {
-    void saveUserAddress(UserAddress userAddress);
+    void saveUserAddress(User registeringUser, AddressDTO addressDTO);
 
     void saveDeliveryAddress(DeliveryAddress deliveryAddress);
 

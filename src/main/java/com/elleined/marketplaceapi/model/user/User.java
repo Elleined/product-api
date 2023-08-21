@@ -52,7 +52,6 @@ public class User {
             name = "suffix_id",
             referencedColumnName = "id"
     )
-    @Setter(AccessLevel.NONE)
     private Suffix suffix;
 
     // user id reference is in user address table

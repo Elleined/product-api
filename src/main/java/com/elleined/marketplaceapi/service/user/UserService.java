@@ -5,9 +5,7 @@ import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.UserCredential;
 
-import java.util.Collection;
 import java.util.List;
 
 // other related user marketplace here

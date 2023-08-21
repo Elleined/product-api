@@ -47,7 +47,9 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
     @Override
     public void update(UserDTO userDTO, User user) throws ResourceNotFoundException {
-
+        User updatedUser = userMapper.toUpdate(userDTO, user);
+        userRepository.save(updatedUser);
+        log.debug("User with id of {} updated successfully!", updatedUser.getId());
     }
 
     @Override

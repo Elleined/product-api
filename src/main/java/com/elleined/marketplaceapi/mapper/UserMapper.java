@@ -4,7 +4,6 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserCredential;
 import com.elleined.marketplaceapi.model.user.UserDetails;
-import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.service.user.SuffixService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -53,19 +52,29 @@ public abstract class UserMapper {
     public abstract UserDTO toDTO(User user);
 
 
-//    @Mappings({
-////          // IGNORE PASSWORD here
-//            @Mapping(target = "address", source = ""),
-//            @Mapping(target = "cartItems", source = ""),
-//            @Mapping(target = "deliveryAddresses", source = ""),
-//            @Mapping(target = "orderedItems", source = ""),
-//            @Mapping(target = "products", source = ""),
-//            @Mapping(target = "shop", source = ""),
-//            @Mapping(target = "userCredential", source = ""),
-//            @Mapping(target = "userDetails", source = ""),
-//            @Mapping(target = "userVerification", source = "")
-//    })
-//    public abstract void toUpdate(UserDTO userDTO, @MappingTarget User user);
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "uuid", ignore = true),
+            @Mapping(target = "cartItems", ignore = true),
+            @Mapping(target = "deliveryAddresses", ignore = true),
+            @Mapping(target = "orderedItems", ignore = true),
+            @Mapping(target = "products", ignore = true),
+            @Mapping(target = "userVerification", ignore = true),
+            @Mapping(target = "shop", ignore = true),
+
+            @Mapping(target = "userCredential", ignore = true),
+
+            @Mapping(target = "suffix", expression = "java(suffixService.getByName(userDTO.getSuffix()))"),
+
+            @Mapping(target = "userDetails", source = "userDTO.userDetailsDTO"),
+            @Mapping(target = "userDetails.gender", ignore = true),
+            @Mapping(target = "userDetails.registrationDate", ignore = true),
+            @Mapping(target = "userDetails.birthDate", ignore = true),
+
+            @Mapping(target = "address", source = "userDTO.addressDTO"),
+            @Mapping(target = "address.id", ignore = true),
+    })
+    public abstract User toUpdate(UserDTO userDTO, @MappingTarget User user);
 
     protected abstract UserCredential toUserCredentialEntity(UserDTO.UserCredentialDTO userCredentialDTO);
 

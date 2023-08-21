@@ -3,7 +3,6 @@ package com.elleined.marketplaceapi.service.product;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.Product.State;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;

@@ -7,16 +7,12 @@ import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
-import com.elleined.marketplaceapi.service.user.SellerService;
-import com.elleined.marketplaceapi.service.user.UserCredentialValidator;
-import com.elleined.marketplaceapi.service.user.UserDetailsValidator;
-import com.elleined.marketplaceapi.service.user.UserService;
+import com.elleined.marketplaceapi.service.user.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,14 +28,15 @@ public class MarketplaceService {
     private final SellerService sellerService;
     private final UserDetailsValidator userDetailsValidator;
     private final UserCredentialValidator userCredentialValidator;
-    private final CropService cropService;
-    private final UnitService unitService;
     private final ProductService productService;
     private final UserService userService;
     private final AddressService addressService;
 
+    private final CropService cropService;
+    private final SuffixService suffixService;
+    private final UnitService unitService;
+
     private final ProductMapper productMapper;
-    private final AddressMapper addressMapper;
     private final UserMapper userMapper;
 
 
@@ -120,13 +117,12 @@ public class MarketplaceService {
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
         userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
+        if (!suffixService.existsByName(userDTO.getSuffix())) cropService.save(userDTO.getSuffix());
 
-        User user = userService.saveByDTO(userDTO);
-        UserAddress userAddress = addressMapper.toUserAddressEntity(userDTO.getAddressDTO(), user);
-        user.setAddress(userAddress);
-        addressService.saveUserAddress(userAddress);
+        User registeringUser = userService.saveByDTO(userDTO);
+        addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
 
-        return userMapper.toDTO(user);
+        return userMapper.toDTO(registeringUser);
     }
 
     public UserDTO getUserById(int userId) {
@@ -136,7 +132,6 @@ public class MarketplaceService {
 
     public UserDTO updateUser(int currentUserId, UserDTO userDTO) {
         User currentUser = userService.getById(currentUserId);
-        // userMapper.toUpdate(userDTO, currentUser);
         userService.update(userDTO, currentUser);
         return userMapper.toDTO(currentUser);
     }
