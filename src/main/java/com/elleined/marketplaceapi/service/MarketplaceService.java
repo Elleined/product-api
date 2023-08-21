@@ -217,10 +217,12 @@ public class MarketplaceService {
     }
 
 
-    public AddressDTO saveDeliveryAddress(int currentUserId, AddressDTO addressDTO) throws ResourceNotFoundException {
+    public AddressDTO saveDeliveryAddress(int currentUserId, AddressDTO addressDTO)
+            throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
-        DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, addressDTO);
+        if (addressService.isUserHas5DeliveryAddress(currentUser)) throw new DeliveryAddressLimitException("Cannot save another delivery address! Because you already reached the limit which is 5");
 
+        DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, addressDTO);
         return addressMapper.toDTO(deliveryAddress);
     }
 
