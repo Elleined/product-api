@@ -1,15 +1,18 @@
 package com.elleined.marketplaceapi.service;
 
+import com.elleined.marketplaceapi.dto.AddressDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.*;
+import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
@@ -45,6 +48,7 @@ public class MarketplaceService {
     private final ProductMapper productMapper;
     private final UserMapper userMapper;
     private final ItemMapper itemMapper;
+    private final AddressMapper addressMapper;
 
 
     public void deleteProduct(int currentUserId, int productId)
@@ -168,7 +172,7 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
 
         if (userService.isUserHasShopRegistration(currentUser)) throw new NotVerifiedException("User with id of " + currentUserId + " already have shop registration! Please wait for email notification. If dont receive an email consider resending your valid id!");
-        
+
         Shop shop = userService.sendShopRegistration(currentUser, shopDTO);
         return shopDTO;
     }
@@ -209,6 +213,21 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
         return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
                 .map(productMapper::toDTO)
+                .toList();
+    }
+
+
+    public AddressDTO saveDeliveryAddress(int currentUserId, AddressDTO addressDTO) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, addressDTO);
+
+        return addressMapper.toDTO(deliveryAddress);
+    }
+
+    public List<AddressDTO> getAllDeliveryAddress(int currentUserId) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        return addressService.getAllDeliveryAddress(currentUser).stream()
+                .map(addressMapper::toDTO)
                 .toList();
     }
 }
