@@ -1,7 +1,11 @@
-package com.elleined.marketplaceapi.service.user;
+package com.elleined.marketplaceapi.service.moderator;
 
+import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ProductRepository;
@@ -22,23 +26,30 @@ public class ModeratorServiceImpl implements ModeratorService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
+    private final UserMapper userMapper;
+    private final ProductMapper productMapper;
+
+
     @Override
-    public List<User> getAllUnverifiedUser() {
+    public List<UserDTO> getAllUnverifiedUser() {
         return userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
+                .map(userMapper::toDTO)
                 .toList();
     }
 
     @Override
-    public List<Product> getAllPendingProduct() {
+    public List<ProductDTO> getAllPendingProduct() {
         return productRepository.findAll().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == Product.State.PENDING)
+                .map(productMapper::toDTO)
                 .toList();
     }
 
     @Override
-    public void verifiedUser(User userToBeVerified) {
+    public void verifyUser(int userToBeVerifiedId) throws ResourceNotFoundException {
+        User userToBeVerified = userRepository.findById(userToBeVerifiedId).orElseThrow(() -> new ResourceNotFoundException("User with id of " + userToBeVerifiedId + " does not exists!"));
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         userRepository.save(userToBeVerified);
 
@@ -46,7 +57,8 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void verifiedAllUser(List<User> usersToBeVerified) {
+    public void verifyAllUser(List<Integer> userToBeVerifiedIds) throws ResourceNotFoundException {
+        List<User> usersToBeVerified = userRepository.findAllById(userToBeVerifiedIds);
         usersToBeVerified.forEach(user -> user.getUserVerification().setStatus(UserVerification.Status.VERIFIED));
         userRepository.saveAll(usersToBeVerified);
 
@@ -55,7 +67,8 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void listProduct(Product product) {
+    public void listProduct(int productId) throws ResourceNotFoundException {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product with id of " + productId + " does not exists!"));
         product.setState(Product.State.LISTING);
         productRepository.save(product);
 
@@ -63,7 +76,8 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void listAllProduct(List<Product> products) {
+    public void listAllProduct(List<Integer> productIds) throws ResourceNotFoundException {
+        List<Product> products = productRepository.findAllById(productIds);
         products.forEach(product -> product.setState(Product.State.LISTING));
         productRepository.saveAll(products);
 
