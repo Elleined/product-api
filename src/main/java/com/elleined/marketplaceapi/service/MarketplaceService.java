@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.*;
@@ -8,6 +9,7 @@ import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
@@ -66,7 +68,6 @@ public class MarketplaceService {
 
     public ProductDTO saveByDTO(int currentUserId, ProductDTO productDTO) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
-        if (currentUser.getShop() == null)  throw new NotVerifiedException("Cannot list a product because user with id of " + currentUserId + "  doesn't have registered shop");
         if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot list a product because user with id of " + currentUserId + " are not yet been verified");
 
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
@@ -83,13 +84,13 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
         Product product = productService.getById(productId);
 
-        if (currentUser.getShop() == null) throw new NotVerifiedException("Cannot update a product because user with id of " + currentUserId + " are not yet been verified");
-        if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot update a product because user with id of " + currentUserId + " are not yet been verified");
+        if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot update a product because user with id of " + currentUserId + " are not yet been verified! Consider register shop first then get verified afterwards");
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
 
         if (productService.isCriticalFieldsChanged(product, productDTO)) product.setState(Product.State.PENDING);
         productService.update(product, productDTO);
+
         return productMapper.toDTO(product);
     }
 
@@ -160,6 +161,16 @@ public class MarketplaceService {
             throws ResourceNotFoundException, InvalidUserCredentialException {
         User currentUser = userService.login(userCredentialDTO);
         return userMapper.toDTO(currentUser);
+    }
+
+    public ShopDTO sendShopRegistration(int currentUserId, ShopDTO shopDTO)
+            throws ResourceNotFoundException, NotOwnedException {
+        User currentUser = userService.getById(currentUserId);
+
+        if (userService.isUserHasShopRegistration(currentUser)) throw new NotVerifiedException("User with id of " + currentUserId + " already have shop registration! Please wait for email notification. If dont receive an email consider resending your valid id!");
+        
+        Shop shop = userService.sendShopRegistration(currentUser, shopDTO);
+        return shopDTO;
     }
 
     public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO)

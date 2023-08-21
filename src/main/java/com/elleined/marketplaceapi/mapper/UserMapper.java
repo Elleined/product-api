@@ -67,6 +67,7 @@ public abstract class UserMapper {
             @Mapping(target = "suffix", expression = "java(suffixService.getByName(userDTO.getSuffix()))"),
 
             @Mapping(target = "userDetails", source = "userDTO.userDetailsDTO"),
+            @Mapping(target = "userDetails.picture", source = "userDTO.userDetailsDTO.picture"),
             @Mapping(target = "userDetails.gender", ignore = true),
             @Mapping(target = "userDetails.registrationDate", ignore = true),
             @Mapping(target = "userDetails.birthDate", ignore = true),
@@ -88,11 +89,13 @@ public abstract class UserMapper {
 
     @Mappings({
             @Mapping(target = "registrationDate", expression = "java(java.time.LocalDateTime.now())"),
+            @Mapping(target = "picture", source = "picture")
     })
     protected abstract UserDetails toUserDetailsEntity(UserDTO.UserDetailsDTO userDetailsDTO);
 
     @Mappings({
-            @Mapping(target = "gender", source = "userDetails.gender")
+            @Mapping(target = "gender", source = "userDetails.gender"),
+            @Mapping(target = "picture", source = "picture")
     })
     protected abstract UserDTO.UserDetailsDTO toUserDetailsDTO(UserDetails userDetails);
 }

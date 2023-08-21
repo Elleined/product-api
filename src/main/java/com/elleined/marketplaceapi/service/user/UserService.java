@@ -1,9 +1,11 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
@@ -34,4 +36,7 @@ public interface UserService {
     List<String> getAllMobileNumber();
 
 
+    Shop sendShopRegistration(User user, ShopDTO shopDTO);
+
+    boolean isUserHasShopRegistration(User user);
 }

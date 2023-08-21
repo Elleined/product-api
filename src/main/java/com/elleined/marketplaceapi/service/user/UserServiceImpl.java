@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
@@ -7,10 +8,12 @@ import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ItemRepository;
+import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +39,8 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     private final ItemMapper itemMapper;
 
     private final ProductService productService;
+
+    private final ShopRepository shopRepository;
 
     @Override
     public User getById(int id) throws ResourceNotFoundException {
@@ -101,6 +106,28 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public List<String> getAllMobileNumber() {
         return userRepository.fetchAllMobileNumber();
+    }
+
+    @Override
+    public Shop sendShopRegistration(User owner, ShopDTO shopDTO) {
+        Shop shop = Shop.builder()
+                .picture(shopDTO.getPicture())
+                .name(shopDTO.getShopName())
+                .description(shopDTO.getDescription())
+                .owner(owner)
+                .build();
+        owner.getUserVerification().setValidId(shopDTO.getValidId());
+
+        userRepository.save(owner);
+        shopRepository.save(shop);
+        log.debug("Shop registration of owner with id of {} are now visible in moderator", owner.getId());
+
+        return shop;
+    }
+
+    @Override
+    public boolean isUserHasShopRegistration(User user) {
+        return user.getShop() != null;
     }
 
     private void encodePassword(User user) {

@@ -11,8 +11,12 @@ import java.util.List;
 
 public interface ModeratorService {
 
+    // Premium users are priority
+    // Users that are newly registered and not have shop registration will not be included
     List<UserDTO> getAllUnverifiedUser();
 
+
+    // Premium users are priority
     List<ProductDTO> getAllPendingProduct();
 
     // Send email

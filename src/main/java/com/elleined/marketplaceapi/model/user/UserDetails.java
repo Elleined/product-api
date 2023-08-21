@@ -38,6 +38,9 @@ public class UserDetails {
     @Column(name = "mobile_number", nullable = false, unique = true)
     private String mobileNumber;
 
+    @Column(name = "picture", nullable = false)
+    private String picture;
+
     public enum Gender {
         MALE,
         FEMALE,

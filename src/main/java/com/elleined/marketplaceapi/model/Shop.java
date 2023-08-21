@@ -30,9 +30,6 @@ public class Shop {
     @Column(name = "picture", nullable = false)
     private String picture;
 
-    @Column(name = "status", nullable = false)
-    private ShopStatus status;
-
     // This is the primary of this shop table
     @MapsId
     @OneToOne(optional = false)
@@ -41,9 +38,4 @@ public class Shop {
             referencedColumnName = "user_id"
     )
     private User owner;
-
-    public enum ShopStatus {
-        VERIFIED,
-        NOT_VERIFIED
-    }
 }

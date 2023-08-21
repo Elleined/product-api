@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.controller;
 
+import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.service.MarketplaceService;
 import jakarta.validation.Valid;
@@ -39,5 +40,13 @@ public class UserController {
     @PostMapping("/login")
     public UserDTO login(@Valid @RequestBody UserDTO.UserCredentialDTO userCredentialDTO) {
         return marketplaceService.login(userCredentialDTO);
+    }
+
+
+    @PostMapping("/{currentUserId}/registerShop")
+    public ShopDTO registerShop(@PathVariable("currentUserId") int currentUserId,
+                                @Valid @RequestBody ShopDTO shopDTO) {
+
+        return marketplaceService.sendShopRegistration(currentUserId, shopDTO);
     }
 }

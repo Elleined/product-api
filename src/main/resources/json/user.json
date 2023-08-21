@@ -1,21 +1,22 @@
 {
-  "suffix": "",
+  "suffix": "JRS",
   "userDetailsDTO": {
     "firstName": "Denielle Mar",
     "middleName": "",
     "lastName": "De Guzman",
     "gender": "MALE",
     "birthDate": "2018-02-05T12:59:11.332",
-    "mobileNumber": "09913929345"
+    "mobileNumber": "09913935695",
+    "picture": "12"
   },
   "addressDTO": {
-    "details": "#106 Purok 3",
+    "details": "#106 Purasasdadadaadcok 3",
     "provinceName": "Nueva Ecija",
     "cityName": "Cabanatuan City",
     "baranggayName": "Sumacab Este"
   },
   "userCredentialDTO": {
-    "email": "demadegu1@gmail.com",
+    "email": "demadegada1asdu1adasdsad@gmail.com",
     "password": "Ayokosabihin1@",
     "confirmPassword": "Ayokosabihin1@"
   }

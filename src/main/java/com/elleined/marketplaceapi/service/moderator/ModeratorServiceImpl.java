@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.exception.NotVerifiedException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
@@ -34,6 +35,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     public List<UserDTO> getAllUnverifiedUser() {
         return userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
+                .filter(user -> user.getShop() != null)
                 .map(userMapper::toDTO)
                 .toList();
     }
@@ -50,6 +52,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     @Override
     public void verifyUser(int userToBeVerifiedId) throws ResourceNotFoundException {
         User userToBeVerified = userRepository.findById(userToBeVerifiedId).orElseThrow(() -> new ResourceNotFoundException("User with id of " + userToBeVerifiedId + " does not exists!"));
+        if (userToBeVerified.getShop() == null) throw new NotVerifiedException("User with id of " + userToBeVerifiedId + " doesn't have pending shop registration! must send a shop registration first!");
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         userRepository.save(userToBeVerified);
 
