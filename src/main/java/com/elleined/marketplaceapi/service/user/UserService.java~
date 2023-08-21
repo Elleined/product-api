@@ -11,8 +11,8 @@ import java.util.List;
 // other related user marketplace here
 public interface UserService {
 
-    // Info will also be saved in forum api
-    User saveByDTO(UserDTO dto);
+    // 
+    User saveByDTO(UserDTO dto); // save also in forum api
 
     User getById(int id) throws ResourceNotFoundException;
 

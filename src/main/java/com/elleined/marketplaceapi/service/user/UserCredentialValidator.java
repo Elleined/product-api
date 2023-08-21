@@ -22,7 +22,7 @@ public class UserCredentialValidator {
         String email = userCredentialDTO.getEmail();
         if (!email.endsWith("@gmail.com")) throw new MalformedEmailException("Email must ends with @gmail.com!");
         if (email.startsWith("@")) throw new MalformedEmailException("Email should not starts with @!");
-        if (userService.getAllEmail().contains(email)) throw new AlreadExistException("This email is already associated with an account!");
+        if (userService.getAllEmail().contains(email)) throw new AlreadExistException("This email " + email + " is already associated with an account!");
     }
 
     public void validatePassword(UserDTO.UserCredentialDTO userCredentialDTO)

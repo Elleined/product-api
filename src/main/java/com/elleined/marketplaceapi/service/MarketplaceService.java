@@ -115,7 +115,7 @@ public class MarketplaceService {
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
         userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
-        if (!suffixService.existsByName(userDTO.getSuffix())) cropService.save(userDTO.getSuffix());
+        if (!suffixService.existsByName(userDTO.getSuffix())) suffixService.save(userDTO.getSuffix());
 
         User registeringUser = userService.saveByDTO(userDTO);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
@@ -144,13 +144,6 @@ public class MarketplaceService {
             throws ResourceNotFoundException, InvalidUserCredentialException {
         User currentUser = userService.login(userCredentialDTO);
         return userMapper.toDTO(currentUser);
-    }
-
-    public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {
-        User currentUser = userService.getById(currentUserId);
-        return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
-                .map(productMapper::toDTO)
-                .toList();
     }
 
     public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO)
@@ -183,5 +176,12 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
         if (currentUser.getOrderedItems().stream().noneMatch(orderItem -> orderItem.getId() == orderId))
             throw new NotOwnedException("User with id of " + currentUserId +  " does not have order item with id of " + orderId);
+    }
+
+    public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
+                .map(productMapper::toDTO)
+                .toList();
     }
 }
