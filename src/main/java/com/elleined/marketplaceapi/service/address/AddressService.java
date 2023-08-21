@@ -10,7 +10,7 @@ import java.util.List;
 public interface AddressService {
     void saveUserAddress(User registeringUser, AddressDTO addressDTO);
 
-    void saveDeliveryAddress(DeliveryAddress deliveryAddress);
+    void saveDeliveryAddress(User orderingUser, AddressDTO addressDTO);
 
     UserAddress getUserAddress(User currentUser);
 

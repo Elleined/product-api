@@ -3,7 +3,6 @@ package com.elleined.marketplaceapi.service;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.*;
-import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+// This is used for orchestrating all transactions instead of using SAGA design pattern
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -96,13 +96,6 @@ public class MarketplaceService {
     }
 
 
-    public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {
-        User currentUser = userService.getById(currentUserId);
-        return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
-                .map(productMapper::toDTO)
-                .toList();
-    }
-
     public UserDTO saveUser(UserDTO userDTO)
             throws ResourceNotFoundException,
             HasDigitException,
@@ -125,25 +118,33 @@ public class MarketplaceService {
         return userMapper.toDTO(registeringUser);
     }
 
-    public UserDTO getUserById(int userId) {
+    public UserDTO getUserById(int userId) throws ResourceNotFoundException {
         User user = userService.getById(userId);
         return userMapper.toDTO(user);
     }
 
-    public UserDTO updateUser(int currentUserId, UserDTO userDTO) {
+    public UserDTO updateUser(int currentUserId, UserDTO userDTO) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         userService.update(userDTO, currentUser);
         return userMapper.toDTO(currentUser);
     }
 
-    public UserDTO resendValidId(int currentUserId, String newValidId) {
+    public UserDTO resendValidId(int currentUserId, String newValidId) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         userService.resendValidId(currentUser, newValidId);
         return userMapper.toDTO(currentUser);
     }
 
-    public UserDTO login(UserDTO.UserCredentialDTO userCredentialDTO) {
+    public UserDTO login(UserDTO.UserCredentialDTO userCredentialDTO)
+            throws ResourceNotFoundException, InvalidUserCredentialException {
         User currentUser = userService.login(userCredentialDTO);
         return userMapper.toDTO(currentUser);
+    }
+
+    public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
+                .map(productMapper::toDTO)
+                .toList();
     }
 }

@@ -33,9 +33,11 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public void saveDeliveryAddress(DeliveryAddress deliveryAddress) {
+    public void saveDeliveryAddress(User orderingUser, AddressDTO addressDTO) {
+        DeliveryAddress deliveryAddress = addressMapper.toDeliveryAddressEntity(addressDTO, orderingUser);
+        orderingUser.getDeliveryAddresses().add(deliveryAddress);
         addressRepository.save(deliveryAddress);
-        log.debug("Delivery address with id of {} saved successfully!", deliveryAddress.getId());
+        log.debug("User with id of {} successfully saved delivery address with id of {}", orderingUser.getId(), deliveryAddress.getId());
     }
 
     @Override

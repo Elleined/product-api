@@ -19,7 +19,8 @@ public class UserDetailsValidator {
     private final UserService userService;
     private final AddressService addressService;
 
-    public void validatePhoneNumber(UserDTO.UserDetailsDTO userDetailsDTO) {
+    public void validatePhoneNumber(UserDTO.UserDetailsDTO userDetailsDTO)
+            throws AlreadExistException, MobileNumberException {
         String mobileNumber = userDetailsDTO.getMobileNumber();
         List<Character> letters = StringUtil.toCharArray(mobileNumber);
 
@@ -43,7 +44,7 @@ public class UserDetailsValidator {
         if (lastNameLetters.stream().anyMatch(Character::isDigit)) throw new HasDigitException("Last name must not contain any digit!");
     }
 
-    public void validateAddressDetails(AddressDTO addressDTO) {
+    public void validateAddressDetails(AddressDTO addressDTO) throws AlreadExistException {
         if (addressService.getAllAddressDetails().contains(addressDTO.getDetails())) throw new AlreadExistException("Address details of " + addressDTO.getDetails() + " already been taken by another user");
     }
 }

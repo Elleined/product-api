@@ -17,14 +17,16 @@ import java.util.List;
 public class UserCredentialValidator {
     private final UserService userService;
 
-    public void validateEmail(UserDTO.UserCredentialDTO userCredentialDTO) throws MalformedEmailException, AlreadExistException {
+    public void validateEmail(UserDTO.UserCredentialDTO userCredentialDTO)
+            throws MalformedEmailException, AlreadExistException {
         String email = userCredentialDTO.getEmail();
         if (!email.endsWith("@gmail.com")) throw new MalformedEmailException("Email must ends with @gmail.com!");
         if (email.startsWith("@")) throw new MalformedEmailException("Email should not starts with @!");
         if (userService.getAllEmail().contains(email)) throw new AlreadExistException("This email is already associated with an account!");
     }
 
-    public void validatePassword(UserDTO.UserCredentialDTO userCredentialDTO) throws PasswordNotMatchException, WeakPasswordException {
+    public void validatePassword(UserDTO.UserCredentialDTO userCredentialDTO)
+            throws PasswordNotMatchException, WeakPasswordException {
         List<Character> specialChars = Arrays.asList('@', '#', '$', '_', '/');
         String password = userCredentialDTO.getPassword();
         List<Character> letters = StringUtil.toCharArray(password);
