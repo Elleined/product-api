@@ -36,7 +36,8 @@ public class ExceptionController {
             MobileNumberException.class,
             MalformedEmailException.class,
             AlreadExistException.class,
-            HasDigitException.class
+            HasDigitException.class,
+            OrderException.class
     })
     public ResponseEntity<APIResponse> handleBadRequestExceptions(RuntimeException ex) {
         var responseMessage = new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage());

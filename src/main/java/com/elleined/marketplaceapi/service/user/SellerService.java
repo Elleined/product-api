@@ -10,6 +10,10 @@ public interface SellerService {
 
     // Generic method for rejecting, accepting, or solding seller product
     // After this method the  buyer will be notified via email
+
+    /**
+     * Seller must provide message for the buyer
+     */
     void updateOrderItemStatus(OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus);
 
     // Seller can use this method to see product listing state if PENDING, LISTING, and SOLD

@@ -153,15 +153,18 @@ public class MarketplaceService {
                 .toList();
     }
 
-    public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO) throws ResourceNotFoundException {
+    public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO)
+            throws ResourceNotFoundException {
         User buyer = userService.getById(buyerId);
-        Product product = productService.getById(orderItemDTO.getProductId());
 
-        if (productService.isDeleted(product)) return null;
-        if (product.getState() == Product.State.SOLD) return null;
-        if (product.getState() != Product.State.LISTING) return null;
-        if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) return null;
-        if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) return null;
+        int productId = orderItemDTO.getProductId();
+        Product product = productService.getById(productId);
+
+        if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
+        if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + productId + " are already been sold!");
+        if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + productId + " are not yet listed!");
+        if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
+        if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit!");
 
         // sendEmailToSeller();
         OrderItem savedOrderItem = buyerService.orderProduct(buyer, orderItemDTO);
