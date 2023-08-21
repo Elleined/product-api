@@ -19,5 +19,6 @@ public interface SellerService {
     // Seller can use this method to see product listing state if PENDING, LISTING, and SOLD
     List<Product> getAllProductByState(User currentUser, Product.State state);
 
-    List<Product> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus);
+    // Use this method to the seller product orders status
+    List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus);
 }

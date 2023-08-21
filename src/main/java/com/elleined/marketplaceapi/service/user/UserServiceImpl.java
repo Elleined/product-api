@@ -147,14 +147,13 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public List<Product> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
+    public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
         List<Product> sellableProducts = seller.getProducts();
         return sellableProducts.stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .flatMap(product -> product.getOrders().stream()
                         .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
-                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed())
-                        .map(OrderItem::getProduct))
+                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
                 .toList();
     }
 

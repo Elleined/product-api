@@ -23,6 +23,7 @@ public interface BuyerService {
      */
     OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO);
 
+    // Use this to see the currentUser product orders status
     List<Product> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);
 
     void cancelOrderItem(User buyer, OrderItem orderItem);

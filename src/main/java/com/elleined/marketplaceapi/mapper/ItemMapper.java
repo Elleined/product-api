@@ -37,7 +37,6 @@ public abstract class ItemMapper {
     public abstract OrderItem toOrderItemEntity(OrderItemDTO orderItemDTO, @Context User buyer) throws ResourceNotFoundException;
 
     @Mappings({
-
             @Mapping(target = "deliveryAddressId", source = "deliveryAddress.id"),
             @Mapping(target = "productId", source = "product.id"),
             @Mapping(target = "purchaserId", source = "purchaser.id")
