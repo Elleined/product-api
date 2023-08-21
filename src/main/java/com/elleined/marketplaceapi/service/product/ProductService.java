@@ -21,7 +21,4 @@ public interface ProductService {
     boolean isDeleted(Product product);
     // Use this to get all the product listing available
     List<Product> getAllExcept(User currentUser);
-
-    // You can use this method to see you product listing state if PENDING, LISTING, and SOLD
-    List<Product> getAllProductByState(User currentUser, State state);
 }

@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.model.item;
 
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -25,8 +26,8 @@ public class OrderItem extends Item {
     private String sellerMessage;
 
     @Builder
-    public OrderItem(Long id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, OrderItemStatus orderItemStatus, String sellerMessage) {
-        super(id, orderQuantity, price, orderDate, product, purchaser);
+    public OrderItem(Long id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress, OrderItemStatus orderItemStatus, String sellerMessage) {
+        super(id, orderQuantity, price, orderDate, product, purchaser, deliveryAddress);
         this.orderItemStatus = orderItemStatus;
         this.sellerMessage = sellerMessage;
     }

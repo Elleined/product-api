@@ -5,8 +5,10 @@ import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
+import com.elleined.marketplaceapi.repository.ItemRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +22,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, SellerService, BuyerService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
     private final UserMapper userMapper;
 
 
@@ -91,5 +94,55 @@ public class UserServiceImpl implements UserService {
         String rawPassword = user.getUserCredential().getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.getUserCredential().setPassword(encodedPassword);
+    }
+
+
+    @Override
+    public void updateOrderItemStatus(OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus) {
+        final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
+        orderItem.setOrderItemStatus(newOrderItemStatus);
+        itemRepository.save(orderItem);
+        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, newOrderItemStatus );
+    }
+
+    @Override
+    public List<Product> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
+        List<Product> sellableProducts = seller.getProducts();
+        return sellableProducts.stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .flatMap(product -> product.getOrders().stream()
+                        .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
+                        .map(OrderItem::getProduct))
+                .toList();
+    }
+
+    @Override
+    public void orderProduct(User buyer, Product product) {
+
+    }
+
+    @Override
+    public List<Product> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
+        return currentUser.getOrderedItems().stream()
+                .filter(orderItem -> orderItem.getOrderItemStatus() == orderItemStatus)
+                .map(OrderItem::getProduct)
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .toList();
+    }
+
+    @Override
+    public void deleteOrderItem(User buyer, OrderItem orderItem) {
+        Product orderedProduct = orderItem.getProduct();
+        buyer.getOrderedItems().remove(orderItem);
+        userRepository.save(buyer);
+        log.debug("Buyer with id of {} removed his order in product with id of {}", buyer.getId(), orderedProduct.getId());
+    }
+
+    @Override
+    public List<Product> getAllProductByState(User currentUser, Product.State state) {
+        return currentUser.getProducts().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(product -> product.getState() == state)
+                .toList();
     }
 }

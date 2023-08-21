@@ -93,12 +93,12 @@ public class Product {
     // product id is in order item table
     @OneToMany(mappedBy = "product")
     @Setter(AccessLevel.NONE)
-    private List<OrderItem> orderItems;
+    private List<OrderItem> orders;
 
     // product id is in cart item table
     @OneToMany(mappedBy = "product")
     @Setter(AccessLevel.NONE)
-    private List<CartItem> cartItems;
+    private List<CartItem> addedToCarts;
 
     public enum State {
         PENDING,

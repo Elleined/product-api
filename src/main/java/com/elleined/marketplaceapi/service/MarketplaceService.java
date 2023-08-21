@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
+import com.elleined.marketplaceapi.service.user.SellerService;
 import com.elleined.marketplaceapi.service.user.UserCredentialValidator;
 import com.elleined.marketplaceapi.service.user.UserDetailsValidator;
 import com.elleined.marketplaceapi.service.user.UserService;
@@ -28,6 +29,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MarketplaceService {
+    private final SellerService sellerService;
     private final UserDetailsValidator userDetailsValidator;
     private final UserCredentialValidator userCredentialValidator;
     private final CropService cropService;
@@ -99,7 +101,7 @@ public class MarketplaceService {
 
     public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
-        return productService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
+        return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
                 .map(productMapper::toDTO)
                 .toList();
     }

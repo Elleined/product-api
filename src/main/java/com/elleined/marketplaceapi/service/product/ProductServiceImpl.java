@@ -76,12 +76,4 @@ public class ProductServiceImpl implements ProductService {
 
         return products;
     }
-
-    @Override
-    public List<Product> getAllProductByState(User currentUser, Product.State state) {
-        return currentUser.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == state)
-                .toList();
-    }
 }

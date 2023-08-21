@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.model.item;
 
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -65,4 +66,12 @@ public abstract class Item {
             updatable = false
     )
     private User purchaser;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(
+            name = "delivery_address_id",
+            referencedColumnName = "address_id",
+            nullable = false
+    )
+    private DeliveryAddress deliveryAddress;
 }
