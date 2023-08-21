@@ -27,23 +27,23 @@ public class ModeratorController {
     }
 
 
-    @PutMapping("/verifyUser/{userToBeVerifiedId}")
+    @PatchMapping("/verifyUser/{userToBeVerifiedId}")
     public void verifyUser(@PathVariable("userToBeVerifiedId") int userToBeVerifiedId) {
         moderatorService.verifyUser(userToBeVerifiedId);
     }
 
-    @PutMapping("/verifyAllUser")
+    @PatchMapping("/verifyAllUser")
     public void verifyAllUser(@RequestBody List<Integer> userToBeVerifiedIds) {
         moderatorService.verifyAllUser(userToBeVerifiedIds);
     }
 
 
-    @PutMapping("/listProduct/{productId}")
+    @PatchMapping("/listProduct/{productId}")
     public void listProduct(@PathVariable("productId") int productId) {
         moderatorService.listProduct(productId);
     }
 
-    @PutMapping
+    @PatchMapping("/listAllProduct")
     public void listAllProduct(@RequestParam List<Integer> productIds) {
         moderatorService.listAllProduct(productIds);
     }
