@@ -111,9 +111,10 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
 
     @Override
-    public void updateOrderItemStatus(OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus) {
+    public void updateOrderItemStatus(OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus, String messageToBuyer) {
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
         orderItem.setOrderItemStatus(newOrderItemStatus);
+        orderItem.setSellerMessage(messageToBuyer);
         itemRepository.save(orderItem);
         log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, newOrderItemStatus );
     }

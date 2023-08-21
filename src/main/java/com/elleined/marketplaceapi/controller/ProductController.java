@@ -21,12 +21,6 @@ public class ProductController {
         return marketplaceService.getAllProductExcept(currentUserId);
     }
 
-    @GetMapping("/state")
-    public List<ProductDTO> getAllProductByState(@PathVariable("currentUserId") int currentUserId,
-                                                 @RequestParam("state") String state) {
-        return marketplaceService.getAllProductByState(currentUserId, state);
-    }
-
     @GetMapping("/{id}")
     public ProductDTO getById(@PathVariable("currentUserId") int currentUserId,
                               @PathVariable("id") int id) {

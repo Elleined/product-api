@@ -66,7 +66,7 @@ public class MarketplaceService {
 
     public ProductDTO saveByDTO(int currentUserId, ProductDTO productDTO) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
-        if (currentUser.getShop() == null) throw new NotVerifiedException("Cannot list a product because user with id of " + currentUserId + " are not yet been verified");
+        if (currentUser.getShop() == null)  throw new NotVerifiedException("Cannot list a product because user with id of " + currentUserId + "  doesn't have registered shop");
         if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot list a product because user with id of " + currentUserId + " are not yet been verified");
 
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
@@ -128,8 +128,23 @@ public class MarketplaceService {
         return userMapper.toDTO(user);
     }
 
-    public UserDTO updateUser(int currentUserId, UserDTO userDTO) throws ResourceNotFoundException {
+    public UserDTO updateUser(int currentUserId, UserDTO userDTO)
+            throws ResourceNotFoundException,
+            HasDigitException,
+            PasswordNotMatchException,
+            WeakPasswordException,
+            MalformedEmailException,
+            AlreadExistException,
+            MobileNumberException {
+
         User currentUser = userService.getById(currentUserId);
+        userDetailsValidator.validateAddressDetails(userDTO.getAddressDTO());
+        userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
+        userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
+        userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
+        userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
+        if (!suffixService.existsByName(userDTO.getSuffix())) suffixService.save(userDTO.getSuffix());
+
         userService.update(userDTO, currentUser);
         return userMapper.toDTO(currentUser);
     }

@@ -10,10 +10,30 @@ import java.util.List;
 
 public interface ProductService {
 
+    /**
+     * Validations
+     *  must have registered shop
+     *  must be verified
+     *  balance must be enough to pay for listing price
+     *
+     *  Normal user
+     *      can only list 10 products a day
+     *      listing price will be deducted
+     */
     Product saveByDTO(ProductDTO dto);
 
     Product getById(int id) throws ResourceNotFoundException;
     boolean existsById(int id);
+
+    /**
+     * Validations
+     *  must have registered shop
+     *  must be verified
+     *  product must be active
+     *  product must be owned
+     *
+     *  Product will be in PENDING state again
+     */
     void update(Product product, ProductDTO productDTO);
     void delete(int id) throws ResourceNotFoundException;
 

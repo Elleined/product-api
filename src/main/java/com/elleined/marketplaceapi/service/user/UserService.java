@@ -12,6 +12,7 @@ import java.util.List;
 public interface UserService {
 
     // Info will also be saved in forum api
+    // After this method will automatically sends welcome email
     User saveByDTO(UserDTO dto);
 
     User getById(int id) throws ResourceNotFoundException;
