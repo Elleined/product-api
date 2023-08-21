@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ItemRepository;
+import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -121,6 +123,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .flatMap(product -> product.getOrders().stream()
                         .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
+                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed())
                         .map(OrderItem::getProduct))
                 .toList();
     }
@@ -142,17 +145,17 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public List<Product> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
         return currentUser.getOrderedItems().stream()
                 .filter(orderItem -> orderItem.getOrderItemStatus() == orderItemStatus)
+                .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed())
                 .map(OrderItem::getProduct)
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .toList();
     }
 
     @Override
-    public void deleteOrderItem(User buyer, OrderItem orderItem) {
-        Product orderedProduct = orderItem.getProduct();
-        buyer.getOrderedItems().remove(orderItem);
-        userRepository.save(buyer);
-        log.debug("Buyer with id of {} removed his order in product with id of {}", buyer.getId(), orderedProduct.getId());
+    public void cancelOrderItem(User buyer, OrderItem orderItem) {
+        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
+        itemRepository.save(orderItem);
+        log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
     }
 
     @Override

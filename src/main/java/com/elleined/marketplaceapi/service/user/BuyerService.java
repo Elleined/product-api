@@ -25,5 +25,5 @@ public interface BuyerService {
 
     List<Product> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);
 
-    void deleteOrderItem(User buyer, OrderItem orderItem);
+    void cancelOrderItem(User buyer, OrderItem orderItem);
 }

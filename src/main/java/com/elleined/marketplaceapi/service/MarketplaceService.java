@@ -155,11 +155,12 @@ public class MarketplaceService {
 
     public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO)
             throws ResourceNotFoundException {
-        User buyer = userService.getById(buyerId);
-
         int productId = orderItemDTO.getProductId();
+
+        User buyer = userService.getById(buyerId);
         Product product = productService.getById(productId);
 
+        if (userService.hasProduct(buyer, product)) throw new OrderException("You cannot order your own product listing!");
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + productId + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + productId + " are not yet listed!");
@@ -169,5 +170,18 @@ public class MarketplaceService {
         // sendEmailToSeller();
         OrderItem savedOrderItem = buyerService.orderProduct(buyer, orderItemDTO);
         return itemMapper.toOrderItemDTO(savedOrderItem);
+    }
+
+    public List<ProductDTO> getAllOrderedProductsByStatus(int currentUserId, String orderItemStatus) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        return buyerService.getAllOrderedProductsByStatus(currentUser, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()
+                .map(productMapper::toDTO)
+                .toList();
+    }
+
+    public void cancelOrderItem(int currentUserId, int orderId) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        if (currentUser.getOrderedItems().stream().noneMatch(orderItem -> orderItem.getId() == orderId))
+            throw new NotOwnedException("User with id of " + currentUserId +  " does not have order item with id of " + orderId);
     }
 }
