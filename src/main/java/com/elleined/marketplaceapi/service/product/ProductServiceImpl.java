@@ -100,4 +100,11 @@ public class ProductServiceImpl implements ProductService {
         log.trace("Total price {}", totalPrice);
         return totalPrice;
     }
+
+    @Override
+    public boolean isProductMustBePendingAgain(Product product, ProductDTO productDTO) {
+        return product.getPricePerUnit() != productDTO.getPricePerUnit() ||
+                product.getAvailableQuantity() != productDTO.getAvailableQuantity() ||
+                product.getQuantityPerUnit() != productDTO.getQuantityPerUnit();
+    }
 }

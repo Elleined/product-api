@@ -32,7 +32,7 @@ public interface ProductService {
      *  product must be active
      *  product must be owned
      *
-     *  Product will be in PENDING state again
+     *  Product will be in PENDING state again if user updates available quantity, price per unit, and available quantity
      */
     void update(Product product, ProductDTO productDTO);
     void delete(int id) throws ResourceNotFoundException;
@@ -45,4 +45,6 @@ public interface ProductService {
     boolean isNotExactToQuantityPerUnit(Product product, int userOrderQuantity);
 
     double calculatePrice(Product product, int userOrderQuantity);
+
+    boolean isProductMustBePendingAgain(Product product, ProductDTO productDTO);
 }
