@@ -8,7 +8,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
+@NoArgsConstructor
 @Getter
 @Setter
 public class OrderItemDTO extends ItemDTO {
@@ -19,7 +19,7 @@ public class OrderItemDTO extends ItemDTO {
 
 
     @Builder
-    public OrderItemDTO(Long id, @Positive(message = "Order quantity cannot be 0 or less than zero!") int orderQuantity, @Positive(message = "price cannot be 0 or less than zero!") double price, @NotNull(message = "Harvest date cannot null") @PastOrPresent(message = "Cannot sell an item that are not have been harvested yet!") LocalDateTime orderDate, @Positive(message = "Product id cannot be 0 or less than zero!") int productId, int purchaserId, @Positive(message = "Delivery address id cannot be 0 or less than zero!") int deliveryAddressId, String orderItemStatus, String sellerMessage) {
+    public OrderItemDTO(Long id, @Positive(message = "Order quantity cannot be 0 or less than zero!") int orderQuantity, double price, LocalDateTime orderDate, @Positive(message = "Product id cannot be 0 or less than zero!") int productId, int purchaserId, @Positive(message = "Delivery address id cannot be 0 or less than zero!") int deliveryAddressId, String orderItemStatus, String sellerMessage) {
         super(id, orderQuantity, price, orderDate, productId, purchaserId, deliveryAddressId);
         this.orderItemStatus = orderItemStatus;
         this.sellerMessage = sellerMessage;

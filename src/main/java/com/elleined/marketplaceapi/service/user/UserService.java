@@ -39,4 +39,6 @@ public interface UserService {
     Shop sendShopRegistration(User user, ShopDTO shopDTO);
 
     boolean isUserHasShopRegistration(User user);
+
+
 }
