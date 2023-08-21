@@ -2,10 +2,13 @@ package com.elleined.marketplaceapi.service;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.*;
+import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.CropService;
@@ -26,6 +29,7 @@ import java.util.List;
 @Transactional
 public class MarketplaceService {
     private final SellerService sellerService;
+    private final BuyerService buyerService;
     private final UserDetailsValidator userDetailsValidator;
     private final UserCredentialValidator userCredentialValidator;
     private final ProductService productService;
@@ -38,6 +42,7 @@ public class MarketplaceService {
 
     private final ProductMapper productMapper;
     private final UserMapper userMapper;
+    private final ItemMapper itemMapper;
 
 
     public void deleteProduct(int currentUserId, int productId)
@@ -146,5 +151,20 @@ public class MarketplaceService {
         return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
                 .map(productMapper::toDTO)
                 .toList();
+    }
+
+    public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO) throws ResourceNotFoundException {
+        User buyer = userService.getById(buyerId);
+        Product product = productService.getById(orderItemDTO.getProductId());
+
+        if (productService.isDeleted(product)) return null;
+        if (product.getState() == Product.State.SOLD) return null;
+        if (product.getState() != Product.State.LISTING) return null;
+        if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) return null;
+        if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) return null;
+
+        // sendEmailToSeller();
+        OrderItem savedOrderItem = buyerService.orderProduct(buyer, orderItemDTO);
+        return itemMapper.toOrderItemDTO(savedOrderItem);
     }
 }

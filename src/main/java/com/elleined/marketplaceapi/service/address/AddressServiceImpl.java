@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.address;
 
 import com.elleined.marketplaceapi.dto.AddressDTO;
+import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
@@ -58,5 +59,13 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public List<String> getAllAddressDetails() {
         return addressRepository.fetchAllAddressDetails();
+    }
+
+    @Override
+    public DeliveryAddress getDeliveryAddressById(User user, int deliveryAddressId) throws ResourceNotFoundException {
+        return user.getDeliveryAddresses().stream()
+                .filter(deliveryAddress -> deliveryAddress.getId() == deliveryAddressId)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("User with id of " + user.getId() + " does not have delivery address with id of " + deliveryAddressId));
     }
 }

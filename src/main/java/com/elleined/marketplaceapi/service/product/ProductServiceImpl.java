@@ -76,4 +76,28 @@ public class ProductServiceImpl implements ProductService {
 
         return products;
     }
+
+    @Override
+    public boolean isExceedingToAvailableQuantity(Product product, int userOrderQuantity) {
+        return userOrderQuantity > product.getAvailableQuantity();
+    }
+
+    @Override
+    public boolean isNotExactToQuantityPerUnit(Product product, int userOrderQuantity) {
+        return userOrderQuantity % product.getQuantityPerUnit() != 0;
+    }
+
+    @Override
+    public double calculatePrice(Product product, int userOrderQuantity) {
+        int tempOrderQuantity = userOrderQuantity;
+        int counter = 0;
+        while (tempOrderQuantity > 0) {
+            if (tempOrderQuantity % product.getQuantityPerUnit() == 0) counter++;
+            tempOrderQuantity -= product.getQuantityPerUnit();
+        }
+
+        double totalPrice = product.getPricePerUnit() * counter;
+        log.trace("Total price {}", totalPrice);
+        return totalPrice;
+    }
 }

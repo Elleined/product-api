@@ -1,8 +1,10 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
@@ -10,6 +12,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ItemRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,10 +27,14 @@ import java.util.List;
 @Transactional
 public class UserServiceImpl implements UserService, SellerService, BuyerService {
     private final PasswordEncoder passwordEncoder;
+
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
     private final UserMapper userMapper;
 
+    private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
+
+    private final ProductService productService;
 
     @Override
     public User getById(int id) throws ResourceNotFoundException {
@@ -119,8 +126,16 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void orderProduct(User buyer, Product product) {
+    public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO) {
+        OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
 
+        double price = productService.calculatePrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
+        orderItem.setPrice(price);
+
+        buyer.getOrderedItems().add(orderItem);
+        itemRepository.save(orderItem);
+        log.debug("User with id of {} successfully ordered product with id of {}", buyer.getId(), orderItem.getProduct().getId());
+        return orderItem;
     }
 
     @Override

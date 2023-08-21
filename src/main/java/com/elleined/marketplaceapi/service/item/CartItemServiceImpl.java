@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.item;
 
+import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
