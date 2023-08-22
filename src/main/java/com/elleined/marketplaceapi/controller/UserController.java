@@ -58,4 +58,9 @@ public class UserController {
                                           @Valid @RequestBody AddressDTO addressDTO) {
         return marketplaceService.saveDeliveryAddress(currentUserId, addressDTO);
     }
+
+    @GetMapping("/getAllSuffix")
+    public List<String> getAllSuffix() {
+        return marketplaceService.getAllSuffix();
+    }
 }

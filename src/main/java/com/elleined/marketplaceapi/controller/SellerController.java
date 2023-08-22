@@ -22,8 +22,6 @@ public class SellerController {
         return marketplaceService.getAllProductByState(currentUserId, state);
     }
 
-
-
     @PutMapping("/updateOrderItemStatus/{orderItemId}")
     public void updateOrderItemStatus(@PathVariable("currentUserId") int currentUserId,
                                       @PathVariable("orderItemId") int orderItemId,
@@ -32,7 +30,9 @@ public class SellerController {
         marketplaceService.updateOrderItemStatus(currentUserId, orderItemId, newOrderItemStatus, messageToBuyer);
     }
 
-    public List<OrderItemDTO> getAllSellerProductOrderByStatus(int sellerId, String orderStatus) {
-        return marketplaceService.getAllSellerProductOrderByStatus(sellerId, orderStatus);
+    @GetMapping("/getAllSellerProductOrderByStatus")
+    public List<OrderItemDTO> getAllSellerProductOrderByStatus(@PathVariable("currentUserId") int sellerId,
+                                                               @RequestParam("orderItemStatus") String orderItemStatus) {
+        return marketplaceService.getAllSellerProductOrderByStatus(sellerId, orderItemStatus);
     }
 }

@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.ItemRepository;
+import com.elleined.marketplaceapi.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class CartItemServiceImpl implements CartItemService {
-    private final ItemRepository itemRepository;
+    private final CartItemRepository cartItemRepository;
     private final ItemMapper itemMapper;
 
     @Override

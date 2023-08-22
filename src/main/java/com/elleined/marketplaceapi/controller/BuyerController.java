@@ -17,24 +17,24 @@ import java.util.List;
 public class BuyerController {
 
     private final MarketplaceService marketplaceService;
-    @PostMapping
+    @PostMapping("/orderProduct")
     public OrderItemDTO orderProduct(@PathVariable("currentUserId") int currentUserId,
                                      @Valid @RequestBody OrderItemDTO orderItemDTO) {
         return marketplaceService.orderProduct(currentUserId, orderItemDTO);
     }
 
-    @PostMapping("/getAllOrderedProductsByStatus")
+    @GetMapping("/getAllOrderedProductsByStatus")
     public List<OrderItemDTO> getAllOrderedProductsByStatus(@PathVariable("currentUserId") int currentUserId,
                                                             @RequestParam("orderItemStatus ") String orderItemStatus) {
 
         return marketplaceService.getAllOrderedProductsByStatus(currentUserId, orderItemStatus);
     }
 
-    @DeleteMapping("/cancelOrderItem/{orderId}")
+    @DeleteMapping("/cancelOrderItem/{orderItemId}")
     public ResponseEntity<OrderItemDTO> cancelOrderItem(@PathVariable("currentUserId") int currentUserId,
-                                                        @PathVariable("orderId") int orderId) {
+                                                        @PathVariable("orderItemId") int orderItemId) {
 
-        marketplaceService.cancelOrderItem(currentUserId, orderId);
+        marketplaceService.cancelOrderItem(currentUserId, orderItemId);
         return ResponseEntity.noContent().build();
     }
 }

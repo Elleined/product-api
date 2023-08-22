@@ -49,4 +49,15 @@ public class ProductController {
         marketplaceService.deleteProduct(currentUserId, id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/getAllCrops")
+    public List<String> getAllCrops() {
+        return marketplaceService.getAllCrops();
+    }
+
+    @GetMapping("/getAllUnits")
+    public List<String> getAllUnit() {
+        return marketplaceService.getAllUnit();
+    }
+
 }

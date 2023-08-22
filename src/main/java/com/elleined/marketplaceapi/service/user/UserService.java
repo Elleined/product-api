@@ -35,7 +35,7 @@ public interface UserService {
     List<String> getAllMobileNumber();
 
 
-    Shop sendShopRegistration(User user, ShopDTO shopDTO);
+    void sendShopRegistration(User user, ShopDTO shopDTO);
 
     boolean isUserHasShopRegistration(User user);
 

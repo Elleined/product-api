@@ -1,12 +1,10 @@
 package com.elleined.marketplaceapi.dto.item;
 
-import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.address.DeliveryAddress;
-import com.elleined.marketplaceapi.model.user.User;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;

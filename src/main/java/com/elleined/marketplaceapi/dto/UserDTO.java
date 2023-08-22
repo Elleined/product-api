@@ -81,7 +81,6 @@ public class UserDTO {
         @NotBlank(message = "Password cannot be blank, null, or empty")
         private String password;
 
-        @NotBlank(message = "Confirm password cannot be blank, null, or empty")
         private String confirmPassword;
     }
 }

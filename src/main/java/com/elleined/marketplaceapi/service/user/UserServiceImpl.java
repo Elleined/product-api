@@ -12,7 +12,7 @@ import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
-import com.elleined.marketplaceapi.repository.ItemRepository;
+import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    private final ItemRepository itemRepository;
+    private final OrderItemRepository orderItemRepository;
     private final ItemMapper itemMapper;
 
     private final ProductService productService;
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public Shop sendShopRegistration(User owner, ShopDTO shopDTO) {
+    public void sendShopRegistration(User owner, ShopDTO shopDTO) {
         Shop shop = Shop.builder()
                 .picture(shopDTO.getPicture())
                 .name(shopDTO.getShopName())
@@ -112,9 +112,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
         userRepository.save(owner);
         shopRepository.save(shop);
-        log.debug("Shop registration of owner with id of {} are now visible in moderator", owner.getId());
-
-        return shop;
+        log.debug("Shop registration of owner with id of {} success his verification are now visible in moderator", owner.getId());
     }
 
     @Override
@@ -124,8 +122,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
     @Override
     public OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException {
-
-        return null;
+        return orderItemRepository.findById((long) orderItemId).orElseThrow(() -> new ResourceNotFoundException("Order item with id of " + orderItemId + " does not exists!"));
     }
 
     private void encodePassword(User user) {
@@ -140,14 +137,13 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
         orderItem.setOrderItemStatus(newOrderItemStatus);
         orderItem.setSellerMessage(messageToBuyer);
-        itemRepository.save(orderItem);
+        orderItemRepository.save(orderItem);
         log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, newOrderItemStatus );
     }
 
     @Override
     public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        List<Product> sellableProducts = seller.getProducts();
-        return sellableProducts.stream()
+        return seller.getProducts().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .flatMap(product -> product.getOrders().stream()
                         .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
@@ -163,7 +159,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         orderItem.setPrice(price);
 
         buyer.getOrderedItems().add(orderItem);
-        itemRepository.save(orderItem);
+        orderItemRepository.save(orderItem);
         log.debug("User with id of {} successfully ordered product with id of {}", buyer.getId(), orderItem.getProduct().getId());
         return orderItem;
     }
@@ -180,7 +176,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public void cancelOrderItem(User buyer, OrderItem orderItem) {
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
-        itemRepository.save(orderItem);
+        orderItemRepository.save(orderItem);
         log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
     }
 

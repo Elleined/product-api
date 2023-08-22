@@ -11,7 +11,6 @@ import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -153,8 +152,7 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
 
         if (userService.isUserHasShopRegistration(currentUser)) throw new NotVerifiedException("User with id of " + currentUserId + " already have shop registration! Please wait for email notification. If dont receive an email consider resending your valid id!");
-
-        Shop shop = userService.sendShopRegistration(currentUser, shopDTO);
+        userService.sendShopRegistration(currentUser, shopDTO);
         return shopDTO;
     }
 
@@ -184,10 +182,11 @@ public class MarketplaceService {
                 .toList();
     }
 
-    public void cancelOrderItem(int currentUserId, int orderId) throws ResourceNotFoundException {
+    public void cancelOrderItem(int currentUserId, int orderItemId)
+            throws ResourceNotFoundException, NotOwnedException {
         User currentUser = userService.getById(currentUserId);
-        if (currentUser.getOrderedItems().stream().noneMatch(orderItem -> orderItem.getId() == orderId))
-            throw new NotOwnedException("User with id of " + currentUserId +  " does not have order item with id of " + orderId);
+        if (currentUser.getOrderedItems().stream().noneMatch(orderItem -> orderItem.getId() == orderItemId))
+            throw new NotOwnedException("User with id of " + currentUserId +  " does not have order item with id of " + orderItemId);
     }
 
     public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {
@@ -218,15 +217,27 @@ public class MarketplaceService {
 
     public void updateOrderItemStatus(int currentUserId, int orderItemId, String newOrderItemStatus, String messageToBuyer) {
         User currentUser = userService.getById(currentUserId);
-
-
+        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+        OrderItem.OrderItemStatus orderItemStatus = OrderItem.OrderItemStatus.valueOf(newOrderItemStatus);
+        sellerService.updateOrderItemStatus(currentUser, orderItem, orderItemStatus, messageToBuyer);
     }
 
-    public List<OrderItemDTO> getAllSellerProductOrderByStatus(int sellerId, String orderStatus) throws ResourceNotFoundException {
+    public List<OrderItemDTO> getAllSellerProductOrderByStatus(int sellerId, String orderItemStatus) throws ResourceNotFoundException {
         User seller = userService.getById(sellerId);
-        OrderItem.OrderItemStatus orderItemStatus = OrderItem.OrderItemStatus.valueOf(orderStatus);
-        return sellerService.getAllSellerProductOrderByStatus(seller, orderItemStatus).stream()
+        OrderItem.OrderItemStatus status = OrderItem.OrderItemStatus.valueOf(orderItemStatus);
+        return sellerService.getAllSellerProductOrderByStatus(seller, status).stream()
                 .map(itemMapper::toOrderItemDTO)
                 .toList();
+    }
+
+    public List<String> getAllCrops() {
+        return cropService.getAll();
+    }
+
+    public List<String> getAllUnit() {
+        return unitService.getAll();
+    }
+    public List<String> getAllSuffix() {
+        return suffixService.getAll();
     }
 }

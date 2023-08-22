@@ -7,7 +7,6 @@ import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.service.user.SuffixService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
