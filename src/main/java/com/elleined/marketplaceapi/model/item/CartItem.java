@@ -15,12 +15,12 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tbl_cart_item")
 @NoArgsConstructor
-@Getter
 @Setter
+@Getter
 public class CartItem extends Item {
 
     @Builder
-    public CartItem(Long id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress) {
+    public CartItem(int id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress) {
         super(id, orderQuantity, price, orderDate, product, purchaser, deliveryAddress);
     }
 }

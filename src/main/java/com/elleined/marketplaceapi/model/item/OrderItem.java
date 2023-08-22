@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tbl_order_item")
 @NoArgsConstructor
-@Getter
 @Setter
+@Getter
 public class OrderItem extends Item {
 
     @Enumerated(EnumType.STRING)
@@ -26,7 +26,7 @@ public class OrderItem extends Item {
     private String sellerMessage;
 
     @Builder
-    public OrderItem(Long id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress, OrderItemStatus orderItemStatus, String sellerMessage) {
+    public OrderItem(int id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress, OrderItemStatus orderItemStatus, String sellerMessage) {
         super(id, orderQuantity, price, orderDate, product, purchaser, deliveryAddress);
         this.orderItemStatus = orderItemStatus;
         this.sellerMessage = sellerMessage;

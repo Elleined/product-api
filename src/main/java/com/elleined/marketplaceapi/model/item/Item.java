@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-@Entity
-@Table(name = "tbl_item")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@MappedSuperclass
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,21 +18,14 @@ import java.time.LocalDateTime;
 public abstract class Item {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.TABLE,
-            generator = "itemAutoIncrement"
-    )
-    @SequenceGenerator(
-            allocationSize = 1,
-            name = "itemAutoIncrement",
-            sequenceName = "itemAutoIncrement"
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
-            name = "item_id",
+            name = "id",
             nullable = false,
-            updatable = false
+            updatable = false,
+            unique = true
     )
-    private Long id;
+    private int id;
 
     @Column(name = "item_quantity", nullable = false)
     private int orderQuantity;
