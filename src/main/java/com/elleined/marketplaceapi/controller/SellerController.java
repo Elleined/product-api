@@ -2,11 +2,8 @@ package com.elleined.marketplaceapi.controller;
 
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.item.OrderItem;
-import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.service.MarketplaceService;
-import com.elleined.marketplaceapi.service.user.SellerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,11 +24,15 @@ public class SellerController {
 
 
 
-    public void updateOrderItemStatus(OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus, String messageToBuyer) {
-
+    @PutMapping("/updateOrderItemStatus/{orderItemId}")
+    public void updateOrderItemStatus(@PathVariable("currentUserId") int currentUserId,
+                                      @PathVariable("orderItemId") int orderItemId,
+                                      @RequestParam("newOrderItemStatus") String newOrderItemStatus,
+                                      @RequestParam("messageToBuyer") String messageToBuyer) {
+        marketplaceService.updateOrderItemStatus(currentUserId, orderItemId, newOrderItemStatus, messageToBuyer);
     }
 
-    public List<Product> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        return null;
+    public List<OrderItemDTO> getAllSellerProductOrderByStatus(int sellerId, String orderStatus) {
+        return marketplaceService.getAllSellerProductOrderByStatus(sellerId, orderStatus);
     }
 }

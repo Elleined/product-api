@@ -123,7 +123,7 @@ public class MarketplaceService {
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
         userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
-        if (!suffixService.existsByName(userDTO.getSuffix())) suffixService.save(userDTO.getSuffix());
+        if (!suffixService.existsByName(userDTO.getUserDetailsDTO().getSuffix())) suffixService.save(userDTO.getUserDetailsDTO().getSuffix());
 
         User registeringUser = userService.saveByDTO(userDTO);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
@@ -134,27 +134,6 @@ public class MarketplaceService {
     public UserDTO getUserById(int userId) throws ResourceNotFoundException {
         User user = userService.getById(userId);
         return userMapper.toDTO(user);
-    }
-
-    public UserDTO updateUser(int currentUserId, UserDTO userDTO)
-            throws ResourceNotFoundException,
-            HasDigitException,
-            PasswordNotMatchException,
-            WeakPasswordException,
-            MalformedEmailException,
-            AlreadExistException,
-            MobileNumberException {
-
-        User currentUser = userService.getById(currentUserId);
-        addressValidator.validateAddressDetails(userDTO.getAddressDTO());
-        userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
-        userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
-        userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
-        userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
-        if (!suffixService.existsByName(userDTO.getSuffix())) suffixService.save(userDTO.getSuffix());
-
-        userService.update(userDTO, currentUser);
-        return userMapper.toDTO(currentUser);
     }
 
     public UserDTO resendValidId(int currentUserId, String newValidId) throws ResourceNotFoundException {
@@ -198,10 +177,10 @@ public class MarketplaceService {
         return itemMapper.toOrderItemDTO(savedOrderItem);
     }
 
-    public List<ProductDTO> getAllOrderedProductsByStatus(int currentUserId, String orderItemStatus) throws ResourceNotFoundException {
+    public List<OrderItemDTO> getAllOrderedProductsByStatus(int currentUserId, String orderItemStatus) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         return buyerService.getAllOrderedProductsByStatus(currentUser, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()
-                .map(productMapper::toDTO)
+                .map(itemMapper::toOrderItemDTO)
                 .toList();
     }
 
@@ -234,6 +213,20 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
         return addressService.getAllDeliveryAddress(currentUser).stream()
                 .map(addressMapper::toDTO)
+                .toList();
+    }
+
+    public void updateOrderItemStatus(int currentUserId, int orderItemId, String newOrderItemStatus, String messageToBuyer) {
+        User currentUser = userService.getById(currentUserId);
+
+
+    }
+
+    public List<OrderItemDTO> getAllSellerProductOrderByStatus(int sellerId, String orderStatus) throws ResourceNotFoundException {
+        User seller = userService.getById(sellerId);
+        OrderItem.OrderItemStatus orderItemStatus = OrderItem.OrderItemStatus.valueOf(orderStatus);
+        return sellerService.getAllSellerProductOrderByStatus(seller, orderItemStatus).stream()
+                .map(itemMapper::toOrderItemDTO)
                 .toList();
     }
 }

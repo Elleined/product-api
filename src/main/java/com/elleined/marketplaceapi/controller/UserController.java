@@ -28,12 +28,6 @@ public class UserController {
         return marketplaceService.getUserById(id);
     }
 
-    @PutMapping("/{currentUserId}")
-    public UserDTO update(@PathVariable("currentUserId") int currentUserId,
-                          @Valid @RequestBody UserDTO userDTO) {
-        return marketplaceService.updateUser(currentUserId, userDTO);
-    }
-
     @PatchMapping("/{currentUserId}/resendValidId")
     public UserDTO resendValidId(@PathVariable("currentUserId") int currentUserId,
                                  @RequestParam("newValidId") String newValidId) {

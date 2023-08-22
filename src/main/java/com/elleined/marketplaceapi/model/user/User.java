@@ -46,14 +46,6 @@ public class User {
     private UserDetails userDetails;
 
 
-    // user id reference is in suffix table
-    @ManyToOne
-    @JoinColumn(
-            name = "suffix_id",
-            referencedColumnName = "id"
-    )
-    private Suffix suffix;
-
     // user id reference is in user address table
     @OneToOne(mappedBy = "user")
     private UserAddress address;

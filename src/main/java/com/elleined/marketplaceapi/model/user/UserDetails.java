@@ -1,9 +1,6 @@
 package com.elleined.marketplaceapi.model.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +37,14 @@ public class UserDetails {
 
     @Column(name = "picture", nullable = false)
     private String picture;
+
+    // user id reference is in suffix table
+    @ManyToOne
+    @JoinColumn(
+            name = "suffix_id",
+            referencedColumnName = "id"
+    )
+    private Suffix suffix;
 
     public enum Gender {
         MALE,

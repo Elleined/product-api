@@ -22,7 +22,7 @@ import java.util.List;
 @Getter
 public class Suffix extends BaseEntity {
 
-    @OneToMany(mappedBy = "suffix")
+    @OneToMany(mappedBy = "userDetails.suffix")
     private List<User> user;
 
     @Builder

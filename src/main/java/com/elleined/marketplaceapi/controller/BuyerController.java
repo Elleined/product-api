@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.controller;
 
 
-import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.service.MarketplaceService;
 import jakarta.validation.Valid;
@@ -25,8 +24,8 @@ public class BuyerController {
     }
 
     @PostMapping("/getAllOrderedProductsByStatus")
-    public List<ProductDTO> getAllOrderedProductsByStatus(@PathVariable("currentUserId") int currentUserId,
-                                                          @RequestParam("orderItemStatus ") String orderItemStatus) {
+    public List<OrderItemDTO> getAllOrderedProductsByStatus(@PathVariable("currentUserId") int currentUserId,
+                                                            @RequestParam("orderItemStatus ") String orderItemStatus) {
 
         return marketplaceService.getAllOrderedProductsByStatus(currentUserId, orderItemStatus);
     }

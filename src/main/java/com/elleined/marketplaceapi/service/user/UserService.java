@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
@@ -18,8 +19,6 @@ public interface UserService {
     User saveByDTO(UserDTO dto);
 
     User getById(int id) throws ResourceNotFoundException;
-
-    void update(UserDTO userDTO, User user);
 
     boolean hasProduct(User currentUser, Product product);
 
@@ -40,5 +39,5 @@ public interface UserService {
 
     boolean isUserHasShopRegistration(User user);
 
-
+    OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException;
 }

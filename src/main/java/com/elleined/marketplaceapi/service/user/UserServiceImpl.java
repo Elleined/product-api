@@ -57,14 +57,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         return user;
     }
 
-
-    @Override
-    public void update(UserDTO userDTO, User user) throws ResourceNotFoundException {
-        User updatedUser = userMapper.toUpdate(userDTO, user);
-        userRepository.save(updatedUser);
-        log.debug("User with id of {} updated successfully!", updatedUser.getId());
-    }
-
     @Override
     public boolean hasProduct(User currentUser, Product product) {
         return currentUser.getProducts().stream().anyMatch(product::equals);
@@ -130,6 +122,12 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         return user.getShop() != null;
     }
 
+    @Override
+    public OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException {
+
+        return null;
+    }
+
     private void encodePassword(User user) {
         String rawPassword = user.getUserCredential().getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
@@ -138,7 +136,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
 
     @Override
-    public void updateOrderItemStatus(OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus, String messageToBuyer) {
+    public void updateOrderItemStatus(User seller, OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus, String messageToBuyer) {
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
         orderItem.setOrderItemStatus(newOrderItemStatus);
         orderItem.setSellerMessage(messageToBuyer);
@@ -171,12 +169,11 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public List<Product> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
+    public List<OrderItem> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
         return currentUser.getOrderedItems().stream()
                 .filter(orderItem -> orderItem.getOrderItemStatus() == orderItemStatus)
+                .filter(orderItem -> orderItem.getProduct().getStatus() == Product.Status.ACTIVE)
                 .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed())
-                .map(OrderItem::getProduct)
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .toList();
     }
 

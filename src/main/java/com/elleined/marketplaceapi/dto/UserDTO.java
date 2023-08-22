@@ -21,7 +21,6 @@ public class UserDTO {
 
     private int id;
     private String uuid;
-    private String suffix;
 
     private String validId;
     private String status;
@@ -65,6 +64,8 @@ public class UserDTO {
 
         @NotBlank(message = "Mobile number cannot be blank, null, or empty")
         private String picture;
+
+        private String suffix;
     }
 
     @Data
