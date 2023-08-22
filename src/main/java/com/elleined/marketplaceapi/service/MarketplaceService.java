@@ -58,7 +58,7 @@ public class MarketplaceService {
         Product product = productService.getById(productId);
 
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
-        productService.delete(productId);
+        sellerService.deleteProduct(productId);
     }
 
     public ProductDTO getProductById(int currentUserId, int productId)
@@ -77,7 +77,7 @@ public class MarketplaceService {
 
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
-        Product product = productService.saveByDTO(productDTO);
+        Product product = sellerService.saveProduct(productDTO);
         return productMapper.toDTO(product);
     }
 
@@ -94,7 +94,7 @@ public class MarketplaceService {
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
 
         if (productService.isCriticalFieldsChanged(product, productDTO)) product.setState(Product.State.PENDING);
-        productService.update(product, productDTO);
+        sellerService.updateProduct(product, productDTO);
 
         return productMapper.toDTO(product);
     }
@@ -206,6 +206,13 @@ public class MarketplaceService {
 
         DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, addressDTO);
         return addressMapper.toDTO(deliveryAddress);
+    }
+
+    public void deleteDeliveryAddress(int currentUserId, int deliveryAddressId)
+            throws ResourceNotFoundException, NotOwnedException {
+        User currentUser = userService.getById(currentUserId);
+        if (currentUser.getDeliveryAddresses().stream().noneMatch(deliveryAddress -> deliveryAddress.getId() == deliveryAddressId)) throw new NotOwnedException("User with id of " + currentUser.getId() + " does not have delivery address with id of " + deliveryAddressId);
+        addressService.deleteDeliveryAddress(currentUser, deliveryAddressId);
     }
 
     public List<AddressDTO> getAllDeliveryAddress(int currentUserId) throws ResourceNotFoundException {

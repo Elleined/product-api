@@ -1,11 +1,14 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
+import com.elleined.marketplaceapi.exception.NotOwnedException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
+import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
@@ -13,6 +16,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -30,6 +34,9 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class UserServiceImpl implements UserService, SellerService, BuyerService {
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
+
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
@@ -77,10 +84,10 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public User login(UserDTO.UserCredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
         String email = userCredentialDTO.getEmail();
+        if (!userRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+
         User user = getByEmail(userCredentialDTO.getEmail());
         String encodedPassword = user.getUserCredential().getPassword();
-
-        if (!userRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
         if (!passwordEncoder.matches(userCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
         return user;
     }
@@ -131,6 +138,30 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         user.getUserCredential().setPassword(encodedPassword);
     }
 
+
+    @Override
+    public Product saveProduct(ProductDTO productDTO) {
+        Product product = productMapper.toEntity(productDTO);
+        productRepository.save(product);
+        log.debug("Product saved successfully with id of {}", product.getId());
+        return product;
+    }
+
+    @Override
+    public void updateProduct(Product product, ProductDTO productDTO) {
+        Product updatedProduct = productMapper.toUpdate(product, productDTO);
+        productRepository.save(updatedProduct);
+        log.debug("Product with id of {} updated successfully!", updatedProduct.getId());
+    }
+
+    @Override
+    public void deleteProduct(int productId) throws ResourceNotFoundException {
+        Product product = productService.getById(productId);
+        product.setStatus(Product.Status.INACTIVE);
+        productRepository.save(product);
+
+        log.debug("Product with id of {} are now inactive", product.getId());
+    }
 
     @Override
     public void updateOrderItemStatus(User seller, OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus, String messageToBuyer) {

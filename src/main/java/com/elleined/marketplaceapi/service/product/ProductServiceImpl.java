@@ -20,16 +20,6 @@ import java.util.List;
 @Transactional
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
-
-    @Override
-    public void delete(int id) throws ResourceNotFoundException {
-        Product product = getById(id);
-        product.setStatus(Product.Status.INACTIVE);
-        productRepository.save(product);
-
-        log.debug("Product with id of {} are now inactive", product.getId());
-    }
 
     @Override
     public boolean isDeleted(Product product) {
@@ -41,28 +31,6 @@ public class ProductServiceImpl implements ProductService {
     public Product getById(int id) throws ResourceNotFoundException {
         return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product with id of " + id + " does not exists!"));
     }
-
-    @Override
-    public boolean existsById(int id) {
-        return productRepository.existsById(id);
-    }
-
-
-    @Override
-    public Product saveByDTO(ProductDTO productDTO) {
-        Product product = productMapper.toEntity(productDTO);
-        productRepository.save(product);
-        log.debug("Product saved successfully with id of {}", product.getId());
-        return product;
-    }
-
-    @Override
-    public void update(Product product, ProductDTO productDTO) throws ResourceNotFoundException {
-        Product updatedProduct = productMapper.toUpdate(product, productDTO);
-        productRepository.save(updatedProduct);
-        log.debug("Product with id of {} updated successfully!", updatedProduct.getId());
-    }
-
 
     @Override
     public List<Product> getAllExcept(User currentUser) {

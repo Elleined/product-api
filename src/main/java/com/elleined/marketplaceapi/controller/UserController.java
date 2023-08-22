@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.service.MarketplaceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,6 +58,13 @@ public class UserController {
     public AddressDTO saveDeliveryAddress(@PathVariable("currentUserId") int currentUserId,
                                           @Valid @RequestBody AddressDTO addressDTO) {
         return marketplaceService.saveDeliveryAddress(currentUserId, addressDTO);
+    }
+
+    @DeleteMapping("/{currentUserId}/deleteDeliveryAddress/{deliveryAddressId}")
+    public ResponseEntity<AddressDTO> deleteDeliveryAddress(@PathVariable("currentUserId") int currentUserId,
+                                                            @PathVariable("deliveryAddressId") int deliveryAddressId) {
+        marketplaceService.deleteDeliveryAddress(currentUserId, deliveryAddressId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/getAllSuffix")

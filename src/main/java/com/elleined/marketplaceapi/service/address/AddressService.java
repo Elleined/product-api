@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.address;
 
 import com.elleined.marketplaceapi.dto.AddressDTO;
+import com.elleined.marketplaceapi.exception.NotOwnedException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
@@ -19,4 +20,6 @@ public interface AddressService {
     List<String> getAllAddressDetails();
 
     DeliveryAddress getDeliveryAddressById(User user, int deliveryAddressId) throws ResourceNotFoundException;
+
+    void deleteDeliveryAddress(User currentUser, int deliveryAddressId) throws NotOwnedException;
 }

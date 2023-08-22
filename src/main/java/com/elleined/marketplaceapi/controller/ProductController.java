@@ -27,29 +27,6 @@ public class ProductController {
         return marketplaceService.getProductById(currentUserId, id);
     }
 
-    @PostMapping
-    public ProductDTO save(@PathVariable("currentUserId") int currentUserId,
-                           @Valid @RequestBody ProductDTO productDTO) {
-
-        return marketplaceService.saveByDTO(currentUserId, productDTO);
-    }
-
-    @PutMapping("/{id}")
-    public ProductDTO update(@PathVariable("currentUserId") int currentUserId,
-                             @PathVariable("id") int id,
-                             @Valid @RequestBody ProductDTO productDTO) {
-
-        return marketplaceService.updateProduct(currentUserId, id, productDTO);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ProductDTO> deleteById(@PathVariable("currentUserId") int currentUserId,
-                                     @PathVariable("id") int id) {
-
-        marketplaceService.deleteProduct(currentUserId, id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/getAllCrops")
     public List<String> getAllCrops() {
         return marketplaceService.getAllCrops();
