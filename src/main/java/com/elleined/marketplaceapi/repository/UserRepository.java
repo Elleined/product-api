@@ -11,8 +11,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select u from User u where u.userCredential.email = ?1")
     Optional<User> fetchByEmail(String email);
-    @Query("SELECT u FROM User u WHERE u.uuid = :uuid")
-    Optional<User> fetchByUUID(@Param("uuid") String uuid);
+    @Query("SELECT u FROM User u WHERE u.referralCode = :referralCode")
+    Optional<User> fetchByReferralCode(@Param("referralCode") String referralCode);
 
     @Query("SELECT u.userCredential.email FROM User u")
     List<String> fetchAllEmail();

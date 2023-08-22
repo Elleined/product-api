@@ -1,5 +1,4 @@
 {
-  "suffix": "JRS",
   "userDetailsDTO": {
     "firstName": "Denielle Mar",
     "middleName": "",
@@ -7,7 +6,8 @@
     "gender": "MALE",
     "birthDate": "2018-02-05T12:59:11.332",
     "mobileNumber": "09913935695",
-    "picture": "12"
+    "picture": "12",
+    "suffix": "JRS"
   },
   "addressDTO": {
     "details": "#106 Purasasdadadaadcok 3",
@@ -19,5 +19,6 @@
     "email": "demadegada1asdu1adasdsad@gmail.com",
     "password": "Ayokosabihin1@",
     "confirmPassword": "Ayokosabihin1@"
-  }
+  },
+  "invitationReferralCode": ""
 }

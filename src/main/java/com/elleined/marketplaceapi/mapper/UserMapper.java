@@ -24,12 +24,13 @@ public abstract class UserMapper {
             @Mapping(target = "userVerification.validId", ignore = true),
             @Mapping(target = "address", ignore = true), // will be saved after saving user
 
-            @Mapping(target = "uuid", expression = "java(java.util.UUID.randomUUID().toString())"),
+            @Mapping(target = "referralCode", expression = "java(java.util.UUID.randomUUID().toString())"),
 
             @Mapping(target = "cartItems", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "orderedItems", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "deliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "products", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "referredUsers", expression = "java(new java.util.HashSet<>())"),
 
             @Mapping(target = "userVerification.status", expression = "java(UserVerification.Status.NOT_VERIFIED)"),
             @Mapping(target = "userDetails", expression = "java(toUserDetailsEntity(userDTO.getUserDetailsDTO()))"),
@@ -38,6 +39,7 @@ public abstract class UserMapper {
     public abstract User toEntity(UserDTO userDTO);
 
     @Mappings({
+            @Mapping(target = "invitationReferralCode", ignore = true),
             @Mapping(target = "validId", source = "userVerification.validId"),
             @Mapping(target = "status", source = "userVerification.status"),
 

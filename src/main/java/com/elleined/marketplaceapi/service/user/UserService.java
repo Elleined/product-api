@@ -40,4 +40,9 @@ public interface UserService {
     boolean isUserHasShopRegistration(User user);
 
     OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException;
+
+    // Alias for referral code
+    User getByReferralCode(String referralCode) throws ResourceNotFoundException;
+
+    void addInvitedUser(String invitingUserReferralCode, User invitedUser);
 }

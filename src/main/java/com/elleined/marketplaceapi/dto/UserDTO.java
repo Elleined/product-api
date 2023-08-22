@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,10 +21,14 @@ import java.time.LocalDateTime;
 public class UserDTO {
 
     private int id;
-    private String uuid;
+    private String referralCode;
 
     private String validId;
     private String status;
+
+
+    // Optional if invited
+    private String invitationReferralCode;
 
     @Valid
     @NotNull(message = "User details cannot be null")

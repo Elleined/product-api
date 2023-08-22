@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "tbl_user", indexes = @Index(name = "uuid_idx", columnList = "uuid"))
+@Table(name = "tbl_user", indexes = @Index(name = "referral_code_idx", columnList = "referral_code"))
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Builder
 @Getter
@@ -32,12 +32,12 @@ public class User {
     private int id;
 
     @Column(
-            name = "uuid",
+            name = "referral_code",
             unique = true,
             nullable = false,
             updatable = false
     )
-    private String uuid;
+    private String referralCode;
 
     @Embedded
     private UserVerification userVerification;
@@ -80,7 +80,7 @@ public class User {
     @ManyToMany
     @JoinTable(
             name = "tbl_user_referral",
-            joinColumns = @JoinColumn(name = "user_id",
+            joinColumns = @JoinColumn(name = "inviting_user_id",
                     referencedColumnName = "user_id"
             ),
             inverseJoinColumns = @JoinColumn(
@@ -88,5 +88,5 @@ public class User {
                     referencedColumnName = "user_id"
             )
     )
-    private Set<User> referredUser;
+    private Set<User> referredUsers;
 }

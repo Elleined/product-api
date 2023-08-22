@@ -133,6 +133,19 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         return orderItemRepository.findById((long) orderItemId).orElseThrow(() -> new ResourceNotFoundException("Order item with id of " + orderItemId + " does not exists!"));
     }
 
+    @Override
+    public User getByReferralCode(String referralCode) throws ResourceNotFoundException {
+        return userRepository.fetchByReferralCode(referralCode).orElseThrow(() -> new ResourceNotFoundException("User with referral code of " + referralCode +  " does not exists!"));
+    }
+
+    @Override
+    public void addInvitedUser(String invitingUserReferralCode, User invitedUser) {
+        User invitingUser = getByReferralCode(invitingUserReferralCode);
+        invitingUser.getReferredUsers().add(invitedUser);
+        userRepository.save(invitingUser);
+        log.debug("User with id of {} invited user with id of {} successfully", invitingUser.getId(), invitedUser.getId());
+    }
+
     private void encodePassword(User user) {
         String rawPassword = user.getUserCredential().getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
