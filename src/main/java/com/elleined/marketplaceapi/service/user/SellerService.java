@@ -12,7 +12,6 @@ public interface SellerService {
 
     /**
      * Validations
-     *  must have registered shop
      *  must be verified
      *  balance must be enough to pay for listing price
      *
@@ -24,7 +23,6 @@ public interface SellerService {
 
     /**
      * Validations
-     *  must have registered shop
      *  must be verified
      *  product must be active
      *  product must be owned
@@ -34,8 +32,9 @@ public interface SellerService {
 
     /**
      * Validations
-     *  not owned
-     *  if there is pending orders
+     *  must be owned
+     *  cannot if there is pending orders
+     *  cannot if there is accepted orders
      */
     void deleteProduct(int productId) throws ResourceNotFoundException;
 

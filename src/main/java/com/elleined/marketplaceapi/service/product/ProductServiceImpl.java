@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,23 @@ public class ProductServiceImpl implements ProductService {
         products.removeAll(userProducts);
 
         return products;
+    }
+
+    @Override
+    public boolean isProductHasPendingOrder(Product product) {
+        return product.getOrders().stream().anyMatch(order -> order.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING);
+    }
+
+    @Override
+    public boolean isProductHasAcceptedOrder(Product product) {
+        return product.getOrders().stream().anyMatch(order -> order.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED);
+    }
+
+    @Override
+    public boolean isSellerAlreadyRejectedBuyerForThisProduct(User buyer, Product product) {
+        return buyer.getOrderedItems().stream()
+                .filter(orderItem -> orderItem.getProduct().equals(product))
+                .anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.REJECTED);
     }
 
     @Override

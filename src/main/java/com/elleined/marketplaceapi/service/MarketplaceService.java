@@ -20,6 +20,7 @@ import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
 import com.elleined.marketplaceapi.service.user.*;
+import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,10 +54,12 @@ public class MarketplaceService {
 
 
     public void deleteProduct(int currentUserId, int productId)
-            throws ResourceNotFoundException, NotOwnedException {
+            throws ResourceNotFoundException, NotOwnedException, OrderException {
         User currentUser = userService.getById(currentUserId);
         Product product = productService.getById(productId);
 
+        if (productService.isProductHasPendingOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the pending products to delete this");
+        if (productService.isProductHasAcceptedOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the accepted products to delete this");
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
         sellerService.deleteProduct(productId);
     }
@@ -169,8 +172,8 @@ public class MarketplaceService {
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + productId + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
         if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit!");
+        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Dont spam bro :)");
 
-        // sendEmailToSeller();
         OrderItem savedOrderItem = buyerService.orderProduct(buyer, orderItemDTO);
         return itemMapper.toOrderItemDTO(savedOrderItem);
     }
@@ -226,6 +229,7 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
         OrderItem.OrderItemStatus orderItemStatus = OrderItem.OrderItemStatus.valueOf(newOrderItemStatus);
+        if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
         sellerService.updateOrderItemStatus(currentUser, orderItem, orderItemStatus, messageToBuyer);
     }
 

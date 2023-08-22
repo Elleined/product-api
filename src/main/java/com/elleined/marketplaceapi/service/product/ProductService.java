@@ -16,6 +16,11 @@ public interface ProductService {
     // Use this to get all the product listing available
     List<Product> getAllExcept(User currentUser);
 
+    boolean isProductHasPendingOrder(Product product);
+
+    boolean isProductHasAcceptedOrder(Product product);
+    boolean isSellerAlreadyRejectedBuyerForThisProduct(User buyer, Product product);
+
     boolean isExceedingToAvailableQuantity(Product product, int userOrderQuantity);
     boolean isNotExactToQuantityPerUnit(Product product, int userOrderQuantity);
 

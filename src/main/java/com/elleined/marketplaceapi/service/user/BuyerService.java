@@ -16,6 +16,7 @@ public interface BuyerService {
      *  not enough buyer balance
      *  quantity per unit must be respected
      *  exceeding to available quantity
+     *  if seller already rejected buyer for ordering product
      *  #####
      *  Inside this price will be calculated
      *  After this method seller will be notified via email
