@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 
@@ -10,6 +11,7 @@ public interface BuyerService {
 
     /**
      * # Product order validations
+     *  if buyer already ordered this product
      *  is deleted
      *  if state is sold
      *  not yet listed
@@ -27,4 +29,6 @@ public interface BuyerService {
     List<OrderItem> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);
 
     void cancelOrderItem(User buyer, OrderItem orderItem);
+
+    boolean isUserAlreadyOrderedProduct(User buyer, Product product);
 }

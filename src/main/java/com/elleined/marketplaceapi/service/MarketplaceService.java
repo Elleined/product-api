@@ -53,17 +53,6 @@ public class MarketplaceService {
     private final AddressMapper addressMapper;
 
 
-    public void deleteProduct(int currentUserId, int productId)
-            throws ResourceNotFoundException, NotOwnedException, OrderException {
-        User currentUser = userService.getById(currentUserId);
-        Product product = productService.getById(productId);
-
-        if (productService.isProductHasPendingOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the pending products to delete this");
-        if (productService.isProductHasAcceptedOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the accepted products to delete this");
-        if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
-        sellerService.deleteProduct(productId);
-    }
-
     public ProductDTO getProductById(int currentUserId, int productId)
             throws ResourceNotFoundException, NotOwnedException {
         User currentUser = userService.getById(currentUserId);
@@ -74,7 +63,7 @@ public class MarketplaceService {
         return productMapper.toDTO(product);
     }
 
-    public ProductDTO saveByDTO(int currentUserId, ProductDTO productDTO) throws ResourceNotFoundException {
+    public ProductDTO saveProduct(int currentUserId, ProductDTO productDTO) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot list a product because user with id of " + currentUserId + " are not yet been verified");
 
@@ -92,9 +81,9 @@ public class MarketplaceService {
         User currentUser = userService.getById(currentUserId);
         Product product = productService.getById(productId);
 
-        if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot update a product because user with id of " + currentUserId + " are not yet been verified! Consider register shop first then get verified afterwards");
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
+        if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot update a product because user with id of " + currentUserId + " are not yet been verified! Consider register shop first then get verified afterwards");
 
         if (productService.isCriticalFieldsChanged(product, productDTO)) product.setState(Product.State.PENDING);
         sellerService.updateProduct(product, productDTO);
@@ -102,6 +91,16 @@ public class MarketplaceService {
         return productMapper.toDTO(product);
     }
 
+    public void deleteProduct(int currentUserId, int productId)
+            throws ResourceNotFoundException, NotOwnedException, OrderException {
+        User currentUser = userService.getById(currentUserId);
+        Product product = productService.getById(productId);
+
+        if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
+        if (productService.isProductHasPendingOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the pending products to delete this");
+        if (productService.isProductHasAcceptedOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the accepted products to delete this");
+        sellerService.deleteProduct(productId);
+    }
 
     public List<ProductDTO> getAllProductExcept(int currentUserId) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
@@ -166,6 +165,7 @@ public class MarketplaceService {
         User buyer = userService.getById(buyerId);
         Product product = productService.getById(productId);
 
+        if (buyerService.isUserAlreadyOrderedProduct(buyer, product)) throw new  OrderException("User with id of " + buyerId + " already order this product with id of " + productId + " please wait until seller take action in you order request!");
         if (userService.hasProduct(buyer, product)) throw new OrderException("You cannot order your own product listing!");
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + productId + " are already been sold!");
@@ -225,12 +225,24 @@ public class MarketplaceService {
                 .toList();
     }
 
-    public void updateOrderItemStatus(int currentUserId, int orderItemId, String newOrderItemStatus, String messageToBuyer) {
-        User currentUser = userService.getById(currentUserId);
+    public void acceptOrder(int sellerId, int orderItemId, String messageToBuyer)
+            throws ResourceNotFoundException, NotValidBodyException {
+        User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
-        OrderItem.OrderItemStatus orderItemStatus = OrderItem.OrderItemStatus.valueOf(newOrderItemStatus);
+
+        if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesnt have order with id of " + orderItemId);
         if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
-        sellerService.updateOrderItemStatus(currentUser, orderItem, orderItemStatus, messageToBuyer);
+        sellerService.acceptOrder(seller, orderItem, messageToBuyer);
+    }
+
+    public void rejectOrder(int sellerId, int orderItemId, String messageToBuyer)
+            throws ResourceNotFoundException, NotValidBodyException {
+        User seller = userService.getById(sellerId);
+        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+
+        if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesnt have order with id of " + orderItemId);
+        if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
+        sellerService.rejectOrder(seller, orderItem, messageToBuyer);
     }
 
     public List<OrderItemDTO> getAllSellerProductOrderByStatus(int sellerId, String orderItemStatus) throws ResourceNotFoundException {

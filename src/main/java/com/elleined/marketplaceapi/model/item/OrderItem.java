@@ -34,7 +34,6 @@ public class OrderItem extends Item {
 
     public enum OrderItemStatus {
         CANCELLED,
-        FAILED,
         PENDING,
         ACCEPTED,
         REJECTED

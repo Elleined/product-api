@@ -25,7 +25,7 @@ public class BuyerController {
 
     @GetMapping("/getAllOrderedProductsByStatus")
     public List<OrderItemDTO> getAllOrderedProductsByStatus(@PathVariable("currentUserId") int currentUserId,
-                                                            @RequestParam("orderItemStatus ") String orderItemStatus) {
+                                                            @RequestParam("orderItemStatus") String orderItemStatus) {
 
         return marketplaceService.getAllOrderedProductsByStatus(currentUserId, orderItemStatus);
     }

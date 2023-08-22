@@ -24,12 +24,18 @@ public class SellerController {
         return marketplaceService.getAllProductByState(currentUserId, state);
     }
 
-    @PutMapping("/updateOrderItemStatus/{orderItemId}")
-    public void updateOrderItemStatus(@PathVariable("currentUserId") int currentUserId,
+    @PutMapping("/acceptOrder/{orderItemId}")
+    public void acceptOrder(@PathVariable("currentUserId") int currentUserId,
                                       @PathVariable("orderItemId") int orderItemId,
-                                      @RequestParam("newOrderItemStatus") String newOrderItemStatus,
                                       @RequestParam("messageToBuyer") String messageToBuyer) {
-        marketplaceService.updateOrderItemStatus(currentUserId, orderItemId, newOrderItemStatus, messageToBuyer);
+        marketplaceService.acceptOrder(currentUserId, orderItemId, messageToBuyer);
+    }
+
+    @PutMapping("/rejectOrder/{orderItemId}")
+    public void rejectOrder(@PathVariable("currentUserId") int currentUserId,
+                            @PathVariable("orderItemId") int orderItemId,
+                            @RequestParam("messageToBuyer") String messageToBuyer) {
+        marketplaceService.rejectOrder(currentUserId, orderItemId, messageToBuyer);
     }
 
     @GetMapping("/getAllSellerProductOrderByStatus")
@@ -42,7 +48,7 @@ public class SellerController {
     public ProductDTO saveProduct(@PathVariable("currentUserId") int currentUserId,
                                   @Valid @RequestBody ProductDTO productDTO) {
 
-        return marketplaceService.saveByDTO(currentUserId, productDTO);
+        return marketplaceService.saveProduct(currentUserId, productDTO);
     }
 
     @PutMapping("/updateProduct/{id}")

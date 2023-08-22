@@ -42,10 +42,14 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     @Override
     public List<ProductDTO> getAllPendingProduct() {
-        return productRepository.findAll().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.PENDING)
-                .map(productMapper::toDTO)
+        return userRepository.findAll().stream()
+                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
+                .filter(user -> user.getShop() != null)
+                .map(User::getProducts)
+                .flatMap(products -> products.stream()
+                        .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                        .filter(product -> product.getState() == Product.State.PENDING)
+                        .map(productMapper::toDTO))
                 .toList();
     }
 

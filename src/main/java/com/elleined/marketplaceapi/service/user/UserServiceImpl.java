@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -164,12 +165,22 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void updateOrderItemStatus(User seller, OrderItem orderItem, OrderItem.OrderItemStatus newOrderItemStatus, String messageToBuyer) {
+    public void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer) {
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
-        orderItem.setOrderItemStatus(newOrderItemStatus);
+        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.ACCEPTED);
         orderItem.setSellerMessage(messageToBuyer);
         orderItemRepository.save(orderItem);
-        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, newOrderItemStatus );
+        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.ACCEPTED.name());
+    }
+
+
+    @Override
+    public void rejectOrder(User seller, OrderItem orderItem, String messageToBuyer) {
+        final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
+        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.REJECTED);
+        orderItem.setSellerMessage(messageToBuyer);
+        orderItemRepository.save(orderItem);
+        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.REJECTED.name());
     }
 
     @Override
@@ -180,6 +191,14 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
                         .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
                         .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
                 .toList();
+    }
+
+    @Override
+    public boolean isSellerHasOrder(User seller, OrderItem orderItem) {
+        return seller.getProducts().stream()
+                .map(Product::getOrders)
+                .flatMap(Collection::stream)
+                .anyMatch(orderItem::equals);
     }
 
     @Override
@@ -209,6 +228,13 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
         orderItemRepository.save(orderItem);
         log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
+    }
+
+    @Override
+    public boolean isUserAlreadyOrderedProduct(User buyer, Product product) {
+        return buyer.getOrderedItems().stream()
+                .map(OrderItem::getProduct)
+                .anyMatch(product::equals);
     }
 
     @Override
