@@ -185,11 +185,14 @@ public class MarketplaceService {
                 .toList();
     }
 
-    public void cancelOrderItem(int currentUserId, int orderItemId)
+    public void cancelOrderItem(int buyerId, int orderItemId)
             throws ResourceNotFoundException, NotOwnedException {
-        User currentUser = userService.getById(currentUserId);
-        if (currentUser.getOrderedItems().stream().noneMatch(orderItem -> orderItem.getId() == orderItemId))
-            throw new NotOwnedException("User with id of " + currentUserId +  " does not have order item with id of " + orderItemId);
+
+        User buyer = userService.getById(buyerId);
+        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+
+        if (!buyerService.isBuyerHasOrder(buyer, orderItem)) throw new NotOwnedException("User with id of " + buyerId +  " does not have order item with id of " + orderItemId);
+        if (buyerService.isSellerAcceptedOrder(orderItem)) throw new OrderException("Cannot cancel order because order with id of " + orderItemId + " are already accepted by the seller!");
     }
 
     public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {

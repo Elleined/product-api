@@ -28,7 +28,16 @@ public interface BuyerService {
     // Use this to see the currentUser product orders status
     List<OrderItem> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);
 
+    /**
+     * Validations
+     *  order must be own by buyer
+     *  cannot cancel an order that is already accepted
+     */
     void cancelOrderItem(User buyer, OrderItem orderItem);
 
     boolean isUserAlreadyOrderedProduct(User buyer, Product product);
+
+
+    boolean isBuyerHasOrder(User buyer, OrderItem orderItem);
+    boolean isSellerAcceptedOrder(OrderItem orderItem);
 }

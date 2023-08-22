@@ -238,6 +238,16 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
+    public boolean isBuyerHasOrder(User buyer, OrderItem orderItem) {
+        return buyer.getOrderedItems().stream().anyMatch(orderItem::equals);
+    }
+
+    @Override
+    public boolean isSellerAcceptedOrder(OrderItem orderItem) {
+        return orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED;
+    }
+
+    @Override
     public List<Product> getAllProductByState(User currentUser, Product.State state) {
         return currentUser.getProducts().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
