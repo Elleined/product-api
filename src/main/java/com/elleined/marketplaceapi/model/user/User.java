@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tbl_user", indexes = @Index(name = "uuid_idx", columnList = "uuid"))
@@ -75,4 +76,17 @@ public class User {
     @OneToMany(mappedBy = "seller")
     @Setter(AccessLevel.NONE)
     private List<Product> products;
+
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_user_referral",
+            joinColumns = @JoinColumn(name = "user_id",
+                    referencedColumnName = "user_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "invited_user_id",
+                    referencedColumnName = "user_id"
+            )
+    )
+    private Set<User> referredUser;
 }
