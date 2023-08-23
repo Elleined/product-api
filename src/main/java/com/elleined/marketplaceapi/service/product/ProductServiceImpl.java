@@ -74,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public double calculatePrice(Product product, int userOrderQuantity) {
+    public double calculateOrderPrice(Product product, int userOrderQuantity) {
         int tempOrderQuantity = userOrderQuantity;
         int counter = 0;
         while (tempOrderQuantity > 0) {
@@ -93,5 +93,4 @@ public class ProductServiceImpl implements ProductService {
                 product.getAvailableQuantity() != productDTO.getAvailableQuantity() ||
                 product.getQuantityPerUnit() != productDTO.getQuantityPerUnit();
     }
-
 }

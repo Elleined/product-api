@@ -13,7 +13,6 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.address.AddressValidator;
-import com.elleined.marketplaceapi.service.message.MessageService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
@@ -32,7 +31,6 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MarketplaceService {
-    private final MessageService messageService;
     private final PrincipalService principalService;
     private final SellerService sellerService;
     private final BuyerService buyerService;
@@ -63,9 +61,14 @@ public class MarketplaceService {
         return productMapper.toDTO(product);
     }
 
-    public ProductDTO saveProduct(int currentUserId, ProductDTO productDTO) throws ResourceNotFoundException {
-        User currentUser = userService.getById(currentUserId);
-        if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot list a product because user with id of " + currentUserId + " are not yet been verified");
+    public ProductDTO saveProduct(int sellerId, ProductDTO productDTO)
+            throws ResourceNotFoundException, InsufficientBalanceException {
+        User seller = userService.getById(sellerId);
+
+        if (!userService.isVerified(seller)) throw new NotVerifiedException("Cannot list a product because user with id of " + sellerId + " are not yet been verified");
+        double totalPrice = sellerService.getTotalPrice(productDTO);
+        double listingFee = sellerService.getListingFee(totalPrice);
+        if (sellerService.isBalanceNotEnoughToPayListingFee(seller, listingFee)) throw new InsufficientBalanceException("Seller with id of " + sellerId + " doesn't have enough balance to pay for the listing fee of " + listingFee + " which is 5% of total price " + totalPrice);
 
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
@@ -128,6 +131,7 @@ public class MarketplaceService {
 
         User registeringUser = userService.saveByDTO(userDTO);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
+        if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(registeringUser);
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         return userMapper.toDTO(registeringUser);

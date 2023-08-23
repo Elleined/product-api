@@ -7,11 +7,10 @@ import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 
 
 // connect in /http://localhost:8083/api/v1/marketplace/ws
-// subscribe to /user/private-chat
+// subscribe to /user/private-chat to get the private messages
 public interface MessageService {
 
     Message sendPrivateMessage(int recipientId, String message)
             throws NoLoggedInUserException, NotValidBodyException, ResourceNotFoundException;
 
-    
 }

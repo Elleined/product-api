@@ -17,7 +17,7 @@ public interface SellerService {
      *
      *  Normal user
      *      can only list 10 products a day
-     *      listing price will be deducted
+     *      listing price will be deducted listing price is 5% of total price
      */
     Product saveProduct(ProductDTO productDTO);
 
@@ -57,9 +57,15 @@ public interface SellerService {
     // Seller can use this method to see product listing state if PENDING, LISTING, and SOLD
     List<Product> getAllProductByState(User seller, Product.State state);
 
-    // Use this method to the seller product orders status
+    // Use this method to the seller product orders status PENDING, CANCELLED, ACCEPTED, and REJECTED
     List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus);
 
 
     boolean isSellerHasOrder(User seller, OrderItem orderItem);
+
+    double getTotalPrice(ProductDTO productDTO);
+
+    boolean isBalanceNotEnoughToPayListingFee(User seller, double productTotalPrice);
+
+    double getListingFee(double productTotalPrice);
 }

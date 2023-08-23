@@ -12,10 +12,10 @@ import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
 
-// other related user marketplace here
 public interface UserService {
 
     // Info will also be saved in forum api
+    // first 500 registrant will receive a token as a reward
     // After this method will automatically sends welcome email
     User saveByDTO(UserDTO dto);
 
@@ -38,6 +38,11 @@ public interface UserService {
 
     boolean existsById(int userId);
 
+    // First 500 registrants
+    boolean isLegibleForRegistrationPromo();
+
+    // First 500 registrants will receive a registration promo of 50 pesos
+    void availRegistrationPromo(User registratingUser);
 
     void sendShopRegistration(User user, ShopDTO shopDTO);
 

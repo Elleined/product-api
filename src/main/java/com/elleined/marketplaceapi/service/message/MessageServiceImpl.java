@@ -19,7 +19,7 @@ import org.springframework.web.util.HtmlUtils;
 @Service
 @RequiredArgsConstructor
 @Primary
-public class PrivateMessageService implements MessageService {
+public class MessageServiceImpl implements MessageService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final PrincipalService principalService;
     private final UserService userService;

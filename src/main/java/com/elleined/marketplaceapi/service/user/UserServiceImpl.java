@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.exception.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +36,10 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class UserServiceImpl implements UserService, SellerService, BuyerService {
+    private static final int REGISTRATION_LIMIT_PROMO = 500;
+    private static final float LISTING_FEE_PERCENTAGE = 5;
+    private static final BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
+
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
@@ -110,6 +116,34 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public boolean existsById(int userId) {
         return userRepository.existsById(userId);
+    }
+
+    @Override
+    public boolean isBalanceNotEnoughToPayListingFee(User seller, double listingFee) {
+        return seller.getBalance().compareTo(new BigDecimal(listingFee)) <= 0;
+    }
+
+    @Override
+    public double getListingFee(double productTotalPrice) {
+        return (productTotalPrice * (LISTING_FEE_PERCENTAGE / 100f));
+    }
+
+    @Override
+    public double getTotalPrice(ProductDTO productDTO) {
+        return productDTO.getPricePerUnit() * productDTO.getQuantityPerUnit();
+    }
+
+    @Override
+    public boolean isLegibleForRegistrationPromo() {
+        return userRepository.findAll().size() <= REGISTRATION_LIMIT_PROMO;
+    }
+
+    @Override
+    public void availRegistrationPromo(User registratingUser) {
+        BigDecimal newBalance = registratingUser.getBalance().add(REGISTRATION_REWARD);
+        registratingUser.setBalance(newBalance);
+        userRepository.save(registratingUser);
+        log.debug("Registrating user receives {} as registration reward for the first {} users", REGISTRATION_REWARD, REGISTRATION_LIMIT_PROMO);
     }
 
     @Override
@@ -222,7 +256,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO) {
         OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
 
-        double price = productService.calculatePrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
+        double price = productService.calculateOrderPrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
         orderItem.setPrice(price);
 
         buyer.getOrderedItems().add(orderItem);

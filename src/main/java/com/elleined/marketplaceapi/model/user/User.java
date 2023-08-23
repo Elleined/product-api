@@ -40,6 +40,7 @@ public class User {
     )
     private String referralCode;
 
+    @Column(name = "balance", nullable = false)
     private BigDecimal balance;
 
     @Embedded
