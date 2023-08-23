@@ -36,6 +36,8 @@ public interface UserService {
 
     List<String> getAllMobileNumber();
 
+    boolean existsById(int userId);
+
 
     void sendShopRegistration(User user, ShopDTO shopDTO);
 
@@ -48,6 +50,4 @@ public interface UserService {
 
     void addInvitedUser(String invitingUserReferralCode, User invitedUser);
 
-
-    Message sendPrivateMessage(User sender, Message message) throws ResourceNotFoundException;
 }

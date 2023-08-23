@@ -1,12 +1,10 @@
 package com.elleined.marketplaceapi.service.user;
 
-import com.elleined.marketplaceapi.dto.Message;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
-import com.elleined.marketplaceapi.exception.NotOwnedException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
@@ -21,15 +19,11 @@ import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.HtmlUtils;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -40,8 +34,6 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class UserServiceImpl implements UserService, SellerService, BuyerService {
-    private final SimpMessagingTemplate simpMessagingTemplate;
-
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
@@ -116,6 +108,11 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
+    public boolean existsById(int userId) {
+        return userRepository.existsById(userId);
+    }
+
+    @Override
     public void sendShopRegistration(User owner, ShopDTO shopDTO) {
         Shop shop = Shop.builder()
                 .picture(shopDTO.getPicture())
@@ -151,18 +148,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         invitingUser.getReferredUsers().add(invitedUser);
         userRepository.save(invitingUser);
         log.debug("User with id of {} invited user with id of {} successfully", invitingUser.getId(), invitedUser.getId());
-    }
-
-    @Override
-    public Message sendPrivateMessage(User sender, Message message) throws ResourceNotFoundException {
-
-        message.setBody(HtmlUtils.htmlEscape(message.getBody())); // Sanitizing for cross site scripting
-        message.setSenderPicture(sender.getUserDetails().getPicture());
-        message.setSenderUsername(sender.getUserDetails().getFirstName());
-
-        String recipientId = String.valueOf(getById(message.getRecipientId()).getId());
-        simpMessagingTemplate.convertAndSendToUser(recipientId, "/private-chat", message);
-        return message;
     }
 
     private void encodePassword(User user) {

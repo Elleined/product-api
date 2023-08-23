@@ -1,9 +1,6 @@
 package com.elleined.marketplaceapi.service;
 
-import com.elleined.marketplaceapi.dto.AddressDTO;
-import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.dto.ShopDTO;
-import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.*;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.*;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
@@ -16,6 +13,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.address.AddressValidator;
+import com.elleined.marketplaceapi.service.message.MessageService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
@@ -34,6 +32,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MarketplaceService {
+    private final MessageService messageService;
     private final PrincipalService principalService;
     private final SellerService sellerService;
     private final BuyerService buyerService;
@@ -258,6 +257,7 @@ public class MarketplaceService {
                 .map(itemMapper::toOrderItemDTO)
                 .toList();
     }
+
 
     public List<String> getAllCrops() {
         return cropService.getAll();

@@ -1,9 +1,11 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.AddressDTO;
+import com.elleined.marketplaceapi.dto.Message;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.service.MarketplaceService;
+import com.elleined.marketplaceapi.service.message.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.List;
 public class UserController {
 
     private final MarketplaceService marketplaceService;
+    private final MessageService messageService;
 
     @PostMapping
     public UserDTO save(@Valid @RequestBody UserDTO userDTO) {
@@ -70,5 +73,12 @@ public class UserController {
     @GetMapping("/getAllSuffix")
     public List<String> getAllSuffix() {
         return marketplaceService.getAllSuffix();
+    }
+
+
+    @PostMapping("/sendPrivateMessage/{recipientId}")
+    public Message sendPrivateMessage(@PathVariable("recipientId") int recipientId,
+                                      @RequestParam("message") String message) {
+        return messageService.sendPrivateMessage(recipientId, message);
     }
 }
