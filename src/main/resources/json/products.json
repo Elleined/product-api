@@ -1,11 +1,10 @@
 {
-  "cropName": "Kangkong",
+  "cropName": "Dragon Fruit",
   "unitName": "Sako",
-  "description": "Matigas at mahaba",
-  "picture": "kangkong.png",
-  "keyword": "kangkong nga diba",
-  "sellerId": 1,
-  "availableQuantity": 100000,
+  "description": "Dragon fruit description",
+  "picture": "dragonFruit.jpg",
+  "keyword": "Dragon Fruit keyword",
+  "availableQuantity": 1000,
   "pricePerUnit": 50,
   "quantityPerUnit": 5,
   "harvestDate": "2018-02-05T12:59:11.332"

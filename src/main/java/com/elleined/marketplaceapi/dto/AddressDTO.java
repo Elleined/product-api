@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddressDTO {
 
-    @JsonIgnore
     private int id;
 
     @NotBlank(message = "Details cannot be null, empty, or blank")

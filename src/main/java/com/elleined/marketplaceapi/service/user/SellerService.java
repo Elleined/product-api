@@ -19,7 +19,7 @@ public interface SellerService {
      *      can only list 10 products a day
      *      listing price will be deducted listing price is 5% of total price
      */
-    Product saveProduct(ProductDTO productDTO);
+    Product saveProduct(ProductDTO productDTO, User seller);
 
     /**
      * Validations

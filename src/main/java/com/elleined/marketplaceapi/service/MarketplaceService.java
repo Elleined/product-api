@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.address.AddressValidator;
+import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
@@ -49,6 +50,7 @@ public class MarketplaceService {
     private final UserMapper userMapper;
     private final ItemMapper itemMapper;
     private final AddressMapper addressMapper;
+    private final FeeService feeService;
 
 
     public ProductDTO getProductById(int currentUserId, int productId)
@@ -72,7 +74,8 @@ public class MarketplaceService {
 
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
-        Product product = sellerService.saveProduct(productDTO);
+        Product product = sellerService.saveProduct(productDTO, seller);
+        feeService.deductListingFee(seller, listingFee);
         return productMapper.toDTO(product);
     }
 
@@ -176,8 +179,8 @@ public class MarketplaceService {
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + productId + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + productId + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit!");
-        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Dont spam bro :)");
+        if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit of seller which is " + product.getQuantityPerUnit());
+        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
 
         OrderItem savedOrderItem = buyerService.orderProduct(buyer, orderItemDTO);
         return itemMapper.toOrderItemDTO(savedOrderItem);

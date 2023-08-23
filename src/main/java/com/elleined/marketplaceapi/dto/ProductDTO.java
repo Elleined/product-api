@@ -36,7 +36,6 @@ public class ProductDTO {
     private String state;
     private String status;
 
-    @Positive(message = "Seller id cannot be negative or less than 0")
     private int sellerId;
     private String sellerName;
 

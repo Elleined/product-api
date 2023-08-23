@@ -192,8 +192,8 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
 
     @Override
-    public Product saveProduct(ProductDTO productDTO) {
-        Product product = productMapper.toEntity(productDTO);
+    public Product saveProduct(ProductDTO productDTO, User seller) {
+        Product product = productMapper.toEntity(productDTO, seller);
         productRepository.save(product);
         log.debug("Product saved successfully with id of {}", product.getId());
         return product;

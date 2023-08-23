@@ -15,6 +15,7 @@ import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
+
     public List<ProductDTO> getAllPendingProduct() {
         return userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
@@ -57,6 +59,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void verifyUser(int userToBeVerifiedId) throws ResourceNotFoundException {
         User userToBeVerified = userRepository.findById(userToBeVerifiedId).orElseThrow(() -> new ResourceNotFoundException("User with id of " + userToBeVerifiedId + " does not exists!"));
         if (userToBeVerified.getShop() == null) throw new NotVerifiedException("User with id of " + userToBeVerifiedId + " doesn't have pending shop registration! must send a shop registration first!");
@@ -75,6 +78,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void listProduct(int productId) throws ResourceNotFoundException {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product with id of " + productId + " does not exists!"));
         product.setState(Product.State.LISTING);

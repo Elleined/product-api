@@ -3,13 +3,11 @@ package com.elleined.marketplaceapi.mapper;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.UnitService;
 import com.elleined.marketplaceapi.service.user.UserService;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Mappings;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -45,12 +43,12 @@ public abstract class ProductMapper {
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
             @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
             @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
-            @Mapping(target = "seller", expression = "java(userService.getById(productDTO.getSellerId()))"),
+            @Mapping(target = "seller", expression = "java(seller)"),
 
             @Mapping(target = "addedToCarts", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "orders", expression = "java(new java.util.ArrayList<>())"),
     })
-    public abstract Product toEntity(ProductDTO productDTO) throws ResourceNotFoundException;
+    public abstract Product toEntity(ProductDTO productDTO, @Context User seller) throws ResourceNotFoundException;
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
