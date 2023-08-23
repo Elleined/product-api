@@ -34,6 +34,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MarketplaceService {
+    private final PrincipalService principalService;
     private final SellerService sellerService;
     private final BuyerService buyerService;
     private final UserDetailsValidator userDetailsValidator;
@@ -147,6 +148,7 @@ public class MarketplaceService {
     public UserDTO login(UserDTO.UserCredentialDTO userCredentialDTO)
             throws ResourceNotFoundException, InvalidUserCredentialException {
         User currentUser = userService.login(userCredentialDTO);
+        principalService.setPrincipal(currentUser);
         return userMapper.toDTO(currentUser);
     }
 

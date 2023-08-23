@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.dto.Message;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
@@ -26,6 +27,7 @@ public interface UserService {
 
     void resendValidId(User currentUser, String validId);
 
+    // After this principal will be set
     User login(UserDTO.UserCredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 
     User getByEmail(String email) throws ResourceNotFoundException;
@@ -45,4 +47,7 @@ public interface UserService {
     User getByReferralCode(String referralCode) throws ResourceNotFoundException;
 
     void addInvitedUser(String invitingUserReferralCode, User invitedUser);
+
+
+    Message sendPrivateMessage(User sender, Message message) throws ResourceNotFoundException;
 }

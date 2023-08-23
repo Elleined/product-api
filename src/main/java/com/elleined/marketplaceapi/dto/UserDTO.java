@@ -85,7 +85,6 @@ public class UserDTO {
         @NotBlank(message = "Password cannot be blank, null, or empty")
         private String password;
 
-        @JsonIgnore
         private String confirmPassword;
     }
 }

@@ -9,6 +9,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +39,8 @@ public class User {
             updatable = false
     )
     private String referralCode;
+
+    private BigDecimal balance;
 
     @Embedded
     private UserVerification userVerification;
