@@ -39,6 +39,8 @@ public class MessageServiceImpl implements MessageService {
                 .senderId(sender.getId())
                 .build();
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(recipientId), "/private-chat", responseMessage);
+
+        log.debug("Sender with id of {} send a message in recipient with id of {}", sender.getId(), recipientId);
         return responseMessage;
     }
 }

@@ -31,6 +31,7 @@ public abstract class UserMapper {
             @Mapping(target = "deliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "products", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "referredUsers", expression = "java(new java.util.HashSet<>())"),
+            @Mapping(target = "balance", expression = "java(new java.math.BigDecimal(0))"),
 
             @Mapping(target = "userVerification.status", expression = "java(UserVerification.Status.NOT_VERIFIED)"),
             @Mapping(target = "userDetails", expression = "java(toUserDetailsEntity(userDTO.getUserDetailsDTO()))"),

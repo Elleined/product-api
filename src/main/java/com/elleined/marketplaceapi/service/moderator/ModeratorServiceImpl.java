@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ import java.util.List;
 public class ModeratorServiceImpl implements ModeratorService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+
+    private final UserService userService;
 
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
@@ -57,6 +60,8 @@ public class ModeratorServiceImpl implements ModeratorService {
     public void verifyUser(int userToBeVerifiedId) throws ResourceNotFoundException {
         User userToBeVerified = userRepository.findById(userToBeVerifiedId).orElseThrow(() -> new ResourceNotFoundException("User with id of " + userToBeVerifiedId + " does not exists!"));
         if (userToBeVerified.getShop() == null) throw new NotVerifiedException("User with id of " + userToBeVerifiedId + " doesn't have pending shop registration! must send a shop registration first!");
+
+        if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         userRepository.save(userToBeVerified);
 
@@ -65,12 +70,8 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     @Override
     public void verifyAllUser(List<Integer> userToBeVerifiedIds) throws ResourceNotFoundException {
-        List<User> usersToBeVerified = userRepository.findAllById(userToBeVerifiedIds);
-        usersToBeVerified.forEach(user -> user.getUserVerification().setStatus(UserVerification.Status.VERIFIED));
-        userRepository.saveAll(usersToBeVerified);
-
-        List<Integer> ids = usersToBeVerified.stream().map(User::getId).toList();
-        log.debug("Users with id of {} are now verified", ids);
+        userToBeVerifiedIds.forEach(this::verifyUser);
+        log.debug("Users with id of {} are now verified", userToBeVerifiedIds);
     }
 
     @Override
@@ -84,11 +85,7 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     @Override
     public void listAllProduct(List<Integer> productIds) throws ResourceNotFoundException {
-        List<Product> products = productRepository.findAllById(productIds);
-        products.forEach(product -> product.setState(Product.State.LISTING));
-        productRepository.saveAll(products);
-
-        List<Integer> ids = products.stream().map(Product::getId).toList();
-        log.debug("Products with id of {} are now listing", ids);
+        productIds.forEach(this::listProduct);
+        log.debug("Products with id of {} are now listing", productIds);
     }
 }

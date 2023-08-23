@@ -131,7 +131,6 @@ public class MarketplaceService {
 
         User registeringUser = userService.saveByDTO(userDTO);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
-        if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(registeringUser);
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         return userMapper.toDTO(registeringUser);

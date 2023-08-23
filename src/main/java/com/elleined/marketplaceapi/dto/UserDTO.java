@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -28,6 +29,8 @@ public class UserDTO {
 
     @JsonIgnore // Optional if invited
     private String invitationReferralCode;
+
+    private BigDecimal balance;
 
     @Valid
     @NotNull(message = "User details cannot be null")
