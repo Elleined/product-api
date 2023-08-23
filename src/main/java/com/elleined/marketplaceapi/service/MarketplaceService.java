@@ -22,6 +22,7 @@ import com.elleined.marketplaceapi.service.user.*;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,6 +119,7 @@ public class MarketplaceService {
     }
 
 
+    @Transactional(noRollbackFor = MessagingException.class)
     public UserDTO saveUser(UserDTO userDTO)
             throws ResourceNotFoundException,
             HasDigitException,

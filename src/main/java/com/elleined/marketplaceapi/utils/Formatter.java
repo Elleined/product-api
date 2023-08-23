@@ -1,0 +1,59 @@
+package com.elleined.marketplaceapi.utils;
+
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public interface Formatter {
+
+    static String formatDateWithoutYear(LocalDateTime dateTime) {
+        String month = dateTime.getMonth().name();
+        String finalMonth = month
+                .substring(0, 1)
+                .toUpperCase() +
+                month.substring(1).toLowerCase();
+
+        String day = String.valueOf(dateTime.getDayOfMonth());
+        return String.format("%s %s", finalMonth, day);
+    }
+
+    static String formatTime(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        return formatter.format(dateTime);
+    }
+
+    static String formatDate(LocalDate orderDate) {
+        String month = orderDate.getMonth().name();
+        String finalMonth = month
+                .substring(0, 1)
+                .toUpperCase() +
+                month.substring(1).toLowerCase();
+
+        String day = String.valueOf(orderDate.getDayOfMonth());
+        String year = String.valueOf(orderDate.getYear());
+        return String.format("%s %s, %s", finalMonth, day, year);
+    }
+
+    static String formatDate(LocalDateTime orderDate) {
+        String month = orderDate.getMonth().name();
+        String finalMonth = month
+                .substring(0, 1)
+                .toUpperCase() +
+                month.substring(1).toLowerCase();
+
+        String day = String.valueOf(orderDate.getDayOfMonth());
+        String year = String.valueOf(orderDate.getYear());
+        return String.format("%s %s, %s", finalMonth, day, year);
+    }
+
+
+    static String formatDeliveryAddress(DeliveryAddress deliveryAddress) {
+        return String.format("%s %s %s, %s",
+                deliveryAddress.getDetails(),
+                deliveryAddress.getBaranggayName(),
+                deliveryAddress.getCityName(),
+                deliveryAddress.getProvinceName());
+    }
+}
