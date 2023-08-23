@@ -140,7 +140,7 @@ public class MarketplaceService {
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
-        emailService.sendRegistrationEmail(registeringUser);
+        // emailService.sendRegistrationEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
     }
 
