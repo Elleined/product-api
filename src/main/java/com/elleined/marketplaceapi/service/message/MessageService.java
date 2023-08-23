@@ -16,5 +16,6 @@ public interface MessageService {
             throws NoLoggedInUserException, NotValidBodyException, ResourceNotFoundException;
 
 
-    Message sendPublicMessage(String message);
+    Message sendPublicMessage(String message)
+            throws NotValidBodyException, NoLoggedInUserException;
 }

@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.address.AddressValidator;
+import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -32,6 +33,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MarketplaceService {
+    private final EmailService emailService;
     private final PrincipalService principalService;
     private final SellerService sellerService;
     private final BuyerService buyerService;
@@ -136,6 +138,7 @@ public class MarketplaceService {
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
+        emailService.sendRegistrationEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
     }
 

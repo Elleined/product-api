@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class ModeratorServiceImpl implements ModeratorService {
+    private final EmailService emailService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
@@ -68,6 +70,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         userRepository.save(userToBeVerified);
 
+        emailService.sendVerificationEmail(userToBeVerified);
         log.debug("User with id of {} are now verified", userToBeVerified.getId());
     }
 
@@ -84,6 +87,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         product.setState(Product.State.LISTING);
         productRepository.save(product);
 
+        emailService.sendProductEmail(product.getSeller(), product);
         log.debug("Product with id of {} are now listing", product.getId());
     }
 
