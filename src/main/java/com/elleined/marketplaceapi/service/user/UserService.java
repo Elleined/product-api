@@ -27,7 +27,7 @@ public interface UserService {
 
     void resendValidId(User currentUser, String validId);
 
-    // After this principal will be set
+    // After this principal will be set to be use in web socket
     User login(UserDTO.UserCredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 
     User getByEmail(String email) throws ResourceNotFoundException;

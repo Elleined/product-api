@@ -39,7 +39,7 @@ public interface SellerService {
     void deleteProduct(int productId) throws ResourceNotFoundException;
 
     /**
-     *  After this method the  buyer will be notified via email
+     *  After this method the  buyer will be notified via websocket
      * Validations
      * order must be owned
      * seller must provide message for the buyer
@@ -47,7 +47,7 @@ public interface SellerService {
     void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer);
 
     /**
-     *  After this method the  buyer will be notified via email
+     *  After this method the  buyer will be notified via websocket
      * Validations
      * order must be owned
      * seller must provide message for the buyer

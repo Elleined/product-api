@@ -21,7 +21,7 @@ public interface BuyerService {
      *  if seller already rejected buyer for ordering product
      *  #####
      *  Inside this price will be calculated
-     *  After this method seller will be notified via email
+     *  After this method seller will be notified via websocket
      */
     OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO);
 

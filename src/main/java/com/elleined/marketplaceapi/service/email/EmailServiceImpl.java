@@ -1,19 +1,21 @@
 package com.elleined.marketplaceapi.service.email;
 
+import com.elleined.marketplaceapi.client.EmailClient;
 import com.elleined.marketplaceapi.dto.email.EmailMessage;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
 public class EmailServiceImpl implements EmailService {
-    private final EmailClient emailClient;
 
+    @Autowired
+    private EmailClient emailClient;
     @Override
     public void sendVerificationEmail(User userToBeVerified) {
         String message = "Hello " + getFullName(userToBeVerified) + " We are happy to inform you that you're verification process in our application CropTrade are successful you can now list your product and enjoy our services";
