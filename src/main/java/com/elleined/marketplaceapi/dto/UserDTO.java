@@ -82,7 +82,7 @@ public class UserDTO {
         @Email(message = "Enter a valid email")
         private String email;
 
-        @JsonIgnore
+        @NotBlank(message = "Password cannot be blank, null, or empty")
         private String password;
 
         @JsonIgnore
