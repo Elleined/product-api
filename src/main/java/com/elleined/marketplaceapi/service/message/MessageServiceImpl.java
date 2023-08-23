@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.message;
 
 import com.elleined.marketplaceapi.dto.Message;
+import com.elleined.marketplaceapi.dto.PrivateMessage;
 import com.elleined.marketplaceapi.exception.NoLoggedInUserException;
 import com.elleined.marketplaceapi.exception.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
@@ -25,7 +26,7 @@ public class MessageServiceImpl implements MessageService {
     private final UserService userService;
 
     @Override
-    public Message sendPrivateMessage(int recipientId, String message)
+    public PrivateMessage sendPrivateMessage(int recipientId, String message)
             throws NoLoggedInUserException, NotValidBodyException, ResourceNotFoundException {
 
         if (!userService.existsById(recipientId)) throw new ResourceNotFoundException("Recipient with id of " + recipientId +  " does not exists!");
@@ -33,7 +34,7 @@ public class MessageServiceImpl implements MessageService {
         if (principalService.getPrincipal() == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
         User sender = principalService.getPrincipal();
-        Message responseMessage = Message.builder()
+        PrivateMessage responseMessage = PrivateMessage.builder()
                 .message(HtmlUtils.htmlEscape(message))
                 .recipientId(recipientId)
                 .senderId(sender.getId())
@@ -41,6 +42,19 @@ public class MessageServiceImpl implements MessageService {
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(recipientId), "/private-chat", responseMessage);
 
         log.debug("Sender with id of {} send a message in recipient with id of {}", sender.getId(), recipientId);
+        return responseMessage;
+    }
+
+    @Override
+    public Message sendPublicMessage(String message)
+            throws NotValidBodyException, NoLoggedInUserException {
+        User sender = principalService.getPrincipal();
+
+        if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
+        if (principalService.getPrincipal() == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
+
+        Message responseMessage = new Message(HtmlUtils.htmlEscape(message), sender.getId());
+        simpMessagingTemplate.convertAndSend("/public-chat/topic", responseMessage);
         return responseMessage;
     }
 }

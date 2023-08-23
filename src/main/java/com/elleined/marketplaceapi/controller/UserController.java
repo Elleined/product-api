@@ -1,9 +1,6 @@
 package com.elleined.marketplaceapi.controller;
 
-import com.elleined.marketplaceapi.dto.AddressDTO;
-import com.elleined.marketplaceapi.dto.Message;
-import com.elleined.marketplaceapi.dto.ShopDTO;
-import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.*;
 import com.elleined.marketplaceapi.service.MarketplaceService;
 import com.elleined.marketplaceapi.service.message.MessageService;
 import jakarta.validation.Valid;
@@ -77,8 +74,13 @@ public class UserController {
 
 
     @PostMapping("/sendPrivateMessage/{recipientId}")
-    public Message sendPrivateMessage(@PathVariable("recipientId") int recipientId,
-                                      @RequestParam("message") String message) {
+    public PrivateMessage sendPrivateMessage(@PathVariable("recipientId") int recipientId,
+                                             @RequestParam("message") String message) {
         return messageService.sendPrivateMessage(recipientId, message);
+    }
+
+    @PostMapping("/sendPublicMessage")
+    public Message sendPublicMessage(@RequestParam("message") String message) {
+        return messageService.sendPublicMessage(message);
     }
 }
