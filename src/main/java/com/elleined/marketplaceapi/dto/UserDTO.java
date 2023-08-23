@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -22,12 +23,10 @@ public class UserDTO {
 
     private int id;
     private String referralCode;
-
     private String validId;
     private String status;
 
-
-    // Optional if invited
+    @JsonIgnore // Optional if invited
     private String invitationReferralCode;
 
     @Valid
@@ -83,9 +82,10 @@ public class UserDTO {
         @Email(message = "Enter a valid email")
         private String email;
 
-        @NotBlank(message = "Password cannot be blank, null, or empty")
+        @JsonIgnore
         private String password;
 
+        @JsonIgnore
         private String confirmPassword;
     }
 }

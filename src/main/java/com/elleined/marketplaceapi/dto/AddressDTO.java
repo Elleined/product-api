@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddressDTO {
 
+    @JsonIgnore
     private int id;
 
     @NotBlank(message = "Details cannot be null, empty, or blank")
