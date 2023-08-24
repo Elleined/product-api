@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -134,12 +135,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public boolean isBalanceNotEnoughToPayListingFee(User seller, double listingFee) {
         return seller.getBalance().compareTo(new BigDecimal(listingFee)) <= 0;
     }
-
-    @Override
-    public double getListingFee(double productTotalPrice) {
-        return (productTotalPrice * (LISTING_FEE_PERCENTAGE / 100f));
-    }
-
     @Override
     public boolean isSellerExceedToMaxPendingOrders(User seller) {
         return getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.PENDING).size() >= SELLER_MAX_PENDING_ORDER;
@@ -152,8 +147,10 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public double getTotalPrice(ProductDTO productDTO) {
-        return productDTO.getPricePerUnit() * productDTO.getQuantityPerUnit();
+    public boolean isSellerExceedsToMaxListingPerDay(User seller) {
+        final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
+        return productRepository.fetchSellerProductListingCount(currentDateTimeMidnight, tomorrowMidnight, seller) >= SELLER_MAX_LISTING_PER_DAY;
     }
 
     @Override

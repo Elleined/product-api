@@ -26,5 +26,16 @@ public interface ProductService {
 
     double calculateOrderPrice(Product product, int userOrderQuantity);
 
+    /**
+     * Sample:
+     * 50(Price per unit)
+     * 5(Quantity per unit)
+     * 100(Available quantity)
+     * Meaning 5 pesos per 50 pieces and has available quantity of 100
+     */
+    double calculateTotalPrice(ProductDTO productDTO);
+
+    double getListingFee(double productTotalPrice);
+
     boolean isCriticalFieldsChanged(Product product, ProductDTO productDTO);
 }

@@ -9,7 +9,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.util.List;
 
 public interface SellerService {
-    int SELLER_MAX_LISTING_LIMIT = 10;
+    int SELLER_MAX_LISTING_PER_DAY = 10;
     int SELLER_MAX_PENDING_ORDER = 10;
     int SELLER_MAX_ACCEPTED_ORDER = 10;
     float LISTING_FEE_PERCENTAGE = 5;
@@ -68,13 +68,12 @@ public interface SellerService {
 
     boolean isSellerHasOrder(User seller, OrderItem orderItem);
 
-    double getTotalPrice(ProductDTO productDTO);
-
     boolean isBalanceNotEnoughToPayListingFee(User seller, double productTotalPrice);
 
-    double getListingFee(double productTotalPrice);
 
     boolean isSellerExceedToMaxPendingOrders(User seller);
 
     boolean isSellerExceedToMaxAcceptedOrders(User seller);
+
+    boolean isSellerExceedsToMaxListingPerDay(User seller);
 }

@@ -26,7 +26,6 @@ public class UserDTO {
     private String validId;
     private String status;
 
-    @JsonIgnore // Optional if invited
     private String invitationReferralCode;
 
     private BigDecimal balance;

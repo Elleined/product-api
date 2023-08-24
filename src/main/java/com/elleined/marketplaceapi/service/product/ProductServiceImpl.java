@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.elleined.marketplaceapi.service.user.SellerService.LISTING_FEE_PERCENTAGE;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -74,11 +76,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public double calculateOrderPrice(Product product, int userOrderQuantity) {
-        int tempOrderQuantity = userOrderQuantity;
         int counter = 0;
-        while (tempOrderQuantity > 0) {
-            if (tempOrderQuantity % product.getQuantityPerUnit() == 0) counter++;
-            tempOrderQuantity -= product.getQuantityPerUnit();
+        while (userOrderQuantity > 0) {
+            if (userOrderQuantity % product.getQuantityPerUnit() == 0) counter++;
+            userOrderQuantity -= product.getQuantityPerUnit();
         }
 
         double totalPrice = product.getPricePerUnit() * counter;
@@ -92,4 +93,28 @@ public class ProductServiceImpl implements ProductService {
                 product.getAvailableQuantity() != productDTO.getAvailableQuantity() ||
                 product.getQuantityPerUnit() != productDTO.getQuantityPerUnit();
     }
+
+    @Override
+    public double calculateTotalPrice(ProductDTO productDTO) {
+        double pricePerUnit = productDTO.getPricePerUnit();
+        int quantityPerUnit = productDTO.getQuantityPerUnit();
+        int availableQuantity = productDTO.getAvailableQuantity();
+
+        int counter = 0;
+        while (availableQuantity > 0) {
+            if (availableQuantity % quantityPerUnit == 0) counter++;
+            availableQuantity -= quantityPerUnit;
+        }
+        log.trace("Counter {}", counter);
+        double totalPrice = counter * pricePerUnit;
+        log.trace("Total price {}", totalPrice);
+        log.trace("Product with total price of {} will have {} of listing fee percentage which is {}", totalPrice, getListingFee(totalPrice), LISTING_FEE_PERCENTAGE);
+        return totalPrice;
+    }
+
+    @Override
+    public double getListingFee(double productTotalPrice) {
+        return (productTotalPrice * (LISTING_FEE_PERCENTAGE / 100f));
+    }
+
 }

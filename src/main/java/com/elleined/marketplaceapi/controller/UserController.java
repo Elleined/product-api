@@ -64,13 +64,6 @@ public class UserController {
         return marketplaceService.saveDeliveryAddress(currentUserId, addressDTO);
     }
 
-    @DeleteMapping("/{currentUserId}/deleteDeliveryAddress/{deliveryAddressId}")
-    public ResponseEntity<AddressDTO> deleteDeliveryAddress(@PathVariable("currentUserId") int currentUserId,
-                                                            @PathVariable("deliveryAddressId") int deliveryAddressId) {
-        marketplaceService.deleteDeliveryAddress(currentUserId, deliveryAddressId);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/getAllSuffix")
     public List<String> getAllSuffix() {
         return marketplaceService.getAllSuffix();
