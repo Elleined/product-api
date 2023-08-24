@@ -33,7 +33,7 @@ public interface ProductService {
      * 100(Available quantity)
      * Meaning 5 pesos per 50 pieces and has available quantity of 100
      */
-    double calculateTotalPrice(ProductDTO productDTO);
+    double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
 
     double getListingFee(double productTotalPrice);
 

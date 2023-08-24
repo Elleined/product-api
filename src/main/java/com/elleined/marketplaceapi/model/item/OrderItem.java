@@ -36,6 +36,7 @@ public class OrderItem extends Item {
         CANCELLED,
         PENDING,
         ACCEPTED,
-        REJECTED
+        REJECTED,
+        SOLD
     }
 }

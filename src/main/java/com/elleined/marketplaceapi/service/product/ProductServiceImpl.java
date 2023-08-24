@@ -95,11 +95,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public double calculateTotalPrice(ProductDTO productDTO) {
-        double pricePerUnit = productDTO.getPricePerUnit();
-        int quantityPerUnit = productDTO.getQuantityPerUnit();
-        int availableQuantity = productDTO.getAvailableQuantity();
-
+    public double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity) {
         int counter = 0;
         while (availableQuantity > 0) {
             if (availableQuantity % quantityPerUnit == 0) counter++;
@@ -108,7 +104,7 @@ public class ProductServiceImpl implements ProductService {
         log.trace("Counter {}", counter);
         double totalPrice = counter * pricePerUnit;
         log.trace("Total price {}", totalPrice);
-        log.trace("Product with total price of {} will have {} of listing fee percentage which is {}", totalPrice, getListingFee(totalPrice), LISTING_FEE_PERCENTAGE);
+        log.trace("Product with total price of {} will have {} of listing fee percenta which is {}", totalPrice, getListingFee(totalPrice), LISTING_FEE_PERCENTAGE);
         return totalPrice;
     }
 

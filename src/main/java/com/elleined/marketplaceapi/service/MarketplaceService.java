@@ -78,7 +78,7 @@ public class MarketplaceService {
 
         if (sellerService.isSellerExceedsToMaxListingPerDay(seller)) throw new ProductListingException("You already reached the limit of product listing per day which is " + SellerService.SELLER_MAX_LISTING_PER_DAY);
         if (!userService.isVerified(seller)) throw new NotVerifiedException("Cannot list a product because user with id of " + sellerId + " are not yet been verified");
-        double totalPrice = productService.calculateTotalPrice(productDTO);
+        double totalPrice = productService.calculateTotalPrice(productDTO.getPricePerUnit(), productDTO.getQuantityPerUnit(), productDTO.getAvailableQuantity());
         double listingFee = productService.getListingFee(totalPrice);
         if (sellerService.isBalanceNotEnoughToPayListingFee(seller, listingFee)) throw new InsufficientBalanceException("Seller with id of " + sellerId + " doesn't have enough balance to pay for the listing fee of " + listingFee + " which is 5% of total price " + totalPrice);
 

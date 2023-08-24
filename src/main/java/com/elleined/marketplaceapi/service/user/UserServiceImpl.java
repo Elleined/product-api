@@ -266,7 +266,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
         List<OrderItem> orderItems = product.getOrders();
         List<Integer> orderItemIds = orderItems.stream().map(OrderItem::getId).toList();
-        orderItems.forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED));
+        orderItems.forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD));
         orderItemRepository.saveAll(orderItems);
 
         productRepository.save(product);
