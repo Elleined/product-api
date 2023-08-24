@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.*;
+import com.elleined.marketplaceapi.dto.item.CartItemDTO;
 import com.elleined.marketplaceapi.service.MarketplaceService;
 import com.elleined.marketplaceapi.service.message.MessageService;
 import com.elleined.marketplaceapi.service.user.PasswordService;
@@ -93,5 +94,11 @@ public class UserController {
 
         passwordService.changePassword(currentUserId, newPassword);
         return new APIResponse(HttpStatus.OK, "Current user successfully changed his/her password");
+    }
+
+    @PutMapping("/setProductStateToSold")
+    public void setProductStateToSold(@PathVariable("currentUserId") int sellerId,
+                                      @PathVariable("productId") int productId) {
+        marketplaceService.updateProductStateToSold(sellerId, productId);
     }
 }

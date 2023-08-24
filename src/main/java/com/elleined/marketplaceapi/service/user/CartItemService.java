@@ -15,7 +15,9 @@ public interface CartItemService {
 
     void delete(User currentUser, int id) throws ResourceNotFoundException;
 
-    void save(User currentUser, CartItemDTO cartItemDTO);
+    void delete(CartItem cartItem);
+    // Same validation in order product in buyerService
+    CartItem save(User currentUser, CartItemDTO cartItemDTO);
 
     // Same validation in order product in buyerService
     OrderItem moveToOrderItem(CartItem cartItem);
@@ -25,5 +27,10 @@ public interface CartItemService {
 
     boolean isProductAlreadyInCart(User buyer, Product product);
 
-    void updateOrderQuantity(CartItem cartItem);
+    CartItem updateOrderQuantity(CartItem cartItem);
+
+    CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException;
+
+
+    CartItem getByProduct(User buyer, Product product) throws ResourceNotFoundException;
 }

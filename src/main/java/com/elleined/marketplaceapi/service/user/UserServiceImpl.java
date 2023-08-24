@@ -36,7 +36,6 @@ import java.util.List;
 @Transactional
 public class UserServiceImpl implements UserService, SellerService, BuyerService {
     private static final int REGISTRATION_LIMIT_PROMO = 500;
-    private static final float LISTING_FEE_PERCENTAGE = 5;
     private static final BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
 
 
@@ -60,6 +59,14 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public User getById(int id) throws ResourceNotFoundException {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id of " + id + " does not exists!"));
+    }
+
+    @Override
+    public CartItem getByProduct(User buyer, Product product) {
+        return buyer.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().equals(product))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("User with id of " + buyer.getId() + " cart item doesn't have product with id of " + product.getId()));
     }
 
 
@@ -131,6 +138,17 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public double getListingFee(double productTotalPrice) {
         return (productTotalPrice * (LISTING_FEE_PERCENTAGE / 100f));
+    }
+
+    @Override
+    public boolean isSellerExceedToMaxPendingOrders(User seller) {
+        return getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.PENDING).size() >= SELLER_MAX_PENDING_ORDER;
+
+    }
+
+    @Override
+    public boolean isSellerExceedToMaxAcceptedOrders(User seller) {
+        return getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.ACCEPTED).size() >= SELLER_MAX_ACCEPTED_ORDER;
     }
 
     @Override
@@ -243,6 +261,22 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
+    public void updateProductStateToSold(User seller, Product product) {
+        product.setState(Product.State.SOLD);
+        List<CartItem> cartItems = product.getAddedToCarts();
+        List<Integer> cartItemIds = cartItems.stream().map(CartItem::getId).toList();
+        cartItemRepository.deleteAll(cartItems);
+
+        List<OrderItem> orderItems = product.getOrders();
+        List<Integer> orderItemIds = orderItems.stream().map(OrderItem::getId).toList();
+        orderItems.forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED));
+        orderItemRepository.saveAll(orderItems);
+
+        productRepository.save(product);
+        log.debug("Product with id of {} state updated to {} all of associated cart items with ids of {} are deleted and associated order items with ids of {} are now set to cancelled", product.getId(), Product.State.SOLD.name(), cartItemIds, orderItemIds);
+    }
+
+    @Override
     public boolean isSellerHasOrder(User seller, OrderItem orderItem) {
         return seller.getProducts().stream()
                 .map(Product::getOrders)
@@ -322,7 +356,11 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
     @Override
     public List<CartItem> getAll(User currentUser) {
-        return currentUser.getCartItems();
+        return currentUser.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().getStatus() == Product.Status.ACTIVE)
+                .filter(cartItem -> cartItem.getProduct().getState() == Product.State.PENDING)
+                .sorted(Comparator.comparing(CartItem::getOrderDate).reversed())
+                .toList();
     }
 
     @Override
@@ -336,7 +374,13 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void save(User currentUser, CartItemDTO cartItemDTO) {
+    public void delete(CartItem cartItem) {
+        cartItemRepository.delete(cartItem);
+        log.debug("Cart item with id of {} are deleted because user ordered this product with id of {}", cartItem.getId(), cartItem.getProduct().getId());
+    }
+
+    @Override
+    public CartItem save(User currentUser, CartItemDTO cartItemDTO) {
         CartItem cartItem = itemMapper.toCartItemEntity(cartItemDTO, currentUser);
 
         double price = productService.calculateOrderPrice(cartItem.getProduct(), cartItem.getOrderQuantity());
@@ -345,13 +389,19 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         currentUser.getCartItems().add(cartItem);
         cartItemRepository.save(cartItem);
         log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), cartItemDTO.getProductId(), cartItem.getId());
+        return cartItem;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public OrderItem moveToOrderItem(CartItem cartItem) {
         OrderItem orderItem = itemMapper.cartItemToOrderItem(cartItem);
-        return orderItemRepository.save(orderItem);
+
+        int cartItemId = cartItem.getId();
+        cartItemRepository.delete(cartItem);
+        orderItemRepository.save(orderItem);
+        log.debug("Cart item with id of {} are now moved to order item with id of {}", cartItemId, orderItem.getId());
+        return orderItem;
     }
 
     @Override
@@ -370,11 +420,21 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void updateOrderQuantity(CartItem cartItem) {
+    public CartItem updateOrderQuantity(CartItem cartItem) {
         int oldOrderQuantity = cartItem.getOrderQuantity();
-        cartItem.setOrderQuantity(oldOrderQuantity + 1);
-        productService.calculateOrderPrice(cartItem.getProduct(), cartItem.getOrderQuantity());
+        int newOrderQuantity = oldOrderQuantity + 1;
+
+        double newPrice = productService.calculateOrderPrice(cartItem.getProduct(), newOrderQuantity);
+
+        cartItem.setOrderQuantity(newOrderQuantity);
+        cartItem.setPrice(newPrice);
         cartItemRepository.save(cartItem);
         log.debug("Cart item order quantity updated successfully with new order quantity of {} from {}", oldOrderQuantity, cartItem.getOrderQuantity());
+        return cartItem;
+    }
+
+    @Override
+    public CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException {
+        return cartItemRepository.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("Cart item with id of " + cartItemId + " does not exists!"));
     }
 }

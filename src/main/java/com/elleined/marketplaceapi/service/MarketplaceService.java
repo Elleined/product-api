@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.AddressDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.item.CartItemDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.*;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
@@ -12,6 +13,7 @@ import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
+import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
@@ -37,7 +39,6 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class MarketplaceService {
-    private final PasswordService passwordService;
     private final EmailService emailService;
     private final PrincipalService principalService;
     private final SellerService sellerService;
@@ -48,6 +49,7 @@ public class MarketplaceService {
     private final ProductService productService;
     private final UserService userService;
     private final AddressService addressService;
+    private final CartItemService cartItemService;
 
     private final CropService cropService;
     private final SuffixService suffixService;
@@ -176,7 +178,7 @@ public class MarketplaceService {
     }
 
     public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO)
-            throws ResourceNotFoundException {
+            throws ResourceNotFoundException, OrderException {
         int productId = orderItemDTO.getProductId();
 
         User buyer = userService.getById(buyerId);
@@ -191,6 +193,10 @@ public class MarketplaceService {
         if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit of seller which is " + product.getQuantityPerUnit());
         if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
 
+        if (cartItemService.isProductAlreadyInCart(buyer, product)) {
+            CartItem cartItem = cartItemService.getByProduct(buyer, product);
+            cartItemService.delete(cartItem);
+        }
         OrderItem savedOrderItem = buyerService.orderProduct(buyer, orderItemDTO);
         return itemMapper.toOrderItemDTO(savedOrderItem);
     }
@@ -282,5 +288,71 @@ public class MarketplaceService {
     }
     public List<String> getAllSuffix() {
         return suffixService.getAll();
+    }
+
+    public List<CartItemDTO> getAllCartItems(int currentUserId) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        return cartItemService.getAll(currentUser).stream()
+                .map(itemMapper::toCartItemDTO)
+                .toList();
+    }
+
+    public void deleteCartItem(int currentUserId, int cartItemId) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        cartItemService.delete(currentUser, cartItemId);
+    }
+
+    // alias for add to cart
+    public CartItemDTO saveCartItem(int currentUserId, CartItemDTO cartItemDTO) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        Product product = productService.getById(cartItemDTO.getProductId());
+
+        if (buyerService.isUserAlreadyOrderedProduct(currentUser, product)) throw new  OrderException("User with id of " + currentUser.getId() + " already order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
+        if (userService.hasProduct(currentUser, product)) throw new OrderException("You cannot order your own product listing!");
+        if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
+        if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + product.getId() + " are already been sold!");
+        if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + product.getId() + " are not yet listed!");
+        if (productService.isExceedingToAvailableQuantity(product, cartItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
+        if (productService.isNotExactToQuantityPerUnit(product, cartItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit of seller which is " + product.getQuantityPerUnit());
+        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(currentUser, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
+
+        if (cartItemService.isProductAlreadyInCart(currentUser, product)) {
+            CartItem cartItem = cartItemService.getByProduct(currentUser, product);
+            cartItemService.updateOrderQuantity(cartItem);
+            return itemMapper.toCartItemDTO(cartItem);
+        }
+        CartItem cartItem = cartItemService.save(currentUser, cartItemDTO);
+        return itemMapper.toCartItemDTO(cartItem);
+    }
+
+    public OrderItemDTO moveToOrderItem(int cartItemId)
+            throws ResourceNotFoundException, OrderException {
+        CartItem cartItem = cartItemService.getCartItemById(cartItemId);
+        User buyer = cartItem.getPurchaser();
+        Product product = cartItem.getProduct();
+
+        if (buyerService.isUserAlreadyOrderedProduct(buyer, product)) throw new  OrderException("User with id of " + buyer.getId() + " already order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
+        if (userService.hasProduct(buyer, product)) throw new OrderException("You cannot order your own product listing!");
+        if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
+        if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + product.getId() + " are already been sold!");
+        if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + product.getId() + " are not yet listed!");
+        if (productService.isExceedingToAvailableQuantity(product, cartItem.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
+        if (productService.isNotExactToQuantityPerUnit(product, cartItem.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit of seller which is " + product.getQuantityPerUnit());
+        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
+
+        OrderItem orderItem = cartItemService.moveToOrderItem(cartItem);
+        return itemMapper.toOrderItemDTO(orderItem);
+    }
+
+    public List<OrderItemDTO> moveAllToOrderItem(List<Integer> cartItemIds) throws ResourceNotFoundException {
+        return cartItemIds.stream()
+                .map(this::moveToOrderItem)
+                .toList();
+    }
+
+    public void updateProductStateToSold(int sellerId, int productId) throws ResourceNotFoundException {
+        User seller = userService.getById(sellerId);
+        Product product = productService.getById(productId);
+        sellerService.updateProductStateToSold(seller, product);
     }
 }

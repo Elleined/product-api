@@ -9,6 +9,10 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.util.List;
 
 public interface SellerService {
+    int SELLER_MAX_LISTING_LIMIT = 10;
+    int SELLER_MAX_PENDING_ORDER = 10;
+    int SELLER_MAX_ACCEPTED_ORDER = 10;
+    float LISTING_FEE_PERCENTAGE = 5;
 
     /**
      * Validations
@@ -60,6 +64,7 @@ public interface SellerService {
     // Use this method to the seller product orders status PENDING, CANCELLED, ACCEPTED, and REJECTED
     List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus);
 
+    void updateProductStateToSold(User seller, Product product) throws ResourceNotFoundException;
 
     boolean isSellerHasOrder(User seller, OrderItem orderItem);
 
@@ -68,4 +73,8 @@ public interface SellerService {
     boolean isBalanceNotEnoughToPayListingFee(User seller, double productTotalPrice);
 
     double getListingFee(double productTotalPrice);
+
+    boolean isSellerExceedToMaxPendingOrders(User seller);
+
+    boolean isSellerExceedToMaxAcceptedOrders(User seller);
 }

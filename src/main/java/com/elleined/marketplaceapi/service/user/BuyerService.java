@@ -20,6 +20,7 @@ public interface BuyerService {
      *  exceeding to available quantity
      *  if seller already rejected buyer for ordering product
      *  #####
+     *  if buyer order a product that already in cart item that cart item will be deleted
      *  Inside this price will be calculated
      *  After this method seller will be notified via websocket
      */
@@ -36,7 +37,6 @@ public interface BuyerService {
     void cancelOrderItem(User buyer, OrderItem orderItem);
 
     boolean isUserAlreadyOrderedProduct(User buyer, Product product);
-
 
     boolean isBuyerHasOrder(User buyer, OrderItem orderItem);
     boolean isSellerAcceptedOrder(OrderItem orderItem);
