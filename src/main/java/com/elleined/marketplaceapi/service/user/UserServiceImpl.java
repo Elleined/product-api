@@ -3,8 +3,8 @@ package com.elleined.marketplaceapi.service.user;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.item.CartItemDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
-import com.elleined.marketplaceapi.exception.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
@@ -12,18 +12,17 @@ import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
+import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
-import com.elleined.marketplaceapi.repository.ProductRepository;
-import com.elleined.marketplaceapi.repository.ShopRepository;
-import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.repository.*;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -40,15 +39,18 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     private static final float LISTING_FEE_PERCENTAGE = 5;
     private static final BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
 
+
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
+    private final PrincipalService principalService;
     private final UserMapper userMapper;
 
     private final OrderItemRepository orderItemRepository;
+    private final CartItemRepository cartItemRepository;
     private final ItemMapper itemMapper;
 
     private final ProductService productService;
@@ -64,7 +66,10 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public User saveByDTO(UserDTO userDTO) {
         User user = userMapper.toEntity(userDTO);
-        encodePassword(user);
+
+        String rawPassword = user.getUserCredential().getPassword();
+        this.encodePassword(user, rawPassword);
+
         userRepository.save(user);
         log.debug("User with name of {} saved successfully with id of {}", user.getUserDetails().getFirstName(), user.getId());
         return user;
@@ -184,13 +189,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         log.debug("User with id of {} invited user with id of {} successfully", invitingUser.getId(), invitedUser.getId());
     }
 
-    private void encodePassword(User user) {
-        String rawPassword = user.getUserCredential().getPassword();
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        user.getUserCredential().setPassword(encodedPassword);
-    }
-
-
     @Override
     public Product saveProduct(ProductDTO productDTO, User seller) {
         Product product = productMapper.toEntity(productDTO, seller);
@@ -304,5 +302,79 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == state)
                 .toList();
+    }
+
+    @Override
+    public void encodePassword(User user, String rawPassword) {
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        user.getUserCredential().setPassword(encodedPassword);
+    }
+
+    @Override
+    public void changePassword(int userId, String newPassword) throws ResourceNotFoundException, IllegalCallerException {
+        User user = getById(userId);
+        if (!principalService.getPrincipal().equals(user)) throw new IllegalCallerException("You cannot change the password of other user bruh");
+        this.encodePassword(user, newPassword);
+        userRepository.save(user);
+        log.debug("User with id of {} successfully changed his/her password", user.getId());
+    }
+
+
+    @Override
+    public List<CartItem> getAll(User currentUser) {
+        return currentUser.getCartItems();
+    }
+
+    @Override
+    public void delete(User currentUser, int id) throws ResourceNotFoundException {
+        CartItem cartItem = currentUser.getCartItems().stream()
+                .filter(item -> item.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("User with id of " + currentUser.getId() + " doesn't have cart item with id of " + id));
+        cartItemRepository.delete(cartItem);
+        log.debug("User with id of {} successfully deleted cart item with id of {}", currentUser.getId(), id);
+    }
+
+    @Override
+    public void save(User currentUser, CartItemDTO cartItemDTO) {
+        CartItem cartItem = itemMapper.toCartItemEntity(cartItemDTO, currentUser);
+
+        double price = productService.calculateOrderPrice(cartItem.getProduct(), cartItem.getOrderQuantity());
+        cartItem.setPrice(price);
+
+        currentUser.getCartItems().add(cartItem);
+        cartItemRepository.save(cartItem);
+        log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), cartItemDTO.getProductId(), cartItem.getId());
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public OrderItem moveToOrderItem(CartItem cartItem) {
+        OrderItem orderItem = itemMapper.cartItemToOrderItem(cartItem);
+        return orderItemRepository.save(orderItem);
+    }
+
+    @Override
+    public List<OrderItem> moveAllToOrderItem(List<CartItem> cartItems) {
+        List<OrderItem> orderItems = cartItems.stream()
+                .map(itemMapper::cartItemToOrderItem)
+                .toList();
+        return orderItemRepository.saveAll(orderItems);
+    }
+
+    @Override
+    public boolean isProductAlreadyInCart(User buyer, Product product) {
+        return buyer.getCartItems().stream()
+                .map(CartItem::getProduct)
+                .anyMatch(product::equals);
+    }
+
+    @Override
+    public void updateOrderQuantity(CartItem cartItem) {
+        int oldOrderQuantity = cartItem.getOrderQuantity();
+        cartItem.setOrderQuantity(oldOrderQuantity + 1);
+        productService.calculateOrderPrice(cartItem.getProduct(), cartItem.getOrderQuantity());
+        cartItemRepository.save(cartItem);
+        log.debug("Cart item order quantity updated successfully with new order quantity of {} from {}", oldOrderQuantity, cartItem.getOrderQuantity());
     }
 }

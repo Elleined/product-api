@@ -47,9 +47,17 @@ public class ExceptionController {
     }
 
 
-    @ExceptionHandler({InvalidUserCredentialException.class, NotVerifiedException.class, NoLoggedInUserException.class})
+    @ExceptionHandler({
+            InvalidUserCredentialException.class,
+            NotVerifiedException.class,
+            NoLoggedInUserException.class,
+            OTPException.class,
+            IllegalCallerException.class
+    })
     public ResponseEntity<APIResponse> handleForbiddenException(RuntimeException ex) {
         var responseMessage = new APIResponse(HttpStatus.FORBIDDEN, ex.getMessage());
         return new ResponseEntity<>(responseMessage, HttpStatus.FORBIDDEN);
     }
+
+
 }

@@ -4,7 +4,6 @@ import com.elleined.marketplaceapi.model.AppWallet;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.MarketplaceRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
-import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

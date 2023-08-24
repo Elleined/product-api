@@ -3,8 +3,10 @@ package com.elleined.marketplaceapi.controller;
 import com.elleined.marketplaceapi.dto.*;
 import com.elleined.marketplaceapi.service.MarketplaceService;
 import com.elleined.marketplaceapi.service.message.MessageService;
+import com.elleined.marketplaceapi.service.user.PasswordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class UserController {
 
     private final MarketplaceService marketplaceService;
+    private final PasswordService passwordService;
     private final MessageService messageService;
 
     @PostMapping
@@ -82,5 +85,13 @@ public class UserController {
     @PostMapping("/sendPublicMessage")
     public Message sendPublicMessage(@RequestParam("message") String message) {
         return messageService.sendPublicMessage(message);
+    }
+
+    @PutMapping("/changePassword/{currentUserId}")
+    public APIResponse changePassword(@PathVariable("currentUserId") int currentUserId,
+                                      @RequestParam("newPassword") String newPassword) {
+
+        passwordService.changePassword(currentUserId, newPassword);
+        return new APIResponse(HttpStatus.OK, "Current user successfully changed his/her password");
     }
 }

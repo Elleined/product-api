@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 @Getter
 @Setter
 @Service
-// Use to track the logged in user to be use in web socket user handshake handler
+// Uses websocket, change password, and otp
 public class PrincipalService {
     private User principal;
+
+    public boolean hasNoLoggedInUser() {
+        return principal == null;
+    }
 }

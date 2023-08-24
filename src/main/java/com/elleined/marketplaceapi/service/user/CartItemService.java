@@ -1,7 +1,6 @@
-package com.elleined.marketplaceapi.service.item;
+package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.item.CartItemDTO;
-import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.CartItem;

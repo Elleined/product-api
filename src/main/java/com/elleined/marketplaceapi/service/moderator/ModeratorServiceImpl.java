@@ -74,7 +74,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         userRepository.save(userToBeVerified);
 
-        // emailService.sendVerificationEmail(userToBeVerified);
+        emailService.sendVerificationEmail(userToBeVerified);
         log.debug("User with id of {} are now verified", userToBeVerified.getId());
     }
 
@@ -94,7 +94,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         product.setState(Product.State.LISTING);
         productRepository.save(product);
 
-        // emailService.sendProductEmail(product.getSeller(), product);
+        emailService.sendProductEmail(product.getSeller(), product);
         log.debug("Product with id of {} are now listing", product.getId());
     }
 

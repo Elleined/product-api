@@ -1,18 +1,16 @@
 package com.elleined.marketplaceapi.service.user;
 
-import com.elleined.marketplaceapi.dto.Message;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
-import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
 
-public interface UserService {
+public interface UserService extends PasswordService, CartItemService {
 
     // Info will also be saved in forum api
     // first 500 registrant will receive a token as a reward
@@ -54,5 +52,4 @@ public interface UserService {
     User getByReferralCode(String referralCode) throws ResourceNotFoundException;
 
     void addInvitedUser(String invitingUserReferralCode, User invitedUser);
-
 }

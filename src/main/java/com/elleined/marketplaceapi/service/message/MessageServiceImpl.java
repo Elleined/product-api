@@ -31,7 +31,7 @@ public class MessageServiceImpl implements MessageService {
 
         if (!userService.existsById(recipientId)) throw new ResourceNotFoundException("Recipient with id of " + recipientId +  " does not exists!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
-        if (principalService.getPrincipal() == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
+        if (principalService.hasNoLoggedInUser()) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
         User sender = principalService.getPrincipal();
         PrivateMessage responseMessage = PrivateMessage.builder()
@@ -51,7 +51,7 @@ public class MessageServiceImpl implements MessageService {
         User sender = principalService.getPrincipal();
 
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
-        if (principalService.getPrincipal() == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
+        if (principalService.hasNoLoggedInUser()) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
         Message responseMessage = new Message(HtmlUtils.htmlEscape(message), sender.getId());
         simpMessagingTemplate.convertAndSend("/public-chat/topic", responseMessage);

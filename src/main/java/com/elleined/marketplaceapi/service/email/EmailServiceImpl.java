@@ -2,20 +2,20 @@ package com.elleined.marketplaceapi.service.email;
 
 import com.elleined.marketplaceapi.client.EmailClient;
 import com.elleined.marketplaceapi.dto.email.EmailMessage;
+import com.elleined.marketplaceapi.dto.email.OTPMessage;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
-
-    @Autowired
-    private EmailClient emailClient;
+    private final EmailClient emailClient;
+    private final static int PLUS_EXPIRATION_IN_SECONDS = 60;
     @Override
     public void sendVerificationEmail(User userToBeVerified) {
         String message = "Hello " + getFullName(userToBeVerified) + " We are happy to inform you that you're verification process in our application CropTrade are successful you can now list your product and enjoy our services";
@@ -24,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(userToBeVerified.getUserCredential().getEmail())
                 .build();
-        emailClient.sendSimpleMail(emailMessage);
+        // emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending verification email for user " + userToBeVerified.getId() + " success!");
     }
 
@@ -37,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(seller.getUserCredential().getEmail())
                 .build();
-        emailClient.sendSimpleMail(emailMessage);
+        // emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending product listing for user " + seller.getId() + " success!");
     }
 
@@ -49,8 +49,19 @@ public class EmailServiceImpl implements EmailService {
                 .subject("Welcome to CropTrade")
                 .messageBody(message)
                 .build();
-        emailClient.sendSimpleMail(emailMessage);
+        // emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending registration email for user " + registrant.getId() + " success");
+    }
+
+    @Override
+    public OTPMessage sendOTP(User user) {
+        OTPMessage sentOTPMessage = OTPMessage.builder()
+                .plusExpirationSeconds(PLUS_EXPIRATION_IN_SECONDS)
+                .receiver(user.getUserCredential().getEmail())
+                .build();
+        // OTPMessage receiveOTPMessage = emailClient.sendOTPMail(sentOTPMessage);
+        log.debug("Sending OTP for user with id of {} success {}", user.getId(), sentOTPMessage);
+        return sentOTPMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
     }
 
     private String getFullName(User userToBeVerified) {
