@@ -39,7 +39,8 @@ public class ExceptionController {
             HasDigitException.class,
             OrderException.class,
             DeliveryAddressLimitException.class,
-            NotValidBodyException.class
+            NotValidBodyException.class,
+            InsufficientBalanceException.class
     })
     public ResponseEntity<APIResponse> handleBadRequestExceptions(RuntimeException ex) {
         var responseMessage = new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
