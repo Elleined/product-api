@@ -98,13 +98,14 @@ public class ProductServiceImpl implements ProductService {
     public double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity) {
         int counter = 0;
         while (availableQuantity > 0) {
-            if (availableQuantity % quantityPerUnit == 0) counter++;
+            if (availableQuantity <= quantityPerUnit) counter++;
+            else if (availableQuantity % quantityPerUnit == 0) counter++;
             availableQuantity -= quantityPerUnit;
         }
-        log.trace("Counter {}", counter);
+        log.debug("Counter {}", counter);
         double totalPrice = counter * pricePerUnit;
-        log.trace("Total price {}", totalPrice);
-        log.trace("Product with total price of {} will have {} of listing fee percenta which is {}", totalPrice, getListingFee(totalPrice), LISTING_FEE_PERCENTAGE);
+        log.debug("Total price {}", totalPrice);
+        log.debug("Product with total price of {} will have {} of listing fee percent which is {}", totalPrice, getListingFee(totalPrice), LISTING_FEE_PERCENTAGE);
         return totalPrice;
     }
 
