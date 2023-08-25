@@ -83,6 +83,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public boolean isProductSold(User currentUser, Product product) {
+        return product.getState() == Product.State.SOLD;
+    }
+
+    @Override
     public double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity) {
         int counter = 0;
         while (availableQuantity > 0) {

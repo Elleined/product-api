@@ -30,6 +30,9 @@ public interface SellerService {
      *  must be verified
      *  product must be active
      *  product must be owned
+     *  cannot if product is already sold
+     *
+     *  Side effects
      *  Product will be in PENDING state again if user updates available quantity, price per unit, and available quantity
      */
     void updateProduct(Product product, ProductDTO productDTO);
@@ -39,6 +42,10 @@ public interface SellerService {
      *  must be owned
      *  cannot if there is pending orders
      *  cannot if there is accepted orders
+     *  cannot if product is already sold
+     *
+     *    Side effects
+     *    all orders will be set to cancelled
      */
     void deleteProduct(int productId) throws ResourceNotFoundException;
 

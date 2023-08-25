@@ -84,6 +84,11 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
+    public void buyPremium(User currentUser) {
+
+    }
+
+    @Override
     public boolean hasProduct(User currentUser, Product product) {
         return currentUser.getProducts().stream().anyMatch(product::equals);
     }
@@ -223,6 +228,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public void deleteProduct(int productId) throws ResourceNotFoundException {
         Product product = productService.getById(productId);
         product.setStatus(Product.Status.INACTIVE);
+        product.getOrders().forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED));
         productRepository.save(product);
 
         log.debug("Product with id of {} are now inactive", product.getId());
@@ -261,15 +267,16 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public void updateProductStateToSold(User seller, Product product) {
         product.setState(Product.State.SOLD);
         List<CartItem> cartItems = product.getAddedToCarts();
-        List<Integer> cartItemIds = cartItems.stream().map(CartItem::getId).toList();
         cartItemRepository.deleteAll(cartItems);
 
         List<OrderItem> orderItems = product.getOrders();
-        List<Integer> orderItemIds = orderItems.stream().map(OrderItem::getId).toList();
         orderItems.forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD));
         orderItemRepository.saveAll(orderItems);
 
         productRepository.save(product);
+
+        List<Integer> orderItemIds = orderItems.stream().map(OrderItem::getId).toList();
+        List<Integer> cartItemIds = cartItems.stream().map(CartItem::getId).toList();
         log.debug("Product with id of {} state updated to {} all of associated cart items with ids of {} are deleted and associated order items with ids of {} are now set to cancelled", product.getId(), Product.State.SOLD.name(), cartItemIds, orderItemIds);
     }
 

@@ -37,4 +37,6 @@ public interface ProductService {
     double getListingFee(double productTotalPrice);
 
     boolean isCriticalFieldsChanged(Product product, ProductDTO productDTO);
+
+    boolean isProductSold(User currentUser, Product product);
 }

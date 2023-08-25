@@ -94,4 +94,5 @@ public class User {
     )
 
     private Set<User> referredUsers;
+
 }

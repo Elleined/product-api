@@ -98,6 +98,7 @@ public class MarketplaceService implements IMarketplaceService {
         Product product = productService.getById(productId);
 
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
+        if (productService.isProductSold(currentUser, product)) throw new ProductAlreadySoldException("Cannot update this product with id of " + productId + " because this product is already sold");
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
         if (!userService.isVerified(currentUser)) throw new NotVerifiedException("Cannot update a product because user with id of " + currentUserId + " are not yet been verified! Consider register shop first then get verified afterwards");
 
@@ -114,6 +115,7 @@ public class MarketplaceService implements IMarketplaceService {
         Product product = productService.getById(productId);
 
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
+        if (productService.isProductSold(currentUser, product)) throw new ProductAlreadySoldException("Cannot update this product with id of " + productId + " because this product is already sold");
         if (productService.isProductHasPendingOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the pending products to delete this");
         if (productService.isProductHasAcceptedOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the accepted products to delete this");
         sellerService.deleteProduct(productId);
