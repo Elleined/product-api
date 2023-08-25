@@ -36,6 +36,7 @@ public abstract class UserMapper {
             @Mapping(target = "userVerification.status", expression = "java(UserVerification.Status.NOT_VERIFIED)"),
             @Mapping(target = "userDetails", expression = "java(toUserDetailsEntity(userDTO.getUserDetailsDTO()))"),
             @Mapping(target = "userCredential", expression = "java(toUserCredentialEntity(userDTO.getUserCredentialDTO()))"),
+            @Mapping(target = "isPremium", expression = "java(false)")
     })
     public abstract User toEntity(UserDTO userDTO);
 

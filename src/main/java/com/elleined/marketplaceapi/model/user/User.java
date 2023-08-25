@@ -32,6 +32,9 @@ public class User {
     )
     private int id;
 
+    @Column(name = "is_premium", nullable = false)
+    private boolean isPremium;
+
     @Column(
             name = "referral_code",
             unique = true,
@@ -94,5 +97,4 @@ public class User {
     )
 
     private Set<User> referredUsers;
-
 }

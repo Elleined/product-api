@@ -84,11 +84,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void buyPremium(User currentUser) {
-
-    }
-
-    @Override
     public boolean hasProduct(User currentUser, Product product) {
         return currentUser.getProducts().stream().anyMatch(product::equals);
     }

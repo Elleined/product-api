@@ -12,6 +12,7 @@ import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;
+import com.elleined.marketplaceapi.service.user.PremiumUserService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -29,35 +31,65 @@ import java.util.List;
 @Transactional
 public class ModeratorServiceImpl implements ModeratorService {
     private final EmailService emailService;
+
     private final UserRepository userRepository;
-    private final ProductRepository productRepository;
-
+    private final PremiumUserService premiumUserService;
     private final UserService userService;
-
     private final UserMapper userMapper;
-    private final ProductMapper productMapper;
 
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Override
     public List<UserDTO> getAllUnverifiedUser() {
-        return userRepository.findAll().stream()
+        List<User> premiumUsers = userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
+                .filter(User::isPremium)
                 .filter(user -> user.getShop() != null)
+                .toList();
+
+        List<User> regularUsers = userRepository.findAll().stream()
+                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
+                .filter(user -> !user.isPremium())
+                .filter(user -> user.getShop() != null)
+                .toList();
+
+        List<User> users = new ArrayList<>();
+        users.addAll(premiumUsers);
+        users.addAll(regularUsers);
+        return users.stream()
                 .map(userMapper::toDTO)
                 .toList();
     }
 
     @Override
-
     public List<ProductDTO> getAllPendingProduct() {
-        return userRepository.findAll().stream()
+
+        List<Product> premiumUserProducts = userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
                 .filter(user -> user.getShop() != null)
+                .filter(User::isPremium)
                 .map(User::getProducts)
                 .flatMap(products -> products.stream()
                         .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                        .filter(product -> product.getState() == Product.State.PENDING)
-                        .map(productMapper::toDTO))
+                        .filter(product -> product.getState() == Product.State.PENDING))
+                .toList();
+
+        List<Product> regularUserProducts = userRepository.findAll().stream()
+                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
+                .filter(user -> user.getShop() != null)
+                .filter(user -> !user.isPremium())
+                .map(User::getProducts)
+                .flatMap(products -> products.stream()
+                        .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                        .filter(product -> product.getState() == Product.State.PENDING))
+                .toList();
+
+        List<Product> products = new ArrayList<>();
+        products.addAll(premiumUserProducts);
+        products.addAll(regularUserProducts);
+        return products.stream()
+                .map(productMapper::toDTO)
                 .toList();
     }
 
