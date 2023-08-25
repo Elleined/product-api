@@ -20,9 +20,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ProductDTO getById(@PathVariable("currentUserId") int currentUserId,
-                              @PathVariable("id") int id) {
-        return marketplaceService.getProductById(currentUserId, id);
+    public ProductDTO getById(@PathVariable("id") int id) {
+        return marketplaceService.getProductById(id);
     }
 
     @GetMapping("/getAllCrops")

@@ -38,7 +38,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class MarketplaceService {
+public class MarketplaceService implements IMarketplaceService {
     private final EmailService emailService;
     private final PrincipalService principalService;
     private final SellerService sellerService;
@@ -62,16 +62,15 @@ public class MarketplaceService {
     private final FeeService feeService;
 
 
-    public ProductDTO getProductById(int currentUserId, int productId)
-            throws ResourceNotFoundException, NotOwnedException {
-        User currentUser = userService.getById(currentUserId);
+    @Override
+    public ProductDTO getProductById(int productId) throws ResourceNotFoundException {
         Product product = productService.getById(productId);
 
-        if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
         return productMapper.toDTO(product);
     }
 
+    @Override
     public ProductDTO saveProduct(int sellerId, ProductDTO productDTO)
             throws ResourceNotFoundException, InsufficientBalanceException {
         User seller = userService.getById(sellerId);
@@ -89,6 +88,7 @@ public class MarketplaceService {
         return productMapper.toDTO(product);
     }
 
+    @Override
     public ProductDTO updateProduct(int currentUserId, int productId, ProductDTO productDTO)
             throws ResourceNotFoundException, NotOwnedException {
 
@@ -107,6 +107,7 @@ public class MarketplaceService {
         return productMapper.toDTO(product);
     }
 
+    @Override
     public void deleteProduct(int currentUserId, int productId)
             throws ResourceNotFoundException, NotOwnedException, OrderException {
         User currentUser = userService.getById(currentUserId);
@@ -118,6 +119,7 @@ public class MarketplaceService {
         sellerService.deleteProduct(productId);
     }
 
+    @Override
     public List<ProductDTO> getAllProductExcept(int currentUserId) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         return productService.getAllExcept(currentUser).stream()
@@ -126,6 +128,7 @@ public class MarketplaceService {
     }
 
 
+    @Override
     @Transactional(noRollbackFor = MessagingException.class)
     public UserDTO saveUser(UserDTO userDTO)
             throws ResourceNotFoundException,
@@ -151,17 +154,20 @@ public class MarketplaceService {
         return userMapper.toDTO(registeringUser);
     }
 
+    @Override
     public UserDTO getUserById(int userId) throws ResourceNotFoundException {
         User user = userService.getById(userId);
         return userMapper.toDTO(user);
     }
 
+    @Override
     public UserDTO resendValidId(int currentUserId, String newValidId) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         userService.resendValidId(currentUser, newValidId);
         return userMapper.toDTO(currentUser);
     }
 
+    @Override
     public UserDTO login(UserDTO.UserCredentialDTO userCredentialDTO)
             throws ResourceNotFoundException, InvalidUserCredentialException {
         User currentUser = userService.login(userCredentialDTO);
@@ -169,6 +175,7 @@ public class MarketplaceService {
         return userMapper.toDTO(currentUser);
     }
 
+    @Override
     public ShopDTO sendShopRegistration(int currentUserId, ShopDTO shopDTO)
             throws ResourceNotFoundException, NotOwnedException {
         User currentUser = userService.getById(currentUserId);
@@ -178,6 +185,7 @@ public class MarketplaceService {
         return shopDTO;
     }
 
+    @Override
     public OrderItemDTO orderProduct(int buyerId, OrderItemDTO orderItemDTO)
             throws ResourceNotFoundException, OrderException {
         int productId = orderItemDTO.getProductId();
@@ -191,7 +199,6 @@ public class MarketplaceService {
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + productId + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + productId + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isNotExactToQuantityPerUnit(product, orderItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit of seller which is " + product.getQuantityPerUnit());
         if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
 
         if (cartItemService.isProductAlreadyInCart(buyer, product)) {
@@ -202,6 +209,7 @@ public class MarketplaceService {
         return itemMapper.toOrderItemDTO(savedOrderItem);
     }
 
+    @Override
     public List<OrderItemDTO> getAllOrderedProductsByStatus(int currentUserId, String orderItemStatus) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         return buyerService.getAllOrderedProductsByStatus(currentUser, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()
@@ -209,6 +217,7 @@ public class MarketplaceService {
                 .toList();
     }
 
+    @Override
     public void cancelOrderItem(int buyerId, int orderItemId)
             throws ResourceNotFoundException, NotOwnedException {
 
@@ -217,8 +226,11 @@ public class MarketplaceService {
 
         if (!buyerService.isBuyerHasOrder(buyer, orderItem)) throw new NotOwnedException("User with id of " + buyerId +  " does not have order item with id of " + orderItemId);
         if (buyerService.isSellerAcceptedOrder(orderItem)) throw new OrderException("Cannot cancel order because order with id of " + orderItemId + " are already accepted by the seller!");
+        
+        buyerService.cancelOrderItem(buyer, orderItem);
     }
 
+    @Override
     public List<ProductDTO> getAllProductByState(int currentUserId, String state) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         return sellerService.getAllProductByState(currentUser, Product.State.valueOf(state)).stream()
@@ -227,6 +239,7 @@ public class MarketplaceService {
     }
 
 
+    @Override
     public AddressDTO saveDeliveryAddress(int currentUserId, AddressDTO addressDTO)
             throws ResourceNotFoundException, AlreadExistException {
         User currentUser = userService.getById(currentUserId);
@@ -238,6 +251,7 @@ public class MarketplaceService {
         return addressMapper.toDTO(deliveryAddress);
     }
 
+    @Override
     public void deleteDeliveryAddress(int currentUserId, int deliveryAddressId)
             throws ResourceNotFoundException, NotOwnedException {
         User currentUser = userService.getById(currentUserId);
@@ -245,6 +259,7 @@ public class MarketplaceService {
         addressService.deleteDeliveryAddress(currentUser, deliveryAddressId);
     }
 
+    @Override
     public List<AddressDTO> getAllDeliveryAddress(int currentUserId) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         return addressService.getAllDeliveryAddress(currentUser).stream()
@@ -252,6 +267,7 @@ public class MarketplaceService {
                 .toList();
     }
 
+    @Override
     public void acceptOrder(int sellerId, int orderItemId, String messageToBuyer)
             throws ResourceNotFoundException, NotValidBodyException {
         User seller = userService.getById(sellerId);
@@ -262,6 +278,7 @@ public class MarketplaceService {
         sellerService.acceptOrder(seller, orderItem, messageToBuyer);
     }
 
+    @Override
     public void rejectOrder(int sellerId, int orderItemId, String messageToBuyer)
             throws ResourceNotFoundException, NotValidBodyException {
         User seller = userService.getById(sellerId);
@@ -272,6 +289,7 @@ public class MarketplaceService {
         sellerService.rejectOrder(seller, orderItem, messageToBuyer);
     }
 
+    @Override
     public List<OrderItemDTO> getAllSellerProductOrderByStatus(int sellerId, String orderItemStatus) throws ResourceNotFoundException {
         User seller = userService.getById(sellerId);
         OrderItem.OrderItemStatus status = OrderItem.OrderItemStatus.valueOf(orderItemStatus);
@@ -280,17 +298,21 @@ public class MarketplaceService {
                 .toList();
     }
 
+    @Override
     public List<String> getAllCrops() {
         return cropService.getAll();
     }
 
+    @Override
     public List<String> getAllUnit() {
         return unitService.getAll();
     }
+    @Override
     public List<String> getAllSuffix() {
         return suffixService.getAll();
     }
 
+    @Override
     public List<CartItemDTO> getAllCartItems(int currentUserId) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         return cartItemService.getAll(currentUser).stream()
@@ -298,12 +320,14 @@ public class MarketplaceService {
                 .toList();
     }
 
+    @Override
     public void deleteCartItem(int currentUserId, int cartItemId) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         cartItemService.delete(currentUser, cartItemId);
     }
 
     // alias for add to cart
+    @Override
     public CartItemDTO saveCartItem(int currentUserId, CartItemDTO cartItemDTO) throws ResourceNotFoundException {
         User currentUser = userService.getById(currentUserId);
         Product product = productService.getById(cartItemDTO.getProductId());
@@ -314,7 +338,6 @@ public class MarketplaceService {
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + product.getId() + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + product.getId() + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, cartItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isNotExactToQuantityPerUnit(product, cartItemDTO.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit of seller which is " + product.getQuantityPerUnit());
         if (productService.isSellerAlreadyRejectedBuyerForThisProduct(currentUser, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
 
         if (cartItemService.isProductAlreadyInCart(currentUser, product)) {
@@ -326,6 +349,7 @@ public class MarketplaceService {
         return itemMapper.toCartItemDTO(cartItem);
     }
 
+    @Override
     public OrderItemDTO moveToOrderItem(int cartItemId)
             throws ResourceNotFoundException, OrderException {
         CartItem cartItem = cartItemService.getCartItemById(cartItemId);
@@ -338,22 +362,33 @@ public class MarketplaceService {
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + product.getId() + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + product.getId() + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, cartItem.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isNotExactToQuantityPerUnit(product, cartItem.getOrderQuantity())) throw new OrderException("Cannot order! Because you are trying to order an amount that are not compliant to specified quantity per unit of seller which is " + product.getQuantityPerUnit());
         if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
 
         OrderItem orderItem = cartItemService.moveToOrderItem(cartItem);
         return itemMapper.toOrderItemDTO(orderItem);
     }
 
+    @Override
     public List<OrderItemDTO> moveAllToOrderItem(List<Integer> cartItemIds) throws ResourceNotFoundException {
         return cartItemIds.stream()
                 .map(this::moveToOrderItem)
                 .toList();
     }
 
+    @Override
     public void updateProductStateToSold(int sellerId, int productId) throws ResourceNotFoundException {
         User seller = userService.getById(sellerId);
         Product product = productService.getById(productId);
         sellerService.updateProductStateToSold(seller, product);
+    }
+
+    @Override
+    public AddressDTO getDeliveryAddressById(int currentUserId, int deliveryAddressId) throws ResourceNotFoundException {
+        User currentUser = userService.getById(currentUserId);
+        DeliveryAddress deliveryAddress = currentUser.getDeliveryAddresses().stream()
+                .filter(address -> address.getId() == deliveryAddressId)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("User with id of " +  currentUser + " doesnt have delivery address with id of " + deliveryAddressId));
+        return addressMapper.toDTO(deliveryAddress);
     }
 }

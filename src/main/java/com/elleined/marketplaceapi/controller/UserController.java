@@ -64,6 +64,12 @@ public class UserController {
         return marketplaceService.saveDeliveryAddress(currentUserId, addressDTO);
     }
 
+    @PostMapping("/{currentUserId}/getDeliveryAddressById/{deliveryAddressId}")
+    public AddressDTO getDeliveryAddressById(@PathVariable("currentUserId") int currentUserId,
+                                             @PathVariable("deliveryAddressId") int deliveryAddressId) {
+        return marketplaceService.getDeliveryAddressById(currentUserId, deliveryAddressId);
+    }
+
     @GetMapping("/getAllSuffix")
     public List<String> getAllSuffix() {
         return marketplaceService.getAllSuffix();

@@ -25,4 +25,5 @@ public class UserVerification {
         VERIFIED,
         NOT_VERIFIED
     }
+
 }

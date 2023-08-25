@@ -69,22 +69,10 @@ public class ProductServiceImpl implements ProductService {
         return userOrderQuantity > product.getAvailableQuantity();
     }
 
-    @Override
-    public boolean isNotExactToQuantityPerUnit(Product product, int userOrderQuantity) {
-        return userOrderQuantity % product.getQuantityPerUnit() != 0;
-    }
 
     @Override
     public double calculateOrderPrice(Product product, int userOrderQuantity) {
-        int counter = 0;
-        while (userOrderQuantity > 0) {
-            if (userOrderQuantity % product.getQuantityPerUnit() == 0) counter++;
-            userOrderQuantity -= product.getQuantityPerUnit();
-        }
-
-        double totalPrice = product.getPricePerUnit() * counter;
-        log.trace("Total price {}", totalPrice);
-        return totalPrice;
+        return product.getPricePerUnit() * userOrderQuantity;
     }
 
     @Override

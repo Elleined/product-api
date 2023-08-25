@@ -92,5 +92,6 @@ public class User {
                     referencedColumnName = "user_id"
             )
     )
+
     private Set<User> referredUsers;
 }

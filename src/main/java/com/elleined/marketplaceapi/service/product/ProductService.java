@@ -22,8 +22,6 @@ public interface ProductService {
     boolean isSellerAlreadyRejectedBuyerForThisProduct(User buyer, Product product);
 
     boolean isExceedingToAvailableQuantity(Product product, int userOrderQuantity);
-    boolean isNotExactToQuantityPerUnit(Product product, int userOrderQuantity);
-
     double calculateOrderPrice(Product product, int userOrderQuantity);
 
     /**
