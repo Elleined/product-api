@@ -12,5 +12,5 @@ public interface FeeService {
 
     void payForPremium(User user);
 
-    void payInvitingUser(String invitingUserReferralCode) throws ResourceNotFoundException;
+    void payInvitingUser(User invitingUser);
 }

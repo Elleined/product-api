@@ -61,7 +61,7 @@ public class UserDTO {
 
         @NotNull(message = "Birthday cannot be blank, null, or empty")
         @Past(message = "Birth Date should be in the past")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         private LocalDateTime birthDate;
 
         @NotBlank(message = "Mobile number cannot be blank, null, or empty")

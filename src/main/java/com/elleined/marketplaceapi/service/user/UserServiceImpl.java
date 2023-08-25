@@ -195,6 +195,16 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
+    public User getInvitingUser(User invitedUser) {
+        return userRepository.findAll().stream()
+                .map(User::getReferredUsers)
+                .flatMap(Collection::stream)
+                .filter(invitedUser::equals)
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public Product saveProduct(ProductDTO productDTO, User seller) {
         Product product = productMapper.toEntity(productDTO, seller);
         productRepository.save(product);

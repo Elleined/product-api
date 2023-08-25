@@ -152,10 +152,7 @@ public class MarketplaceService implements IMarketplaceService {
 
         User registeringUser = userService.saveByDTO(userDTO);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
-        if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) {
-            userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
-            feeService.payInvitingUser(userDTO.getInvitationReferralCode());
-        }
+            if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         emailService.sendWelcomeEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
@@ -187,6 +184,7 @@ public class MarketplaceService implements IMarketplaceService {
             throws ResourceNotFoundException, NotOwnedException {
         User currentUser = userService.getById(currentUserId);
 
+        if (userService.isVerified(currentUser)) throw new AlreadExistException("Cannot resend shop registration! because user with id of " + currentUser.getId() + " are already been verified!");
         if (userService.isUserHasShopRegistration(currentUser)) throw new NotVerifiedException("User with id of " + currentUserId + " already have shop registration! Please wait for email notification. If dont receive an email consider resending your valid id!");
         userService.sendShopRegistration(currentUser, shopDTO);
         return shopDTO;

@@ -57,8 +57,7 @@ public class FeeServiceImpl implements FeeService {
     }
 
     @Override
-    public void payInvitingUser(String invitingUserReferralCode) throws ResourceNotFoundException {
-        User invitingUser = userRepository.fetchByReferralCode(invitingUserReferralCode).orElseThrow(() -> new ResourceNotFoundException("User with referral code of " + invitingUserReferralCode + " does not exists!"));
+    public void payInvitingUser(User invitingUser) {
         BigDecimal oldUserBalance = invitingUser.getBalance();
         invitingUser.setBalance(oldUserBalance.add(new BigDecimal(REFERRAL_FEE)));
         userRepository.save(invitingUser);

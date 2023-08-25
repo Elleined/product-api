@@ -14,6 +14,7 @@ import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;
+import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     private final UserService userService;
     private final UserMapper userMapper;
 
+    private final FeeService feeService;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
@@ -101,6 +103,8 @@ public class ModeratorServiceImpl implements ModeratorService {
         if (userToBeVerified.getShop() == null) throw new NotVerifiedException("User with id of " + userToBeVerifiedId + " doesn't have pending shop registration! must send a shop registration first!");
 
         if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
+        User invitingUser = userService.getInvitingUser(userToBeVerified);
+        if (invitingUser != null) feeService.payInvitingUser(invitingUser);
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         userRepository.save(userToBeVerified);
 

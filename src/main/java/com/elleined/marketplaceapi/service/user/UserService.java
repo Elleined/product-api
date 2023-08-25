@@ -52,4 +52,7 @@ public interface UserService extends PasswordService, CartItemService {
     User getByReferralCode(String referralCode) throws ResourceNotFoundException;
 
     void addInvitedUser(String invitingUserReferralCode, User invitedUser);
+
+    // returns the inviting user of invited user
+    User getInvitingUser(User invitedUser) throws ResourceNotFoundException;
 }
