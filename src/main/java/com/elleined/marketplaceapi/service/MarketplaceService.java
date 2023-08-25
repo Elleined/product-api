@@ -228,7 +228,7 @@ public class MarketplaceService implements IMarketplaceService {
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
 
         if (!buyerService.isBuyerHasOrder(buyer, orderItem)) throw new NotOwnedException("User with id of " + buyerId +  " does not have order item with id of " + orderItemId);
-        if (buyerService.isSellerAcceptedOrder(orderItem)) throw new OrderException("Cannot cancel order because order with id of " + orderItemId + " are already accepted by the seller!");
+        if (sellerService.isSellerAcceptedOrder(orderItem)) throw new OrderException("Cannot cancel order because order with id of " + orderItemId + " are already accepted by the seller!");
 
         buyerService.cancelOrderItem(buyer, orderItem);
     }
@@ -283,7 +283,7 @@ public class MarketplaceService implements IMarketplaceService {
 
     @Override
     public void rejectOrder(int sellerId, int orderItemId, String messageToBuyer)
-            throws ResourceNotFoundException, NotValidBodyException {
+            throws ResourceNotFoundException, NotValidBodyException, OrderAlreadyAcceptedException {
         User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
 

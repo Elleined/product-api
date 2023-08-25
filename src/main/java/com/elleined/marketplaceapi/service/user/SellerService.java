@@ -83,4 +83,6 @@ public interface SellerService {
     boolean isSellerExceedToMaxAcceptedOrders(User seller);
 
     boolean isSellerExceedsToMaxListingPerDay(User seller);
+
+    boolean isSellerAcceptedOrder(OrderItem orderItem);
 }

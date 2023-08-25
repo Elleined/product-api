@@ -42,5 +42,4 @@ public interface BuyerService {
     boolean isBuyerHasAcceptedOrderToProduct(User buyer, Product product);
 
     boolean isBuyerHasOrder(User buyer, OrderItem orderItem);
-    boolean isSellerAcceptedOrder(OrderItem orderItem);
 }
