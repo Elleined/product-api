@@ -19,7 +19,8 @@ public interface ProductService {
     boolean isProductHasPendingOrder(Product product);
 
     boolean isProductHasAcceptedOrder(Product product);
-    boolean isSellerAlreadyRejectedBuyerForThisProduct(User buyer, Product product);
+
+    boolean isSellerAlreadyRejectedBuyer(User buyer, Product product);
 
     boolean isExceedingToAvailableQuantity(Product product, int userOrderQuantity);
     double calculateOrderPrice(Product product, int userOrderQuantity);

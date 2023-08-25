@@ -27,8 +27,6 @@ public interface CartItemService {
 
     boolean isProductAlreadyInCart(User buyer, Product product);
 
-    CartItem updateOrderQuantity(CartItem cartItem);
-
     CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException;
 
 

@@ -22,6 +22,8 @@ public abstract class ItemDTO {
 
     private double price;
 
+    private int sellerId;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime orderDate;
 

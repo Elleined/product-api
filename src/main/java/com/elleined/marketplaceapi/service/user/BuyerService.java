@@ -36,7 +36,10 @@ public interface BuyerService {
      */
     void cancelOrderItem(User buyer, OrderItem orderItem);
 
-    boolean isUserAlreadyOrderedProduct(User buyer, Product product);
+    // returns false if buyer cancel his order for this product
+    boolean isBuyerHasPendingOrderToProduct(User buyer, Product product);
+
+    boolean isBuyerHasAcceptedOrderToProduct(User buyer, Product product);
 
     boolean isBuyerHasOrder(User buyer, OrderItem orderItem);
     boolean isSellerAcceptedOrder(OrderItem orderItem);

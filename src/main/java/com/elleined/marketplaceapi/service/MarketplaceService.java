@@ -193,13 +193,14 @@ public class MarketplaceService implements IMarketplaceService {
         User buyer = userService.getById(buyerId);
         Product product = productService.getById(productId);
 
-        if (buyerService.isUserAlreadyOrderedProduct(buyer, product)) throw new  OrderException("User with id of " + buyerId + " already order this product with id of " + productId + " please wait until seller take action in you order request!");
+        if (buyerService.isBuyerHasPendingOrderToProduct(buyer, product)) throw new OrderException("User with id of " + buyerId + " has already pending order this product with id of " + productId + " please wait until seller take action in you order request!");
+        if (buyerService.isBuyerHasAcceptedOrderToProduct(buyer, product)) throw new OrderException("User with id of " + buyerId + " has accepted order for this product with id of " + productId + " please contact the seller to settle your order");
         if (userService.hasProduct(buyer, product)) throw new OrderException("You cannot order your own product listing!");
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + productId + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + productId + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
+        if (productService.isSellerAlreadyRejectedBuyer(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
 
         if (cartItemService.isProductAlreadyInCart(buyer, product)) {
             CartItem cartItem = cartItemService.getByProduct(buyer, product);
@@ -226,7 +227,7 @@ public class MarketplaceService implements IMarketplaceService {
 
         if (!buyerService.isBuyerHasOrder(buyer, orderItem)) throw new NotOwnedException("User with id of " + buyerId +  " does not have order item with id of " + orderItemId);
         if (buyerService.isSellerAcceptedOrder(orderItem)) throw new OrderException("Cannot cancel order because order with id of " + orderItemId + " are already accepted by the seller!");
-        
+
         buyerService.cancelOrderItem(buyer, orderItem);
     }
 
@@ -332,19 +333,16 @@ public class MarketplaceService implements IMarketplaceService {
         User currentUser = userService.getById(currentUserId);
         Product product = productService.getById(cartItemDTO.getProductId());
 
-        if (buyerService.isUserAlreadyOrderedProduct(currentUser, product)) throw new  OrderException("User with id of " + currentUser.getId() + " already order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
+        if (cartItemService.isProductAlreadyInCart(currentUser, product)) throw new OrderException("Cannot add to cart this product! Because user with id of " + currentUserId + " has already a product with id of " + product.getId() + " in his cart");
+        if (buyerService.isBuyerHasPendingOrderToProduct(currentUser, product)) throw new OrderException("User with id of " + currentUserId + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
+        if (buyerService.isBuyerHasAcceptedOrderToProduct(currentUser, product)) throw new OrderException("User with id of " + currentUserId + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
         if (userService.hasProduct(currentUser, product)) throw new OrderException("You cannot order your own product listing!");
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + product.getId() + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + product.getId() + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, cartItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(currentUser, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
+        if (productService.isSellerAlreadyRejectedBuyer(currentUser, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
 
-        if (cartItemService.isProductAlreadyInCart(currentUser, product)) {
-            CartItem cartItem = cartItemService.getByProduct(currentUser, product);
-            cartItemService.updateOrderQuantity(cartItem);
-            return itemMapper.toCartItemDTO(cartItem);
-        }
         CartItem cartItem = cartItemService.save(currentUser, cartItemDTO);
         return itemMapper.toCartItemDTO(cartItem);
     }
@@ -356,13 +354,14 @@ public class MarketplaceService implements IMarketplaceService {
         User buyer = cartItem.getPurchaser();
         Product product = cartItem.getProduct();
 
-        if (buyerService.isUserAlreadyOrderedProduct(buyer, product)) throw new  OrderException("User with id of " + buyer.getId() + " already order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
+        if (buyerService.isBuyerHasPendingOrderToProduct(buyer, product)) throw new OrderException("User with id of " + buyer.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
+        if (buyerService.isBuyerHasAcceptedOrderToProduct(buyer, product)) throw new OrderException("User with id of " + buyer.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
         if (userService.hasProduct(buyer, product)) throw new OrderException("You cannot order your own product listing!");
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + product.getId() + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + product.getId() + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, cartItem.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isSellerAlreadyRejectedBuyerForThisProduct(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
+        if (productService.isSellerAlreadyRejectedBuyer(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
 
         OrderItem orderItem = cartItemService.moveToOrderItem(cartItem);
         return itemMapper.toOrderItemDTO(orderItem);

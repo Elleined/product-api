@@ -311,11 +311,21 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public boolean isUserAlreadyOrderedProduct(User buyer, Product product) {
+    public boolean isBuyerHasPendingOrderToProduct(User buyer, Product product) {
+       return buyer.getOrderedItems().stream()
+               .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
+               .map(OrderItem::getProduct)
+               .anyMatch(product::equals);
+    }
+
+    @Override
+    public boolean isBuyerHasAcceptedOrderToProduct(User buyer, Product product) {
         return buyer.getOrderedItems().stream()
+                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
                 .map(OrderItem::getProduct)
                 .anyMatch(product::equals);
     }
+
 
     @Override
     public boolean isBuyerHasOrder(User buyer, OrderItem orderItem) {
@@ -355,7 +365,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public List<CartItem> getAll(User currentUser) {
         return currentUser.getCartItems().stream()
                 .filter(cartItem -> cartItem.getProduct().getStatus() == Product.Status.ACTIVE)
-                .filter(cartItem -> cartItem.getProduct().getState() == Product.State.PENDING)
+                .filter(cartItem -> cartItem.getProduct().getState() == Product.State.LISTING)
                 .sorted(Comparator.comparing(CartItem::getOrderDate).reversed())
                 .toList();
     }
@@ -414,20 +424,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         return buyer.getCartItems().stream()
                 .map(CartItem::getProduct)
                 .anyMatch(product::equals);
-    }
-
-    @Override
-    public CartItem updateOrderQuantity(CartItem cartItem) {
-        int oldOrderQuantity = cartItem.getOrderQuantity();
-        int newOrderQuantity = oldOrderQuantity + 1;
-
-        double newPrice = productService.calculateOrderPrice(cartItem.getProduct(), newOrderQuantity);
-
-        cartItem.setOrderQuantity(newOrderQuantity);
-        cartItem.setPrice(newPrice);
-        cartItemRepository.save(cartItem);
-        log.debug("Cart item order quantity updated successfully with new order quantity of {} from {}", oldOrderQuantity, cartItem.getOrderQuantity());
-        return cartItem;
     }
 
     @Override

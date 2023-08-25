@@ -20,8 +20,8 @@ public class OrderItemDTO extends ItemDTO {
 
 
     @Builder
-    public OrderItemDTO(Long id, @Positive(message = "Order quantity cannot be 0 or less than zero!") int orderQuantity, double price, LocalDateTime orderDate, @Positive(message = "Product id cannot be 0 or less than zero!") int productId, int purchaserId, @Positive(message = "Delivery address id cannot be 0 or less than zero!") int deliveryAddressId, String orderItemStatus, String sellerMessage) {
-        super(id, orderQuantity, price, orderDate, productId, purchaserId, deliveryAddressId);
+    public OrderItemDTO(Long id, @Positive(message = "Order quantity cannot be 0 or less than zero!") int orderQuantity, double price, int sellerId, LocalDateTime orderDate, @Positive(message = "Product id cannot be 0 or less than zero!") int productId, int purchaserId, @Positive(message = "Delivery address id cannot be 0 or less than zero!") int deliveryAddressId, String orderItemStatus, String sellerMessage) {
+        super(id, orderQuantity, price, sellerId, orderDate, productId, purchaserId, deliveryAddressId);
         this.orderItemStatus = orderItemStatus;
         this.sellerMessage = sellerMessage;
     }

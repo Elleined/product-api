@@ -43,7 +43,8 @@ public abstract class ItemMapper {
     @Mappings({
             @Mapping(target = "deliveryAddressId", source = "deliveryAddress.id"),
             @Mapping(target = "productId", source = "product.id"),
-            @Mapping(target = "purchaserId", source = "purchaser.id")
+            @Mapping(target = "purchaserId", source = "purchaser.id"),
+            @Mapping(target = "sellerId", source = "product.seller.id")
     })
     public abstract OrderItemDTO toOrderItemDTO(OrderItem orderItem);
 
@@ -51,6 +52,7 @@ public abstract class ItemMapper {
             @Mapping(target = "id", ignore = true),
 
             @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(currentUser, cartItemDTO.getDeliveryAddressId()))"),
+            @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "product", expression = "java(productService.getById(cartItemDTO.getProductId()))"),
             @Mapping(target = "purchaser", expression = "java(currentUser)")
     })
@@ -59,7 +61,8 @@ public abstract class ItemMapper {
     @Mappings({
             @Mapping(target = "deliveryAddressId", source = "deliveryAddress.id"),
             @Mapping(target = "productId", source = "product.id"),
-            @Mapping(target = "purchaserId", source = "purchaser.id")
+            @Mapping(target = "purchaserId", source = "purchaser.id"),
+            @Mapping(target = "sellerId", source = "product.seller.id")
     })
     public abstract CartItemDTO toCartItemDTO(CartItem cartItem);
 

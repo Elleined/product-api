@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean isSellerAlreadyRejectedBuyerForThisProduct(User buyer, Product product) {
+    public boolean isSellerAlreadyRejectedBuyer(User buyer, Product product) {
         return buyer.getOrderedItems().stream()
                 .filter(orderItem -> orderItem.getProduct().equals(product))
                 .anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.REJECTED);
