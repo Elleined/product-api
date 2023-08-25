@@ -8,7 +8,7 @@ public interface EmailService {
     void sendVerificationEmail(User userToBeVerified);
 
     void sendProductEmail(User seller, Product product);
-    void sendRegistrationEmail(User registrant);
+    void sendWelcomeEmail(User registrant);
 
     OTPMessage sendOTP(User user);
 }

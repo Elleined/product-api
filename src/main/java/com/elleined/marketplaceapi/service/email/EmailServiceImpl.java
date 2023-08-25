@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendRegistrationEmail(User registrant) {
+    public void sendWelcomeEmail(User registrant) {
         String message = " Hello " + getFullName(registrant) + " Thank you for registering in our application we appreciate your trust. We ensure that you're data is secured and enjoy our services. Thanks...";
         EmailMessage emailMessage = EmailMessage.builder()
                 .receiver(registrant.getUserCredential().getEmail())

@@ -152,9 +152,12 @@ public class MarketplaceService implements IMarketplaceService {
 
         User registeringUser = userService.saveByDTO(userDTO);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
-        if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
+        if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) {
+            userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
+            feeService.payInvitingUser(userDTO.getInvitationReferralCode());
+        }
 
-        emailService.sendRegistrationEmail(registeringUser);
+        emailService.sendWelcomeEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
     }
 
