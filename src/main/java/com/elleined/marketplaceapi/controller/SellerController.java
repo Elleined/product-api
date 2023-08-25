@@ -24,14 +24,14 @@ public class SellerController {
         return marketplaceService.getAllProductByState(currentUserId, state);
     }
 
-    @PutMapping("/acceptOrder/{orderItemId}")
+    @PatchMapping("/acceptOrder/{orderItemId}")
     public void acceptOrder(@PathVariable("currentUserId") int currentUserId,
                                       @PathVariable("orderItemId") int orderItemId,
                                       @RequestParam("messageToBuyer") String messageToBuyer) {
         marketplaceService.acceptOrder(currentUserId, orderItemId, messageToBuyer);
     }
 
-    @PutMapping("/rejectOrder/{orderItemId}")
+    @PatchMapping("/rejectOrder/{orderItemId}")
     public void rejectOrder(@PathVariable("currentUserId") int currentUserId,
                             @PathVariable("orderItemId") int orderItemId,
                             @RequestParam("messageToBuyer") String messageToBuyer) {

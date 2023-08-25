@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.fee;
 
+import com.elleined.marketplaceapi.exception.InsufficientBalanceException;
 import com.elleined.marketplaceapi.model.AppWallet;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.AppWalletRepository;
@@ -35,5 +36,22 @@ public class FeeServiceImpl implements FeeService {
 
         log.debug("Seller with id of {} has now new balance of {} because listing fee is deducted which is {} from old balance of {}", seller.getId(), sellerNewBalance, fee, oldSellerBalance);
         log.debug("Appwallet has now new balance of {} from old balance of {} because listing fee is added which is {}", newAppWalletBalance, oldAppWalletBalance, fee);
+    }
+
+    @Override
+    public void payForPremium(User user) {
+        BigDecimal userOldBalance = user.getBalance();
+        user.setBalance(userOldBalance.subtract(new BigDecimal(PREMIUM_USER_FEE)));
+        BigDecimal userNewBalance = user.getBalance();
+        userRepository.save(user);
+
+        AppWallet appWallet = appWalletRepository.findById(1).orElseThrow();
+        BigDecimal oldAppWalletBalance = appWallet.getAppWalletBalance();
+        appWallet.setAppWalletBalance(oldAppWalletBalance.add(new BigDecimal(PREMIUM_USER_FEE)));
+        BigDecimal newAppWalletBalance = appWallet.getAppWalletBalance();
+        appWalletRepository.save(appWallet);
+
+        log.debug("User with id of {} buys premium account amounting {}. This amount is deducted to his/her account balance and now has new balance of {} from {}", user.getId(), PREMIUM_USER_FEE, userNewBalance, userOldBalance);
+        log.debug("Premium user fee has been added to app wallet and now has new balance of {} from {}", newAppWalletBalance, oldAppWalletBalance);
     }
 }

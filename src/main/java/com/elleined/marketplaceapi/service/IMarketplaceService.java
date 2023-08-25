@@ -93,4 +93,6 @@ public interface IMarketplaceService {
     void updateProductStateToSold(int sellerId, int productId) throws ResourceNotFoundException;
 
     AddressDTO getDeliveryAddressById(int currentUserId, int deliveryAddressId) throws ResourceNotFoundException;
+
+    void buyPremium(int currentUserId) throws InsufficientBalanceException, ResourceNotFoundException;
 }

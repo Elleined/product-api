@@ -1,17 +1,18 @@
-package com.elleined.marketplaceapi.model;
+package com.elleined.marketplaceapi.model.user;
 
-import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "tbl_shop")
+@Table(name = "tbl_user_premium")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
-public class Shop {
+public class Premium {
 
     @Id
     @Column(
@@ -21,14 +22,8 @@ public class Shop {
     )
     private int id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "picture", nullable = false)
-    private String picture;
+    @Column(name = "registration_date", nullable = false)
+    private LocalDateTime registrationDate;
 
     // This is the primary key of this shop table
     @MapsId
@@ -37,5 +32,5 @@ public class Shop {
             name = "owner_id",
             referencedColumnName = "user_id"
     )
-    private User owner;
+    private User user;
 }

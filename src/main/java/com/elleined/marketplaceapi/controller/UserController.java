@@ -87,7 +87,7 @@ public class UserController {
         return messageService.sendPublicMessage(message);
     }
 
-    @PutMapping("/changePassword/{currentUserId}")
+    @PatchMapping("/changePassword/{currentUserId}")
     public APIResponse changePassword(@PathVariable("currentUserId") int currentUserId,
                                       @RequestParam("newPassword") String newPassword) {
 
@@ -95,9 +95,14 @@ public class UserController {
         return new APIResponse(HttpStatus.OK, "Current user successfully changed his/her password");
     }
 
-    @PutMapping("/{currentUserId}/setProductStateToSold/{productId}")
+    @PatchMapping("/{currentUserId}/setProductStateToSold/{productId}")
     public void setProductStateToSold(@PathVariable("currentUserId") int sellerId,
                                       @PathVariable("productId") int productId) {
         marketplaceService.updateProductStateToSold(sellerId, productId);
+    }
+
+    @PatchMapping("/{currentUserId}/buyPremium")
+    public void buyPremium(@PathVariable("currentUserId") int currentUserId) {
+        marketplaceService.buyPremium(currentUserId);
     }
 }

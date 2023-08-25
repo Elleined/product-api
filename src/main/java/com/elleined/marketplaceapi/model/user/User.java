@@ -32,9 +32,6 @@ public class User {
     )
     private int id;
 
-    @Column(name = "is_premium", nullable = false)
-    private boolean isPremium;
-
     @Column(
             name = "referral_code",
             unique = true,
@@ -78,6 +75,12 @@ public class User {
     @PrimaryKeyJoinColumn
     @Setter(AccessLevel.NONE)
     private Shop shop;
+
+    // user id reference is in premium user table
+    @OneToOne(mappedBy = "user")
+    @PrimaryKeyJoinColumn
+    @Setter(AccessLevel.NONE)
+    private Premium premium;
 
     // user id reference is in products table
     @OneToMany(mappedBy = "seller")

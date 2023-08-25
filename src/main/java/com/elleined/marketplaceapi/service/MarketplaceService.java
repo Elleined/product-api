@@ -20,6 +20,7 @@ import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.address.AddressValidator;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
+import com.elleined.marketplaceapi.service.premiumuser.PremiumUserService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
@@ -43,6 +44,7 @@ public class MarketplaceService implements IMarketplaceService {
     private final PrincipalService principalService;
     private final SellerService sellerService;
     private final BuyerService buyerService;
+    private final PremiumUserService premiumUserService;
     private final UserDetailsValidator userDetailsValidator;
     private final UserCredentialValidator userCredentialValidator;
     private final AddressValidator addressValidator;
@@ -394,5 +396,11 @@ public class MarketplaceService implements IMarketplaceService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with id of " +  currentUser + " doesnt have delivery address with id of " + deliveryAddressId));
         return addressMapper.toDTO(deliveryAddress);
 
+    }
+
+    @Override
+    public void buyPremium(int currentUserId) throws InsufficientBalanceException, ResourceNotFoundException {
+        User user = userService.getById(currentUserId);
+        premiumUserService.upgradeToPremium(user);
     }
 }

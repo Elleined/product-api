@@ -427,4 +427,5 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException {
         return cartItemRepository.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("Cart item with id of " + cartItemId + " does not exists!"));
     }
+
 }

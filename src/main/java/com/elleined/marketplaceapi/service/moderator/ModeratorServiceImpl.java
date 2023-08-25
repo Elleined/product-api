@@ -7,12 +7,13 @@ import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
+import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;
-import com.elleined.marketplaceapi.service.user.PremiumUserService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,8 @@ import java.util.List;
 public class ModeratorServiceImpl implements ModeratorService {
     private final EmailService emailService;
 
+    private final PremiumRepository premiumRepository;
     private final UserRepository userRepository;
-    private final PremiumUserService premiumUserService;
     private final UserService userService;
     private final UserMapper userMapper;
 
@@ -42,15 +43,14 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     @Override
     public List<UserDTO> getAllUnverifiedUser() {
-        List<User> premiumUsers = userRepository.findAll().stream()
+        List<User> premiumUsers = premiumRepository.findAll().stream()
+                .map(Premium::getUser)
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
-                .filter(User::isPremium)
                 .filter(user -> user.getShop() != null)
                 .toList();
 
         List<User> regularUsers = userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
-                .filter(user -> !user.isPremium())
                 .filter(user -> user.getShop() != null)
                 .toList();
 
@@ -64,11 +64,10 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     @Override
     public List<ProductDTO> getAllPendingProduct() {
-
-        List<Product> premiumUserProducts = userRepository.findAll().stream()
+        List<Product> premiumUserProducts = premiumRepository.findAll().stream()
+                .map(Premium::getUser)
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
                 .filter(user -> user.getShop() != null)
-                .filter(User::isPremium)
                 .map(User::getProducts)
                 .flatMap(products -> products.stream()
                         .filter(product -> product.getStatus() == Product.Status.ACTIVE)
@@ -78,7 +77,6 @@ public class ModeratorServiceImpl implements ModeratorService {
         List<Product> regularUserProducts = userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
                 .filter(user -> user.getShop() != null)
-                .filter(user -> !user.isPremium())
                 .map(User::getProducts)
                 .flatMap(products -> products.stream()
                         .filter(product -> product.getStatus() == Product.Status.ACTIVE)
