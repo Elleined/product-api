@@ -140,16 +140,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public boolean isBalanceNotEnoughToPayListingFee(User seller, double listingFee) {
         return seller.getBalance().compareTo(new BigDecimal(listingFee)) <= 0;
     }
-    @Override
-    public boolean isSellerExceedToMaxPendingOrders(User seller) {
-        return getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.PENDING).size() >= SELLER_MAX_PENDING_ORDER;
-
-    }
-
-    @Override
-    public boolean isSellerExceedToMaxAcceptedOrders(User seller) {
-        return getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.ACCEPTED).size() >= SELLER_MAX_ACCEPTED_ORDER;
-    }
 
     @Override
     public boolean isSellerExceedsToMaxListingPerDay(User seller) {
@@ -270,14 +260,19 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         cartItemRepository.deleteAll(cartItems);
 
         List<OrderItem> orderItems = product.getOrders();
-        orderItems.forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD));
+        updatePendingAndAcceptedOrderStatusToSold(orderItems);
         orderItemRepository.saveAll(orderItems);
 
         productRepository.save(product);
+    }
 
-        List<Integer> orderItemIds = orderItems.stream().map(OrderItem::getId).toList();
-        List<Integer> cartItemIds = cartItems.stream().map(CartItem::getId).toList();
-        log.debug("Product with id of {} state updated to {} all of associated cart items with ids of {} are deleted and associated order items with ids of {} are now set to cancelled", product.getId(), Product.State.SOLD.name(), cartItemIds, orderItemIds);
+    private void updatePendingAndAcceptedOrderStatusToSold(List<OrderItem> orderItems) {
+        orderItems.stream()
+                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
+                .forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD));
+        orderItems.stream()
+                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
+                .forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD));
     }
 
     @Override

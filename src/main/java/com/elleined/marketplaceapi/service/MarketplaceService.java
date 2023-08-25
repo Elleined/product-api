@@ -202,7 +202,7 @@ public class MarketplaceService implements IMarketplaceService {
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + productId + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + productId + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, orderItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isSellerAlreadyRejectedBuyer(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product! Don't spam bro :)");
+        if (productService.isSellerAlreadyRejectedBuyer(buyer, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product with id of " + productId + " Don't spam bro :)");
 
         if (cartItemService.isProductAlreadyInCart(buyer, product)) {
             CartItem cartItem = cartItemService.getByProduct(buyer, product);
@@ -275,6 +275,8 @@ public class MarketplaceService implements IMarketplaceService {
             throws ResourceNotFoundException, NotValidBodyException {
         User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
+
+
 
         if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesnt have order with id of " + orderItemId);
         if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
@@ -391,5 +393,6 @@ public class MarketplaceService implements IMarketplaceService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("User with id of " +  currentUser + " doesnt have delivery address with id of " + deliveryAddressId));
         return addressMapper.toDTO(deliveryAddress);
+
     }
 }

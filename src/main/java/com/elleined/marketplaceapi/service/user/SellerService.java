@@ -77,11 +77,6 @@ public interface SellerService {
 
     boolean isBalanceNotEnoughToPayListingFee(User seller, double productTotalPrice);
 
-
-    boolean isSellerExceedToMaxPendingOrders(User seller);
-
-    boolean isSellerExceedToMaxAcceptedOrders(User seller);
-
     boolean isSellerExceedsToMaxListingPerDay(User seller);
 
     boolean isSellerAcceptedOrder(OrderItem orderItem);

@@ -95,7 +95,7 @@ public class UserController {
         return new APIResponse(HttpStatus.OK, "Current user successfully changed his/her password");
     }
 
-    @PutMapping("/setProductStateToSold")
+    @PutMapping("/{currentUserId}/setProductStateToSold/{productId}")
     public void setProductStateToSold(@PathVariable("currentUserId") int sellerId,
                                       @PathVariable("productId") int productId) {
         marketplaceService.updateProductStateToSold(sellerId, productId);
