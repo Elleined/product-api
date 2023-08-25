@@ -3,6 +3,7 @@ package com.elleined.marketplaceapi.model.user;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Embeddable
@@ -30,7 +31,7 @@ public class UserDetails {
     private Gender gender;
 
     @Column(name = "birth_date", nullable = false)
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "mobile_number", nullable = false, unique = true)
     private String mobileNumber;

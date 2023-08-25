@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -62,7 +63,8 @@ public class UserDTO {
         @NotNull(message = "Birthday cannot be blank, null, or empty")
         @Past(message = "Birth Date should be in the past")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
-        private LocalDateTime birthDate;
+        private LocalDate birthDate;
+
 
         @NotBlank(message = "Mobile number cannot be blank, null, or empty")
         private String mobileNumber;
