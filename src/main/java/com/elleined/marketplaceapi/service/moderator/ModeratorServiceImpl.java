@@ -105,7 +105,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
         User invitingUser = userService.getInvitingUser(userToBeVerified);
         if (invitingUser != null) feeService.payInvitingUserForHisReferral(invitingUser);
-        if (feeService.isUserHasLegibleForExtraReferralReward(invitingUser)) feeService.payExtraReferralRewardForInvitingUser(invitingUser);
+        if (invitingUser != null && feeService.isUserHasLegibleForExtraReferralReward(invitingUser)) feeService.payExtraReferralRewardForInvitingUser(invitingUser);
 
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         userRepository.save(userToBeVerified);

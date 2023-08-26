@@ -37,13 +37,15 @@ public class CartItemController {
 
 
     @PostMapping("/orderCartItem/{cartItemId}")
-    public OrderItemDTO moveToOrderItem(@PathVariable("cartItemId") int cartItemId) {
-        return marketplaceService.moveToOrderItem(cartItemId);
+    public OrderItemDTO moveToOrderItem(@PathVariable("currentUserId") int currentUserId,
+                                        @PathVariable("cartItemId") int cartItemId) {
+        return marketplaceService.moveToOrderItem(currentUserId, cartItemId);
     }
 
 
     @PostMapping("/orderAllCartItem")
-    public List<OrderItemDTO> moveAllToOrderItem(@RequestBody List<Integer> cartItemIds) {
-        return marketplaceService.moveAllToOrderItem(cartItemIds);
+    public List<OrderItemDTO> moveAllToOrderItem(@PathVariable("currentUserId") int currentUserId,
+                                                 @RequestBody List<Integer> cartItemIds) {
+        return marketplaceService.moveAllToOrderItem(currentUserId, cartItemIds);
     }
 }

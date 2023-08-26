@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.service.fee;
 
+import com.elleined.marketplaceapi.exception.InsufficientBalanceException;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 
 public interface FeeService {
@@ -20,4 +22,6 @@ public interface FeeService {
     void payExtraReferralRewardForInvitingUser(User invitingUser);
 
     boolean isUserHasLegibleForExtraReferralReward(User invitingUser);
+
+    void deductSuccessfulTransactionFee(User seller, double successfulTransactionFee);
 }

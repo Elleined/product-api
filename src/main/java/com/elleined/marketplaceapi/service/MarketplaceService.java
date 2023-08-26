@@ -74,6 +74,7 @@ public class MarketplaceService implements IMarketplaceService {
             throws ResourceNotFoundException, InsufficientBalanceException {
         User seller = userService.getById(sellerId);
 
+        if (sellerService.isUserExceedsToMaxAcceptedOrders(seller)) throw new OrderException("Cannot proceed because seller with id of " + sellerId + " exceeds to max accepted order which is " + SellerService.SELLER_MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
         if (sellerService.isSellerExceedsToMaxListingPerDay(seller)) throw new ProductListingException("You already reached the limit of product listing per day which is " + SellerService.SELLER_MAX_LISTING_PER_DAY);
         if (!userService.isVerified(seller)) throw new NotVerifiedException("Cannot list a product because user with id of " + sellerId + " are not yet been verified");
         double totalPrice = productService.calculateTotalPrice(productDTO.getPricePerUnit(), productDTO.getQuantityPerUnit(), productDTO.getAvailableQuantity());
@@ -96,6 +97,7 @@ public class MarketplaceService implements IMarketplaceService {
         User currentUser = userService.getById(currentUserId);
         Product product = productService.getById(productId);
 
+        if (sellerService.isUserExceedsToMaxAcceptedOrders(currentUser)) throw new OrderException("Cannot proceed because seller with id of " + currentUserId + " exceeds to max accepted order which is " + SellerService.SELLER_MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
         if (productService.isProductSold(currentUser, product)) throw new ProductAlreadySoldException("Cannot update this product with id of " + productId + " because this product is already sold");
         if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " does not exists or might already been deleted!");
@@ -194,6 +196,7 @@ public class MarketplaceService implements IMarketplaceService {
         User buyer = userService.getById(buyerId);
         Product product = productService.getById(productId);
 
+        if (sellerService.isUserExceedsToMaxAcceptedOrders(buyer)) throw new OrderException("Cannot proceed because seller with id of " + buyerId + " exceeds to max accepted order which is " + SellerService.SELLER_MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
         if (buyerService.isBuyerHasPendingOrderToProduct(buyer, product)) throw new OrderException("User with id of " + buyerId + " has already pending order this product with id of " + productId + " please wait until seller take action in you order request!");
         if (buyerService.isBuyerHasAcceptedOrderToProduct(buyer, product)) throw new OrderException("User with id of " + buyerId + " has accepted order for this product with id of " + productId + " please contact the seller to settle your order");
         if (userService.hasProduct(buyer, product)) throw new OrderException("You cannot order your own product listing!");
@@ -260,16 +263,29 @@ public class MarketplaceService implements IMarketplaceService {
     }
 
     @Override
+    public void soldOrder(int sellerId, int orderItemId)
+            throws ResourceNotFoundException, InsufficientBalanceException {
+        User seller = userService.getById(sellerId);
+        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+        if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesn't have an order item with id of " + orderItemId);
+        sellerService.soldOrder(orderItem);
+
+        double orderPrice = orderItem.getPrice();
+        double successfulTransactionFee = productService.getSuccessfulTransactionFee(orderPrice);
+        if (sellerService.isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee)) throw new InsufficientBalanceException("Seller with id of " + sellerId + " doesn't have enough balance to pay for the successful transaction fee of " + sellerService.SUCCESSFUL_TRANSACTION_FEE + " which is the 5% of order price of " + orderPrice);
+        feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
+    }
+
+    @Override
     public void acceptOrder(int sellerId, int orderItemId, String messageToBuyer)
             throws ResourceNotFoundException, NotValidBodyException {
         User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
 
-
-
+        if (sellerService.isUserExceedsToMaxAcceptedOrders(seller)) throw new OrderException("Cannot proceed because seller with id of " + seller + " exceeds to max accepted order which is " + SellerService.SELLER_MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
         if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesnt have order with id of " + orderItemId);
         if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
-        sellerService.acceptOrder(seller, orderItem, messageToBuyer);
+        sellerService.acceptOrder(orderItem, messageToBuyer);
     }
 
     @Override
@@ -278,9 +294,10 @@ public class MarketplaceService implements IMarketplaceService {
         User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
 
+        if (sellerService.isSellerExceedsToMaxRejectionPerDay(seller)) throw new OrderRejectionException("Cannot reject order anymore! Because seller with id of " + sellerId + " already reached the rejection limit per day which is " + SellerService.SELLER_MAX_ORDER_REJECTION_PER_DAY + " come back again tomorrow... Thanks");
         if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesnt have order with id of " + orderItemId);
         if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
-        sellerService.rejectOrder(seller, orderItem, messageToBuyer);
+        sellerService.rejectOrder(orderItem, messageToBuyer);
     }
 
     @Override
@@ -339,17 +356,17 @@ public class MarketplaceService implements IMarketplaceService {
         if (product.getState() == Product.State.SOLD) throw new OrderException("Product with id of " + product.getId() + " are already been sold!");
         if (product.getState() != Product.State.LISTING) throw new OrderException("Product with id of " + product.getId() + " are not yet listed!");
         if (productService.isExceedingToAvailableQuantity(product, cartItemDTO.getOrderQuantity())) throw new OrderException("You are trying to order that exceeds to available amount!");
-        if (productService.isSellerAlreadyRejectedBuyer(currentUser, product)) throw new OrderException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
+        if (productService.isSellerAlreadyRejectedBuyer(currentUser, product)) throw new OrderException("Cannot add to cart! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
 
         CartItem cartItem = cartItemService.save(currentUser, cartItemDTO);
         return itemMapper.toCartItemDTO(cartItem);
     }
 
     @Override
-    public OrderItemDTO moveToOrderItem(int cartItemId)
+    public OrderItemDTO moveToOrderItem(int currentUserId, int cartItemId)
             throws ResourceNotFoundException, OrderException {
         CartItem cartItem = cartItemService.getCartItemById(cartItemId);
-        User buyer = cartItem.getPurchaser();
+        User buyer = userService.getById(currentUserId);
         Product product = cartItem.getProduct();
 
         if (buyerService.isBuyerHasPendingOrderToProduct(buyer, product)) throw new OrderException("User with id of " + buyer.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
@@ -366,18 +383,10 @@ public class MarketplaceService implements IMarketplaceService {
     }
 
     @Override
-    public List<OrderItemDTO> moveAllToOrderItem(List<Integer> cartItemIds) throws ResourceNotFoundException {
+    public List<OrderItemDTO> moveAllToOrderItem(int currentUserId, List<Integer> cartItemIds) throws ResourceNotFoundException {
         return cartItemIds.stream()
-                .map(this::moveToOrderItem)
+                .map(cartItemId -> this.moveToOrderItem(currentUserId, cartItemId))
                 .toList();
-    }
-
-    @Override
-    public void updateOrderItemToSold(int sellerId, int orderItemId) throws ResourceNotFoundException {
-        User seller = userService.getById(sellerId);
-        OrderItem orderItem = userService.getOrderItemById(orderItemId);
-        if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesn't have an order item with id of " + orderItemId);
-        sellerService.updateOrderItemToSold(seller, orderItem);
     }
 
     @Override

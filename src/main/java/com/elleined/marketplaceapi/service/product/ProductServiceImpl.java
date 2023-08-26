@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.elleined.marketplaceapi.service.user.SellerService.LISTING_FEE_PERCENTAGE;
+import static com.elleined.marketplaceapi.service.user.SellerService.SUCCESSFUL_TRANSACTION_FEE;
 
 @Service
 @RequiredArgsConstructor
@@ -95,16 +96,21 @@ public class ProductServiceImpl implements ProductService {
             else if (availableQuantity % quantityPerUnit == 0) counter++;
             availableQuantity -= quantityPerUnit;
         }
-        log.debug("Counter {}", counter);
+        log.trace("Counter {}", counter);
         double totalPrice = counter * pricePerUnit;
-        log.debug("Total price {}", totalPrice);
-        log.debug("Product with total price of {} will have {} of listing fee percent which is {}", totalPrice, getListingFee(totalPrice), LISTING_FEE_PERCENTAGE);
+        log.trace("Total price {}", totalPrice);
+        log.trace("Product with total price of {} will have listing fee of {} which is {} percent of total price", totalPrice, getListingFee(totalPrice), LISTING_FEE_PERCENTAGE);
         return totalPrice;
     }
 
     @Override
     public double getListingFee(double productTotalPrice) {
         return (productTotalPrice * (LISTING_FEE_PERCENTAGE / 100f));
+    }
+
+    @Override
+    public double getSuccessfulTransactionFee(double orderPrice) {
+        return (orderPrice * (SUCCESSFUL_TRANSACTION_FEE / 100f));
     }
 
 }

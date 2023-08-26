@@ -36,7 +36,8 @@ public abstract class ItemMapper {
             @Mapping(target = "orderItemStatus", expression = "java(OrderItemStatus.PENDING)"),
             @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, orderItemDTO.getDeliveryAddressId()))"),
             @Mapping(target = "product", expression = "java(productService.getById(orderItemDTO.getProductId()))"),
-            @Mapping(target = "purchaser", expression = "java(buyer)")
+            @Mapping(target = "purchaser", expression = "java(buyer)"),
+            @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     })
     public abstract OrderItem toOrderItemEntity(OrderItemDTO orderItemDTO, @Context User buyer) throws ResourceNotFoundException;
 
@@ -74,6 +75,7 @@ public abstract class ItemMapper {
                 .deliveryAddress(cartItem.getDeliveryAddress())
                 .product(cartItem.getProduct())
                 .orderDate(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .price(cartItem.getPrice())
                 .orderItemStatus(OrderItem.OrderItemStatus.PENDING)
                 .sellerMessage(null)

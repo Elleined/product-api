@@ -74,4 +74,19 @@ public class FeeServiceImpl implements FeeService {
     public boolean isUserHasLegibleForExtraReferralReward(User invitingUser) {
         return invitingUser.getReferredUsers().size() % EXTRA_REFERRAL_FEE_LEGIBILITY == 0;
     }
+
+    @Override
+    public void deductSuccessfulTransactionFee(User seller, double successfulTransactionFee) {
+        BigDecimal userOldBalance = seller.getBalance();
+        seller.setBalance(userOldBalance.subtract(new BigDecimal(successfulTransactionFee)));
+        userRepository.save(seller);
+
+        AppWallet appWallet = appWalletRepository.findById(1).orElseThrow();
+        BigDecimal appOldBalance = appWallet.getAppWalletBalance();
+        appWallet.setAppWalletBalance(appOldBalance.add(new BigDecimal(successfulTransactionFee)));
+        appWalletRepository.save(appWallet);
+
+        log.debug("Successful transaction fee of {} has been deducted to user with id of {} and now has new balance of {} from {}", successfulTransactionFee, seller.getId(), seller.getBalance(), userOldBalance);
+        log.debug("Successful transaction fee of {} has been added to app wallet and now has new balance of {} from {}", successfulTransactionFee, appWallet.getAppWalletBalance(), appOldBalance);
+    }
 }

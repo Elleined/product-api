@@ -84,12 +84,13 @@ public interface IMarketplaceService {
     // alias for add to cart
     CartItemDTO saveCartItem(int currentUserId, CartItemDTO cartItemDTO) throws ResourceNotFoundException;
 
-    OrderItemDTO moveToOrderItem(int cartItemId)
+    OrderItemDTO moveToOrderItem(int currentUserId, int cartItemId)
             throws ResourceNotFoundException, OrderException;
 
-    List<OrderItemDTO> moveAllToOrderItem(List<Integer> cartItemIds) throws ResourceNotFoundException;
+    List<OrderItemDTO> moveAllToOrderItem(int currentUserId, List<Integer> cartItemIds) throws ResourceNotFoundException;
 
-    void updateOrderItemToSold(int sellerId, int productId) throws ResourceNotFoundException;
+    void soldOrder(int sellerId, int orderItemId)
+            throws ResourceNotFoundException, InsufficientBalanceException;
 
     AddressDTO getDeliveryAddressById(int currentUserId, int deliveryAddressId) throws ResourceNotFoundException;
 

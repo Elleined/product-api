@@ -33,6 +33,7 @@ public interface BuyerService {
      * Validations
      *  order must be own by buyer
      *  cannot cancel an order that is already accepted
+     *  user must not have reached the max accepted orders
      */
     void cancelOrderItem(User buyer, OrderItem orderItem);
 

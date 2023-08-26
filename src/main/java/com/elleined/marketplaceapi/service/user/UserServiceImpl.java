@@ -155,10 +155,37 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
+    public boolean isBalanceNotEnoughToPaySuccessfulTransactionFee(User seller, double successfulTransactionFee) {
+        return seller.getBalance().compareTo(new BigDecimal(successfulTransactionFee)) <= 0;
+    }
+
+    @Override
     public boolean isSellerExceedsToMaxListingPerDay(User seller) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         return productRepository.fetchSellerProductListingCount(currentDateTimeMidnight, tomorrowMidnight, seller) >= SELLER_MAX_LISTING_PER_DAY;
+    }
+
+    @Override
+    public boolean isSellerExceedsToMaxRejectionPerDay(User seller) {
+        final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
+        return orderItemRepository.fetchSellerRejectedOrderCount(
+                currentDateTimeMidnight,
+                tomorrowMidnight,
+                seller,
+                OrderItem.OrderItemStatus.REJECTED
+        ) >= SELLER_MAX_ORDER_REJECTION_PER_DAY;
+    }
+
+    @Override
+    public boolean isUserExceedsToMaxAcceptedOrders(User seller) {
+        return seller.getProducts().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .map(Product::getOrders)
+                .flatMap(Collection::stream)
+                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
+                .count() >= SELLER_MAX_ACCEPTED_ORDER;
     }
 
     @Override
@@ -248,9 +275,10 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer) {
+    public void acceptOrder(OrderItem orderItem, String messageToBuyer) {
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.ACCEPTED);
+        orderItem.setUpdatedAt(LocalDateTime.now());
         orderItem.setSellerMessage(messageToBuyer);
         orderItemRepository.save(orderItem);
         log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.ACCEPTED.name());
@@ -258,26 +286,18 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
 
     @Override
-    public void rejectOrder(User seller, OrderItem orderItem, String messageToBuyer) {
+    public void rejectOrder(OrderItem orderItem, String messageToBuyer) {
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.REJECTED);
+        orderItem.setUpdatedAt(LocalDateTime.now());
         orderItem.setSellerMessage(messageToBuyer);
         orderItemRepository.save(orderItem);
         log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.REJECTED.name());
     }
 
-    @Override
-    public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        return seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .flatMap(product -> product.getOrders().stream()
-                        .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
-                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
-                .toList();
-    }
 
     @Override
-    public void updateOrderItemToSold(User seller, OrderItem orderItem) {
+    public void soldOrder(OrderItem orderItem) {
         Product product = orderItem.getProduct();
         product.setState(Product.State.SOLD);
         productRepository.save(product);
@@ -290,12 +310,35 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     private void updatePendingAndAcceptedOrderStatusToSold(List<OrderItem> orderItems) {
-        orderItems.stream()
+        List<OrderItem> pendingOrders = orderItems.stream()
                 .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
-                .forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD));
-        orderItems.stream()
+                .toList();
+
+        List<OrderItem> acceptedOrders = orderItems.stream()
                 .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD));
+                .toList();
+
+        pendingOrders.forEach(orderItem -> {
+            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
+        acceptedOrders.forEach(orderItem -> {
+            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
+
+        log.debug("Pending order items with ids {} are set to sold", pendingOrders.stream().map(OrderItem::getId));
+        log.debug("Accepted order items with ids {} are set to sold", acceptedOrders.stream().map(OrderItem::getId));
+    }
+
+    @Override
+    public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
+        return seller.getProducts().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .flatMap(product -> product.getOrders().stream()
+                        .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
+                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
+                .toList();
     }
 
     @Override
@@ -311,6 +354,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
 
         double price = productService.calculateOrderPrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
+        orderItem.setUpdatedAt(LocalDateTime.now());
         orderItem.setPrice(price);
 
         buyer.getOrderedItems().add(orderItem);
@@ -331,6 +375,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public void cancelOrderItem(User buyer, OrderItem orderItem) {
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
+        orderItem.setUpdatedAt(LocalDateTime.now());
         orderItemRepository.save(orderItem);
         log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
     }

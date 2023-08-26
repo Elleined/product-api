@@ -98,10 +98,10 @@ public class UserController {
         return new APIResponse(HttpStatus.OK, "Current user successfully changed his/her password");
     }
 
-    @PatchMapping("/{currentUserId}/updateOrderItemToSold/{orderItemId}")
-    public void updateOrderItemToSold(@PathVariable("currentUserId") int sellerId,
+    @PatchMapping("/{currentUserId}/soldOrder/{orderItemId}")
+    public void soldOrder(@PathVariable("currentUserId") int sellerId,
                                       @PathVariable("orderItemId") int orderItemId) {
-        marketplaceService.updateOrderItemToSold(sellerId, orderItemId);
+        marketplaceService.soldOrder(sellerId, orderItemId);
     }
 
     @PatchMapping("/{currentUserId}/buyPremium")

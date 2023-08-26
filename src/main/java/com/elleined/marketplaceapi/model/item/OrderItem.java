@@ -25,11 +25,15 @@ public class OrderItem extends Item {
     @Column(name = "seller_message_to_purchaser")
     private String sellerMessage;
 
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     @Builder
-    public OrderItem(int id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress, OrderItemStatus orderItemStatus, String sellerMessage) {
+    public OrderItem(int id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress, OrderItemStatus orderItemStatus, String sellerMessage, LocalDateTime updatedAt) {
         super(id, orderQuantity, price, orderDate, product, purchaser, deliveryAddress);
         this.orderItemStatus = orderItemStatus;
         this.sellerMessage = sellerMessage;
+        this.updatedAt = updatedAt;
     }
 
     public enum OrderItemStatus {
