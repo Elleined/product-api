@@ -95,7 +95,7 @@ public class UserController {
                                       @RequestParam("newPassword") String newPassword) {
 
         passwordService.changePassword(currentUserId, newPassword);
-        return new APIResponse(HttpStatus.OK, "Current user successfully changed his/her password");
+        return new APIResponse(HttpStatus.OK, "User with id of {} successfully changed his/her password");
     }
 
     @PatchMapping("/{currentUserId}/soldOrder/{orderItemId}")
