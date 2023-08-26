@@ -69,7 +69,7 @@ public class UserDTO {
         @NotBlank(message = "Mobile number cannot be blank, null, or empty")
         private String mobileNumber;
 
-        @NotBlank(message = "Mobile number cannot be blank, null, or empty")
+        @NotBlank(message = "Picture cannot be blank, null, or empty")
         private String picture;
 
         private String suffix;

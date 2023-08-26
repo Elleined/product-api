@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Getter
 @Setter
 @Service
-// Uses websocket, change password, and otp
+// Uses websocket public and private chat
 public class PrincipalService {
     private User principal;
 

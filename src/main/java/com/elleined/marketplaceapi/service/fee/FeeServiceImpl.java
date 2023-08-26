@@ -57,10 +57,23 @@ public class FeeServiceImpl implements FeeService {
     }
 
     @Override
-    public void payInvitingUser(User invitingUser) {
+    public void payInvitingUserForHisReferral(User invitingUser) {
         BigDecimal oldUserBalance = invitingUser.getBalance();
         invitingUser.setBalance(oldUserBalance.add(new BigDecimal(REFERRAL_FEE)));
         userRepository.save(invitingUser);
         log.debug("Inviting user with id of {} successfully invited this user and now has new balance of {} from {}", invitingUser.getId(), invitingUser.getBalance(), oldUserBalance);
+    }
+
+    @Override
+    public void payExtraReferralRewardForInvitingUser(User invitingUser) {
+        BigDecimal oldBalance = invitingUser.getBalance();
+        invitingUser.setBalance(oldBalance.add(new BigDecimal(EXTRA_REFERRAL_FEE)));
+        userRepository.save(invitingUser);
+        log.debug("User with id of {} has reached his {}th invited user and now has legible for extra referral fee of {} and now has new balance of {} from {}", invitingUser.getId(), EXTRA_REFERRAL_FEE_LEGIBILITY, EXTRA_REFERRAL_FEE, invitingUser.getBalance(), oldBalance);
+    }
+
+    @Override
+    public boolean isUserHasLegibleForExtraReferralReward(User invitingUser) {
+        return invitingUser.getReferredUsers().size() % EXTRA_REFERRAL_FEE_LEGIBILITY == 0;
     }
 }
