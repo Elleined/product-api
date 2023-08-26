@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -72,6 +71,7 @@ public class UserDTO {
         @NotBlank(message = "Picture cannot be blank, null, or empty")
         private String picture;
 
+        @NotBlank(message = "Suffix id cannot be less than zero. If user has no suffix use NONE")
         private String suffix;
     }
 

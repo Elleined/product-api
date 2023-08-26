@@ -15,6 +15,7 @@ import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.*;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -81,6 +83,22 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         userRepository.save(user);
         log.debug("User with name of {} saved successfully with id of {}", user.getUserDetails().getFirstName(), user.getId());
         return user;
+    }
+
+    @Override
+    public List<String> getAllGender() {
+        return Arrays.stream(UserDetails.Gender.values())
+                .map(Enum::name)
+                .sorted()
+                .toList();
+    }
+
+    @Override
+    public List<String> getAllSuffix() {
+        return Arrays.stream(UserDetails.Suffix.values())
+                .map(Enum::name)
+                .sorted()
+                .toList();
     }
 
     @Override

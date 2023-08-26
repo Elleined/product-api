@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service;
+package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 

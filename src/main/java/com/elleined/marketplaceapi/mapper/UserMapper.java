@@ -4,19 +4,12 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserCredential;
 import com.elleined.marketplaceapi.model.user.UserDetails;
-import com.elleined.marketplaceapi.service.user.SuffixService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring", uses = AddressMapper.class)
 public abstract class UserMapper {
-
-    @Autowired @Lazy
-    protected SuffixService suffixService;
-
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -48,7 +41,7 @@ public abstract class UserMapper {
             @Mapping(target = "addressDTO", source = "address"),
             @Mapping(target = "userCredentialDTO", expression = "java(toUserCredentialDTO(user.getUserCredential()))"),
             @Mapping(target = "userDetailsDTO", expression = "java(toUserDetailsDTO(user.getUserDetails()))"),
-            @Mapping(target = "userDetailsDTO.suffix", source = "userDetails.suffix.name"),
+            @Mapping(target = "userDetailsDTO.suffix", source = "userDetails.suffix"),
     })
     public abstract UserDTO toDTO(User user);
 
@@ -65,14 +58,13 @@ public abstract class UserMapper {
 
     @Mappings({
             @Mapping(target = "registrationDate", expression = "java(java.time.LocalDateTime.now())"),
-            @Mapping(target = "suffix", expression = "java(suffixService.getByName(userDetailsDTO.getSuffix()))"),
     })
     protected abstract UserDetails toUserDetailsEntity(UserDTO.UserDetailsDTO userDetailsDTO);
 
     @Mappings({
             @Mapping(target = "gender", source = "userDetails.gender"),
             @Mapping(target = "picture", source = "picture"),
-            @Mapping(target = "suffix", source = "userDetails.suffix.name"),
+            @Mapping(target = "suffix", source = "userDetails.suffix"),
     })
     protected abstract UserDTO.UserDetailsDTO toUserDetailsDTO(UserDetails userDetails);
 }

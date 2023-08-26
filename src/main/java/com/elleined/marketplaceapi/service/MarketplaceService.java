@@ -17,7 +17,6 @@ import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
-import com.elleined.marketplaceapi.service.address.AddressValidator;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.premiumuser.PremiumUserService;
@@ -47,14 +46,12 @@ public class MarketplaceService implements IMarketplaceService {
     private final PremiumUserService premiumUserService;
     private final UserDetailsValidator userDetailsValidator;
     private final UserCredentialValidator userCredentialValidator;
-    private final AddressValidator addressValidator;
     private final ProductService productService;
     private final UserService userService;
     private final AddressService addressService;
     private final CartItemService cartItemService;
 
     private final CropService cropService;
-    private final SuffixService suffixService;
     private final UnitService unitService;
 
     private final ProductMapper productMapper;
@@ -143,16 +140,15 @@ public class MarketplaceService implements IMarketplaceService {
             AlreadExistException,
             MobileNumberException {
 
-        addressValidator.validateAddressDetails(userDTO.getAddressDTO());
+
         userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
         userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
-        if (!suffixService.existsByName(userDTO.getUserDetailsDTO().getSuffix())) suffixService.save(userDTO.getUserDetailsDTO().getSuffix());
 
         User registeringUser = userService.saveByDTO(userDTO);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
-            if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
+        if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) userService.addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         emailService.sendWelcomeEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
@@ -250,19 +246,9 @@ public class MarketplaceService implements IMarketplaceService {
             throws ResourceNotFoundException, AlreadExistException {
         User currentUser = userService.getById(currentUserId);
 
-        addressValidator.validateAddressDetails(addressDTO);
         if (addressService.isUserHas5DeliveryAddress(currentUser)) throw new DeliveryAddressLimitException("Cannot save another delivery address! Because you already reached the limit which is 5");
-
         DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, addressDTO);
         return addressMapper.toDTO(deliveryAddress);
-    }
-
-    @Override
-    public void deleteDeliveryAddress(int currentUserId, int deliveryAddressId)
-            throws ResourceNotFoundException, NotOwnedException {
-        User currentUser = userService.getById(currentUserId);
-        if (currentUser.getDeliveryAddresses().stream().noneMatch(deliveryAddress -> deliveryAddress.getId() == deliveryAddressId)) throw new NotOwnedException("User with id of " + currentUser.getId() + " does not have delivery address with id of " + deliveryAddressId);
-        addressService.deleteDeliveryAddress(currentUser, deliveryAddressId);
     }
 
     @Override
@@ -317,7 +303,12 @@ public class MarketplaceService implements IMarketplaceService {
     }
     @Override
     public List<String> getAllSuffix() {
-        return suffixService.getAll();
+        return userService.getAllSuffix();
+    }
+
+    @Override
+    public List<String> getAllGender() {
+        return userService.getAllGender();
     }
 
     @Override

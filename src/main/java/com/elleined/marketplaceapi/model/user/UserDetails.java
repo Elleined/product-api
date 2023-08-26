@@ -1,6 +1,9 @@
 package com.elleined.marketplaceapi.model.user;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -39,18 +42,22 @@ public class UserDetails {
     @Column(name = "picture", nullable = false)
     private String picture;
 
-    // user id reference is in suffix table
-    @ManyToOne
-    @JoinColumn(
-            name = "suffix_id",
-            referencedColumnName = "id"
-    )
+    @Column(name = "suffix", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Suffix suffix;
 
     public enum Gender {
         MALE,
-        FEMALE,
-        LGBTQ_MEMBER,
-        PREFER_NOT_TO_SAY
+        FEMALE
+    }
+
+    public enum Suffix {
+        JR,
+        SR,
+        II,
+        III,
+        IV,
+        V,
+        NONE
     }
 }

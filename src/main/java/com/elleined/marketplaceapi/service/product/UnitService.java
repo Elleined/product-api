@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.model.Unit;
 import com.elleined.marketplaceapi.repository.UnitRepository;
-import com.elleined.marketplaceapi.service.BaseEntityService;
+import com.elleined.marketplaceapi.service.user.BaseEntityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

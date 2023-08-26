@@ -34,8 +34,7 @@ public abstract class Address {
 
     @Column(
             name = "details",
-            nullable = false,
-            unique = true
+            nullable = false
     )
     private String details;
 

@@ -17,6 +17,10 @@ public interface UserService extends PasswordService, CartItemService {
     // After this method will automatically sends welcome email
     User saveByDTO(UserDTO dto);
 
+    List<String> getAllGender();
+
+    List<String> getAllSuffix();
+
     User getById(int id) throws ResourceNotFoundException;
 
     boolean hasProduct(User currentUser, Product product);

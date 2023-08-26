@@ -59,9 +59,6 @@ public interface IMarketplaceService {
     AddressDTO saveDeliveryAddress(int currentUserId, AddressDTO addressDTO)
             throws ResourceNotFoundException, AlreadExistException;
 
-    void deleteDeliveryAddress(int currentUserId, int deliveryAddressId)
-            throws ResourceNotFoundException, NotOwnedException;
-
     List<AddressDTO> getAllDeliveryAddress(int currentUserId) throws ResourceNotFoundException;
 
     void acceptOrder(int sellerId, int orderItemId, String messageToBuyer)
@@ -77,6 +74,8 @@ public interface IMarketplaceService {
     List<String> getAllUnit();
 
     List<String> getAllSuffix();
+
+    List<String> getAllGender();
 
     List<CartItemDTO> getAllCartItems(int currentUserId) throws ResourceNotFoundException;
 

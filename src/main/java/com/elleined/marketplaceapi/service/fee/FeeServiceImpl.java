@@ -1,7 +1,5 @@
 package com.elleined.marketplaceapi.service.fee;
 
-import com.elleined.marketplaceapi.exception.InsufficientBalanceException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.AppWallet;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.AppWalletRepository;
