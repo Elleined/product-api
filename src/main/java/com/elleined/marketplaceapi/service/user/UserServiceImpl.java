@@ -422,9 +422,8 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void changePassword(int userId, String newPassword) throws ResourceNotFoundException, IllegalCallerException {
+    public void changePassword(int userId, String newPassword) throws ResourceNotFoundException {
         User user = getById(userId);
-        if (!principalService.getPrincipal().equals(user)) throw new IllegalCallerException("You cannot change the password of other user bruh");
         this.encodePassword(user, newPassword);
         userRepository.save(user);
         log.debug("User with id of {} successfully changed his/her password", user.getId());
