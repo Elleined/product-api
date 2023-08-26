@@ -277,16 +277,16 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void updateProductStateToSold(User seller, Product product) {
+    public void updateOrderItemToSold(User seller, OrderItem orderItem) {
+        Product product = orderItem.getProduct();
         product.setState(Product.State.SOLD);
-        List<CartItem> cartItems = product.getAddedToCarts();
-        cartItemRepository.deleteAll(cartItems);
+        productRepository.save(product);
 
         List<OrderItem> orderItems = product.getOrders();
+        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
         updatePendingAndAcceptedOrderStatusToSold(orderItems);
+        orderItemRepository.save(orderItem);
         orderItemRepository.saveAll(orderItems);
-
-        productRepository.save(product);
     }
 
     private void updatePendingAndAcceptedOrderStatusToSold(List<OrderItem> orderItems) {

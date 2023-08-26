@@ -373,10 +373,11 @@ public class MarketplaceService implements IMarketplaceService {
     }
 
     @Override
-    public void updateProductStateToSold(int sellerId, int productId) throws ResourceNotFoundException {
+    public void updateOrderItemToSold(int sellerId, int orderItemId) throws ResourceNotFoundException {
         User seller = userService.getById(sellerId);
-        Product product = productService.getById(productId);
-        sellerService.updateProductStateToSold(seller, product);
+        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+        if (!sellerService.isSellerHasOrder(seller, orderItem)) throw new ResourceNotFoundException("Seller with id of " + sellerId + " doesn't have an order item with id of " + orderItemId);
+        sellerService.updateOrderItemToSold(seller, orderItem);
     }
 
     @Override

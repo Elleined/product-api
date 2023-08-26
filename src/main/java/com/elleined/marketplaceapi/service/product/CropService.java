@@ -4,7 +4,6 @@ import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.repository.CropRepository;
-import com.elleined.marketplaceapi.service.user.BaseEntityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,10 +25,6 @@ public class CropService implements BaseEntityService<Crop> {
         return cropRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Crop with id of " + id + " does not exists!"));
     }
 
-    @Override
-    public boolean existsById(int id) {
-        return cropRepository.existsById(id);
-    }
 
     @Override
     public boolean existsByName(String name) {

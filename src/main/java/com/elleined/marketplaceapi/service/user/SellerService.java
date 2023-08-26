@@ -71,7 +71,7 @@ public interface SellerService {
     // Use this method to the seller product orders status PENDING, CANCELLED, ACCEPTED, and REJECTED
     List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus);
 
-    void updateProductStateToSold(User seller, Product product) throws ResourceNotFoundException;
+    void updateOrderItemToSold(User seller, OrderItem orderItem);
 
     boolean isSellerHasOrder(User seller, OrderItem orderItem);
 

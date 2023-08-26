@@ -89,7 +89,7 @@ public interface IMarketplaceService {
 
     List<OrderItemDTO> moveAllToOrderItem(List<Integer> cartItemIds) throws ResourceNotFoundException;
 
-    void updateProductStateToSold(int sellerId, int productId) throws ResourceNotFoundException;
+    void updateOrderItemToSold(int sellerId, int productId) throws ResourceNotFoundException;
 
     AddressDTO getDeliveryAddressById(int currentUserId, int deliveryAddressId) throws ResourceNotFoundException;
 

@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service.user;
+package com.elleined.marketplaceapi.service.product;
 
 import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 
@@ -9,7 +9,6 @@ public interface BaseEntityService<T> {
     T save(String name);
 
     T getById(int id) throws ResourceNotFoundException;
-    boolean existsById(int id);
 
     boolean existsByName(String name) throws ResourceNotFoundException;
 

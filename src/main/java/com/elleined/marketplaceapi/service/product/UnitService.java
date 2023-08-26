@@ -4,7 +4,6 @@ import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.model.Unit;
 import com.elleined.marketplaceapi.repository.UnitRepository;
-import com.elleined.marketplaceapi.service.user.BaseEntityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,6 @@ public class UnitService implements BaseEntityService<Unit> {
     @Override
     public Unit getById(int id) throws ResourceNotFoundException {
         return unitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Unit with id of " + id + " does not exists!"));
-    }
-
-    @Override
-    public boolean existsById(int id) {
-        return unitRepository.existsById(id);
     }
 
     @Override
