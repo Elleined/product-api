@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Entity
 @Table(name = "tbl_order_item")
@@ -42,5 +43,9 @@ public class OrderItem extends Item {
         ACCEPTED,
         REJECTED,
         SOLD
+    }
+
+    public boolean isAccepted() {
+        return this.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED;
     }
 }

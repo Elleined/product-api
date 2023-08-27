@@ -3,7 +3,7 @@ package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -45,7 +45,7 @@ public class ModeratorController {
     @PatchMapping("/listProduct/{productId}")
     public void listProduct(@PathVariable("productId") int productId) throws ResourceNotFoundException {
         Product product = productService.getById(productId);
-        if (productService.isDeleted(product)) throw new ResourceNotFoundException("Product with id of " + productId + " are already been deleted or does not exists!");
+        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + productId + " are already been deleted or does not exists!");
         moderatorService.listProduct(productId);
     }
 

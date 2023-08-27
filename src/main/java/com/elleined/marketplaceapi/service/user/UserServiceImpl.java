@@ -1,113 +1,83 @@
 package com.elleined.marketplaceapi.service.user;
 
-import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.dto.item.CartItemDTO;
-import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
-import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
-import com.elleined.marketplaceapi.mapper.ItemMapper;
-import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.field.HasDigitException;
+import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
+import com.elleined.marketplaceapi.exception.field.MobileNumberException;
+import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
+import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
+import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
-import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
-import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.UserDetails;
-import com.elleined.marketplaceapi.model.user.UserVerification;
-import com.elleined.marketplaceapi.repository.*;
-import com.elleined.marketplaceapi.service.product.ProductService;
+import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.ShopRepository;
+import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.email.EmailService;
+import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class UserServiceImpl implements UserService, SellerService, BuyerService {
-    private static final int REGISTRATION_LIMIT_PROMO = 500;
-    private static final BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
-
-
-    private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
-
+public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     private final UserRepository userRepository;
+    private final UserCredentialValidator userCredentialValidator;
+    private final UserDetailsValidator userDetailsValidator;
     private final UserMapper userMapper;
 
     private final OrderItemRepository orderItemRepository;
-    private final CartItemRepository cartItemRepository;
-    private final ItemMapper itemMapper;
-
-    private final ProductService productService;
 
     private final ShopRepository shopRepository;
+
+    private final AddressService addressService;
 
     @Override
     public User getById(int id) throws ResourceNotFoundException {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id of " + id + " does not exists!"));
     }
 
-    @Override
-    public CartItem getByProduct(User buyer, Product product) {
-        return buyer.getCartItems().stream()
-                .filter(cartItem -> cartItem.getProduct().equals(product))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("User with id of " + buyer.getId() + " cart item doesn't have product with id of " + product.getId()));
-    }
-
 
     @Override
-    public User saveByDTO(UserDTO userDTO) {
-        User user = userMapper.toEntity(userDTO);
+    public User saveByDTO(UserDTO userDTO)
+            throws ResourceNotFoundException,
+            HasDigitException,
+            PasswordNotMatchException,
+            WeakPasswordException,
+            MalformedEmailException,
+            AlreadyExistException,
+            MobileNumberException {
 
-        String rawPassword = user.getUserCredential().getPassword();
-        this.encodePassword(user, rawPassword);
+        userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
+        userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
+        userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
+        userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
 
-        userRepository.save(user);
-        log.debug("User with name of {} saved successfully with id of {}", user.getUserDetails().getFirstName(), user.getId());
-        return user;
-    }
+        User registeringUser = userMapper.toEntity(userDTO);
+        userRepository.save(registeringUser);
+        addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
+        this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
+        if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
-    @Override
-    public List<String> getAllGender() {
-        return Arrays.stream(UserDetails.Gender.values())
-                .map(Enum::name)
-                .sorted()
-                .toList();
-    }
-
-    @Override
-    public List<String> getAllSuffix() {
-        return Arrays.stream(UserDetails.Suffix.values())
-                .map(Enum::name)
-                .sorted()
-                .toList();
-    }
-
-    @Override
-    public boolean hasProduct(User currentUser, Product product) {
-        return currentUser.getProducts().stream().anyMatch(product::equals);
-    }
-
-    @Override
-    public boolean isVerified(User currentUser) {
-        return currentUser.getUserVerification().getStatus() == UserVerification.Status.VERIFIED;
+        emailService.sendWelcomeEmail(registeringUser);
+        log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
+        return registeringUser;
     }
 
     @Override
@@ -134,57 +104,8 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public List<String> getAllEmail() {
-        return userRepository.fetchAllEmail();
-    }
-
-    @Override
-    public List<String> getAllMobileNumber() {
-        return userRepository.fetchAllMobileNumber();
-    }
-
-    @Override
     public boolean existsById(int userId) {
         return userRepository.existsById(userId);
-    }
-
-    @Override
-    public boolean isBalanceNotEnoughToPayListingFee(User seller, double listingFee) {
-        return seller.getBalance().compareTo(new BigDecimal(listingFee)) <= 0;
-    }
-
-    @Override
-    public boolean isBalanceNotEnoughToPaySuccessfulTransactionFee(User seller, double successfulTransactionFee) {
-        return seller.getBalance().compareTo(new BigDecimal(successfulTransactionFee)) <= 0;
-    }
-
-    @Override
-    public boolean isSellerExceedsToMaxListingPerDay(User seller) {
-        final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
-        return productRepository.fetchSellerProductListingCount(currentDateTimeMidnight, tomorrowMidnight, seller) >= SELLER_MAX_LISTING_PER_DAY;
-    }
-
-    @Override
-    public boolean isSellerExceedsToMaxRejectionPerDay(User seller) {
-        final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
-        return orderItemRepository.fetchSellerRejectedOrderCount(
-                currentDateTimeMidnight,
-                tomorrowMidnight,
-                seller,
-                OrderItem.OrderItemStatus.REJECTED
-        ) >= SELLER_MAX_ORDER_REJECTION_PER_DAY;
-    }
-
-    @Override
-    public boolean isUserExceedsToMaxAcceptedOrders(User seller) {
-        return seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .map(Product::getOrders)
-                .flatMap(Collection::stream)
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .count() >= SELLER_MAX_ACCEPTED_ORDER;
     }
 
     @Override
@@ -201,7 +122,10 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public void sendShopRegistration(User owner, ShopDTO shopDTO) {
+    public void sendShopRegistration(User owner, ShopDTO shopDTO) throws AlreadyExistException {
+        if (owner.isVerified()) throw new AlreadyExistException("Cannot resend shop registration! because user with id of " + owner.getId() + " are already been verified!");
+        if (owner.hasShopRegistration()) throw new AlreadyExistException("User with id of " + owner.getId() + " already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
+
         Shop shop = Shop.builder()
                 .picture(shopDTO.getPicture())
                 .name(shopDTO.getShopName())
@@ -213,11 +137,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         userRepository.save(owner);
         shopRepository.save(shop);
         log.debug("Shop registration of owner with id of {} success his verification are now visible in moderator", owner.getId());
-    }
-
-    @Override
-    public boolean isUserHasShopRegistration(User user) {
-        return user.getShop() != null;
     }
 
     @Override
@@ -233,7 +152,7 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     @Override
     public void addInvitedUser(String invitingUserReferralCode, User invitedUser) {
         User invitingUser = getByReferralCode(invitingUserReferralCode);
-        invitingUser.getReferredUsers().add(invitedUser);
+        invitingUser.addInvitedUser(invitedUser);
         userRepository.save(invitingUser);
         log.debug("User with id of {} invited user with id of {} successfully", invitingUser.getId(), invitedUser.getId());
     }
@@ -249,186 +168,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
-    public int getAllUsersCount() {
-        return userRepository.findAll().size();
-    }
-
-    @Override
-    public int getAllUsersTransactionsCount() {
-        return orderItemRepository.findAll().size();
-    }
-
-    @Override
-    public Product saveProduct(ProductDTO productDTO, User seller) {
-        Product product = productMapper.toEntity(productDTO, seller);
-        productRepository.save(product);
-        log.debug("Product saved successfully with id of {}", product.getId());
-        return product;
-    }
-
-    @Override
-    public void updateProduct(Product product, ProductDTO productDTO) {
-        Product updatedProduct = productMapper.toUpdate(product, productDTO);
-        productRepository.save(updatedProduct);
-        log.debug("Product with id of {} updated successfully!", updatedProduct.getId());
-    }
-
-    @Override
-    public void deleteProduct(int productId) throws ResourceNotFoundException {
-        Product product = productService.getById(productId);
-        product.setStatus(Product.Status.INACTIVE);
-
-        List<OrderItem> orderItems = product.getOrders();
-        updatePendingAndAcceptedOrderStatus(orderItems, OrderItem.OrderItemStatus.CANCELLED);
-
-        productRepository.save(product);
-        orderItemRepository.saveAll(orderItems);
-        log.debug("Product with id of {} are now inactive", product.getId());
-    }
-
-    @Override
-    public void acceptOrder(OrderItem orderItem, String messageToBuyer) {
-        final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
-        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.ACCEPTED);
-        orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItem.setSellerMessage(messageToBuyer);
-        orderItemRepository.save(orderItem);
-        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.ACCEPTED.name());
-    }
-
-
-    @Override
-    public void rejectOrder(OrderItem orderItem, String messageToBuyer) {
-        final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
-        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.REJECTED);
-        orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItem.setSellerMessage(messageToBuyer);
-        orderItemRepository.save(orderItem);
-        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.REJECTED.name());
-    }
-
-
-    @Override
-    public void soldOrder(OrderItem orderItem) {
-        Product product = orderItem.getProduct();
-        product.setState(Product.State.SOLD);
-        productRepository.save(product);
-
-        List<OrderItem> orderItems = product.getOrders();
-        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
-        updatePendingAndAcceptedOrderStatus(orderItems, OrderItem.OrderItemStatus.SOLD);
-
-        orderItemRepository.save(orderItem);
-        orderItemRepository.saveAll(orderItems);
-    }
-
-    private void updatePendingAndAcceptedOrderStatus(List<OrderItem> orderItems, OrderItem.OrderItemStatus orderItemStatus) {
-        List<OrderItem> pendingOrders = orderItems.stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
-                .toList();
-
-        List<OrderItem> acceptedOrders = orderItems.stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .toList();
-
-        pendingOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(orderItemStatus);
-            orderItem.setUpdatedAt(LocalDateTime.now());
-        });
-        acceptedOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(orderItemStatus);
-            orderItem.setUpdatedAt(LocalDateTime.now());
-        });
-
-        log.debug("Pending order items with ids {} are set to {}", pendingOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
-        log.debug("Accepted order items with ids {} are set to {}", acceptedOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
-    }
-
-    @Override
-    public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        return seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .flatMap(product -> product.getOrders().stream()
-                        .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
-                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
-                .toList();
-    }
-
-    @Override
-    public boolean isSellerHasOrder(User seller, OrderItem orderItem) {
-        return seller.getProducts().stream()
-                .map(Product::getOrders)
-                .flatMap(Collection::stream)
-                .anyMatch(orderItem::equals);
-    }
-
-    @Override
-    public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO) {
-        OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
-
-        double price = productService.calculateOrderPrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
-        orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItem.setPrice(price);
-
-        buyer.getOrderedItems().add(orderItem);
-        orderItemRepository.save(orderItem);
-        log.debug("User with id of {} successfully ordered product with id of {}", buyer.getId(), orderItem.getProduct().getId());
-        return orderItem;
-    }
-
-    @Override
-    public List<OrderItem> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
-        return currentUser.getOrderedItems().stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == orderItemStatus)
-                .filter(orderItem -> orderItem.getProduct().getStatus() == Product.Status.ACTIVE)
-                .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed())
-                .toList();
-    }
-
-    @Override
-    public void cancelOrderItem(User buyer, OrderItem orderItem) {
-        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
-        orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItemRepository.save(orderItem);
-        log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
-    }
-
-    @Override
-    public boolean isBuyerHasPendingOrderToProduct(User buyer, Product product) {
-       return buyer.getOrderedItems().stream()
-               .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
-               .map(OrderItem::getProduct)
-               .anyMatch(product::equals);
-    }
-
-    @Override
-    public boolean isBuyerHasAcceptedOrderToProduct(User buyer, Product product) {
-        return buyer.getOrderedItems().stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .map(OrderItem::getProduct)
-                .anyMatch(product::equals);
-    }
-
-
-    @Override
-    public boolean isBuyerHasOrder(User buyer, OrderItem orderItem) {
-        return buyer.getOrderedItems().stream().anyMatch(orderItem::equals);
-    }
-
-    @Override
-    public boolean isSellerAcceptedOrder(OrderItem orderItem) {
-        return orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED;
-    }
-
-    @Override
-    public List<Product> getAllProductByState(User currentUser, Product.State state) {
-        return currentUser.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == state)
-                .toList();
-    }
-
-    @Override
     public void encodePassword(User user, String rawPassword) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.getUserCredential().setPassword(encodedPassword);
@@ -441,76 +180,4 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
         userRepository.save(user);
         log.debug("User with id of {} successfully changed his/her password", user.getId());
     }
-
-
-    @Override
-    public List<CartItem> getAll(User currentUser) {
-        return currentUser.getCartItems().stream()
-                .filter(cartItem -> cartItem.getProduct().getStatus() == Product.Status.ACTIVE)
-                .filter(cartItem -> cartItem.getProduct().getState() == Product.State.LISTING)
-                .sorted(Comparator.comparing(CartItem::getOrderDate).reversed())
-                .toList();
-    }
-
-    @Override
-    public void delete(User currentUser, int id) throws ResourceNotFoundException {
-        CartItem cartItem = currentUser.getCartItems().stream()
-                .filter(item -> item.getId() == id)
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("User with id of " + currentUser.getId() + " doesn't have cart item with id of " + id));
-        cartItemRepository.delete(cartItem);
-        log.debug("User with id of {} successfully deleted cart item with id of {}", currentUser.getId(), id);
-    }
-
-    @Override
-    public void delete(CartItem cartItem) {
-        cartItemRepository.delete(cartItem);
-        log.debug("Cart item with id of {} are deleted because user ordered this product with id of {}", cartItem.getId(), cartItem.getProduct().getId());
-    }
-
-    @Override
-    public CartItem save(User currentUser, CartItemDTO cartItemDTO) {
-        CartItem cartItem = itemMapper.toCartItemEntity(cartItemDTO, currentUser);
-
-        double price = productService.calculateOrderPrice(cartItem.getProduct(), cartItem.getOrderQuantity());
-        cartItem.setPrice(price);
-
-        currentUser.getCartItems().add(cartItem);
-        cartItemRepository.save(cartItem);
-        log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), cartItemDTO.getProductId(), cartItem.getId());
-        return cartItem;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public OrderItem moveToOrderItem(CartItem cartItem) {
-        OrderItem orderItem = itemMapper.cartItemToOrderItem(cartItem);
-
-        int cartItemId = cartItem.getId();
-        cartItemRepository.delete(cartItem);
-        orderItemRepository.save(orderItem);
-        log.debug("Cart item with id of {} are now moved to order item with id of {}", cartItemId, orderItem.getId());
-        return orderItem;
-    }
-
-    @Override
-    public List<OrderItem> moveAllToOrderItem(List<CartItem> cartItems) {
-        List<OrderItem> orderItems = cartItems.stream()
-                .map(itemMapper::cartItemToOrderItem)
-                .toList();
-        return orderItemRepository.saveAll(orderItems);
-    }
-
-    @Override
-    public boolean isProductAlreadyInCart(User buyer, Product product) {
-        return buyer.getCartItems().stream()
-                .map(CartItem::getProduct)
-                .anyMatch(product::equals);
-    }
-
-    @Override
-    public CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException {
-        return cartItemRepository.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("Cart item with id of " + cartItemId + " does not exists!"));
-    }
-
 }

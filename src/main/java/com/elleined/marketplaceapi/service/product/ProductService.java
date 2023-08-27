@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.service.product;
 
-import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
 
@@ -12,17 +11,8 @@ public interface ProductService {
 
     Product getById(int productId) throws ResourceNotFoundException;
 
-    boolean isDeleted(Product product);
     // Use this to get all the product listing available
     List<Product> getAllExcept(User currentUser);
-
-    boolean isProductHasPendingOrder(Product product);
-
-    boolean isProductHasAcceptedOrder(Product product);
-
-    boolean isSellerAlreadyRejectedBuyer(User buyer, Product product);
-
-    boolean isExceedingToAvailableQuantity(Product product, int userOrderQuantity);
     double calculateOrderPrice(Product product, int userOrderQuantity);
 
     /**
@@ -33,15 +23,4 @@ public interface ProductService {
      * Meaning 5 pesos per 50 pieces and has available quantity of 100
      */
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
-
-    double getListingFee(double productTotalPrice);
-
-    double getSuccessfulTransactionFee(double orderPrice);
-
-    boolean isCriticalFieldsChanged(Product product, ProductDTO productDTO);
-
-    boolean isProductSold(User currentUser, Product product);
-
-    // only the sold and listed products are included to the count
-    int getAllProductCount();
 }

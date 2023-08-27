@@ -1,9 +1,9 @@
 package com.elleined.marketplaceapi.service.otp;
 
 import com.elleined.marketplaceapi.dto.email.OTPMessage;
-import com.elleined.marketplaceapi.exception.OTPExpiredException;
-import com.elleined.marketplaceapi.exception.OTPMismatchException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.otp.OTPExpiredException;
+import com.elleined.marketplaceapi.exception.otp.OTPMismatchException;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;

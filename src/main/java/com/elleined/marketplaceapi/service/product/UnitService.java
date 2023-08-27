@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.product;
 
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.BaseMapper;
 import com.elleined.marketplaceapi.model.Unit;
 import com.elleined.marketplaceapi.repository.UnitRepository;

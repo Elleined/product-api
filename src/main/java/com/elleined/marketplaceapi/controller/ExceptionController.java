@@ -1,7 +1,21 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.APIResponse;
-import com.elleined.marketplaceapi.exception.*;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.ResourceException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
+import com.elleined.marketplaceapi.exception.field.FieldException;
+import com.elleined.marketplaceapi.exception.field.password.PasswordException;
+import com.elleined.marketplaceapi.exception.order.OrderException;
+import com.elleined.marketplaceapi.exception.otp.OTPException;
+import com.elleined.marketplaceapi.exception.product.ProductException;
+import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
+import com.elleined.marketplaceapi.exception.user.NoLoggedInUserException;
+import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
+import com.elleined.marketplaceapi.exception.user.UserException;
+import com.elleined.marketplaceapi.exception.user.buyer.BuyerException;
+import com.elleined.marketplaceapi.exception.user.seller.SellerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -30,18 +44,17 @@ public class ExceptionController {
     }
 
     @ExceptionHandler({
-            NotOwnedException.class,
-            WeakPasswordException.class,
-            PasswordNotMatchException.class,
-            MobileNumberException.class,
-            MalformedEmailException.class,
-            AlreadExistException.class,
-            HasDigitException.class,
+            FieldException.class,
+            PasswordException.class,
+
             OrderException.class,
-            DeliveryAddressLimitException.class,
-            NotValidBodyException.class,
-            InsufficientBalanceException.class,
-            ProductException.class
+            ProductException.class,
+
+            UserException.class,
+            SellerException.class,
+            BuyerException.class,
+
+            ResourceException.class
     })
     public ResponseEntity<APIResponse> handleBadRequestExceptions(RuntimeException ex) {
         var responseMessage = new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage());

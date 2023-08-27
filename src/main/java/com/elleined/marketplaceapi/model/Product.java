@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.model;
 
+import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -100,6 +101,10 @@ public class Product {
     @Setter(AccessLevel.NONE)
     private List<CartItem> addedToCarts;
 
+    public boolean isNotListed() {
+        return this.getState() != State.LISTING;
+    }
+
     public enum State {
         PENDING,
         LISTING,
@@ -109,5 +114,31 @@ public class Product {
     public enum Status {
         ACTIVE,
         INACTIVE
+    }
+
+    public boolean hasPendingOrder() {
+        return this.getOrders().stream().anyMatch(order -> order.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING);
+    }
+
+    public boolean hasAcceptedOrder() {
+        return this.getOrders().stream().anyMatch(order -> order.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED);
+    }
+
+    public boolean isDeleted() {
+        return this.getStatus() == Product.Status.INACTIVE;
+    }
+
+    public boolean isSold() {
+        return this.getState() == Product.State.SOLD;
+    }
+
+    public boolean isExceedingToAvailableQuantity(int userOrderQuantity) {
+        return userOrderQuantity > this.getAvailableQuantity();
+    }
+
+    public boolean isCriticalFieldsChanged(ProductDTO productDTO) {
+        return this.getPricePerUnit() != productDTO.getPricePerUnit() ||
+                this.getAvailableQuantity() != productDTO.getAvailableQuantity() ||
+                this.getQuantityPerUnit() != productDTO.getQuantityPerUnit();
     }
 }

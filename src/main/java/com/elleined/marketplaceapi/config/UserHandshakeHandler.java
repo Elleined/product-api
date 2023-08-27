@@ -1,7 +1,8 @@
 package com.elleined.marketplaceapi.config;
 
-import com.elleined.marketplaceapi.service.user.PrincipalService;
+import com.elleined.marketplaceapi.model.user.User;
 import com.sun.security.auth.UserPrincipal;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
@@ -16,12 +17,12 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class UserHandshakeHandler extends DefaultHandshakeHandler {
-    private final PrincipalService principalService;
+    private final HttpSession session;
 
     @Override
      protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        int currentUserId = principalService.getPrincipal().getId();
-        log.debug("User with subscriber id of {} connected to the website", currentUserId);
-        return new UserPrincipal(String.valueOf(currentUserId));
+        User currentUser = (User) session.getAttribute("currentUser");
+        log.debug("User with subscriber id of {} connected to the website", currentUser);
+        return new UserPrincipal(String.valueOf(currentUser.getId()));
     }
 }

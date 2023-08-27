@@ -1,9 +1,10 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.AlreadExistException;
-import com.elleined.marketplaceapi.exception.HasDigitException;
-import com.elleined.marketplaceapi.exception.MobileNumberException;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.field.HasDigitException;
+import com.elleined.marketplaceapi.exception.field.MobileNumberException;
+import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,14 +15,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserDetailsValidator {
 
-    private final UserService userService;
+    private final GetAllUtilityService getAllUtilityService;
 
     public void validatePhoneNumber(UserDTO.UserDetailsDTO userDetailsDTO)
-            throws AlreadExistException, MobileNumberException {
+            throws AlreadyExistException, MobileNumberException {
         String mobileNumber = userDetailsDTO.getMobileNumber();
         List<Character> letters = StringUtil.toCharArray(mobileNumber);
 
-        if (userService.getAllMobileNumber().contains(mobileNumber)) throw new AlreadExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
+        if (getAllUtilityService.getAllMobileNumber().contains(mobileNumber)) throw new AlreadyExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
         if (letters.stream().anyMatch(Character::isLetter)) throw new MobileNumberException("Phone number cannot contain letters!");
         if (!mobileNumber.startsWith("09")) throw new MobileNumberException("Phone number must starts with 09!");
         if (mobileNumber.length() != 11) throw new MobileNumberException("Phone number must be 11 digits long!");

@@ -6,12 +6,15 @@ import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.service.fee.FeeService;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+
+import static com.elleined.marketplaceapi.service.address.AddressServiceImpl.DELIVERY_ADDRESS_LIMIT;
 
 @Entity
 @Table(name = "tbl_user", indexes = @Index(name = "referral_code_idx", columnList = "referral_code"))
@@ -100,4 +103,44 @@ public class User {
     )
 
     private Set<User> referredUsers;
+
+    public void addInvitedUser(User invitedUser) {
+        this.getReferredUsers().add(invitedUser);
+    }
+
+
+    public boolean isPremium() {
+        return this.getPremium() != null;
+    }
+
+    public boolean isVerified() {
+        return this.getUserVerification().getStatus() == UserVerification.Status.VERIFIED;
+    }
+
+    public boolean hasShopRegistration() {
+        return this.getShop() != null;
+    }
+
+    public boolean isProductAlreadyInCart(Product product) {
+        return this.getCartItems().stream()
+                .map(CartItem::getProduct)
+                .anyMatch(product::equals);
+    }
+
+    public boolean hasReachedDeliveryAddressLimit() {
+        return this.getDeliveryAddresses().size() == DELIVERY_ADDRESS_LIMIT;
+    }
+
+    public boolean isBalanceNotEnoughForPremium() {
+        return this.getBalance().compareTo(new BigDecimal(FeeService.PREMIUM_USER_FEE)) <= 0;
+    }
+
+    public boolean hasProduct(Product product) {
+        return this.getProducts().stream().anyMatch(product::equals);
+    }
+
+
+    public boolean hasOrder(OrderItem orderItem) {
+        return this.getOrderedItems().stream().anyMatch(orderItem::equals);
+    }
 }

@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.product;
 
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 
 import java.util.List;
 

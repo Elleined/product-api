@@ -2,30 +2,36 @@ package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.InvalidUserCredentialException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.field.HasDigitException;
+import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
+import com.elleined.marketplaceapi.exception.field.MobileNumberException;
+import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
+import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
+import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 
-import java.util.List;
+import java.math.BigDecimal;
 
-public interface UserService extends PasswordService, CartItemService {
+public interface UserService extends PasswordService {
+    int REGISTRATION_LIMIT_PROMO = 500;
+    BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
 
     // Info will also be saved in forum api
     // first 500 registrant will receive a token as a reward
     // After this method will automatically sends welcome email
-    User saveByDTO(UserDTO dto);
-
-    List<String> getAllGender();
-
-    List<String> getAllSuffix();
+    User saveByDTO(UserDTO dto)
+            throws ResourceNotFoundException,
+            HasDigitException,
+            PasswordNotMatchException,
+            WeakPasswordException,
+            MalformedEmailException,
+            AlreadyExistException,
+            MobileNumberException;
 
     User getById(int id) throws ResourceNotFoundException;
-
-    boolean hasProduct(User currentUser, Product product);
-
-    boolean isVerified(User currentUser);
 
     void resendValidId(User currentUser, String validId);
 
@@ -33,10 +39,6 @@ public interface UserService extends PasswordService, CartItemService {
     User login(UserDTO.UserCredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 
     User getByEmail(String email) throws ResourceNotFoundException;
-
-    List<String> getAllEmail();
-
-    List<String> getAllMobileNumber();
 
     boolean existsById(int userId);
 
@@ -46,22 +48,14 @@ public interface UserService extends PasswordService, CartItemService {
     // First 500 registrants will receive a registration promo of 50 pesos
     void availRegistrationPromo(User registratingUser);
 
-    void sendShopRegistration(User user, ShopDTO shopDTO);
-
-    boolean isUserHasShopRegistration(User user);
+    void sendShopRegistration(User user, ShopDTO shopDTO) throws AlreadyExistException;
 
     OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException;
 
-    // Alias for referral code
     User getByReferralCode(String referralCode) throws ResourceNotFoundException;
 
     void addInvitedUser(String invitingUserReferralCode, User invitedUser);
 
     // returns the inviting user of invited user
     User getInvitingUser(User invitedUser) throws ResourceNotFoundException;
-
-
-    int getAllUsersCount();
-
-    int getAllUsersTransactionsCount();
 }

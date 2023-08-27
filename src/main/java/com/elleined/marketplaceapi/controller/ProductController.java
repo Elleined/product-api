@@ -1,7 +1,12 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.service.MarketplaceService;
+import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.service.GetAllUtilityService;
+import com.elleined.marketplaceapi.service.product.ProductService;
+import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,26 +17,34 @@ import java.util.List;
 @RequestMapping("/{currentUserId}/products")
 @CrossOrigin(origins = "*")
 public class ProductController {
-    private final MarketplaceService marketplaceService;
+    private final ProductService productService;
+    private final ProductMapper productMapper;
 
+    private final UserService userService;
+
+    private final GetAllUtilityService getAllUtilityService;
     @GetMapping
     public List<ProductDTO> getAllExcept(@PathVariable("currentUserId") int currentUserId) {
-        return marketplaceService.getAllProductExcept(currentUserId);
+        User currentUser = userService.getById(currentUserId);
+        return productService.getAllExcept(currentUser).stream()
+                .map(productMapper::toDTO)
+                .toList();
     }
 
     @GetMapping("/{id}")
     public ProductDTO getById(@PathVariable("id") int id) {
-        return marketplaceService.getProductById(id);
+        Product product = productService.getById(id);
+        return productMapper.toDTO(product);
     }
 
     @GetMapping("/getAllCrops")
     public List<String> getAllCrops() {
-        return marketplaceService.getAllCrops();
+        return getAllUtilityService.getAllCrops();
     }
 
     @GetMapping("/getAllUnits")
     public List<String> getAllUnit() {
-        return marketplaceService.getAllUnit();
+        return getAllUtilityService.getAllUnit();
     }
 
 }

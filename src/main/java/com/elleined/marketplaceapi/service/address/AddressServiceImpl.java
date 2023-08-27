@@ -1,7 +1,8 @@
 package com.elleined.marketplaceapi.service.address;
 
 import com.elleined.marketplaceapi.dto.AddressDTO;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.user.DeliveryAddressLimitException;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
@@ -20,8 +21,6 @@ import java.util.List;
 @Transactional
 public class AddressServiceImpl implements AddressService {
 
-    private static final int DELIVERY_ADDRESS_LIMIT = 5;
-
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
@@ -34,7 +33,8 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public DeliveryAddress saveDeliveryAddress(User orderingUser, AddressDTO addressDTO) {
+    public DeliveryAddress saveDeliveryAddress(User orderingUser, AddressDTO addressDTO) throws DeliveryAddressLimitException {
+        if (orderingUser.hasReachedDeliveryAddressLimit()) throw new DeliveryAddressLimitException("Cannot save another delivery address! Because you already reached the limit which is 5");
         DeliveryAddress deliveryAddress = addressMapper.toDeliveryAddressEntity(addressDTO, orderingUser);
         orderingUser.getDeliveryAddresses().add(deliveryAddress);
         addressRepository.save(deliveryAddress);
@@ -45,11 +45,6 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public List<DeliveryAddress> getAllDeliveryAddress(User currentUser) {
         return currentUser.getDeliveryAddresses();
-    }
-
-    @Override
-    public boolean isUserHas5DeliveryAddress(User currentUser) {
-        return getAllDeliveryAddress(currentUser).size() == DELIVERY_ADDRESS_LIMIT;
     }
 
     @Override

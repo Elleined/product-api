@@ -34,7 +34,7 @@ public class FeeServiceImpl implements FeeService {
         appWalletRepository.save(appWallet);
 
         log.debug("Seller with id of {} has now new balance of {} because listing fee is deducted which is {} from old balance of {}", seller.getId(), sellerNewBalance, fee, oldSellerBalance);
-        log.debug("Appwallet has now new balance of {} from old balance of {} because listing fee is added which is {}", newAppWalletBalance, oldAppWalletBalance, fee);
+        log.debug("App wallet has now new balance of {} from old balance of {} because listing fee is added which is {}", newAppWalletBalance, oldAppWalletBalance, fee);
     }
 
     @Override

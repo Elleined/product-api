@@ -2,13 +2,13 @@ package com.elleined.marketplaceapi.service.message;
 
 import com.elleined.marketplaceapi.dto.Message;
 import com.elleined.marketplaceapi.dto.PrivateMessage;
-import com.elleined.marketplaceapi.exception.NoLoggedInUserException;
-import com.elleined.marketplaceapi.exception.NotValidBodyException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
+import com.elleined.marketplaceapi.exception.user.NoLoggedInUserException;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.user.PrincipalService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import com.elleined.marketplaceapi.utils.StringUtil;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -22,8 +22,9 @@ import org.springframework.web.util.HtmlUtils;
 @Primary
 public class MessageServiceImpl implements MessageService {
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final PrincipalService principalService;
     private final UserService userService;
+
+    private final HttpSession session;
 
     @Override
     public PrivateMessage sendPrivateMessage(int recipientId, String message)
@@ -31,29 +32,30 @@ public class MessageServiceImpl implements MessageService {
 
         if (!userService.existsById(recipientId)) throw new ResourceNotFoundException("Recipient with id of " + recipientId +  " does not exists!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
-        if (principalService.hasNoLoggedInUser()) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
-        User sender = principalService.getPrincipal();
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
+
         PrivateMessage responseMessage = PrivateMessage.builder()
                 .message(HtmlUtils.htmlEscape(message))
                 .recipientId(recipientId)
-                .senderId(sender.getId())
+                .senderId(currentUser.getId())
                 .build();
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(recipientId), "/private-chat", responseMessage);
 
-        log.debug("Sender with id of {} send a message in recipient with id of {}", sender.getId(), recipientId);
+        log.debug("Sender with id of {} send a message in recipient with id of {}", currentUser.getId(), recipientId);
         return responseMessage;
     }
 
     @Override
     public Message sendPublicMessage(String message)
             throws NotValidBodyException, NoLoggedInUserException {
-        User sender = principalService.getPrincipal();
 
+        User currentUser = (User) session.getAttribute("currentUser");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
-        if (principalService.hasNoLoggedInUser()) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
+        if (currentUser == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
-        Message responseMessage = new Message(HtmlUtils.htmlEscape(message), sender.getId());
+        Message responseMessage = new Message(HtmlUtils.htmlEscape(message), currentUser.getId());
         simpMessagingTemplate.convertAndSend("/public-chat/topic", responseMessage);
         return responseMessage;
     }

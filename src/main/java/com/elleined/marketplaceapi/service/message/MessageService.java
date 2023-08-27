@@ -2,9 +2,9 @@ package com.elleined.marketplaceapi.service.message;
 
 import com.elleined.marketplaceapi.dto.Message;
 import com.elleined.marketplaceapi.dto.PrivateMessage;
-import com.elleined.marketplaceapi.exception.NoLoggedInUserException;
-import com.elleined.marketplaceapi.exception.NotValidBodyException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
+import com.elleined.marketplaceapi.exception.user.NoLoggedInUserException;
 
 
 // connect in /http://localhost:8083/api/v1/marketplace/ws

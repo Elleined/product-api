@@ -2,8 +2,8 @@ package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.NotVerifiedException;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Product;

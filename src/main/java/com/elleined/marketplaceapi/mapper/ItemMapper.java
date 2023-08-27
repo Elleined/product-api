@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.item.CartItemDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;

@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 
 import java.util.List;
 
