@@ -72,7 +72,7 @@ public class UserController {
         return marketplaceService.saveDeliveryAddress(currentUserId, addressDTO);
     }
 
-    @PostMapping("/{currentUserId}/getDeliveryAddressById/{deliveryAddressId}")
+    @GetMapping("/{currentUserId}/getDeliveryAddressById/{deliveryAddressId}")
     public AddressDTO getDeliveryAddressById(@PathVariable("currentUserId") int currentUserId,
                                              @PathVariable("deliveryAddressId") int deliveryAddressId) {
         return marketplaceService.getDeliveryAddressById(currentUserId, deliveryAddressId);

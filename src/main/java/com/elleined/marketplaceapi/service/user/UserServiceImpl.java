@@ -48,7 +48,6 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
-    private final PrincipalService principalService;
     private final UserMapper userMapper;
 
     private final OrderItemRepository orderItemRepository;
@@ -250,6 +249,16 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     }
 
     @Override
+    public int getAllUsersCount() {
+        return userRepository.findAll().size();
+    }
+
+    @Override
+    public int getAllUsersTransactionsCount() {
+        return orderItemRepository.findAll().size();
+    }
+
+    @Override
     public Product saveProduct(ProductDTO productDTO, User seller) {
         Product product = productMapper.toEntity(productDTO, seller);
         productRepository.save(product);
@@ -268,9 +277,12 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
     public void deleteProduct(int productId) throws ResourceNotFoundException {
         Product product = productService.getById(productId);
         product.setStatus(Product.Status.INACTIVE);
-        product.getOrders().forEach(orderItem -> orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED));
-        productRepository.save(product);
 
+        List<OrderItem> orderItems = product.getOrders();
+        updatePendingAndAcceptedOrderStatus(orderItems, OrderItem.OrderItemStatus.CANCELLED);
+
+        productRepository.save(product);
+        orderItemRepository.saveAll(orderItems);
         log.debug("Product with id of {} are now inactive", product.getId());
     }
 
@@ -304,12 +316,13 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
 
         List<OrderItem> orderItems = product.getOrders();
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
-        updatePendingAndAcceptedOrderStatusToSold(orderItems);
+        updatePendingAndAcceptedOrderStatus(orderItems, OrderItem.OrderItemStatus.SOLD);
+
         orderItemRepository.save(orderItem);
         orderItemRepository.saveAll(orderItems);
     }
 
-    private void updatePendingAndAcceptedOrderStatusToSold(List<OrderItem> orderItems) {
+    private void updatePendingAndAcceptedOrderStatus(List<OrderItem> orderItems, OrderItem.OrderItemStatus orderItemStatus) {
         List<OrderItem> pendingOrders = orderItems.stream()
                 .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
                 .toList();
@@ -319,16 +332,16 @@ public class UserServiceImpl implements UserService, SellerService, BuyerService
                 .toList();
 
         pendingOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
+            orderItem.setOrderItemStatus(orderItemStatus);
             orderItem.setUpdatedAt(LocalDateTime.now());
         });
         acceptedOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
+            orderItem.setOrderItemStatus(orderItemStatus);
             orderItem.setUpdatedAt(LocalDateTime.now());
         });
 
-        log.debug("Pending order items with ids {} are set to sold", pendingOrders.stream().map(OrderItem::getId));
-        log.debug("Accepted order items with ids {} are set to sold", acceptedOrders.stream().map(OrderItem::getId));
+        log.debug("Pending order items with ids {} are set to {}", pendingOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
+        log.debug("Accepted order items with ids {} are set to {}", acceptedOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
     }
 
     @Override

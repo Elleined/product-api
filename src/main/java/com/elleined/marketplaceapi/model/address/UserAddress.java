@@ -26,8 +26,8 @@ public class UserAddress extends Address {
     private User user;
 
     @Builder(builderMethodName = "userAddressBuilder")
-    public UserAddress(int id, String details, String provinceName, String cityName, String baranggayName, User user) {
-        super(id, details, provinceName, cityName, baranggayName);
+    public UserAddress(int id, String details, String regionName, String provinceName, String cityName, String baranggayName, User user) {
+        super(id, details, regionName, provinceName, cityName, baranggayName);
         this.user = user;
     }
 }

@@ -17,6 +17,9 @@ public class AddressDTO {
     @NotBlank(message = "Details cannot be null, empty, or blank")
     private String details;
 
+    @NotBlank(message = "Region name cannot be null, empty, or blank")
+    private String regionName;
+
     @NotBlank(message = "Province name cannot be null, empty, or blank")
     private String provinceName;
 

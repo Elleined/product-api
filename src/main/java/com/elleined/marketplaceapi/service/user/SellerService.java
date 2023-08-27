@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface SellerService {
     int SELLER_MAX_LISTING_PER_DAY = 10;
-    int SELLER_MAX_ORDER_REJECTION_PER_DAY = 10;
-    int SELLER_MAX_ACCEPTED_ORDER = 10;
+    int SELLER_MAX_ORDER_REJECTION_PER_DAY = 20;
+    int SELLER_MAX_ACCEPTED_ORDER = 20;
     float LISTING_FEE_PERCENTAGE = 5;
 
     float SUCCESSFUL_TRANSACTION_FEE = 5;
@@ -47,7 +47,7 @@ public interface SellerService {
      *  cannot if there is pending orders
      *  cannot if there is accepted orders
      *  cannot if product is already sold
-     *
+     * user must not have reached the max accepted orders
      *    Side effects
      *    all orders will be set to cancelled
      */

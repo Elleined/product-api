@@ -39,6 +39,12 @@ public abstract class Address {
     private String details;
 
     @Column(
+            name = "region_name",
+            nullable = false
+    )
+    private String regionName;
+
+    @Column(
             name = "province_name",
             nullable = false
     )

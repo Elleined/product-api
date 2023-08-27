@@ -95,4 +95,10 @@ public interface IMarketplaceService {
     AddressDTO getDeliveryAddressById(int currentUserId, int deliveryAddressId) throws ResourceNotFoundException;
 
     void buyPremium(int currentUserId) throws InsufficientBalanceException, ResourceNotFoundException;
+
+
+
+    int usersCount();
+    int productsCount();
+    int transactionsCount();
 }

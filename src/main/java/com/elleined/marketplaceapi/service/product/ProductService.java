@@ -41,4 +41,7 @@ public interface ProductService {
     boolean isCriticalFieldsChanged(Product product, ProductDTO productDTO);
 
     boolean isProductSold(User currentUser, Product product);
+
+    // only the sold and listed products are included to the count
+    int getAllProductCount();
 }

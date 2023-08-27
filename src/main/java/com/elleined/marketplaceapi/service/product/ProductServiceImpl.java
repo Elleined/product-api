@@ -89,6 +89,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public int getAllProductCount() {
+        return (int) productRepository.findAll().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(product -> product.getState() != Product.State.PENDING)
+                .count();
+    }
+
+    @Override
     public double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity) {
         int counter = 0;
         while (availableQuantity > 0) {

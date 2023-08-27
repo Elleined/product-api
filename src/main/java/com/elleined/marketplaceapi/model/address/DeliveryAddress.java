@@ -34,8 +34,8 @@ public class DeliveryAddress extends Address {
     private List<CartItem> cartItemDeliveryAddresses;
 
     @Builder(builderMethodName = "deliveryAddressBuilder")
-    public DeliveryAddress(int id, String details, String provinceName, String cityName, String baranggayName, User user, List<OrderItem> orderItemAddresses, List<CartItem> cartItemDeliveryAddresses) {
-        super(id, details, provinceName, cityName, baranggayName);
+    public DeliveryAddress(int id, String details, String regionName, String provinceName, String cityName, String baranggayName, User user, List<OrderItem> orderItemAddresses, List<CartItem> cartItemDeliveryAddresses) {
+        super(id, details, regionName, provinceName, cityName, baranggayName);
         this.user = user;
         this.orderItemAddresses = orderItemAddresses;
         this.cartItemDeliveryAddresses = cartItemDeliveryAddresses;

@@ -59,4 +59,9 @@ public interface UserService extends PasswordService, CartItemService {
 
     // returns the inviting user of invited user
     User getInvitingUser(User invitedUser) throws ResourceNotFoundException;
+
+
+    int getAllUsersCount();
+
+    int getAllUsersTransactionsCount();
 }

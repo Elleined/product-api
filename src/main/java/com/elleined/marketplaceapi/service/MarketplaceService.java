@@ -111,10 +111,15 @@ public class MarketplaceService implements IMarketplaceService {
 
     @Override
     public void deleteProduct(int currentUserId, int productId)
-            throws ResourceNotFoundException, NotOwnedException, OrderException {
+            throws ResourceNotFoundException,
+            NotOwnedException,
+            OrderException,
+            ProductAlreadySoldException {
+
         User currentUser = userService.getById(currentUserId);
         Product product = productService.getById(productId);
 
+        if (sellerService.isUserExceedsToMaxAcceptedOrders(currentUser)) throw new OrderException("Cannot proceed because seller with id of " + currentUserId + " exceeds to max accepted order which is " + SellerService.SELLER_MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
         if (!userService.hasProduct(currentUser, product)) throw new NotOwnedException("Current user with id of " + currentUserId + " does not have product with id of " + productId);
         if (productService.isProductSold(currentUser, product)) throw new ProductAlreadySoldException("Cannot update this product with id of " + productId + " because this product is already sold");
         if (productService.isProductHasPendingOrder(product)) throw new OrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the pending products to delete this");
@@ -224,7 +229,7 @@ public class MarketplaceService implements IMarketplaceService {
 
     @Override
     public void cancelOrderItem(int buyerId, int orderItemId)
-            throws ResourceNotFoundException, NotOwnedException {
+            throws ResourceNotFoundException, NotOwnedException, OrderException {
 
         User buyer = userService.getById(buyerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
@@ -404,5 +409,20 @@ public class MarketplaceService implements IMarketplaceService {
     public void buyPremium(int currentUserId) throws InsufficientBalanceException, ResourceNotFoundException {
         User user = userService.getById(currentUserId);
         premiumUserService.upgradeToPremium(user);
+    }
+
+    @Override
+    public int usersCount() {
+        return userService.getAllUsersCount();
+    }
+
+    @Override
+    public int productsCount() {
+        return productService.getAllProductCount();
+    }
+
+    @Override
+    public int transactionsCount() {
+        return userService.getAllUsersTransactionsCount();
     }
 }
