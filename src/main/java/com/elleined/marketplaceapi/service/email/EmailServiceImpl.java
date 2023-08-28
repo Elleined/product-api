@@ -24,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(userToBeVerified.getUserCredential().getEmail())
                 .build();
-        emailClient.sendSimpleMail(emailMessage);
+        // emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending verification email for user " + userToBeVerified.getId() + " success!");
     }
 
@@ -37,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(seller.getUserCredential().getEmail())
                 .build();
-        emailClient.sendSimpleMail(emailMessage);
+        // emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending product listing for user " + seller.getId() + " success!");
     }
 
@@ -49,7 +49,7 @@ public class EmailServiceImpl implements EmailService {
                 .subject("Welcome to CropTrade")
                 .messageBody(message)
                 .build();
-        emailClient.sendSimpleMail(emailMessage);
+        // emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending registration email for user " + registrant.getId() + " success");
     }
 
@@ -59,7 +59,7 @@ public class EmailServiceImpl implements EmailService {
                 .plusExpirationSeconds(PLUS_EXPIRATION_IN_SECONDS)
                 .receiver(user.getUserCredential().getEmail())
                 .build();
-        otpMessage = emailClient.sendOTPMail(otpMessage);
+        // otpMessage = emailClient.sendOTPMail(otpMessage);
         log.debug("Sending OTP for user with id of {} success {}", user.getId(), otpMessage);
         return otpMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
     }

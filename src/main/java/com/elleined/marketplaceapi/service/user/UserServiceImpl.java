@@ -1,8 +1,10 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.client.ForumClient;
 import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.forum.ForumUserDTO;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
@@ -48,6 +50,8 @@ public class UserServiceImpl implements UserService {
 
     private final AddressService addressService;
 
+    private final ForumClient forumClient;
+
     @Override
     public User getById(int id) throws ResourceNotFoundException {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id of " + id + " does not exists!"));
@@ -79,8 +83,22 @@ public class UserServiceImpl implements UserService {
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
+
+        // saveForumUser(registeringUser);
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
         return registeringUser;
+    }
+
+    private void saveForumUser(User user) {
+        ForumUserDTO forumUserDTO = ForumUserDTO.builder()
+                .id(user.getId())
+                .picture(user.getUserDetails().getPicture())
+                .name(user.getUserDetails().getFirstName())
+                .email(user.getUserCredential().getEmail())
+                .UUID(user.getReferralCode())
+                .build();
+        forumClient.save(forumUserDTO);
+        log.debug("Saving user with id of {} in forum api success", user.getId());
     }
 
     @Override

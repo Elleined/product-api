@@ -32,8 +32,9 @@ public class OTPServiceImpl implements OTPService {
     }
 
     @Override
-    public void sendOTP(String email) throws ResourceNotFoundException {
+    public OTPMessage sendOTP(String email) throws ResourceNotFoundException {
         User user =  userRepository.fetchByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email of " + email + " does not exists!"));
         this.otpMessage = emailService.sendOTP(user);
+        return this.otpMessage;
     }
 }

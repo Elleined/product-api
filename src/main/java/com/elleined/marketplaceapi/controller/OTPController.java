@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.APIResponse;
+import com.elleined.marketplaceapi.dto.email.OTPMessage;
 import com.elleined.marketplaceapi.service.otp.OTPService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class OTPController {
 
     // Use this method also to resendOTP
     @PostMapping("/sendOTP")
-    public void sendOTP(@RequestParam("email") String email) {
-        otpService.sendOTP(email);
+    public OTPMessage sendOTP(@RequestParam("email") String email) {
+        return otpService.sendOTP(email);
     }
 }
