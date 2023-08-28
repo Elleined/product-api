@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.service.user.UserService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +51,7 @@ public class SellerController {
     public List<ProductDTO> getAllProductByState(@PathVariable("currentUserId") int sellerId,
                                                  @RequestParam("state") String state) {
         User seller = userService.getById(sellerId);
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             return premiumSeller.getAllProductByState(seller, Product.State.valueOf(state)).stream()
                     .map(productMapper::toDTO)
                     .toList();
@@ -69,7 +70,7 @@ public class SellerController {
         User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
 
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             premiumSeller.acceptOrder(seller, orderItem, messageToBuyer);
             return;
         }
@@ -83,7 +84,7 @@ public class SellerController {
 
         User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             premiumSeller.rejectOrder(seller, orderItem, messageToBuyer);
             return;
         }
@@ -96,7 +97,7 @@ public class SellerController {
 
         User seller = userService.getById(sellerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             premiumSeller.soldOrder(seller, orderItem);
             return;
         }
@@ -108,7 +109,7 @@ public class SellerController {
                                                                @RequestParam("orderItemStatus") String orderItemStatus) {
 
         User seller = userService.getById(sellerId);
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             return premiumSeller.getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()
                     .map(itemMapper::toOrderItemDTO)
                     .toList();
@@ -123,7 +124,7 @@ public class SellerController {
                                   @Valid @RequestBody ProductDTO productDTO) {
 
         User seller = userService.getById(sellerId);
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             Product product = premiumSeller.saveProduct(productDTO, seller);
             return productMapper.toDTO(product);
         }
@@ -139,7 +140,7 @@ public class SellerController {
 
         User seller = userService.getById(sellerId);
         Product product = productService.getById(productId);
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             premiumSeller.updateProduct(seller, product, productDTO);
             return productMapper.toDTO(product);
         }
@@ -153,7 +154,7 @@ public class SellerController {
 
         User seller = userService.getById(sellerId);
         Product product = productService.getById(productId);
-        if (seller.isPremium()) {
+        if (seller.isPremiumAndNotExpired()) {
             premiumSeller.deleteProduct(seller, product);
             return ResponseEntity.noContent().build();
         }

@@ -1,6 +1,16 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
+import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
+import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
+import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
+import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
+import com.elleined.marketplaceapi.exception.product.ProductNotListedException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
+import com.elleined.marketplaceapi.exception.user.NotOwnedException;
+import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
@@ -24,13 +34,31 @@ import java.util.List;
 @Qualifier("buyerServiceImpl")
 public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
     private final ProductService productService;
-    private final ItemMapper itemMapper;
 
     private final OrderItemRepository orderItemRepository;
-
+    private final ItemMapper itemMapper;
 
     @Override
-    public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO) {
+    public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO)
+            throws ResourceNotFoundException,
+            ResourceOwnedException,
+            ProductHasPendingOrderException,
+            ProductHasAcceptedOrderException,
+            ProductAlreadySoldException,
+            ProductNotListedException,
+            OrderQuantiantyExceedsException,
+            BuyerAlreadyRejectedException {
+
+        Product product = productService.getById(orderItemDTO.getProductId());
+        if (isBuyerHasPendingOrderToProduct(buyer, product)) throw new ProductHasPendingOrderException("User with id of " + buyer.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
+        if (isBuyerHasAcceptedOrderToProduct(buyer, product)) throw new ProductHasAcceptedOrderException("User with id of " + buyer.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
+        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
+        if (product.isSold()) throw new ProductAlreadySoldException("Product with id of " + product.getId() + " are already been sold!");
+        if (product.isNotListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
+        if (buyer.hasProduct(product)) throw new ResourceOwnedException("You cannot order your own product listing!");
+        if (product.isExceedingToAvailableQuantity(orderItemDTO.getOrderQuantity())) throw new OrderQuantiantyExceedsException("You are trying to order that exceeds to available amount!");
+        if (isBuyerAlreadyBeenRejected(buyer, product)) throw new BuyerAlreadyRejectedException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product with id of " + product.getId() + " Don't spam bro :)");
+
         OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
 
         double price = productService.calculateOrderPrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
@@ -53,7 +81,9 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
     }
 
     @Override
-    public void cancelOrderItem(User buyer, OrderItem orderItem) {
+    public void cancelOrderItem(User buyer, OrderItem orderItem) throws NotOwnedException, OrderAlreadyAcceptedException {
+        if (!buyer.hasOrder(orderItem)) throw new NotOwnedException("User with id of " + buyer.getId() +  " does not have order item with id of " + orderItem.getId());
+        if (orderItem.isAccepted()) throw new OrderAlreadyAcceptedException("Cannot cancel order because order with id of " + orderItem.getId() + " are already accepted by the seller!");
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
         orderItem.setUpdatedAt(LocalDateTime.now());
         orderItemRepository.save(orderItem);

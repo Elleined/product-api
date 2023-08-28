@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -142,5 +143,14 @@ public class User {
 
     public boolean hasOrder(OrderItem orderItem) {
         return this.getOrderedItems().stream().anyMatch(orderItem::equals);
+    }
+
+    public boolean isPremiumSubscriptionExpired() {
+        LocalDateTime premiumExpiration = this.getPremium().getRegistrationDate().plusMonths(1);
+        return LocalDateTime.now().isAfter(premiumExpiration);
+    }
+
+    public boolean isPremiumAndNotExpired() {
+        return isPremium() && !isPremiumSubscriptionExpired();
     }
 }

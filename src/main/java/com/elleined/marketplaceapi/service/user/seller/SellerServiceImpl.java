@@ -12,11 +12,9 @@ import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.service.product.CropService;
-import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -172,12 +171,26 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
 
     @Override
     public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        return seller.getProducts().stream()
+        List<OrderItem> premiumUserOrders = seller.getProducts().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .flatMap(product -> product.getOrders().stream()
                         .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
+                        .filter(productOrder -> productOrder.getPurchaser().isPremium())
                         .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
                 .toList();
+
+        List<OrderItem> regularUserOrders = seller.getProducts().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .flatMap(product -> product.getOrders().stream()
+                        .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
+                        .filter(productOrder -> !productOrder.getPurchaser().isPremium())
+                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
+                .toList();
+
+        List<OrderItem> orders = new ArrayList<>();
+        orders.addAll(premiumUserOrders);
+        orders.addAll(regularUserOrders);
+        return orders;
     }
 
     @Override

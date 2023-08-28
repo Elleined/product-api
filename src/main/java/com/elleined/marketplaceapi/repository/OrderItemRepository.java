@@ -16,10 +16,23 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             WHERE oi.updatedAt
             BETWEEN :currentDateTimeMidnight AND :tomorrowMidnight
             AND oi.product.seller = :seller
-            AND oi.updatedAt = :orderItemStatus
+            AND oi.orderItemStatus = :orderItemStatus
             """)
     int fetchSellerRejectedOrderCount(@Param("currentDateTimeMidnight") LocalDateTime currentDateTimeMidnight,
                                  @Param("tomorrowMidnight") LocalDateTime tomorrowMidnight,
                                  @Param("seller") User seller,
                                  @Param("orderItemStatus") OrderItem.OrderItemStatus orderItemStatus);
+
+    @Query("""
+            SELECT COUNT(oi)
+            FROM OrderItem oi
+            WHERE oi.orderDate
+            BETWEEN :currentDateTimeMidnight AND :tomorrowMidnight
+            AND oi.purchaser = :buyer
+            AND oi.orderItemStatus = :orderItemStatus
+            """)
+    int fetchBuyerOrderCount(@Param("currentDateTimeMidnight") LocalDateTime currentDateTimeMidnight,
+                             @Param("tomorrowMidnight") LocalDateTime tomorrowMidnight,
+                             @Param("buyer") User buyer,
+                             @Param("orderItemStatus") OrderItem.OrderItemStatus orderItemStatus);
 }

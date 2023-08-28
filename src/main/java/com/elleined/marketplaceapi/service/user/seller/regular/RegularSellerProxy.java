@@ -50,7 +50,8 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     public RegularSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
                               OrderItemRepository orderItemRepository,
                               ProductRepository productRepository,
-                              ProductService productService, FeeService feeService) {
+                              ProductService productService,
+                              FeeService feeService) {
         this.sellerService = sellerService;
         this.orderItemRepository = orderItemRepository;
         this.productRepository = productRepository;
