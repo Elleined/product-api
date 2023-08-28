@@ -18,7 +18,7 @@ public interface FeeService {
 
     void payExtraReferralRewardForInvitingUser(User invitingUser);
 
-    boolean isUserHasLegibleForExtraReferralReward(User invitingUser);
+    boolean isInvitingUserLegibleForExtraReferralReward(User invitingUser);
 
     void deductSuccessfulTransactionFee(User seller, double successfulTransactionFee);
 }

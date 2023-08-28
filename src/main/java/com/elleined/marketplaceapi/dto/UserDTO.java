@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -39,8 +39,8 @@ public class UserDTO {
     private AddressDTO addressDTO;
 
     @Valid
-    @NotNull(message = "Address cannot be null")
-    private UserCredentialDTO userCredentialDTO;
+    @NotNull(message = "Credentials cannot be null")
+    private CredentialDTO userCredentialDTO;
 
     @Data
     @Builder
@@ -73,21 +73,5 @@ public class UserDTO {
 
         @NotBlank(message = "Suffix id cannot be less than zero. If user has no suffix use NONE")
         private String suffix;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserCredentialDTO {
-
-        @NotBlank(message = "Email cannot be blank, null, or empty")
-        @Email(message = "Enter a valid email")
-        private String email;
-
-        @NotBlank(message = "Password cannot be blank, null, or empty")
-        private String password;
-
-        private String confirmPassword;
     }
 }

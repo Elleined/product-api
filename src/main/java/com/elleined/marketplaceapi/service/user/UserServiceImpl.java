@@ -1,14 +1,15 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Shop;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +55,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id of " + id + " does not exists!"));
     }
 
+    @Override
+    public List<User> getAllById(List<Integer> userIds) throws ResourceNotFoundException {
+        return userRepository.findAll();
+    }
+
 
     @Override
     public User saveByDTO(UserDTO userDTO)
@@ -70,9 +77,9 @@ public class UserServiceImpl implements UserService {
         userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
 
         User registeringUser = userMapper.toEntity(userDTO);
+        this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
-        this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         emailService.sendWelcomeEmail(registeringUser);
@@ -88,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(UserDTO.UserCredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
+    public User login(CredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
         String email = userCredentialDTO.getEmail();
         if (!userRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
 
@@ -174,8 +181,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(int userId, String newPassword) throws ResourceNotFoundException {
-        User user = getById(userId);
+    public void changePassword(User user, String newPassword) {
         this.encodePassword(user, newPassword);
         userRepository.save(user);
         log.debug("User with id of {} successfully changed his/her password", user.getId());

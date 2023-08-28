@@ -1,12 +1,17 @@
 package com.elleined.marketplaceapi.controller;
 
 
+import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import com.elleined.marketplaceapi.service.product.ProductService;
+import com.elleined.marketplaceapi.service.user.UserService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +19,21 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/{moderatorId}/moderator")
+@RequestMapping("/moderators")
 @CrossOrigin(origins = "*")
 public class ModeratorController {
     private final ModeratorService moderatorService;
+    private final UserService userService;
     private final ProductService productService;
+
+    @PostMapping("/login")
+    public Moderator login(@Valid @RequestBody CredentialDTO moderatorCredentialDTO,
+                           HttpSession session) {
+
+        Moderator loggedInModerator = moderatorService.login(moderatorCredentialDTO);
+        session.setAttribute("loggedInModerator", loggedInModerator);
+        return null;
+    }
 
     @GetMapping("/getAllUnverifiedUser")
     public List<UserDTO> getAllUnverifiedUser() {
@@ -31,26 +46,40 @@ public class ModeratorController {
     }
 
 
-    @PatchMapping("/verifyUser/{userToBeVerifiedId}")
-    public void verifyUser(@PathVariable("userToBeVerifiedId") int userToBeVerifiedId) {
-        moderatorService.verifyUser(userToBeVerifiedId);
+    @PatchMapping("/{moderatorId}/verifyUser/{userToBeVerifiedId}")
+    public void verifyUser(@PathVariable("moderatorId") int moderatorId,
+                           @PathVariable("userToBeVerifiedId") int userToBeVerifiedId) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        User userToBeVerified = userService.getById(userToBeVerifiedId);
+        moderatorService.verifyUser(moderator, userToBeVerified);
     }
 
-    @PatchMapping("/verifyAllUser")
-    public void verifyAllUser(@RequestBody List<Integer> userToBeVerifiedIds) {
-        moderatorService.verifyAllUser(userToBeVerifiedIds);
+    @PatchMapping("/{moderatorId}/verifyAllUser")
+    public void verifyAllUser(@PathVariable("moderatorId") int moderatorId,
+                              @RequestBody List<Integer> userToBeVerifiedIds) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        List<User> usersToBeVerified = userService.getAllById(userToBeVerifiedIds);
+        moderatorService.verifyAllUser(moderator, usersToBeVerified);
     }
 
 
-    @PatchMapping("/listProduct/{productId}")
-    public void listProduct(@PathVariable("productId") int productId) throws ResourceNotFoundException {
-        Product product = productService.getById(productId);
-        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + productId + " are already been deleted or does not exists!");
-        moderatorService.listProduct(productId);
+    @PatchMapping("/{moderatorId}/listProduct/{productToBeListedId}")
+    public void listProduct(@PathVariable("moderatorId") int moderatorId,
+                            @PathVariable("productToBeListedId") int productToBeListedId) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        Product product = productService.getById(productToBeListedId);
+        moderatorService.listProduct(moderator, product);
     }
 
-    @PatchMapping("/listAllProduct")
-    public void listAllProduct(@RequestParam List<Integer> productIds) {
-        moderatorService.listAllProduct(productIds);
+    @PatchMapping("/{moderatorId}/listAllProduct")
+    public void listAllProduct(@PathVariable("moderatorId") int moderatorId,
+                               @RequestParam List<Integer> productsToBeListedId) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        List<Product> productsToBeListed = productService.getAllById(productsToBeListedId);
+        moderatorService.listAllProduct(moderator, productsToBeListed);
     }
 }

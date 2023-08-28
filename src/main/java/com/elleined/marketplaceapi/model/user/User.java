@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.model.user;
 
+import com.elleined.marketplaceapi.model.Credential;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
@@ -32,7 +33,8 @@ public class User {
     @Column(
             name = "user_id",
             nullable = false,
-            updatable = false
+            updatable = false,
+            unique = true
     )
     private int id;
 
@@ -50,7 +52,7 @@ public class User {
     @Embedded
     private UserVerification userVerification;
     @Embedded
-    private UserCredential userCredential;
+    private Credential userCredential;
     @Embedded
     private UserDetails userDetails;
 
@@ -58,6 +60,19 @@ public class User {
     // user id reference is in user address table
     @OneToOne(mappedBy = "user")
     private UserAddress address;
+
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_user_referral",
+            joinColumns = @JoinColumn(name = "inviting_user_id",
+                    referencedColumnName = "user_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "invited_user_id",
+                    referencedColumnName = "user_id"
+            )
+    )
+    private Set<User> referredUsers;
 
     // user id reference is in delivery address table
     @OneToMany(mappedBy = "user")
@@ -90,20 +105,6 @@ public class User {
     @OneToMany(mappedBy = "seller")
     @Setter(AccessLevel.NONE)
     private List<Product> products;
-
-    @ManyToMany
-    @JoinTable(
-            name = "tbl_user_referral",
-            joinColumns = @JoinColumn(name = "inviting_user_id",
-                    referencedColumnName = "user_id"
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "invited_user_id",
-                    referencedColumnName = "user_id"
-            )
-    )
-
-    private Set<User> referredUsers;
 
     public void addInvitedUser(User invitedUser) {
         this.getReferredUsers().add(invitedUser);

@@ -1,15 +1,20 @@
 package com.elleined.marketplaceapi.service.moderator;
 
+import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
-import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
+import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
+import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
+import com.elleined.marketplaceapi.model.Credential;
+import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
+import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
@@ -19,19 +24,24 @@ import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.MessagingException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class ModeratorServiceImpl implements ModeratorService {
+
+    private final ModeratorRepository moderatorRepository;
+
     private final EmailService emailService;
 
     private final PremiumRepository premiumRepository;
@@ -40,8 +50,11 @@ public class ModeratorServiceImpl implements ModeratorService {
     private final UserMapper userMapper;
 
     private final FeeService feeService;
+
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserDTO> getAllUnverifiedUser() {
@@ -98,26 +111,28 @@ public class ModeratorServiceImpl implements ModeratorService {
             propagation = Propagation.REQUIRES_NEW,
             noRollbackFor = MessagingException.class
     )
-    public void verifyUser(int userToBeVerifiedId) throws ResourceNotFoundException {
-        User userToBeVerified = userRepository.findById(userToBeVerifiedId).orElseThrow(() -> new ResourceNotFoundException("User with id of " + userToBeVerifiedId + " does not exists!"));
-        if (userToBeVerified.getShop() == null) throw new NotVerifiedException("User with id of " + userToBeVerifiedId + " doesn't have pending shop registration! must send a shop registration first!");
+    public void verifyUser(Moderator moderator, User userToBeVerified) throws NoShopRegistrationException {
+        if (userToBeVerified.getShop() == null) throw new NoShopRegistrationException("User with id of " + userToBeVerified.getId() + " doesn't have pending shop registration! must send a shop registration first!");
 
         if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
         User invitingUser = userService.getInvitingUser(userToBeVerified);
         if (invitingUser != null) feeService.payInvitingUserForHisReferral(invitingUser);
-        if (invitingUser != null && feeService.isUserHasLegibleForExtraReferralReward(invitingUser)) feeService.payExtraReferralRewardForInvitingUser(invitingUser);
+        if (invitingUser != null && feeService.isInvitingUserLegibleForExtraReferralReward(invitingUser)) feeService.payExtraReferralRewardForInvitingUser(invitingUser);
 
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
+        moderator.addVerifiedUser(userToBeVerified);
+
         userRepository.save(userToBeVerified);
+        moderatorRepository.save(moderator);
 
         emailService.sendVerificationEmail(userToBeVerified);
         log.debug("User with id of {} are now verified", userToBeVerified.getId());
     }
 
     @Override
-    public void verifyAllUser(List<Integer> userToBeVerifiedIds) throws ResourceNotFoundException {
-        userToBeVerifiedIds.forEach(this::verifyUser);
-        log.debug("Users with id of {} are now verified", userToBeVerifiedIds);
+    public void verifyAllUser(Moderator moderator, List<User> usersToBeVerified) throws NoShopRegistrationException {
+        usersToBeVerified.forEach(user -> this.verifyAllUser(moderator, usersToBeVerified));
+        log.debug("Users with id of {} are now verified", usersToBeVerified.stream().map(User::getId).toList());
     }
 
     @Override
@@ -125,18 +140,68 @@ public class ModeratorServiceImpl implements ModeratorService {
             propagation = Propagation.REQUIRES_NEW,
             noRollbackFor = MessagingException.class
     )
-    public void listProduct(int productId) throws ResourceNotFoundException {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product with id of " + productId + " does not exists!"));
-        product.setState(Product.State.LISTING);
-        productRepository.save(product);
+    public void listProduct(Moderator moderator, Product productToBeListed) {
+        productToBeListed.setState(Product.State.LISTING);
+        moderator.addListedProducts(productToBeListed);
 
-        emailService.sendProductEmail(product.getSeller(), product);
-        log.debug("Product with id of {} are now listing", product.getId());
+        moderatorRepository.save(moderator);
+        productRepository.save(productToBeListed);
+
+        emailService.sendProductEmail(productToBeListed.getSeller(), productToBeListed);
+        log.debug("Product with id of {} are now listing", productToBeListed.getId());
     }
 
     @Override
-    public void listAllProduct(List<Integer> productIds) throws ResourceNotFoundException {
-        productIds.forEach(this::listProduct);
-        log.debug("Products with id of {} are now listing", productIds);
+    public void listAllProduct(Moderator moderator, List<Product> productsToBeListed) {
+        productsToBeListed.forEach(product -> this.listProduct(moderator, product));
+        log.debug("Products with id of {} are now listing", productsToBeListed.stream().map(Product::getId).toList());
+    }
+
+    @Override
+    public Moderator getById(int moderatorId) throws ResourceNotFoundException {
+        return moderatorRepository.findById(moderatorId).orElseThrow(() -> new ResourceNotFoundException("Moderator with id of " + moderatorId + " does not exists!"));
+    }
+
+    @Override
+    public Moderator save(int id, String name, String email, String password) {
+        Moderator moderator = Moderator.builder()
+                .id(id)
+                .name(name)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .verifiedUsers(new HashSet<>())
+                .listedProducts(new HashSet<>())
+                .moderatorCredential(Credential.builder()
+                        .email(email)
+                        .build())
+                .build();
+        this.encodePassword(moderator, password);
+        moderatorRepository.save(moderator);
+        log.debug("Moderator name of {} successfully saved with id of {}", name, id);
+        return moderator;
+    }
+
+    @Override
+    public Moderator login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
+        String email = moderatorCredentialDTO.getEmail();
+        if (!moderatorRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+
+        Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail());
+        String encodedPassword = moderator.getModeratorCredential().getPassword();
+        if (!passwordEncoder.matches(moderatorCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        return moderator;
+    }
+
+    @Override
+    public void encodePassword(Moderator moderator, String rawPassword) {
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        moderator.getModeratorCredential().setPassword(encodedPassword);
+    }
+
+    @Override
+    public void changePassword(Moderator moderator, String newPassword) {
+        this.encodePassword(moderator, newPassword);
+        moderatorRepository.save(moderator);
+        log.debug("User with id of {} successfully changed his/her password", moderator.getId());
     }
 }

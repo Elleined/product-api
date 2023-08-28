@@ -13,7 +13,6 @@ import com.elleined.marketplaceapi.service.user.UserService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.model.user;
+package com.elleined.marketplaceapi.model;
 
 
 import jakarta.persistence.Column;
@@ -11,7 +11,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCredential {
+public class Credential {
 
     @Column(
             name = "email",
@@ -22,8 +22,7 @@ public class UserCredential {
 
     @Column(
             name = "password",
-            nullable = false,
-            unique = true
+            nullable = false
     )
     private String password;
 }

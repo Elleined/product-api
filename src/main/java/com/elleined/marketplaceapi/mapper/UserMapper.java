@@ -2,14 +2,13 @@ package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.model.user.UserCredential;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper(componentModel = "spring", uses = AddressMapper.class)
-public abstract class UserMapper {
+@Mapper(componentModel = "spring", uses = {AddressMapper.class, CredentialMapper.class})
+public interface UserMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -29,9 +28,9 @@ public abstract class UserMapper {
 
             @Mapping(target = "userVerification.status", expression = "java(UserVerification.Status.NOT_VERIFIED)"),
             @Mapping(target = "userDetails", expression = "java(toUserDetailsEntity(userDTO.getUserDetailsDTO()))"),
-            @Mapping(target = "userCredential", expression = "java(toUserCredentialEntity(userDTO.getUserCredentialDTO()))"),
+            @Mapping(target = "userCredential", source = "userCredentialDTO"),
     })
-    public abstract User toEntity(UserDTO userDTO);
+    User toEntity(UserDTO userDTO);
 
     @Mappings({
             @Mapping(target = "invitationReferralCode", ignore = true),
@@ -39,32 +38,21 @@ public abstract class UserMapper {
             @Mapping(target = "status", source = "userVerification.status"),
 
             @Mapping(target = "addressDTO", source = "address"),
-            @Mapping(target = "userCredentialDTO", expression = "java(toUserCredentialDTO(user.getUserCredential()))"),
+            @Mapping(target = "userCredentialDTO", source = "userCredential"),
             @Mapping(target = "userDetailsDTO", expression = "java(toUserDetailsDTO(user.getUserDetails()))"),
             @Mapping(target = "userDetailsDTO.suffix", source = "userDetails.suffix"),
     })
-    public abstract UserDTO toDTO(User user);
-
-
-    protected abstract UserCredential toUserCredentialEntity(UserDTO.UserCredentialDTO userCredentialDTO);
-
-
-    @Mappings({
-            @Mapping(target = "password", ignore = true),
-            @Mapping(target = "confirmPassword", ignore = true)
-    })
-    protected abstract UserDTO.UserCredentialDTO toUserCredentialDTO(UserCredential userCredential);
-
+    UserDTO toDTO(User user);
 
     @Mappings({
             @Mapping(target = "registrationDate", expression = "java(java.time.LocalDateTime.now())"),
     })
-    protected abstract UserDetails toUserDetailsEntity(UserDTO.UserDetailsDTO userDetailsDTO);
+    UserDetails toUserDetailsEntity(UserDTO.UserDetailsDTO userDetailsDTO);
 
     @Mappings({
             @Mapping(target = "gender", source = "userDetails.gender"),
             @Mapping(target = "picture", source = "picture"),
             @Mapping(target = "suffix", source = "userDetails.suffix"),
     })
-    protected abstract UserDTO.UserDetailsDTO toUserDetailsDTO(UserDetails userDetails);
+    UserDTO.UserDetailsDTO toUserDetailsDTO(UserDetails userDetails);
 }

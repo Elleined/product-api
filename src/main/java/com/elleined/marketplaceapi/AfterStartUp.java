@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.model.AppWallet;
 import com.elleined.marketplaceapi.populator.Populator;
 import com.elleined.marketplaceapi.repository.AppWalletRepository;
 import com.elleined.marketplaceapi.repository.CropRepository;
+import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,15 +24,17 @@ public class AfterStartUp {
 
     private final CropRepository cropRepository;
     private final AppWalletRepository appWalletRepository;
+    private final ModeratorService moderatorService;
 
     public AfterStartUp(Populator cropPopulator,
                         @Qualifier("unitPopulator") Populator unitPopulator,
                         CropRepository cropRepository,
-                        AppWalletRepository appWalletRepository) {
+                        AppWalletRepository appWalletRepository, ModeratorService moderatorService) {
         this.cropPopulator = cropPopulator;
         this.unitPopulator = unitPopulator;
         this.cropRepository = cropRepository;
         this.appWalletRepository = appWalletRepository;
+        this.moderatorService = moderatorService;
     }
 
     private final static String CROPS_JSON = "/json/crops.json";
@@ -53,5 +56,7 @@ public class AfterStartUp {
                 .build();
         appWalletRepository.save(appWallet);
         log.debug("Saving app wallet success...");
+
+        moderatorService.save(1, "Sample moderator name", "sampleModeratorEmail@gmail.com", "sampleModeratorPassword");
     }
 }

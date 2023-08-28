@@ -11,17 +11,17 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
-public abstract class AddressMapper {
+public interface AddressMapper {
 
 
-    public abstract AddressDTO toDTO(Address address);
+    AddressDTO toDTO(Address address);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "user", expression = "java(registeringUser)"),
 
     })
-    public abstract UserAddress toUserAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
+    UserAddress toUserAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -30,5 +30,5 @@ public abstract class AddressMapper {
             @Mapping(target = "cartItemDeliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "orderItemAddresses", expression = "java(new java.util.ArrayList<>())")
     })
-    public abstract DeliveryAddress toDeliveryAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
+    DeliveryAddress toDeliveryAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
 }

@@ -1,15 +1,13 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.APIResponse;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
-import com.elleined.marketplaceapi.exception.resource.ResourceException;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
-import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordException;
 import com.elleined.marketplaceapi.exception.order.OrderException;
 import com.elleined.marketplaceapi.exception.otp.OTPException;
 import com.elleined.marketplaceapi.exception.product.ProductException;
+import com.elleined.marketplaceapi.exception.resource.ResourceException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.user.NoLoggedInUserException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;

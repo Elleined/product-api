@@ -2,8 +2,8 @@ package com.elleined.marketplaceapi.service.message;
 
 import com.elleined.marketplaceapi.dto.Message;
 import com.elleined.marketplaceapi.dto.PrivateMessage;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NoLoggedInUserException;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.user.UserService;

@@ -1,9 +1,9 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;

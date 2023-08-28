@@ -1,18 +1,18 @@
 package com.elleined.marketplaceapi.service.user.seller.regular;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.exception.user.seller.SellerMaxPendingOrderException;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.order.MaxOrderRejectionException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
 import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
 import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxAcceptedOrderException;
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxListingException;
+import com.elleined.marketplaceapi.exception.user.seller.SellerMaxPendingOrderException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;

@@ -23,4 +23,7 @@ public interface ProductService {
      * Meaning 5 pesos per 50 pieces and has available quantity of 100
      */
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
+
+    List<Product> getAllById(List<Integer> productsToBeListedId);
+
 }

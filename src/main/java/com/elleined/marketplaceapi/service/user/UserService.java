@@ -1,21 +1,23 @@
 package com.elleined.marketplaceapi.service.user;
 
+import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-public interface UserService extends PasswordService {
+public interface UserService extends PasswordService<User> {
     int REGISTRATION_LIMIT_PROMO = 500;
     BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
 
@@ -32,11 +34,12 @@ public interface UserService extends PasswordService {
             MobileNumberException;
 
     User getById(int id) throws ResourceNotFoundException;
+    List<User> getAllById(List<Integer> userIds) throws ResourceNotFoundException;
 
     void resendValidId(User currentUser, String validId);
 
     // After this principal will be set to be use in web socket
-    User login(UserDTO.UserCredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
+    User login(CredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 
     User getByEmail(String email) throws ResourceNotFoundException;
 

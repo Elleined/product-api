@@ -20,9 +20,6 @@ public abstract class ProductMapper {
     @Autowired @Lazy
     protected UnitService unitService;
 
-    @Autowired @Lazy
-    protected UserService userService;
-
     @Mappings({
             @Mapping(target = "state", source = "product.state"),
             @Mapping(target = "status", source = "product.status"),

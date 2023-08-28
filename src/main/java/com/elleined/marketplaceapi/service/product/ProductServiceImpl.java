@@ -58,4 +58,9 @@ public class ProductServiceImpl implements ProductService {
         log.trace("Total price {}", totalPrice);
         return totalPrice;
     }
+
+    @Override
+    public List<Product> getAllById(List<Integer> productsToBeListedId) {
+        return productRepository.findAll();
+    }
 }

@@ -1,10 +1,10 @@
 package com.elleined.marketplaceapi.service.user;
 
-import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
+import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 public class UserCredentialValidator {
     private final GetAllUtilityService getAllUtilityService;
 
-    public void validateEmail(UserDTO.UserCredentialDTO userCredentialDTO)
+    public void validateEmail(CredentialDTO userCredentialDTO)
             throws MalformedEmailException, AlreadyExistException {
         String email = userCredentialDTO.getEmail();
         if (!email.endsWith("@gmail.com")) throw new MalformedEmailException("Email must ends with @gmail.com!");
@@ -26,7 +26,7 @@ public class UserCredentialValidator {
         if (getAllUtilityService.getAllEmail().contains(email)) throw new AlreadyExistException("This email " + email + " is already associated with an account!");
     }
 
-    public void validatePassword(UserDTO.UserCredentialDTO userCredentialDTO)
+    public void validatePassword(CredentialDTO userCredentialDTO)
             throws PasswordNotMatchException, WeakPasswordException {
         List<Character> specialChars = Arrays.asList('@', '#', '$', '_', '/');
         String password = userCredentialDTO.getPassword();

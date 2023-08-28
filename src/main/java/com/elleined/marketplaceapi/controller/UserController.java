@@ -27,7 +27,7 @@ public class UserController {
 
     private final UserService userService;
 
-    private final PasswordService passwordService;
+    private final PasswordService<User> passwordService;
     private final MessageService messageService;
 
     private final PremiumService premiumService;
@@ -69,7 +69,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserDTO login(@Valid @RequestBody UserDTO.UserCredentialDTO userCredentialDTO,
+    public UserDTO login(@Valid @RequestBody CredentialDTO userCredentialDTO,
                          HttpSession session) {
         User currentUser = userService.login(userCredentialDTO);
         session.setAttribute("currentUser", currentUser);
@@ -129,7 +129,8 @@ public class UserController {
     public APIResponse changePassword(@PathVariable("currentUserId") int currentUserId,
                                       @RequestParam("newPassword") String newPassword) {
 
-        passwordService.changePassword(currentUserId, newPassword);
+        User currentUser = userService.getById(currentUserId);
+        passwordService.changePassword(currentUser, newPassword);
         return new APIResponse(HttpStatus.OK, "User with id of {} successfully changed his/her password");
     }
 

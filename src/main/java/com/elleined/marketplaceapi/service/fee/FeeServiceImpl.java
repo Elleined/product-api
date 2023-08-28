@@ -71,7 +71,7 @@ public class FeeServiceImpl implements FeeService {
     }
 
     @Override
-    public boolean isUserHasLegibleForExtraReferralReward(User invitingUser) {
+    public boolean isInvitingUserLegibleForExtraReferralReward(User invitingUser) {
         return invitingUser.getReferredUsers().size() % EXTRA_REFERRAL_FEE_LEGIBILITY == 0;
     }
 
