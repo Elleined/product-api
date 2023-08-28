@@ -55,13 +55,13 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public OTPMessage sendOTP(User user) {
-        OTPMessage sentOTPMessage = OTPMessage.builder()
+        OTPMessage otpMessage = OTPMessage.builder()
                 .plusExpirationSeconds(PLUS_EXPIRATION_IN_SECONDS)
                 .receiver(user.getUserCredential().getEmail())
                 .build();
-        // OTPMessage receiveOTPMessage = emailClient.sendOTPMail(sentOTPMessage);
-        log.debug("Sending OTP for user with id of {} success {}", user.getId(), sentOTPMessage);
-        return sentOTPMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
+        // otpMessage = emailClient.sendOTPMail(otpMessage);
+        log.debug("Sending OTP for user with id of {} success {}", user.getId(), otpMessage);
+        return otpMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
     }
 
     private String getFullName(User userToBeVerified) {

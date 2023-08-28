@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.seller.regular;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.exception.user.seller.SellerMaxPendingOrderException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.order.MaxOrderRejectionException;
@@ -103,14 +104,26 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
+    public boolean isExceedsToMaxPendingOrder(User seller) {
+        return seller.getProducts().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .map(Product::getOrders)
+                .flatMap(Collection::stream)
+                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
+                .count() >= MAX_PENDING_ORDER;
+    }
+
+    @Override
     public Product saveProduct(ProductDTO productDTO, User seller)
             throws NotVerifiedException,
             SellerMaxAcceptedOrderException,
             SellerMaxListingException,
+            SellerMaxPendingOrderException,
             InsufficientBalanceException {
 
         if (isExceedsToMaxAcceptedOrder(seller)) throw new SellerMaxAcceptedOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
         if (isExceedsToMaxListingPerDay(seller)) throw new SellerMaxListingException("You already reached the limit of product listing per day which is " + MAX_LISTING_PER_DAY);
+        if (isExceedsToMaxPendingOrder(seller)) throw new SellerMaxPendingOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max pending which is " + MAX_PENDING_ORDER + " order please accept first some orders to proceed...");
         // Add more validation for regular seller here for future
 
         double totalPrice = productService.calculateTotalPrice(productDTO.getPricePerUnit(), productDTO.getQuantityPerUnit(), productDTO.getAvailableQuantity());
@@ -126,9 +139,11 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             NotVerifiedException,
             ProductAlreadySoldException,
             ResourceNotFoundException,
-            SellerMaxAcceptedOrderException {
+            SellerMaxAcceptedOrderException,
+            SellerMaxPendingOrderException {
 
         if (isExceedsToMaxAcceptedOrder(seller)) throw new SellerMaxAcceptedOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
+        if (isExceedsToMaxPendingOrder(seller)) throw new SellerMaxPendingOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max pending which is " + MAX_PENDING_ORDER + " order please accept first some orders to proceed...");
         // Add more validation for regular seller here for future
 
         sellerService.updateProduct(seller, product, productDTO);
@@ -141,9 +156,11 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             ProductAlreadySoldException,
             ProductHasPendingOrderException,
             ProductHasAcceptedOrderException,
-            SellerMaxAcceptedOrderException {
+            SellerMaxAcceptedOrderException,
+            SellerMaxPendingOrderException {
 
         if (isExceedsToMaxAcceptedOrder(seller)) throw new SellerMaxAcceptedOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
+        if (isExceedsToMaxPendingOrder(seller)) throw new SellerMaxPendingOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max pending which is " + MAX_PENDING_ORDER + " order please accept first some orders to proceed...");
         // Add more validation for regular seller here for future
 
         sellerService.deleteProduct(seller, product);
@@ -165,8 +182,10 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     public void rejectOrder(User seller, OrderItem orderItem, String messageToBuyer)
             throws NotOwnedException,
             NotValidBodyException,
-            MaxOrderRejectionException {
+            MaxOrderRejectionException,
+            SellerMaxPendingOrderException {
 
+        if (isExceedsToMaxPendingOrder(seller)) throw new SellerMaxPendingOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max pending which is " + MAX_PENDING_ORDER + " order please accept first some orders to proceed...");
         if (isExceedsToMaxRejectionPerDay(seller)) throw new MaxOrderRejectionException("Cannot reject order anymore! Because seller with id of " + seller.getId() + " already reached the rejection limit per day which is " + MAX_ORDER_REJECTION_PER_DAY + " come back again tomorrow... Thanks");
         // Add more validation for regular seller here for future
 
