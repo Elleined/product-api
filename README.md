@@ -4,6 +4,10 @@ REST API for marketplace microservice
 # Features
   - Moderator
   - E-commerce API(Buy and Sell)
+  - Incentives
+  - Referral
+  - Sustainability
+  - Premium user (Buyer and Seller)
 
 # Technologies used
   - Spring boot
