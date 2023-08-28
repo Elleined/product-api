@@ -1,0 +1,52 @@
+[
+  {
+    "userDetailsDTO": {
+      "firstName": "Juan",
+      "middleName": "Dela",
+      "lastName": "Cruz",
+      "gender": "MALE",
+      "birthDate": "2000-10-03",
+      "mobileNumber": "09911111111",
+      "picture": "juanDelaCruz.jpeg",
+      "suffix": "JR"
+    },
+    "addressDTO": {
+      "details": "#106 Blk 13 JamesGosling Street",
+      "regionName": "Region III",
+      "provinceName": "Nueva Ecija",
+      "cityName": "Cabanatuan City",
+      "baranggayName": "Sumacab Este"
+    },
+    "userCredentialDTO": {
+      "email": "juanDelaCruz@gmail.com",
+      "password": "@JuanDelaCruz1",
+      "confirmPassword": "@JuanDelaCruz1"
+    },
+    "invitationReferralCode": ""
+  },
+  {
+    "userDetailsDTO": {
+      "firstName": "Cardo",
+      "middleName": "",
+      "lastName": "Dalisay",
+      "gender": "MALE",
+      "birthDate": "1995-04-10",
+      "mobileNumber": "09222222222",
+      "picture": "cardoDalisay.jpeg",
+      "suffix": "NONE"
+    },
+    "addressDTO": {
+      "details": "#99 houseDetails",
+      "regionName": "Region III",
+      "provinceName": "Nueva Ecija",
+      "cityName": "Cabanatuan City",
+      "baranggayName": "Sumacab Este"
+    },
+    "userCredentialDTO": {
+      "email": "cardoDalisay@gmail.com",
+      "password": "@cardoDalisay1",
+      "confirmPassword": "@cardoDalisay1"
+    },
+    "invitationReferralCode": ""
+  }
+]

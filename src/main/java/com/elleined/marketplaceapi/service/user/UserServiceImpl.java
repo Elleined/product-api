@@ -19,7 +19,6 @@ import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
-import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,6 @@ import java.util.List;
 @Transactional
 public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
 
     private final UserRepository userRepository;
     private final UserCredentialValidator userCredentialValidator;
@@ -81,8 +79,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
-
-        emailService.sendWelcomeEmail(registeringUser);
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
         return registeringUser;
     }

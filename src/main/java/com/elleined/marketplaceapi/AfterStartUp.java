@@ -21,23 +21,27 @@ public class AfterStartUp {
 
     private final Populator cropPopulator;
     private final Populator unitPopulator;
-
+    private final Populator userPopulator;
     private final CropRepository cropRepository;
     private final AppWalletRepository appWalletRepository;
     private final ModeratorService moderatorService;
 
     public AfterStartUp(Populator cropPopulator,
                         @Qualifier("unitPopulator") Populator unitPopulator,
+                        @Qualifier("userPopulator") Populator userPopulator,
                         CropRepository cropRepository,
-                        AppWalletRepository appWalletRepository, ModeratorService moderatorService) {
+                        AppWalletRepository appWalletRepository,
+                        ModeratorService moderatorService) {
         this.cropPopulator = cropPopulator;
         this.unitPopulator = unitPopulator;
+        this.userPopulator = userPopulator;
         this.cropRepository = cropRepository;
         this.appWalletRepository = appWalletRepository;
         this.moderatorService = moderatorService;
     }
 
     private final static String CROPS_JSON = "/json/crops.json";
+    private final static String USERS_JSON = "/json/users.json";
     private final static String UNITS_JSON = "/json/units.json";
 
     @PostConstruct
@@ -46,17 +50,18 @@ public class AfterStartUp {
             log.debug("Returning... because initial values of crops and units are already saved!");
             return;
         }
-        log.debug("Saving crops and units initial values! Please wait....");
+        log.debug("Saving app wallet, moderator, crops and units initial values! Please wait....");
+
         cropPopulator.populate(CROPS_JSON);
         unitPopulator.populate(UNITS_JSON);
-        log.debug("Saving crops and units are successful. Thank you!...");
+        userPopulator.populate(USERS_JSON);
 
         AppWallet appWallet = AppWallet.builder()
                 .appWalletBalance(new BigDecimal(0))
                 .build();
         appWalletRepository.save(appWallet);
-        log.debug("Saving app wallet success...");
 
         moderatorService.save(1, "Sample moderator name", "sampleModeratorEmail@gmail.com", "sampleModeratorPassword");
+        log.debug("Saving app wallet, moderator, crops and units are successful. Thank you!...");
     }
 }

@@ -7,6 +7,7 @@ import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.message.MessageService;
 import com.elleined.marketplaceapi.service.user.PasswordService;
 import com.elleined.marketplaceapi.service.user.PremiumService;
@@ -27,6 +28,8 @@ public class UserController {
 
     private final UserService userService;
 
+    private final EmailService emailService;
+
     private final PasswordService<User> passwordService;
     private final MessageService messageService;
 
@@ -39,8 +42,9 @@ public class UserController {
     private final GetAllUtilityService getAllUtilityService;
     @PostMapping
     public UserDTO save(@Valid @RequestBody UserDTO userDTO) {
-        User user = userService.saveByDTO(userDTO);
-        return userMapper.toDTO(user);
+        User registeringUser = userService.saveByDTO(userDTO);
+        emailService.sendWelcomeEmail(registeringUser);
+        return userMapper.toDTO(registeringUser);
     }
 
     @GetMapping("/{id}")
