@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,10 +58,10 @@ public class ModeratorController {
 
     @PatchMapping("/{moderatorId}/verifyAllUser")
     public void verifyAllUser(@PathVariable("moderatorId") int moderatorId,
-                              @RequestBody List<Integer> userToBeVerifiedIds) {
+                              @RequestBody Set<Integer> userToBeVerifiedIds) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        List<User> usersToBeVerified = userService.getAllById(userToBeVerifiedIds);
+        Set<User> usersToBeVerified = userService.getAllById(userToBeVerifiedIds);
         moderatorService.verifyAllUser(moderator, usersToBeVerified);
     }
 
@@ -76,10 +77,10 @@ public class ModeratorController {
 
     @PatchMapping("/{moderatorId}/listAllProduct")
     public void listAllProduct(@PathVariable("moderatorId") int moderatorId,
-                               @RequestParam List<Integer> productsToBeListedId) {
+                               @RequestBody Set<Integer> productsToBeListedId) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        List<Product> productsToBeListed = productService.getAllById(productsToBeListedId);
+        Set<Product> productsToBeListed = productService.getAllById(productsToBeListedId);
         moderatorService.listAllProduct(moderator, productsToBeListed);
     }
 }

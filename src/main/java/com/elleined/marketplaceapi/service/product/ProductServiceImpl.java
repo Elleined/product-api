@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -60,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllById(List<Integer> productsToBeListedId) {
-        return productRepository.findAll();
+    public Set<Product> getAllById(Set<Integer> productsToBeListedId) {
+        return productRepository.findAllById(productsToBeListedId).stream().collect(Collectors.toUnmodifiableSet());
     }
 }

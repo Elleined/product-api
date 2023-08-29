@@ -30,7 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,8 +59,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllById(List<Integer> userIds) throws ResourceNotFoundException {
-        return userRepository.findAll();
+    public Set<User> getAllById(Set<Integer> userIds) throws ResourceNotFoundException {
+        return userRepository.findAllById(userIds).stream().collect(Collectors.toUnmodifiableSet());
     }
 
 

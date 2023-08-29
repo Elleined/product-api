@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
+import java.util.Set;
 
 
 public interface ProductService {
@@ -24,6 +25,6 @@ public interface ProductService {
      */
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
 
-    List<Product> getAllById(List<Integer> productsToBeListedId);
+    Set<Product> getAllById(Set<Integer> productsToBeListedId);
 
 }

@@ -15,7 +15,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 public interface UserService extends PasswordService<User> {
     int REGISTRATION_LIMIT_PROMO = 500;
@@ -34,7 +34,7 @@ public interface UserService extends PasswordService<User> {
             MobileNumberException;
 
     User getById(int id) throws ResourceNotFoundException;
-    List<User> getAllById(List<Integer> userIds) throws ResourceNotFoundException;
+    Set<User> getAllById(Set<Integer> userIds) throws ResourceNotFoundException;
 
     void resendValidId(User currentUser, String validId);
 

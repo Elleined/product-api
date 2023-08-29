@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -112,6 +113,7 @@ public class ModeratorServiceImpl implements ModeratorService {
             noRollbackFor = MessagingException.class
     )
     public void verifyUser(Moderator moderator, User userToBeVerified) throws NoShopRegistrationException {
+        if (userToBeVerified.isVerified()) return;
         if (userToBeVerified.getShop() == null) throw new NoShopRegistrationException("User with id of " + userToBeVerified.getId() + " doesn't have pending shop registration! must send a shop registration first!");
 
         if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
@@ -130,8 +132,8 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void verifyAllUser(Moderator moderator, List<User> usersToBeVerified) throws NoShopRegistrationException {
-        usersToBeVerified.forEach(user -> this.verifyAllUser(moderator, usersToBeVerified));
+    public void verifyAllUser(Moderator moderator, Set<User> usersToBeVerified) throws NoShopRegistrationException {
+        usersToBeVerified.forEach(userToBeVerified -> this.verifyUser(moderator, userToBeVerified));
         log.debug("Users with id of {} are now verified", usersToBeVerified.stream().map(User::getId).toList());
     }
 
@@ -152,7 +154,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void listAllProduct(Moderator moderator, List<Product> productsToBeListed) {
+    public void listAllProduct(Moderator moderator, Set<Product> productsToBeListed) {
         productsToBeListed.forEach(product -> this.listProduct(moderator, product));
         log.debug("Products with id of {} are now listing", productsToBeListed.stream().map(Product::getId).toList());
     }

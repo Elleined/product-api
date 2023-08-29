@@ -39,7 +39,7 @@ public class UserDetails {
     @Column(name = "mobile_number", nullable = false, unique = true)
     private String mobileNumber;
 
-    @Column(name = "picture", nullable = false)
+    @Column(name = "picture", nullable = false, columnDefinition = "TEXT")
     private String picture;
 
     @Column(name = "suffix", nullable = false)
