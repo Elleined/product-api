@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.controller;
 
 
 import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.model.Moderator;
@@ -28,10 +29,10 @@ public class ModeratorController {
     private final ProductService productService;
 
     @PostMapping("/login")
-    public Moderator login(@Valid @RequestBody CredentialDTO moderatorCredentialDTO,
-                           HttpSession session) {
+    public ModeratorDTO login(@Valid @RequestBody CredentialDTO moderatorCredentialDTO,
+                              HttpSession session) {
 
-        Moderator loggedInModerator = moderatorService.login(moderatorCredentialDTO);
+        ModeratorDTO loggedInModerator = moderatorService.login(moderatorCredentialDTO);
         session.setAttribute("loggedInModerator", loggedInModerator);
         return loggedInModerator;
     }

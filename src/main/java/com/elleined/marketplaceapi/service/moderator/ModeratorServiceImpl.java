@@ -1,14 +1,15 @@
 package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
+import com.elleined.marketplaceapi.mapper.ModeratorMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
-import com.elleined.marketplaceapi.model.Credential;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.Premium;
@@ -29,9 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,6 +41,7 @@ import java.util.Set;
 public class ModeratorServiceImpl implements ModeratorService {
 
     private final ModeratorRepository moderatorRepository;
+    private final ModeratorMapper moderatorMapper;
 
     private final EmailService emailService;
 
@@ -165,33 +165,23 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public Moderator save(int id, String name, String email, String password) {
-        Moderator moderator = Moderator.builder()
-                .id(id)
-                .name(name)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .verifiedUsers(new HashSet<>())
-                .listedProducts(new HashSet<>())
-                .moderatorCredential(Credential.builder()
-                        .email(email)
-                        .build())
-                .build();
-        this.encodePassword(moderator, password);
+    public Moderator save(ModeratorDTO moderatorDTO) {
+        Moderator moderator = moderatorMapper.toEntity(moderatorDTO);
+        this.encodePassword(moderator, moderatorDTO.moderatorCredentialDTO().getPassword());
         moderatorRepository.save(moderator);
-        log.debug("Moderator name of {} successfully saved with id of {}", name, id);
+        log.debug("Moderator name of {} successfully saved with id of {}", moderatorDTO.name(), moderatorDTO.id());
         return moderator;
     }
 
     @Override
-    public Moderator login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
+    public ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
         String email = moderatorCredentialDTO.getEmail();
         if (!moderatorRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
 
         Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail());
         String encodedPassword = moderator.getModeratorCredential().getPassword();
         if (!passwordEncoder.matches(moderatorCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
-        return moderator;
+        return moderatorMapper.toDTO(moderator);
     }
 
     @Override

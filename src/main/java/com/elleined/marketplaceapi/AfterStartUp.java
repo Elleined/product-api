@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi;
 
+import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.model.AppWallet;
 import com.elleined.marketplaceapi.populator.Populator;
 import com.elleined.marketplaceapi.repository.AppWalletRepository;
@@ -61,7 +63,14 @@ public class AfterStartUp {
                 .build();
         appWalletRepository.save(appWallet);
 
-        moderatorService.save(1, "Sample moderator name", "sampleModeratorEmail@gmail.com", "sampleModeratorPassword");
+        moderatorService.save(ModeratorDTO.builder()
+                .id(1)
+                .name("Sample moderator name")
+                .moderatorCredentialDTO(CredentialDTO.builder()
+                        .email("sampleModeratorEmail@gmail.com")
+                        .password("sampleModeratorPassword")
+                        .build())
+                .build());
         log.debug("Saving app wallet, moderator, crops and units are successful. Thank you!...");
     }
 }

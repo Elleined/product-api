@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
@@ -37,7 +38,7 @@ public interface ModeratorService extends PasswordService<Moderator> {
     Moderator getById(int moderatorId) throws ResourceNotFoundException;
 
 
-    Moderator save(int id, String name, String email, String password);
+    Moderator save(ModeratorDTO moderatorDTO);
 
-    Moderator login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
+    ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 }
