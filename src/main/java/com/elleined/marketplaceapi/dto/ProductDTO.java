@@ -53,4 +53,6 @@ public class ProductDTO {
     private LocalDateTime listingDate;
 
     private String shopName;
+
+    private double totalPrice;
 }

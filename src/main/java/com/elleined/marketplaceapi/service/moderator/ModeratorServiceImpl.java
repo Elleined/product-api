@@ -181,6 +181,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail());
         String encodedPassword = moderator.getModeratorCredential().getPassword();
         if (!passwordEncoder.matches(moderatorCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        log.debug("Moderator with id of {} are now logged in", moderator.getId());
         return moderatorMapper.toDTO(moderator);
     }
 

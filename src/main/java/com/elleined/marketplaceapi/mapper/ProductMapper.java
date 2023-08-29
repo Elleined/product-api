@@ -5,8 +5,8 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.CropService;
+import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
-import com.elleined.marketplaceapi.service.user.UserService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,6 +20,9 @@ public abstract class ProductMapper {
     @Autowired @Lazy
     protected UnitService unitService;
 
+    @Autowired @Lazy
+    protected ProductService productService;
+
     @Mappings({
             @Mapping(target = "state", source = "product.state"),
             @Mapping(target = "status", source = "product.status"),
@@ -28,7 +31,8 @@ public abstract class ProductMapper {
             @Mapping(target = "sellerName", source = "product.seller.userDetails.firstName"),
             @Mapping(target = "cropName", source = "product.crop.name"),
             @Mapping(target = "unitName", source = "product.unit.name"),
-            @Mapping(target = "shopName", source = "product.seller.shop.name")
+            @Mapping(target = "shopName", source = "product.seller.shop.name"),
+            @Mapping(target = "totalPrice", expression = "java(productService.calculateTotalPrice(product.getPricePerUnit(), product.getQuantityPerUnit(), product.getAvailableQuantity()))")
     })
     public abstract ProductDTO toDTO(Product product);
 
