@@ -33,7 +33,7 @@ public class ModeratorController {
 
         Moderator loggedInModerator = moderatorService.login(moderatorCredentialDTO);
         session.setAttribute("loggedInModerator", loggedInModerator);
-        return null;
+        return loggedInModerator;
     }
 
     @GetMapping("/getAllUnverifiedUser")
