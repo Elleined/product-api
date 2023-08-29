@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -47,9 +48,10 @@ public class ProductDTO {
     private int quantityPerUnit;
 
     @NotNull(message = "Harvest date cannot null")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message = "Cannot sell an item that are not have been harvested yet")
-    private LocalDateTime harvestDate;
+    private LocalDate harvestDate;
+
     private LocalDateTime listingDate;
 
     private String shopName;

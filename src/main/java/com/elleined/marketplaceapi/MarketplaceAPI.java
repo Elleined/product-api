@@ -1,7 +1,5 @@
 package com.elleined.marketplaceapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -24,11 +22,6 @@ public class MarketplaceAPI {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public ObjectMapper objectMapper() {
-		return new ObjectMapper().registerModule(new JavaTimeModule());
 	}
 
 	@Bean

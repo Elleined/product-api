@@ -7,6 +7,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class Product {
     private int availableQuantity;
 
     @Column(name = "date_of_harvest", nullable = false)
-    private LocalDateTime harvestDate;
+    private LocalDate harvestDate;
 
     @Column(
             name = "date_of_listing",
