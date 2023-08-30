@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.exception.order.MaxOrderRejectionException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
 import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
 import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
+import com.elleined.marketplaceapi.exception.product.ProductRejectedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -170,6 +171,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     public void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer)
             throws NotOwnedException,
             NotValidBodyException,
+            ProductRejectedException,
             SellerMaxAcceptedOrderException {
 
         if (isExceedsToMaxAcceptedOrder(seller)) throw new SellerMaxAcceptedOrderException("Cannot proceed because seller with id of " + seller.getId() + " exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");

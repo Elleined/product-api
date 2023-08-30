@@ -59,6 +59,19 @@ public class Moderator {
     )
     private Set<Product> listedProducts;
 
+    // This unidirectional mapping
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_moderator_rejected_product",
+            joinColumns = @JoinColumn(name = "moderator_id",
+                    referencedColumnName = "moderator_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "product_id",
+                    referencedColumnName = "product_id"
+            )
+    )
+    private Set<Product> rejectedProducts;
 
     // This unidirectional mapping
     @ManyToMany
@@ -82,5 +95,9 @@ public class Moderator {
 
     public void addListedProducts(Product product) {
         this.getListedProducts().add(product);
+    }
+
+    public void addRejectedProduct(Product productToBeRejected) {
+        this.getRejectedProducts().add(productToBeRejected);
     }
 }

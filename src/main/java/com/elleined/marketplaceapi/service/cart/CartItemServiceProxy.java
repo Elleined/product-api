@@ -77,7 +77,7 @@ public class CartItemServiceProxy implements CartItemService {
         if (currentUser.hasProduct(product)) throw new ResourceOwnedException("You cannot order your own product listing!");
         if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
         if (product.isSold()) throw new ProductAlreadySoldException("Product with id of " + product.getId() + " are already been sold!");
-        if (product.isNotListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
+        if (!product.isListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
         if (product.isExceedingToAvailableQuantity(cartItemDTO.getOrderQuantity())) throw new OrderQuantiantyExceedsException("You are trying to order that exceeds to available amount!");
         if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product)) throw new BuyerAlreadyRejectedException("Cannot add to cart! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
 
@@ -103,7 +103,7 @@ public class CartItemServiceProxy implements CartItemService {
         if (buyerOrderChecker.isBuyerHasAcceptedOrderToProduct(currentUser, product)) throw new ProductHasAcceptedOrderException("User with id of " + currentUser.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
         if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
         if (product.isSold()) throw new ProductAlreadySoldException("Product with id of " + product.getId() + " are already been sold!");
-        if (product.isNotListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
+        if (!product.isListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
         if (product.isExceedingToAvailableQuantity(cartItem.getOrderQuantity())) throw new OrderQuantiantyExceedsException("You are trying to order that exceeds to available amount!");
         if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product)) throw new BuyerAlreadyRejectedException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product with id of " + product.getId() + " Don't spam bro :)");
 

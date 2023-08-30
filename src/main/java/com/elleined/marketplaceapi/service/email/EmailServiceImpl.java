@@ -17,7 +17,7 @@ public class EmailServiceImpl implements EmailService {
     private final EmailClient emailClient;
     private final static int PLUS_EXPIRATION_IN_SECONDS = 60;
     @Override
-    public void sendVerificationEmail(User userToBeVerified) {
+    public void sendAcceptedVerificationEmail(User userToBeVerified) {
         String message = "Hello " + getFullName(userToBeVerified) + " We are happy to inform you that you're verification process in our application CropTrade are successful you can now list your product and enjoy our services";
         EmailMessage emailMessage = EmailMessage.builder()
                 .subject("CropTrade user verification")
@@ -28,9 +28,21 @@ public class EmailServiceImpl implements EmailService {
         log.debug("Sending verification email for user " + userToBeVerified.getId() + " success!");
     }
 
+    @Override
+    public void sendRejectedVerificationEmail(User rejectedUser, String reason) {
+        String message = "Hello " + getFullName(rejectedUser) + " We are sorry to inform you that you're application for verification are rejected by the moderator because " + reason;
+        EmailMessage emailMessage = EmailMessage.builder()
+                .subject("CropTrade Verification Rejection")
+                .messageBody(message)
+                .receiver(rejectedUser.getUserCredential().getEmail())
+                .build();
+        // emailClient.sendSimpleMail(emailMessage);
+        log.debug("Sending rejected verification to user with id of " + rejectedUser.getId() + " success!");
+    }
+
 
     @Override
-    public void sendProductEmail(User seller, Product product) {
+    public void sendProductListedEmail(User seller, Product product) {
         String message = "Hello " + getFullName(seller) + " We are happy to inform you that you're product listing of " + product.getCrop() + "  are now approved by moderator your product will now be visible in marketplace";
         EmailMessage emailMessage = EmailMessage.builder()
                 .subject("Product listing approve")
@@ -38,7 +50,20 @@ public class EmailServiceImpl implements EmailService {
                 .receiver(seller.getUserCredential().getEmail())
                 .build();
         // emailClient.sendSimpleMail(emailMessage);
-        log.debug("Sending product listing for user " + seller.getId() + " success!");
+        log.debug("Sending product listing for user {} success!", seller.getId());
+    }
+
+    @Override
+    public void sendRejectedProductEmail(Product product, String reason) {
+        User seller = product.getSeller();
+        String message = "Hello " + getFullName(seller) + " We are sorry to inform you that you're product listing of " + product.getCrop() + " are rejected by the moderator because " + reason;
+        EmailMessage emailMessage = EmailMessage.builder()
+                .subject("Product listing rejected")
+                .messageBody(message)
+                .receiver(seller.getUserCredential().getEmail())
+                .build();
+        // emailClient.sendSimpleMail(emailMessage);
+        log.debug("Sending product rejected for user {} success", seller.getId());
     }
 
     @Override
@@ -50,7 +75,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .build();
         // emailClient.sendSimpleMail(emailMessage);
-        log.debug("Sending registration email for user " + registrant.getId() + " success");
+        log.debug("Sending registration email for user {} success", registrant.getId());
     }
 
     @Override
@@ -64,7 +89,7 @@ public class EmailServiceImpl implements EmailService {
         return otpMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
     }
 
-    private String getFullName(User userToBeVerified) {
-        return userToBeVerified.getUserDetails().getFirstName() + " " + userToBeVerified.getUserDetails().getMiddleName() + " " + userToBeVerified.getUserDetails().getLastName();
+    private String getFullName(User user) {
+        return user.getUserDetails().getFirstName() + " " + user.getUserDetails().getMiddleName() + " " + user.getUserDetails().getLastName();
     }
 }

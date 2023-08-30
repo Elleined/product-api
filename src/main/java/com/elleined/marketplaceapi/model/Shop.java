@@ -27,7 +27,11 @@ public class Shop {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "picture", nullable = false)
+    @Column(
+            name = "picture",
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
     private String picture;
 
     // This is the primary key of this shop table

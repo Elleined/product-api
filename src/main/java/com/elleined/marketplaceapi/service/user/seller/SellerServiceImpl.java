@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
 import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
 import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
+import com.elleined.marketplaceapi.exception.product.ProductRejectedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
@@ -103,8 +104,10 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
     @Override
     public void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer)
             throws NotOwnedException,
-            NotValidBodyException {
+            NotValidBodyException,
+            ProductRejectedException {
 
+        if (orderItem.getProduct().isRejected()) throw new ProductRejectedException("Cannot accept order because with this product is rejected by the moderator!");
         if (!isSellerHasOrder(seller, orderItem)) throw new NotOwnedException("Seller with id of " + seller.getId() + " doesn't have order with id of " + orderItem.getId());
         if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
 

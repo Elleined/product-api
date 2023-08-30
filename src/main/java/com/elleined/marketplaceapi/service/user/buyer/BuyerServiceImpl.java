@@ -3,10 +3,7 @@ package com.elleined.marketplaceapi.service.user.buyer;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
-import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
-import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductNotListedException;
+import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -44,17 +41,19 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
             ResourceOwnedException,
             ProductHasPendingOrderException,
             ProductHasAcceptedOrderException,
+            ProductRejectedException,
             ProductAlreadySoldException,
             ProductNotListedException,
             OrderQuantiantyExceedsException,
             BuyerAlreadyRejectedException {
 
         Product product = productService.getById(orderItemDTO.getProductId());
+        if (product.isRejected()) throw new ProductRejectedException("You cannot order a product with id of " + product.getId() + "  because this product is rejected by moderator!");
         if (isBuyerHasPendingOrderToProduct(buyer, product)) throw new ProductHasPendingOrderException("User with id of " + buyer.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
         if (isBuyerHasAcceptedOrderToProduct(buyer, product)) throw new ProductHasAcceptedOrderException("User with id of " + buyer.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
         if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
         if (product.isSold()) throw new ProductAlreadySoldException("Product with id of " + product.getId() + " are already been sold!");
-        if (product.isNotListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
+        if (!product.isListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
         if (buyer.hasProduct(product)) throw new ResourceOwnedException("You cannot order your own product listing!");
         if (product.isExceedingToAvailableQuantity(orderItemDTO.getOrderQuantity())) throw new OrderQuantiantyExceedsException("You are trying to order that exceeds to available amount!");
         if (isBuyerAlreadyBeenRejected(buyer, product)) throw new BuyerAlreadyRejectedException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product with id of " + product.getId() + " Don't spam bro :)");

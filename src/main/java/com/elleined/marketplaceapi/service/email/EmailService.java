@@ -5,10 +5,15 @@ import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
 
 public interface EmailService {
-    void sendVerificationEmail(User userToBeVerified);
+    void sendAcceptedVerificationEmail(User userToBeVerified);
 
-    void sendProductEmail(User seller, Product product);
+    void sendRejectedVerificationEmail(User rejectedUser, String reason);
+
     void sendWelcomeEmail(User registrant);
 
     OTPMessage sendOTP(User user);
+
+    void sendProductListedEmail(User seller, Product product);
+
+    void sendRejectedProductEmail(Product product, String reason);
 }

@@ -4,6 +4,10 @@ import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
+import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
+import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
+import com.elleined.marketplaceapi.exception.user.UserVerificationRejectionException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
@@ -22,6 +26,7 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.user.UserService;
+import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.MessagingException;
@@ -62,12 +67,14 @@ public class ModeratorServiceImpl implements ModeratorService {
         List<User> premiumUsers = premiumRepository.findAll().stream()
                 .map(Premium::getUser)
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
-                .filter(user -> user.getShop() != null)
+                .filter(User::hasShopRegistration)
+                .filter(User::hasNotBeenRejected) // Checking for rejected user
                 .toList();
 
         List<User> regularUsers = userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
-                .filter(user -> user.getShop() != null)
+                .filter(User::hasShopRegistration)
+                .filter(User::hasNotBeenRejected) // Checking for rejected user
                 .toList();
 
         List<User> users = new ArrayList<>();
@@ -82,8 +89,8 @@ public class ModeratorServiceImpl implements ModeratorService {
     public List<ProductDTO> getAllPendingProduct() {
         List<Product> premiumUserProducts = premiumRepository.findAll().stream()
                 .map(Premium::getUser)
-                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
-                .filter(user -> user.getShop() != null)
+                .filter(User::isVerified)
+                .filter(User::hasShopRegistration)
                 .map(User::getProducts)
                 .flatMap(products -> products.stream()
                         .filter(product -> product.getStatus() == Product.Status.ACTIVE)
@@ -91,8 +98,8 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .toList();
 
         List<Product> regularUserProducts = userRepository.findAll().stream()
-                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.VERIFIED)
-                .filter(user -> user.getShop() != null)
+                .filter(User::isVerified)
+                .filter(User::hasShopRegistration)
                 .map(User::getProducts)
                 .flatMap(products -> products.stream()
                         .filter(product -> product.getStatus() == Product.Status.ACTIVE)
@@ -112,9 +119,14 @@ public class ModeratorServiceImpl implements ModeratorService {
             propagation = Propagation.REQUIRES_NEW,
             noRollbackFor = MessagingException.class
     )
-    public void verifyUser(Moderator moderator, User userToBeVerified) throws NoShopRegistrationException {
-        if (userToBeVerified.isVerified()) return;
-        if (userToBeVerified.getShop() == null) throw new NoShopRegistrationException("User with id of " + userToBeVerified.getId() + " doesn't have pending shop registration! must send a shop registration first!");
+    public void verifyUser(Moderator moderator, User userToBeVerified)
+            throws NoShopRegistrationException,
+            UserVerificationRejectionException,
+            UserAlreadyVerifiedException {
+
+        if (userToBeVerified.isVerified()) throw new UserAlreadyVerifiedException("This user is already been verified");
+        if (!userToBeVerified.hasShopRegistration()) throw new NoShopRegistrationException("User with id of " + userToBeVerified.getId() + " doesn't have pending shop registration! must send a shop registration first!");
+        if (userToBeVerified.hasShopRegistration() && userToBeVerified.isRejected()) throw new UserVerificationRejectionException("You're verification are been rejected by moderator try re-sending you're valid id and check email for reason why you're verification application are rejected... Thanks");
 
         if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
         User invitingUser = userService.getInvitingUser(userToBeVerified);
@@ -127,7 +139,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         userRepository.save(userToBeVerified);
         moderatorRepository.save(moderator);
 
-        emailService.sendVerificationEmail(userToBeVerified);
+        emailService.sendAcceptedVerificationEmail(userToBeVerified);
         log.debug("User with id of {} are now verified", userToBeVerified.getId());
     }
 
@@ -149,7 +161,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         moderatorRepository.save(moderator);
         productRepository.save(productToBeListed);
 
-        emailService.sendProductEmail(productToBeListed.getSeller(), productToBeListed);
+        emailService.sendProductListedEmail(productToBeListed.getSeller(), productToBeListed);
         log.debug("Product with id of {} are now listing", productToBeListed.getId());
     }
 
@@ -157,6 +169,38 @@ public class ModeratorServiceImpl implements ModeratorService {
     public void listAllProduct(Moderator moderator, Set<Product> productsToBeListed) {
         productsToBeListed.forEach(product -> this.listProduct(moderator, product));
         log.debug("Products with id of {} are now listing", productsToBeListed.stream().map(Product::getId).toList());
+    }
+
+    @Override
+    public void rejectUser(User userToBeRejected, String reason)
+            throws UserAlreadyVerifiedException,
+            NotValidBodyException {
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you rejecting this user... Thanks");
+        if (userToBeRejected.isVerified()) throw new UserAlreadyVerifiedException("Rejection failed! because user with id of " + userToBeRejected.getId() + " verification that are already been verified!");
+
+        userToBeRejected.getUserVerification().setStatus(UserVerification.Status.NOT_VERIFIED);
+        userToBeRejected.getUserVerification().setValidId(null);
+        userRepository.save(userToBeRejected);
+
+        emailService.sendRejectedVerificationEmail(userToBeRejected, reason);
+        log.debug("User with id of {} application for verification are rejected by the moderator!", userToBeRejected.getId());
+    }
+
+    @Override
+    public void rejectProduct(Moderator moderator, Product productToBeRejected, String reason)
+            throws ProductAlreadyListedException,
+            NotValidBodyException {
+
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting this product... Thanks");
+        if (productToBeRejected.isListed()) throw new ProductAlreadyListedException("Rejection failed! because product with id of " + productToBeRejected.getId() + " already been listed");
+        productToBeRejected.setState(Product.State.REJECTED);
+        moderator.addRejectedProduct(productToBeRejected);
+
+        moderatorRepository.save(moderator);
+        productRepository.save(productToBeRejected);
+
+        emailService.sendRejectedProductEmail(productToBeRejected, reason);
+        log.debug("Product with id of {} are rejected by moderator with id of {}", productToBeRejected.getId(), moderator.getId());
     }
 
     @Override

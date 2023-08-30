@@ -154,4 +154,12 @@ public class User {
     public boolean isPremiumAndNotExpired() {
         return isPremium() && !isPremiumSubscriptionExpired();
     }
+
+    public boolean isRejected() {
+        return this.getUserVerification().getValidId() == null;
+    }
+
+    public boolean hasNotBeenRejected() {
+        return this.getUserVerification().getValidId() != null;
+    }
 }

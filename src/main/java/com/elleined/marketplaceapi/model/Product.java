@@ -53,7 +53,11 @@ public class Product {
     @Column(name = "quantity_per_unit", nullable = false)
     private int quantityPerUnit;
 
-    @Column(name = "picture", nullable = false)
+    @Column(
+            name = "picture",
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
     private String picture;
 
     @Column(name = "keyword", length = 40, nullable = false)
@@ -102,19 +106,25 @@ public class Product {
     @Setter(AccessLevel.NONE)
     private List<CartItem> addedToCarts;
 
-    public boolean isNotListed() {
-        return this.getState() != State.LISTING;
-    }
 
     public enum State {
         PENDING,
         LISTING,
-        SOLD
+        SOLD,
+        REJECTED
     }
 
     public enum Status {
         ACTIVE,
         INACTIVE
+    }
+
+    public boolean isListed() {
+        return this.getState() == State.LISTING;
+    }
+
+    public boolean isRejected() {
+        return this.getState() == State.REJECTED;
     }
 
     public boolean hasPendingOrder() {

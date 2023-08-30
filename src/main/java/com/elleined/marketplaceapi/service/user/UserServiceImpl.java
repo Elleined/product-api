@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.exception.field.password.WeakPasswordExceptio
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
+import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.item.OrderItem;
@@ -103,10 +104,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void resendValidId(User currentUser, String validId) {
+    public void resendValidId(User currentUser, String validId) throws UserAlreadyVerifiedException {
+        if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! User with id of " + currentUser.getId() + " are already been verified");
         currentUser.getUserVerification().setValidId(validId);
         userRepository.save(currentUser);
-        log.debug("User with id of {} resended valid id {}", currentUser.getId(), validId);
+        log.debug("User with id of {} resended  valid id {}", currentUser.getId(), validId);
     }
 
     @Override

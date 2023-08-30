@@ -3,10 +3,7 @@ package com.elleined.marketplaceapi.service.user.buyer;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
-import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
-import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductNotListedException;
+import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -23,6 +20,7 @@ public interface BuyerService {
             ResourceOwnedException,
             ProductHasPendingOrderException,
             ProductHasAcceptedOrderException,
+            ProductRejectedException,
             ProductAlreadySoldException,
             ProductNotListedException,
             OrderQuantiantyExceedsException,

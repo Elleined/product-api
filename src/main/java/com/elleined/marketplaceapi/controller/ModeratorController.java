@@ -48,6 +48,14 @@ public class ModeratorController {
     }
 
 
+    @PatchMapping("/rejectUser/{userToBeRejectedId}")
+    public void rejectUser(@PathVariable("userToBeRejectedId") int userToBeRejectedId,
+                           @RequestParam("reason") String reason) {
+
+        User userToBeRejected = userService.getById(userToBeRejectedId);
+        moderatorService.rejectUser(userToBeRejected, reason);
+    }
+
     @PatchMapping("/{moderatorId}/verifyUser/{userToBeVerifiedId}")
     public void verifyUser(@PathVariable("moderatorId") int moderatorId,
                            @PathVariable("userToBeVerifiedId") int userToBeVerifiedId) {
@@ -64,6 +72,16 @@ public class ModeratorController {
         Moderator moderator = moderatorService.getById(moderatorId);
         Set<User> usersToBeVerified = userService.getAllById(userToBeVerifiedIds);
         moderatorService.verifyAllUser(moderator, usersToBeVerified);
+    }
+
+    @PatchMapping("/{moderatorId}/rejectProduct/{productToBeRejectedId}")
+    public void rejectProduct(@PathVariable("moderatorId") int moderatorId,
+                              @PathVariable("productToBeRejectedId") int productToBeRejectedId,
+                              @RequestParam("reason") String reason) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        Product productToBeRejected = productService.getById(productToBeRejectedId);
+        moderatorService.rejectProduct(moderator, productToBeRejected, reason);
     }
 
 

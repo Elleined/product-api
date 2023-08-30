@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
 import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
 import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
+import com.elleined.marketplaceapi.exception.product.ProductRejectedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -34,7 +35,8 @@ public interface SellerService {
 
     void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer)
             throws NotOwnedException,
-            NotValidBodyException;
+            NotValidBodyException,
+            ProductRejectedException;
 
     void rejectOrder(User seller, OrderItem orderItem, String messageToBuyer)
             throws NotOwnedException,
