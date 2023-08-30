@@ -98,6 +98,7 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .toList();
 
         List<Product> regularUserProducts = userRepository.findAll().stream()
+                .filter(user -> !user.isPremium())
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
                 .map(User::getProducts)

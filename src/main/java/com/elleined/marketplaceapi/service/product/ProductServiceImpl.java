@@ -2,8 +2,11 @@ package com.elleined.marketplaceapi.service.product;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
+import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
+    private final UserRepository userRepository;
+    private final PremiumRepository premiumRepository;
+
     @Override
     public Product getById(int id) throws ResourceNotFoundException {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product with id of " + id + " does not exists!"));
@@ -33,12 +39,30 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getAllExcept(User currentUser) {
         List<Product> userProducts = currentUser.getProducts();
 
-        List<Product> products = new ArrayList<>(productRepository.findAll().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
-                .toList());
-        products.removeAll(userProducts);
+        List<Product> premiumUserProducts = premiumRepository.findAll().stream()
+                .map(Premium::getUser)
+                .filter(User::isVerified)
+                .filter(User::hasShopRegistration)
+                .map(User::getProducts)
+                .flatMap(products -> products.stream()
+                        .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                        .filter(product -> product.getState() == Product.State.LISTING))
+                .toList();
 
+        List<Product> regularUserProducts = userRepository.findAll().stream()
+                .filter(user -> !user.isPremium())
+                .filter(User::isVerified)
+                .filter(User::hasShopRegistration)
+                .map(User::getProducts)
+                .flatMap(products -> products.stream()
+                        .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                        .filter(product -> product.getState() == Product.State.LISTING))
+                .toList();
+
+        List<Product> products = new ArrayList<>();
+        products.addAll(premiumUserProducts);
+        products.addAll(regularUserProducts);
+        products.removeAll(userProducts);
         return products;
     }
 

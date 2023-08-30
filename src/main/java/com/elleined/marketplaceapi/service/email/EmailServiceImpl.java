@@ -63,7 +63,7 @@ public class EmailServiceImpl implements EmailService {
                 .receiver(seller.getUserCredential().getEmail())
                 .build();
         // emailClient.sendSimpleMail(emailMessage);
-        log.debug("Sending product rejected for user {} success", seller.getId());
+        log.debug("Sending product rejection email for seller with id {} of in his/her product with id of {} success", seller.getId(), product.getId());
     }
 
     @Override
