@@ -56,7 +56,7 @@ public class Product {
     @Column(
             name = "picture",
             nullable = false,
-            columnDefinition = "TEXT"
+            columnDefinition = "MEDIUMTEXT"
     )
     private String picture;
 
