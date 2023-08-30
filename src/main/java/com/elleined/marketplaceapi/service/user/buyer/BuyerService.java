@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.user.buyer;
 
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
+import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
@@ -36,5 +37,6 @@ public interface BuyerService {
      */
     void cancelOrderItem(User buyer, OrderItem orderItem)
             throws NotOwnedException,
-            OrderAlreadyAcceptedException;
+            OrderAlreadyAcceptedException,
+            OrderAlreadyRejectedException;
 }

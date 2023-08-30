@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
@@ -80,8 +81,13 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
     }
 
     @Override
-    public void cancelOrderItem(User buyer, OrderItem orderItem) throws NotOwnedException, OrderAlreadyAcceptedException {
+    public void cancelOrderItem(User buyer, OrderItem orderItem)
+            throws NotOwnedException,
+            OrderAlreadyAcceptedException,
+            OrderAlreadyRejectedException {
+        
         if (!buyer.hasOrder(orderItem)) throw new NotOwnedException("User with id of " + buyer.getId() +  " does not have order item with id of " + orderItem.getId());
+        if (orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.REJECTED) throw new OrderAlreadyRejectedException("You cannot cancel these order with id of " + orderItem.getId() + " because seller already rejected your order!");
         if (orderItem.isAccepted()) throw new OrderAlreadyAcceptedException("Cannot cancel order because order with id of " + orderItem.getId() + " are already accepted by the seller!");
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
         orderItem.setUpdatedAt(LocalDateTime.now());
