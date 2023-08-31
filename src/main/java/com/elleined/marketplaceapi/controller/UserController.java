@@ -23,7 +23,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
-@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService userService;
@@ -40,6 +39,7 @@ public class UserController {
     private final AddressMapper addressMapper;
 
     private final GetAllUtilityService getAllUtilityService;
+
     @PostMapping
     public UserDTO save(@Valid @RequestBody UserDTO userDTO) {
         User registeringUser = userService.saveByDTO(userDTO);

@@ -13,7 +13,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WSConfig implements WebSocketMessageBrokerConfigurer {
 
     private final UserHandshakeHandler userHandshakeHandler;
-
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")

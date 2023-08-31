@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
-@CrossOrigin(origins = "*")
 public class UtilityController {
 
     private final GetAllUtilityService getAllUtilityService;

@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users/{currentUserId}/buyer")
-@CrossOrigin(origins = "*")
 public class BuyerController {
 
     private final BuyerService regularBuyer;

@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.utils.StringUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ public class MessageServiceImpl implements MessageService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserService userService;
 
-    private final HttpSession session;
+    @Autowired
+    private HttpSession session;
 
     @Override
     public PrivateMessage sendPrivateMessage(int recipientId, String message)
@@ -51,8 +53,9 @@ public class MessageServiceImpl implements MessageService {
     public Message sendPublicMessage(String message)
             throws NotValidBodyException, NoLoggedInUserException {
 
-        User currentUser = (User) session.getAttribute("currentUser");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
+
+        User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
         Message responseMessage = new Message(HtmlUtils.htmlEscape(message), currentUser.getId());

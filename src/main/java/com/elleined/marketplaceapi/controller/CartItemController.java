@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{currentUserId}/cartItems")
-@CrossOrigin(origins = "*")
 public class CartItemController {
 
     private final UserService userService;

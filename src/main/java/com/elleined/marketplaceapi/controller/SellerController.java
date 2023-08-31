@@ -20,7 +20,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users/{currentUserId}/seller")
-@CrossOrigin(origins = "*")
 public class SellerController {
 
     private final UserService userService;

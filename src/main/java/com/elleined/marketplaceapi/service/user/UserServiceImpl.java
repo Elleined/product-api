@@ -119,6 +119,7 @@ public class UserServiceImpl implements UserService {
         User user = getByEmail(userCredentialDTO.getEmail());
         String encodedPassword = user.getUserCredential().getPassword();
         if (!passwordEncoder.matches(userCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        log.debug("User with email of {} logged in marketplace api", userCredentialDTO.getEmail());
         return user;
     }
 
