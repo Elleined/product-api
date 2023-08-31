@@ -35,17 +35,20 @@ public class MessageServiceImpl implements MessageService {
         if (!userService.existsById(recipientId)) throw new ResourceNotFoundException("Recipient with id of " + recipientId +  " does not exists!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
 
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
+        // alias for currentUser
+        User sender = (User) session.getAttribute("currentUser");
+        if (sender == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
         PrivateMessage responseMessage = PrivateMessage.builder()
                 .message(HtmlUtils.htmlEscape(message))
                 .recipientId(recipientId)
-                .senderId(currentUser.getId())
+                .senderId(sender.getId())
                 .build();
-        simpMessagingTemplate.convertAndSendToUser(String.valueOf(recipientId), "/private-chat", responseMessage);
 
-        log.debug("Sender with id of {} send a message in recipient with id of {}", currentUser.getId(), recipientId);
+        // /private-chat/{senderId}/{recipientId}
+        simpMessagingTemplate.convertAndSendToUser(String.valueOf(recipientId),"/private-chat/" + sender.getId() + "/" + recipientId, responseMessage);
+
+        log.debug("Sender with id of {} send a message in recipient with id of {}", sender.getId(), recipientId);
         return responseMessage;
     }
 
@@ -55,6 +58,7 @@ public class MessageServiceImpl implements MessageService {
 
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
 
+        // alias for currentUser
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) throw new NoLoggedInUserException("Please login first before sending private message. Thank you very much...");
 
