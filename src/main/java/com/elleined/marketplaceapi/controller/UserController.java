@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.*;
+import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
@@ -92,29 +93,29 @@ public class UserController {
 
 
     @GetMapping("/{currentUserId}/getAllDeliveryAddress")
-    public List<AddressDTO> getAllDeliveryAddress(@PathVariable("currentUserId") int currentUserId) {
+    public List<DeliveryAddressDTO> getAllDeliveryAddress(@PathVariable("currentUserId") int currentUserId) {
         User currentUser = userService.getById(currentUserId);
         List<DeliveryAddress> deliveryAddresses = addressService.getAllDeliveryAddress(currentUser);
         return deliveryAddresses.stream()
-                .map(addressMapper::toDTO)
+                .map(addressMapper::toDeliveryAddressDTO)
                 .toList();
     }
 
     @PostMapping("/{currentUserId}/saveDeliveryAddress")
-    public AddressDTO saveDeliveryAddress(@PathVariable("currentUserId") int currentUserId,
-                                          @Valid @RequestBody AddressDTO addressDTO) {
+    public DeliveryAddressDTO saveDeliveryAddress(@PathVariable("currentUserId") int currentUserId,
+                                          @Valid @RequestBody DeliveryAddressDTO deliveryAddressDTO) {
         User currentUser = userService.getById(currentUserId);
-        DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, addressDTO);
-        return addressMapper.toDTO(deliveryAddress);
+        DeliveryAddress deliveryAddress = addressService.saveDeliveryAddress(currentUser, deliveryAddressDTO);
+        return addressMapper.toDeliveryAddressDTO(deliveryAddress);
     }
 
     @GetMapping("/{currentUserId}/getDeliveryAddressById/{deliveryAddressId}")
-    public AddressDTO getDeliveryAddressById(@PathVariable("currentUserId") int currentUserId,
+    public DeliveryAddressDTO getDeliveryAddressById(@PathVariable("currentUserId") int currentUserId,
                                              @PathVariable("deliveryAddressId") int deliveryAddressId) {
 
         User currentUser = userService.getById(currentUserId);
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, deliveryAddressId);
-        return addressMapper.toDTO(deliveryAddress);
+        return addressMapper.toDeliveryAddressDTO(deliveryAddress);
     }
 
 

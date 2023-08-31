@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper;
 
-import com.elleined.marketplaceapi.dto.AddressDTO;
+import com.elleined.marketplaceapi.dto.address.AddressDTO;
+import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.model.address.Address;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
@@ -14,7 +15,9 @@ import org.mapstruct.Mappings;
 public interface AddressMapper {
 
 
-    AddressDTO toDTO(Address address);
+    AddressDTO toAddressDTO(Address address);
+
+    DeliveryAddressDTO toDeliveryAddressDTO(DeliveryAddress deliveryAddress);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -30,5 +33,5 @@ public interface AddressMapper {
             @Mapping(target = "cartItemDeliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "orderItemAddresses", expression = "java(new java.util.ArrayList<>())")
     })
-    DeliveryAddress toDeliveryAddressEntity(AddressDTO addressDTO, @Context User registeringUser);
+    DeliveryAddress toDeliveryAddressEntity(DeliveryAddressDTO deliveryAddressDTO, @Context User registeringUser);
 }

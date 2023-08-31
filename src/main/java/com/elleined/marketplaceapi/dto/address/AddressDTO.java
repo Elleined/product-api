@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.dto;
+package com.elleined.marketplaceapi.dto.address;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

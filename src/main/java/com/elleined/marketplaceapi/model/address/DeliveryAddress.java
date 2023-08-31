@@ -16,6 +16,9 @@ import java.util.List;
 @Setter
 public class DeliveryAddress extends Address {
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
     @ManyToOne(optional = false)
     @JoinColumn(
             name = "user_id",
@@ -34,8 +37,9 @@ public class DeliveryAddress extends Address {
     private List<CartItem> cartItemDeliveryAddresses;
 
     @Builder(builderMethodName = "deliveryAddressBuilder")
-    public DeliveryAddress(int id, String details, String regionName, String provinceName, String cityName, String baranggayName, User user, List<OrderItem> orderItemAddresses, List<CartItem> cartItemDeliveryAddresses) {
+    public DeliveryAddress(int id, String details, String regionName, String provinceName, String cityName, String baranggayName, String title, User user, List<OrderItem> orderItemAddresses, List<CartItem> cartItemDeliveryAddresses) {
         super(id, details, regionName, provinceName, cityName, baranggayName);
+        this.title = title;
         this.user = user;
         this.orderItemAddresses = orderItemAddresses;
         this.cartItemDeliveryAddresses = cartItemDeliveryAddresses;
