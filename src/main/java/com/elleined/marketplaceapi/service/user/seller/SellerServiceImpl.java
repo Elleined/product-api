@@ -169,6 +169,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
         return seller.getProducts().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == state)
+                .sorted(Comparator.comparing(Product::getListingDate).reversed())
                 .toList();
     }
 

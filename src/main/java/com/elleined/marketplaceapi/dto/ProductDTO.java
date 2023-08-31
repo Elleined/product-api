@@ -52,7 +52,7 @@ public class ProductDTO {
     @PastOrPresent(message = "Cannot sell an item that are not have been harvested yet")
     private LocalDate harvestDate;
 
-    private LocalDateTime listingDate;
+    private LocalDate listingDate;
 
     private String shopName;
 

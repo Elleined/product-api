@@ -32,7 +32,8 @@ public abstract class ProductMapper {
             @Mapping(target = "cropName", source = "product.crop.name"),
             @Mapping(target = "unitName", source = "product.unit.name"),
             @Mapping(target = "shopName", source = "product.seller.shop.name"),
-            @Mapping(target = "totalPrice", expression = "java(productService.calculateTotalPrice(product.getPricePerUnit(), product.getQuantityPerUnit(), product.getAvailableQuantity()))")
+            @Mapping(target = "totalPrice", expression = "java(productService.calculateTotalPrice(product.getPricePerUnit(), product.getQuantityPerUnit(), product.getAvailableQuantity()))"),
+            @Mapping(target = "listingDate", expression = "java(product.getListingDate().toLocalDate())")
     })
     public abstract ProductDTO toDTO(Product product);
 
