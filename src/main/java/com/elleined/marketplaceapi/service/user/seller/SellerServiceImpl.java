@@ -93,7 +93,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
         if (!seller.hasProduct(product)) throw new NotOwnedException("Seller user with id of " + seller.getId() + " does not have product with id of " + product.getId());
         if (product.isSold()) throw new ProductAlreadySoldException("Cannot update this product with id of " + product.getId() + " because this product is already sold");
         if (product.hasPendingOrder()) throw new ProductHasPendingOrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the pending products to delete this");
-        if (product.hasAcceptedOrder()) throw new ProductHasAcceptedOrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the accepted products to delete this");
+        if (product.hasAcceptedOrder()) throw new ProductHasAcceptedOrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a accepted orders. Please settle first the accepted products to delete this");
 
         product.setStatus(Product.Status.INACTIVE);
         List<OrderItem> orderItems = product.getOrders();
