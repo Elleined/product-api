@@ -39,7 +39,7 @@ public class ProductDTO {
     private int sellerId;
     private String sellerName;
 
-    @Positive(message = "Quantity cannot be negative or less than 0")
+    @Positive(message = "Available quantity cannot be negative or less than 0")
     private int availableQuantity;
     @Positive(message = "Price per unit cannot be negative or less than 0")
     private double pricePerUnit;
