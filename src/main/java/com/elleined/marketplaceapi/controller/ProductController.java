@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/{currentUserId}/products")
+@RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
@@ -22,7 +22,7 @@ public class ProductController {
     private final UserService userService;
 
     private final GetAllUtilityService getAllUtilityService;
-    @GetMapping
+    @GetMapping("/{currentUserId}/getAllProducts")
     public List<ProductDTO> getAllExcept(@PathVariable("currentUserId") int currentUserId) {
         User currentUser = userService.getById(currentUserId);
         return productService.getAllExcept(currentUser).stream()

@@ -70,7 +70,10 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
         if (product.isSold()) throw new ProductAlreadySoldException("Cannot update this product with id of " + product.getId() + " because this product is already sold");
         if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
 
-        if (product.isCriticalFieldsChanged(productDTO)) product.setState(Product.State.PENDING);
+        if (product.isCriticalFieldsChanged(productDTO)) {
+            product.setState(Product.State.PENDING);
+            updatePendingAndAcceptedOrderStatus(product.getOrders(), OrderItem.OrderItemStatus.CANCELLED);
+        }
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
         Product updatedProduct = productMapper.toUpdate(product, productDTO);
