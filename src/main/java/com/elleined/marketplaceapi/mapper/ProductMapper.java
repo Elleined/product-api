@@ -25,8 +25,6 @@ public abstract class ProductMapper {
 
     @Mappings({
             @Mapping(target = "state", source = "product.state"),
-            @Mapping(target = "status", source = "product.status"),
-
             @Mapping(target = "sellerId", source = "product.seller.id"),
             @Mapping(target = "sellerName", source = "product.seller.userDetails.firstName"),
             @Mapping(target = "cropName", source = "product.crop.name"),

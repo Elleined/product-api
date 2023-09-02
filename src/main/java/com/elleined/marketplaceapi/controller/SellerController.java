@@ -47,7 +47,7 @@ public class SellerController {
 
     @GetMapping("/getAllProductByState")
     public List<ProductDTO> getAllProductByState(@PathVariable("currentUserId") int sellerId,
-                                                 @RequestParam("state") String state) {
+                                                 @RequestParam("productState") String state) {
         User seller = userService.getById(sellerId);
         if (seller.isPremiumAndNotExpired()) {
             return premiumSeller.getAllProductByState(seller, Product.State.valueOf(state)).stream()

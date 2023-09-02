@@ -35,7 +35,6 @@ public class ProductDTO {
     @NotBlank(message = "Keyword cannot be null, blank, or empty")
     private String keyword;
     private String state;
-    private String status;
 
     private int sellerId;
     private String sellerName;
