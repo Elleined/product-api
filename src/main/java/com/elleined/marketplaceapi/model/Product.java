@@ -106,6 +106,10 @@ public class Product {
     @Setter(AccessLevel.NONE)
     private List<CartItem> addedToCarts;
 
+    public boolean hasSoldOrder() {
+        return this.getOrders().stream().anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.SOLD);
+    }
+
 
     public enum State {
         PENDING,

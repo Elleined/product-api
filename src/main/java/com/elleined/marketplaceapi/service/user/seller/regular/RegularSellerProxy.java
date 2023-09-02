@@ -140,6 +140,8 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             NotVerifiedException,
             ProductAlreadySoldException,
             ResourceNotFoundException,
+            ProductHasAcceptedOrderException,
+            ProductHasPendingOrderException,
             SellerMaxAcceptedOrderException,
             SellerMaxPendingOrderException {
 

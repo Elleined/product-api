@@ -24,7 +24,9 @@ public interface SellerService {
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
-            ResourceNotFoundException;
+            ResourceNotFoundException,
+            ProductHasAcceptedOrderException,
+            ProductHasPendingOrderException;
 
     void deleteProduct(User seller, Product product)
             throws NotOwnedException,

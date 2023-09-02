@@ -63,8 +63,13 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
-            ResourceNotFoundException {
+            ResourceNotFoundException,
+            ProductHasAcceptedOrderException,
+            ProductHasPendingOrderException {
 
+        if (product.hasAcceptedOrder()) throw new ProductHasAcceptedOrderException("You cannot update this product with id of " + product.getId() + " because theres an accepted order...");
+        if (product.hasPendingOrder()) throw new ProductHasPendingOrderException("You cannot update this product with id of " + product.getId() + " because theres an pending order...");
+        if (product.hasSoldOrder()) throw new ProductAlreadySoldException("You cannot this product with id of " + product.getId() + " because theres an sold order!");
         if (!seller.isVerified()) throw new NotVerifiedException("Cannot update a product because user with id of " + seller.getId() + " are not yet been verified! Consider register shop first then get verified afterwards");
         if (!seller.hasProduct(product))  throw new NotOwnedException("Seller user with id of " + seller.getId() + " does not have product with id of " + product.getId());
         if (product.isSold()) throw new ProductAlreadySoldException("Cannot update this product with id of " + product.getId() + " because this product is already sold");
