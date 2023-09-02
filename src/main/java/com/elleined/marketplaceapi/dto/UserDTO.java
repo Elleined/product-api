@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.dto;
 
 import com.elleined.marketplaceapi.dto.address.AddressDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,9 @@ public class UserDTO {
     private String referralCode;
     private String validId;
     private String status;
+
+    @JsonProperty("isPremium")
+    private boolean isPremium;
 
     private String invitationReferralCode;
 

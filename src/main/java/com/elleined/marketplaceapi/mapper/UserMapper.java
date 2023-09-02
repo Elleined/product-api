@@ -41,6 +41,7 @@ public interface UserMapper {
             @Mapping(target = "userCredentialDTO", source = "userCredential"),
             @Mapping(target = "userDetailsDTO", expression = "java(toUserDetailsDTO(user.getUserDetails()))"),
             @Mapping(target = "userDetailsDTO.suffix", source = "userDetails.suffix"),
+            @Mapping(target = "isPremium", expression = "java(user.isPremium())")
     })
     UserDTO toDTO(User user);
 
