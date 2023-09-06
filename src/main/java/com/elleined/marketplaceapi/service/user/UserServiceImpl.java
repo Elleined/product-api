@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
-        // saveForumUser(registeringUser);
+        saveForumUser(registeringUser);
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
         return registeringUser;
     }
