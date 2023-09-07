@@ -23,6 +23,7 @@ import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, EntityPasswordEncoder<User> {
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
@@ -203,7 +204,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(User user, String newPassword, String retypeNewPassword) throws PasswordException {
+    public void changePassword(String email, String newPassword, String retypeNewPassword)
+            throws PasswordException,
+            ResourceNotFoundException {
+
+        User user = getByEmail(email);
+        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        userCredentialValidator.validatePassword(newPassword);
+
+        this.encodePassword(user, newPassword);
+        userRepository.save(user);
+        log.debug("User with id of {} successfully changed his/her password", user.getId());
+    }
+
+    @Override
+    public void changePassword(User user, String oldPassword, String newPassword, String retypeNewPassword) throws PasswordException {
+        String encodedPassword = user.getUserCredential().getPassword();
+        if (!passwordEncoder.matches(oldPassword, encodedPassword)) throw new PasswordNotMatchException("Old password didn't match to your current password!");
         if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
         userCredentialValidator.validatePassword(newPassword);
 

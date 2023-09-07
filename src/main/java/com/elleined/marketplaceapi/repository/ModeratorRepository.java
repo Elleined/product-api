@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ModeratorRepository extends JpaRepository<Moderator, Integer> {
 
@@ -13,5 +14,5 @@ public interface ModeratorRepository extends JpaRepository<Moderator, Integer> {
     List<String> fetchAllEmail();
 
     @Query("SELECT m FROM Moderator m WHERE m.moderatorCredential.email = :email")
-    Moderator fetchByEmail(@Param("email") String email);
+    Optional<Moderator> fetchByEmail(@Param("email") String email);
 }

@@ -30,7 +30,7 @@ public class UserController {
 
     private final EmailService emailService;
 
-    private final PasswordService<User> passwordService;
+    private final PasswordService passwordService;
     private final MessageService messageService;
 
     private final PremiumService premiumService;
@@ -130,14 +130,24 @@ public class UserController {
         return messageService.sendPublicMessage(message);
     }
 
-    @PatchMapping("/changePassword/{currentUserId}")
-    public APIResponse changePassword(@PathVariable("currentUserId") int currentUserId,
-                                      @RequestParam("newPassword") String newPassword,
-                                      @RequestParam("retypeNewPassword") String retypeNewPassword) {
+    @PatchMapping("/{currentUserId}/account/changePassword")
+    public APIResponse accountChangePassword(@PathVariable("currentUserId") int currentUserId,
+                                             @RequestParam("oldPassword") String oldPassword,
+                                             @RequestParam("newPassword") String newPassword,
+                                             @RequestParam("retypeNewPassword") String retypeNewPassword) {
 
         User currentUser = userService.getById(currentUserId);
-        passwordService.changePassword(currentUser, newPassword, retypeNewPassword);
+        passwordService.changePassword(currentUser, oldPassword, newPassword, retypeNewPassword);
         return new APIResponse(HttpStatus.OK, "User with id of {} successfully changed his/her password");
+    }
+
+    @PatchMapping("/{currentUserId}/forgot/changePassword")
+    public APIResponse forgotChangePassword(@RequestParam("email") String email,
+                                            @RequestParam("newPassword") String newPassword,
+                                            @RequestParam("retypeNewPassword") String retypeNewPassword) {
+
+        passwordService.changePassword(email, newPassword, retypeNewPassword);
+        return new APIResponse(HttpStatus.OK, "User with email of {} successfully changed his/her password");
     }
 
     @PatchMapping("/{currentUserId}/buyPremium")

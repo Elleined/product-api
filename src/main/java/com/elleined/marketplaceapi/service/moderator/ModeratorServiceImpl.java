@@ -1,6 +1,9 @@
 package com.elleined.marketplaceapi.service.moderator;
 
-import com.elleined.marketplaceapi.dto.*;
+import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ModeratorDTO;
+import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
@@ -24,6 +27,7 @@ import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
+import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
 import com.elleined.marketplaceapi.service.user.UserCredentialValidator;
 import com.elleined.marketplaceapi.service.user.UserService;
 import com.elleined.marketplaceapi.utils.StringUtil;
@@ -43,7 +47,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class ModeratorServiceImpl implements ModeratorService {
+public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEncoder<Moderator> {
 
     private final ModeratorRepository moderatorRepository;
     private final ModeratorMapper moderatorMapper;
@@ -223,10 +227,11 @@ public class ModeratorServiceImpl implements ModeratorService {
     public ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
         String email = moderatorCredentialDTO.getEmail();
         if (!moderatorRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Moderator with email of " + email + " does not exists!"));
 
-        Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail());
+        String rawPassword = moderatorCredentialDTO.getPassword();
         String encodedPassword = moderator.getModeratorCredential().getPassword();
-        if (!passwordEncoder.matches(moderatorCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
         log.debug("Moderator with id of {} are now logged in", moderator.getId());
         return moderatorMapper.toDTO(moderator);
     }
@@ -235,17 +240,5 @@ public class ModeratorServiceImpl implements ModeratorService {
     public void encodePassword(Moderator moderator, String rawPassword) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         moderator.getModeratorCredential().setPassword(encodedPassword);
-    }
-
-    @Override
-    public void changePassword(Moderator moderator, String newPassword, String retypeNewPassword)
-            throws PasswordException {
-
-        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
-        userCredentialValidator.validatePassword(newPassword);
-
-        this.encodePassword(moderator, newPassword);
-        moderatorRepository.save(moderator);
-        log.debug("User with id of {} successfully changed his/her password", moderator.getId());
     }
 }

@@ -18,7 +18,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.math.BigDecimal;
 import java.util.Set;
 
-public interface UserService extends PasswordService<User> {
+public interface UserService extends PasswordService {
     int REGISTRATION_LIMIT_PROMO = 500;
     BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
 

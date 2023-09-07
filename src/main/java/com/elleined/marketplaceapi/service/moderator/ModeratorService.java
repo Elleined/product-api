@@ -19,7 +19,7 @@ import com.elleined.marketplaceapi.service.user.PasswordService;
 import java.util.List;
 import java.util.Set;
 
-public interface ModeratorService extends PasswordService<Moderator> {
+public interface ModeratorService {
 
     // Premium users are priority
     // Users that are newly registered and not have shop registration will not be included
