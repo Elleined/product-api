@@ -16,7 +16,6 @@ import com.elleined.marketplaceapi.service.user.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -133,10 +132,11 @@ public class UserController {
 
     @PatchMapping("/changePassword/{currentUserId}")
     public APIResponse changePassword(@PathVariable("currentUserId") int currentUserId,
-                                      @RequestParam("newPassword") String newPassword) {
+                                      @RequestParam("newPassword") String newPassword,
+                                      @RequestParam("retypeNewPassword") String retypeNewPassword) {
 
         User currentUser = userService.getById(currentUserId);
-        passwordService.changePassword(currentUser, newPassword);
+        passwordService.changePassword(currentUser, newPassword, retypeNewPassword);
         return new APIResponse(HttpStatus.OK, "User with id of {} successfully changed his/her password");
     }
 

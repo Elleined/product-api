@@ -8,6 +8,7 @@ import com.elleined.marketplaceapi.dto.forum.ForumUserDTO;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
+import com.elleined.marketplaceapi.exception.field.password.PasswordException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
@@ -78,7 +79,10 @@ public class UserServiceImpl implements UserService {
         userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
         userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
         userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
-        userCredentialValidator.validatePassword(userDTO.getUserCredentialDTO());
+        String password = userDTO.getUserCredentialDTO().getPassword();
+        String confirmPassword = userDTO.getUserCredentialDTO().getConfirmPassword();
+        if (isTwoPasswordNotMatch(password, confirmPassword)) throw new PasswordNotMatchException("Password and confirm password not match!");
+        userCredentialValidator.validatePassword(password);
 
         User registeringUser = userMapper.toEntity(userDTO);
         this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
@@ -199,7 +203,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(User user, String newPassword) {
+    public void changePassword(User user, String newPassword, String retypeNewPassword) throws PasswordException {
+        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        userCredentialValidator.validatePassword(newPassword);
+
         this.encodePassword(user, newPassword);
         userRepository.save(user);
         log.debug("User with id of {} successfully changed his/her password", user.getId());

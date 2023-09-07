@@ -1,10 +1,9 @@
 package com.elleined.marketplaceapi.service.moderator;
 
-import com.elleined.marketplaceapi.dto.CredentialDTO;
-import com.elleined.marketplaceapi.dto.ModeratorDTO;
-import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.*;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
+import com.elleined.marketplaceapi.exception.field.password.PasswordException;
+import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
@@ -25,6 +24,7 @@ import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
+import com.elleined.marketplaceapi.service.user.UserCredentialValidator;
 import com.elleined.marketplaceapi.service.user.UserService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +53,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     private final PremiumRepository premiumRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final UserCredentialValidator userCredentialValidator;
     private final UserMapper userMapper;
 
     private final FeeService feeService;
@@ -237,7 +238,12 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void changePassword(Moderator moderator, String newPassword) {
+    public void changePassword(Moderator moderator, String newPassword, String retypeNewPassword)
+            throws PasswordException {
+
+        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        userCredentialValidator.validatePassword(newPassword);
+
         this.encodePassword(moderator, newPassword);
         moderatorRepository.save(moderator);
         log.debug("User with id of {} successfully changed his/her password", moderator.getId());
