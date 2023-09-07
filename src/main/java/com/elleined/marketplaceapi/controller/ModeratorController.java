@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,11 @@ public class ModeratorController {
     private final ProductService productService;
 
     @PostMapping("/login")
-    public ModeratorDTO login(@Valid @RequestBody CredentialDTO moderatorCredentialDTO) {
-         return moderatorService.login(moderatorCredentialDTO);
+    public ModeratorDTO login(@Valid @RequestBody CredentialDTO moderatorCredentialDTO,
+                              HttpSession session) {
+        ModeratorDTO moderatorDTO = moderatorService.login(moderatorCredentialDTO);
+        session.setAttribute("moderatorId", moderatorDTO.id());
+        return moderatorDTO;
     }
 
     @GetMapping("/getAllUnverifiedUser")
