@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.forum.ForumUserDTO;
+import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
@@ -98,7 +99,6 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     private void saveForumUser(User user) {
         ForumUserDTO forumUserDTO = ForumUserDTO.builder()
-                .id(user.getId())
                 .picture(user.getUserDetails().getPicture())
                 .name(user.getUserDetails().getFirstName())
                 .email(user.getUserCredential().getEmail())
@@ -110,6 +110,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public void resendValidId(User currentUser, String validId) throws UserAlreadyVerifiedException {
+        if (StringUtil.isNotValid(validId)) throw new FieldException("Please provide your new valid id in valid id input... Thanks!");
         if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! User with id of " + currentUser.getId() + " are already been verified");
         currentUser.getUserVerification().setValidId(validId);
         userRepository.save(currentUser);
