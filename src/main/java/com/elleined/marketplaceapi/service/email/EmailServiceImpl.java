@@ -84,9 +84,9 @@ public class EmailServiceImpl implements EmailService {
                 .plusExpirationSeconds(PLUS_EXPIRATION_IN_SECONDS)
                 .receiver(user.getUserCredential().getEmail())
                 .build();
-        // otpMessage = emailClient.sendOTPMail(otpMessage);
-        log.debug("Sending OTP for user with id of {} success {}", user.getId(), otpMessage);
-        return otpMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
+        OTPMessage receiveOTPMessage = emailClient.sendOTPMail(otpMessage);
+        log.debug("Sending OTP for user with id of {} success {}", user.getId(), receiveOTPMessage);
+        return receiveOTPMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
     }
 
     private String getFullName(User user) {
