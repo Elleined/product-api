@@ -141,7 +141,7 @@ public class UserController {
         return new APIResponse(HttpStatus.OK, "User with id of {} successfully changed his/her password");
     }
 
-    @PatchMapping("/{currentUserId}/forgot/changePassword")
+    @PatchMapping("/forgot/changePassword")
     public APIResponse forgotChangePassword(@RequestParam("email") String email,
                                             @RequestParam("newPassword") String newPassword,
                                             @RequestParam("retypeNewPassword") String retypeNewPassword) {
