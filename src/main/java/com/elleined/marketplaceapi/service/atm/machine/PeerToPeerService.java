@@ -7,7 +7,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
-import com.elleined.marketplaceapi.service.atm.fee.FeeService;
+import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @Transactional
 public class PeerToPeerService {
     private final UserRepository userRepository;
-    private final FeeService feeService;
+    private final ATMFeeService ATMFeeService;
     private final ATMValidator atmValidator;
     private final TransactionService transactionService;
     private final AppWalletService appWalletService;
@@ -39,8 +39,8 @@ public class PeerToPeerService {
         if (atmValidator.isValidAmount(sentAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(sender, sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
 
-        float p2pFee = feeService.getP2pFee(sentAmount);
-        BigDecimal finalSentAmount = feeService.deductP2pFee(sentAmount, p2pFee);
+        float p2pFee = ATMFeeService.getP2pFee(sentAmount);
+        BigDecimal finalSentAmount = ATMFeeService.deductP2pFee(sentAmount, p2pFee);
         BigDecimal senderOldBalance = sender.getBalance();
         BigDecimal receiverOldBalance = receiver.getBalance();
 
@@ -49,7 +49,7 @@ public class PeerToPeerService {
         appWalletService.addAndSaveBalance(p2pFee * 2);
         PeerToPeerTransaction peerToPeerTransaction = savePeerToPeerTransaction(sender, receiver, finalSentAmount);
 
-        log.debug("Sender with id of {} sent money amounting {} from {} because of p2p fee of {} which is the {}% of sent amount.", sender.getId(), finalSentAmount, sentAmount, p2pFee, FeeService.P2P_FEE_PERCENTAGE);
+        log.debug("Sender with id of {} sent money amounting {} from {} because of p2p fee of {} which is the {}% of sent amount.", sender.getId(), finalSentAmount, sentAmount, p2pFee, ATMFeeService.P2P_FEE_PERCENTAGE);
         log.debug("Sender with id of {} has now new balance of {} from {}.", sender.getId(), sender.getBalance(), senderOldBalance);
         log.debug("Receiver with id of {} has now new balance of {} from {}", receiver.getId(), receiver.getBalance(), receiverOldBalance);
         return peerToPeerTransaction;

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Slf4j
 @Transactional
 @Service
-public class FeeServiceImpl implements FeeService {
+public class ATMFeeServiceImpl implements ATMFeeService {
 
     @Override
     public float getWithdrawalFee(BigDecimal withdrawalAmount) {

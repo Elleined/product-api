@@ -5,7 +5,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
-import com.elleined.marketplaceapi.service.atm.fee.FeeService;
+import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class DepositService {
 
     private final TransactionService transactionService;
 
-    private final FeeService feeService;
+    private final ATMFeeService ATMFeeService;
 
     private final AppWalletService appWalletService;
 
@@ -39,15 +39,15 @@ public class DepositService {
         if (atmValidator.isValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
 
         BigDecimal oldBalance = currentUser.getBalance();
-        float depositFee = feeService.getDepositFee(depositedAmount);
-        BigDecimal finalDepositedAmount = feeService.deductDepositFee(depositedAmount, depositFee);
+        float depositFee = ATMFeeService.getDepositFee(depositedAmount);
+        BigDecimal finalDepositedAmount = ATMFeeService.deductDepositFee(depositedAmount, depositFee);
         currentUser.setBalance(oldBalance.add(finalDepositedAmount));
         userRepository.save(currentUser);
         appWalletService.addAndSaveBalance(depositFee);
 
         DepositTransaction depositTransaction = saveDepositTransaction(currentUser, finalDepositedAmount);
 
-        log.debug("User with id of {} deposited amounting {} from {} because of deposit fee of {} which is the {}% of the deposited amount and now has new balance of {} from {}", currentUser.getId(), finalDepositedAmount, depositedAmount, depositFee, FeeService.DEPOSIT_FEE_PERCENTAGE, currentUser.getBalance(), oldBalance);
+        log.debug("User with id of {} deposited amounting {} from {} because of deposit fee of {} which is the {}% of the deposited amount and now has new balance of {} from {}", currentUser.getId(), finalDepositedAmount, depositedAmount, depositFee, ATMFeeService.DEPOSIT_FEE_PERCENTAGE, currentUser.getBalance(), oldBalance);
         return depositTransaction;
     }
 
