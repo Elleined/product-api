@@ -1,9 +1,8 @@
 package com.elleined.marketplaceapi.service.fee;
 
-import com.elleined.marketplaceapi.model.AppWallet;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.AppWalletRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.service.AppWalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,24 +16,18 @@ import java.math.BigDecimal;
 @Transactional
 public class FeeServiceImpl implements FeeService {
     private final UserRepository userRepository;
-    private final AppWalletRepository appWalletRepository;
+    private final AppWalletService appWalletService;
     @Override
     public void deductListingFee(User seller, double listingFee) {
         BigDecimal fee = new BigDecimal(listingFee);
         BigDecimal oldSellerBalance = seller.getBalance();
         BigDecimal sellerNewBalance = seller.getBalance().subtract(fee);
         seller.setBalance(sellerNewBalance);
-
-        AppWallet appWallet = appWalletRepository.findById(1).orElseThrow();
-        BigDecimal oldAppWalletBalance = appWallet.getAppWalletBalance();
-        BigDecimal newAppWalletBalance = appWallet.getAppWalletBalance().add(fee);
-        appWallet.setAppWalletBalance(newAppWalletBalance);
-
+        
         userRepository.save(seller);
-        appWalletRepository.save(appWallet);
+        appWalletService.addAndSaveBalance(fee);
 
         log.debug("Seller with id of {} has now new balance of {} because listing fee is deducted which is {} from old balance of {}", seller.getId(), sellerNewBalance, fee, oldSellerBalance);
-        log.debug("App wallet has now new balance of {} from old balance of {} because listing fee is added which is {}", newAppWalletBalance, oldAppWalletBalance, fee);
     }
 
     @Override
@@ -43,15 +36,9 @@ public class FeeServiceImpl implements FeeService {
         user.setBalance(userOldBalance.subtract(new BigDecimal(PREMIUM_USER_FEE)));
         BigDecimal userNewBalance = user.getBalance();
         userRepository.save(user);
-
-        AppWallet appWallet = appWalletRepository.findById(1).orElseThrow();
-        BigDecimal oldAppWalletBalance = appWallet.getAppWalletBalance();
-        appWallet.setAppWalletBalance(oldAppWalletBalance.add(new BigDecimal(PREMIUM_USER_FEE)));
-        BigDecimal newAppWalletBalance = appWallet.getAppWalletBalance();
-        appWalletRepository.save(appWallet);
+        appWalletService.addAndSaveBalance(PREMIUM_USER_FEE);
 
         log.debug("User with id of {} buys premium account amounting {}. This amount is deducted to his/her account balance and now has new balance of {} from {}", user.getId(), PREMIUM_USER_FEE, userNewBalance, userOldBalance);
-        log.debug("Premium user fee has been added to app wallet and now has new balance of {} from {}", newAppWalletBalance, oldAppWalletBalance);
     }
 
     @Override
@@ -80,13 +67,7 @@ public class FeeServiceImpl implements FeeService {
         BigDecimal userOldBalance = seller.getBalance();
         seller.setBalance(userOldBalance.subtract(new BigDecimal(successfulTransactionFee)));
         userRepository.save(seller);
-
-        AppWallet appWallet = appWalletRepository.findById(1).orElseThrow();
-        BigDecimal appOldBalance = appWallet.getAppWalletBalance();
-        appWallet.setAppWalletBalance(appOldBalance.add(new BigDecimal(successfulTransactionFee)));
-        appWalletRepository.save(appWallet);
-
+        appWalletService.addAndSaveBalance(successfulTransactionFee);
         log.debug("Successful transaction fee of {} has been deducted to user with id of {} and now has new balance of {} from {}", successfulTransactionFee, seller.getId(), seller.getBalance(), userOldBalance);
-        log.debug("Successful transaction fee of {} has been added to app wallet and now has new balance of {} from {}", successfulTransactionFee, appWallet.getAppWalletBalance(), appOldBalance);
     }
 }

@@ -26,5 +26,4 @@ public interface ProductService {
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
 
     Set<Product> getAllById(Set<Integer> productsToBeListedId);
-
 }

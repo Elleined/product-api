@@ -5,6 +5,9 @@ import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.service.address.AddressService;
@@ -104,6 +107,22 @@ public class User {
     @OneToMany(mappedBy = "seller")
     @Setter(AccessLevel.NONE)
     private List<Product> products;
+
+    // sender id reference is in peer to peer transaction table
+    @OneToMany(mappedBy = "sender")
+    List<PeerToPeerTransaction> sentMoneyTransactions;
+
+    // recipient id reference is in peer to peer transaction table
+    @OneToMany(mappedBy = "receiver")
+    List<PeerToPeerTransaction> receiveMoneyTransactions;
+
+    // user id reference is in withdraw transaction table
+    @OneToMany(mappedBy = "user")
+    List<WithdrawTransaction> withdrawTransactions;
+
+    // user id reference is in withdraw transaction table
+    @OneToMany(mappedBy = "user")
+    List<DepositTransaction> depositTransactions;
 
     public void addInvitedUser(User invitedUser) {
         this.getReferredUsers().add(invitedUser);
