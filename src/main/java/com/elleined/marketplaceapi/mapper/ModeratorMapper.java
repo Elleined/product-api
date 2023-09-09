@@ -18,7 +18,8 @@ public interface ModeratorMapper {
             @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "listedProducts", expression = "java(new java.util.HashSet<>())"),
             @Mapping(target = "verifiedUsers", expression = "java(new java.util.HashSet<>())"),
-            @Mapping(target = "moderatorCredential", source = "moderatorCredentialDTO")
+            @Mapping(target = "moderatorCredential", source = "moderatorCredentialDTO"),
+            @Mapping(target = "rejectedProducts", expression = "java(new java.util.HashSet<>())")
     })
     Moderator toEntity(ModeratorDTO moderatorDTO);
 }

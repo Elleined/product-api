@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/machine/{currentUserId}")
+@RequestMapping("/users/{currentUserId}/atm")
 @RequiredArgsConstructor
 public class ATMController  {
     private final ATMService atmService;
@@ -43,7 +43,7 @@ public class ATMController  {
     }
 
 
-    @PostMapping("/peer-to-peer/{receiverId}")
+    @PostMapping("/send-money/{receiverId}")
     public PeerToPeerTransactionDTO peerToPeer(@PathVariable("currentUserId") int senderId,
                                                @RequestParam("amount") BigDecimal sentAmount,
                                                @PathVariable("receiverId") int receiverId) {

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/{currentUserId}/transactions")
+@RequestMapping("/users/{currentUserId}/atm-transactions")
 @RequiredArgsConstructor
 public class TransactionController {
     private final UserService userService;
