@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service.fee.atm;
+package com.elleined.marketplaceapi.service.atm.fee;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

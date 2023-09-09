@@ -23,7 +23,7 @@ public class FeeServiceImpl implements FeeService {
         BigDecimal oldSellerBalance = seller.getBalance();
         BigDecimal sellerNewBalance = seller.getBalance().subtract(fee);
         seller.setBalance(sellerNewBalance);
-        
+
         userRepository.save(seller);
         appWalletService.addAndSaveBalance(fee);
 
