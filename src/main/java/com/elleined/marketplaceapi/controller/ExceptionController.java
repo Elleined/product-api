@@ -67,7 +67,6 @@ public class ExceptionController {
         return new ResponseEntity<>(responseMessage, HttpStatus.BAD_REQUEST);
     }
 
-
     @ExceptionHandler({
             InvalidUserCredentialException.class,
             NotVerifiedException.class,

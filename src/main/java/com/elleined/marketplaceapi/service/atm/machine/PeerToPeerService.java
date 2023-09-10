@@ -9,7 +9,6 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,13 +29,13 @@ public class PeerToPeerService {
     private final TransactionService transactionService;
     private final AppWalletService appWalletService;
 
-    public PeerToPeerTransaction peerToPeer(User sender, User receiver, @NonNull BigDecimal sentAmount)
+    public PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount)
             throws SendingToHimselfException,
             InsufficientFundException,
             NotValidAmountException {
 
         if (atmValidator.isSenderSendingToHimself(sender, receiver)) throw new SendingToHimselfException("You cannot send to yourself");
-        if (atmValidator.isValidAmount(sentAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
+        if (atmValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(sender, sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
 
         float p2pFee = ATMFeeService.getP2pFee(sentAmount);

@@ -34,11 +34,11 @@ public class WithdrawService {
     private final AppWalletService appWalletService;
 
 
-    public WithdrawTransaction withdraw(User currentUser, @NonNull BigDecimal withdrawalAmount)
+    public WithdrawTransaction withdraw(User currentUser, BigDecimal withdrawalAmount)
             throws InsufficientFundException,
             NotValidAmountException {
 
-        if (atmValidator.isValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
+        if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(currentUser, withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
 
         BigDecimal oldBalance = currentUser.getBalance();

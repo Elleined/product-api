@@ -33,10 +33,10 @@ public class DepositService {
     private final AppWalletService appWalletService;
 
 
-    public DepositTransaction deposit(User currentUser, @NonNull BigDecimal depositedAmount)
+    public DepositTransaction deposit(User currentUser, BigDecimal depositedAmount)
             throws NotValidAmountException {
 
-        if (atmValidator.isValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
+        if (atmValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
 
         BigDecimal oldBalance = currentUser.getBalance();
         float depositFee = ATMFeeService.getDepositFee(depositedAmount);

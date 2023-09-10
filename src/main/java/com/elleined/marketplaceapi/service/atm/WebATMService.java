@@ -31,19 +31,19 @@ public class WebATMService implements ATMService {
     private final PeerToPeerService peerToPeerService;
 
     @Override
-    public DepositTransaction deposit(User currentUser, @NonNull  BigDecimal depositedAmount)
+    public DepositTransaction deposit(User currentUser, BigDecimal depositedAmount)
             throws NotValidAmountException {
         return depositService.deposit(currentUser, depositedAmount);
     }
 
     @Override
-    public WithdrawTransaction withdraw(User currentUser, @NonNull  BigDecimal withdrawnAmount)
+    public WithdrawTransaction withdraw(User currentUser, BigDecimal withdrawnAmount)
             throws InsufficientFundException, NotValidAmountException {
         return withdrawService.withdraw(currentUser, withdrawnAmount);
     }
 
     @Override
-    public PeerToPeerTransaction peerToPeer(User sender, User receiver, @NonNull  BigDecimal sentAmount)
+    public PeerToPeerTransaction peerToPeer(User sender, User receiver,  BigDecimal sentAmount)
             throws SendingToHimselfException, InsufficientFundException, NotValidAmountException {
         return peerToPeerService.peerToPeer(sender, receiver, sentAmount);
     }

@@ -7,19 +7,18 @@ import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
-import org.springframework.lang.NonNull;
 
 import java.math.BigDecimal;
 
 public interface ATMService {
-    DepositTransaction deposit(User currentUser, @NonNull BigDecimal depositedAmount)
+    DepositTransaction deposit(User currentUser, BigDecimal depositedAmount)
             throws NotValidAmountException;
 
-    WithdrawTransaction withdraw(User currentUser, @NonNull BigDecimal withdrawnAmount)
+    WithdrawTransaction withdraw(User currentUser, BigDecimal withdrawnAmount)
             throws InsufficientFundException,
             NotValidAmountException;
 
-    PeerToPeerTransaction peerToPeer(User sender, User receiver, @NonNull BigDecimal sentAmount)
+    PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount)
             throws SendingToHimselfException,
             InsufficientFundException,
             NotValidAmountException;

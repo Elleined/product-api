@@ -12,8 +12,8 @@ public class ATMValidator {
         return sender.getBalance().compareTo(amountToBeSent) < 0;
     }
 
-    public boolean isValidAmount(BigDecimal amount) {
-        return amount.compareTo(BigDecimal.ZERO) <= 0;
+    public boolean isNotValidAmount(BigDecimal amount) {
+        return amount == null || amount.compareTo(BigDecimal.ZERO) <= 0;
     }
 
     public boolean isSenderSendingToHimself(User sender, User receiver) {
