@@ -18,7 +18,7 @@ public class UserVerification {
     @Column(name = "status", nullable = false)
     private Status status;
 
-    @Column(name = "valid_id", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "valid_id")
     private String validId;
 
     public enum Status {

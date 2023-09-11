@@ -29,8 +29,7 @@ public class Shop {
 
     @Column(
             name = "picture",
-            nullable = false,
-            columnDefinition = "MEDIUMTEXT"
+            nullable = false
     )
     private String picture;
 
