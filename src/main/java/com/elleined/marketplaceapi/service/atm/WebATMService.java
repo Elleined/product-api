@@ -3,6 +3,7 @@ package com.elleined.marketplaceapi.service.atm;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
+import com.elleined.marketplaceapi.exception.atm.limit.LimitException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
@@ -31,20 +32,20 @@ public class WebATMService implements ATMService {
     private final PeerToPeerService peerToPeerService;
 
     @Override
-    public DepositTransaction deposit(User currentUser, BigDecimal depositedAmount)
-            throws NotValidAmountException {
+    public DepositTransaction deposit(User currentUser, @NonNull  BigDecimal depositedAmount)
+            throws NotValidAmountException, LimitException {
         return depositService.deposit(currentUser, depositedAmount);
     }
 
     @Override
-    public WithdrawTransaction withdraw(User currentUser, BigDecimal withdrawnAmount)
-            throws InsufficientFundException, NotValidAmountException {
+    public WithdrawTransaction withdraw(User currentUser, @NonNull  BigDecimal withdrawnAmount)
+            throws InsufficientFundException, NotValidAmountException, LimitException {
         return withdrawService.withdraw(currentUser, withdrawnAmount);
     }
 
     @Override
-    public PeerToPeerTransaction peerToPeer(User sender, User receiver,  BigDecimal sentAmount)
-            throws SendingToHimselfException, InsufficientFundException, NotValidAmountException {
+    public PeerToPeerTransaction peerToPeer(User sender, User receiver, @NonNull  BigDecimal sentAmount)
+            throws SendingToHimselfException, InsufficientFundException, NotValidAmountException, LimitException {
         return peerToPeerService.peerToPeer(sender, receiver, sentAmount);
     }
 }
