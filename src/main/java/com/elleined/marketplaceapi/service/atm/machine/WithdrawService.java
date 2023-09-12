@@ -91,7 +91,7 @@ public class WithdrawService {
         BigDecimal totalWithdrawAmount = withdrawTransactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal::add)
-                .orElseThrow();
+                .orElseGet(() -> new BigDecimal(0));
         int comparisonResult = totalWithdrawAmount.compareTo(new BigDecimal(WITHDRAWAL_LIMIT_PER_DAY));
         return comparisonResult >= 0;
     }

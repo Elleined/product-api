@@ -49,7 +49,7 @@ public class PeerToPeerService {
         if (atmValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(sender, sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
         if (isSentAmountAboveLimit(sentAmount)) throw new LimitException("You cannot send money that is greater than sent amount limit which is " + PEER_TO_PEER_LIMIT_PER_DAY);
-        if (isUserReachedDepositLimitPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot sent money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
+        if (isSenderReachedSentLimitPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot sent money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
 
         float p2pFee = feeService.getP2pFee(sentAmount);
         BigDecimal finalSentAmount = feeService.deductP2pFee(sentAmount, p2pFee);
@@ -58,7 +58,7 @@ public class PeerToPeerService {
 
         updateSenderBalance(sender, sentAmount);
         updateRecipientBalance(receiver, finalSentAmount);
-        appWalletService.addAndSaveBalance(p2pFee * 2);
+        appWalletService.addAndSaveBalance(p2pFee);
         PeerToPeerTransaction peerToPeerTransaction = savePeerToPeerTransaction(sender, receiver, sentAmount);
 
         log.debug("Sender with id of {} sent money amounting {} from {} because of p2p fee of {} which is the {}% of sent amount.", sender.getId(), finalSentAmount, sentAmount, p2pFee, ATMFeeService.P2P_FEE_PERCENTAGE);
@@ -98,17 +98,17 @@ public class PeerToPeerService {
     public boolean isSentAmountAboveLimit(BigDecimal sentAmount) {
         return sentAmount.compareTo(new BigDecimal(PEER_TO_PEER_LIMIT_PER_DAY)) > 0;
     }
-    public boolean isUserReachedDepositLimitPerDay(User currentUser) {
+    public boolean isSenderReachedSentLimitPerDay(User currentUser) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
-        List<PeerToPeerTransaction> userPeerToPeerTransactions = currentUser.getSentMoneyTransactions();
-        List<PeerToPeerTransaction>  peerToPeerTransactions =
-                TransactionUtils.getTransactionsByDateRange(userPeerToPeerTransactions, currentDateTimeMidnight, tomorrowMidnight);
+        List<PeerToPeerTransaction> userSentMoneyTransactions = currentUser.getSentMoneyTransactions();
+        List<PeerToPeerTransaction>  sentMoneyTransactions =
+                TransactionUtils.getTransactionsByDateRange(userSentMoneyTransactions, currentDateTimeMidnight, tomorrowMidnight);
 
-        BigDecimal totalSentAmount = peerToPeerTransactions.stream()
+        BigDecimal totalSentAmount = sentMoneyTransactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal::add)
-                .orElseThrow();
+                .orElseGet(() -> new BigDecimal(0));
         int comparisonResult = totalSentAmount.compareTo(new BigDecimal(PEER_TO_PEER_LIMIT_PER_DAY));
         return comparisonResult >= 0;
     }
