@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.APIResponse;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
+import com.elleined.marketplaceapi.exception.atm.limit.LimitException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordException;
 import com.elleined.marketplaceapi.exception.order.OrderException;
@@ -60,7 +61,8 @@ public class ExceptionController {
             // ATM Exceptions
             NotValidAmountException.class,
             InsufficientFundException.class,
-            SendingToHimselfException.class
+            SendingToHimselfException.class,
+            LimitException.class
     })
     public ResponseEntity<APIResponse> handleBadRequestExceptions(RuntimeException ex) {
         var responseMessage = new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
