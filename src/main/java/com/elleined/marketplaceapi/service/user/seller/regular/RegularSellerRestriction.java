@@ -18,4 +18,6 @@ public interface RegularSellerRestriction {
     boolean isExceedsToMaxAcceptedOrder(User seller);
 
     boolean isExceedsToMaxPendingOrder(User seller);
+
+
 }

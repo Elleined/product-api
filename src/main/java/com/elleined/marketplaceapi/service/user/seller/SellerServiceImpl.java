@@ -36,7 +36,7 @@ import java.util.List;
 @Qualifier("sellerServiceImpl")
 public class SellerServiceImpl implements SellerService, SellerOrderChecker {
 
-    private static final int DAY_RANGE = 7;
+    private static final int DAY_RANGE = 14;
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;

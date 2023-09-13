@@ -103,6 +103,7 @@ public class ProductServiceImpl implements ProductService {
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == Product.State.PENDING)
                 .forEach(product -> {
+                    product.setStatus(Product.Status.INACTIVE);
                     product.setState(Product.State.EXPIRED);
                     updatePendingAndAcceptedOrderStatus(product.getOrders());
                 });
@@ -112,6 +113,7 @@ public class ProductServiceImpl implements ProductService {
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == Product.State.LISTING)
                 .forEach(product -> {
+                    product.setStatus(Product.Status.INACTIVE);
                     product.setState(Product.State.EXPIRED);
                     updatePendingAndAcceptedOrderStatus(product.getOrders());
                 });
