@@ -1,9 +1,6 @@
 package com.elleined.marketplaceapi.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,8 +44,13 @@ public class ProductDTO {
 
     @NotNull(message = "Harvest date cannot null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @PastOrPresent(message = "Cannot sell an item that are not have been harvested yet")
+    @PastOrPresent(message = "Cannot sell an product that are not have been harvested yet")
     private LocalDate harvestDate;
+
+    @NotNull(message = "Expiration date cannot null")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @FutureOrPresent(message = "Please provide expiration date")
+    private LocalDate expirationDate;
 
     private LocalDate listingDate;
 

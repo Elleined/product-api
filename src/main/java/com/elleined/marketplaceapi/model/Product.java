@@ -40,6 +40,9 @@ public class Product {
     @Column(name = "date_of_harvest", nullable = false)
     private LocalDate harvestDate;
 
+    @Column(name = "date_of_expiration", nullable = false)
+    private LocalDate expirationDate;
+
     @Column(
             name = "date_of_listing",
             nullable = false,
