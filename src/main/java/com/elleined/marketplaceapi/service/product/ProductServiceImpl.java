@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.product;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -88,5 +90,51 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Set<Product> getAllById(Set<Integer> productsToBeListedId) {
         return productRepository.findAllById(productsToBeListedId).stream().collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
+    public void deleteExpiredProducts() {
+        List<Product> expiredProducts = productRepository.findAll().stream()
+                .filter(Product::isExpired)
+                .toList();
+
+        // Pending products
+        expiredProducts.stream()
+                .filter(product -> product.getState() == Product.State.PENDING)
+                .forEach(product -> {
+                    product.setState(Product.State.EXPIRED);
+                    updatePendingAndAcceptedOrderStatus(product.getOrders());
+                });
+
+        // Listing products
+        expiredProducts.stream()
+                .filter(product -> product.getState() == Product.State.LISTING)
+                .forEach(product -> {
+                    product.setState(Product.State.EXPIRED);
+                    updatePendingAndAcceptedOrderStatus(product.getOrders());
+                });
+        productRepository.saveAll(expiredProducts);
+    }
+
+    private void updatePendingAndAcceptedOrderStatus(List<OrderItem> orderItems) {
+        List<OrderItem> pendingOrders = orderItems.stream()
+                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
+                .toList();
+
+        List<OrderItem> acceptedOrders = orderItems.stream()
+                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
+                .toList();
+
+        pendingOrders.forEach(orderItem -> {
+            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
+        acceptedOrders.forEach(orderItem -> {
+            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
+
+        log.debug("Pending order items with ids {} are set to {}", pendingOrders.stream().map(OrderItem::getId).toList(), OrderItem.OrderItemStatus.CANCELLED);
+        log.debug("Accepted order items with ids {} are set to {}", acceptedOrders.stream().map(OrderItem::getId).toList(), OrderItem.OrderItemStatus.CANCELLED);
     }
 }
