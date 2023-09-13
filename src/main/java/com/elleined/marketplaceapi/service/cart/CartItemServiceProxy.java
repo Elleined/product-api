@@ -2,10 +2,7 @@ package com.elleined.marketplaceapi.service.cart;
 
 import com.elleined.marketplaceapi.dto.item.CartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
-import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
-import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductNotListedException;
+import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -68,9 +65,11 @@ public class CartItemServiceProxy implements CartItemService {
             ProductAlreadySoldException,
             ProductNotListedException,
             OrderQuantiantyExceedsException,
+            ProductExpiredException,
             BuyerAlreadyRejectedException {
         Product product = productService.getById(cartItemDTO.getProductId());
 
+        if (product.isExpired()) throw new ProductExpiredException("Cannot add to cart because this product is already expired!");
         if (currentUser.isProductAlreadyInCart(product)) throw new AlreadyExistException("Cannot add to cart this product! Because user with id of " + currentUser.getId() + " has already a product with id of " + product.getId() + " in his cart");
         if (buyerOrderChecker.isBuyerHasPendingOrderToProduct(currentUser, product)) throw new ProductHasPendingOrderException("User with id of " + currentUser.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
         if (buyerOrderChecker.isBuyerHasAcceptedOrderToProduct(currentUser, product)) throw new ProductHasAcceptedOrderException("User with id of " + currentUser.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
@@ -95,10 +94,12 @@ public class CartItemServiceProxy implements CartItemService {
             ProductAlreadySoldException,
             ProductNotListedException,
             OrderQuantiantyExceedsException,
+            ProductExpiredException,
             BuyerAlreadyRejectedException {
 
         Product product = cartItem.getProduct();
 
+        if (product.isExpired()) throw new ProductExpiredException("Cannot order! because this product is already expired!");
         if (buyerOrderChecker.isBuyerHasPendingOrderToProduct(currentUser, product)) throw new ProductHasPendingOrderException("User with id of " + currentUser.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
         if (buyerOrderChecker.isBuyerHasAcceptedOrderToProduct(currentUser, product)) throw new ProductHasAcceptedOrderException("User with id of " + currentUser.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
         if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");

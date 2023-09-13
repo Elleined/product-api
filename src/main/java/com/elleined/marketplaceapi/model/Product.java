@@ -108,16 +108,12 @@ public class Product {
     @Setter(AccessLevel.NONE)
     private List<CartItem> addedToCarts;
 
-    public boolean hasSoldOrder() {
-        return this.getOrders().stream().anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.SOLD);
-    }
-
-
     public enum State {
         PENDING,
         LISTING,
         SOLD,
-        REJECTED
+        REJECTED,
+        EXPIRED
     }
 
     public enum Status {
@@ -125,6 +121,13 @@ public class Product {
         INACTIVE
     }
 
+    public boolean hasSoldOrder() {
+        return this.getOrders().stream().anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.SOLD);
+    }
+
+    public boolean isExpired() {
+        return this.state == State.EXPIRED;
+    }
     public boolean isListed() {
         return this.getState() == State.LISTING;
     }

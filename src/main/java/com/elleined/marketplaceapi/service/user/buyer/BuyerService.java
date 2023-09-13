@@ -25,7 +25,8 @@ public interface BuyerService {
             ProductAlreadySoldException,
             ProductNotListedException,
             OrderQuantiantyExceedsException,
-            BuyerAlreadyRejectedException;
+            BuyerAlreadyRejectedException,
+            ProductExpiredException;
 
     // Use this to see the currentUser product orders status
     List<OrderItem> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus);

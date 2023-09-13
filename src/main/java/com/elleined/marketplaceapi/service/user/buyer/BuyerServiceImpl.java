@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.exception.product.ProductExpiredException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
@@ -46,9 +47,11 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
             ProductAlreadySoldException,
             ProductNotListedException,
             OrderQuantiantyExceedsException,
-            BuyerAlreadyRejectedException {
+            BuyerAlreadyRejectedException,
+            ProductExpiredException {
 
         Product product = productService.getById(orderItemDTO.getProductId());
+        if (product.isExpired()) throw new ProductExpiredException("Cannot order! Because this product is already expired!");
         if (product.isRejected()) throw new ProductRejectedException("You cannot order a product with id of " + product.getId() + "  because this product is rejected by moderator!");
         if (isBuyerHasPendingOrderToProduct(buyer, product)) throw new ProductHasPendingOrderException("User with id of " + buyer.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
         if (isBuyerHasAcceptedOrderToProduct(buyer, product)) throw new ProductHasAcceptedOrderException("User with id of " + buyer.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");

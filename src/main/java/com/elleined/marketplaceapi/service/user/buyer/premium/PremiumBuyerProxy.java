@@ -39,7 +39,8 @@ public class PremiumBuyerProxy implements BuyerService {
             ProductAlreadySoldException,
             ProductNotListedException,
             OrderQuantiantyExceedsException,
-            BuyerAlreadyRejectedException {
+            BuyerAlreadyRejectedException,
+            ProductExpiredException {
 
         // add validation here for premium user for future
         return buyerService.orderProduct(buyer, orderItemDTO);
