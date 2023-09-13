@@ -2,10 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
-import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
-import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductRejectedException;
+import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
@@ -40,6 +37,8 @@ import java.util.List;
 @Qualifier("sellerServiceImpl")
 public class SellerServiceImpl implements SellerService, SellerOrderChecker {
 
+    private static final int DAY_RANGE = 7;
+
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
@@ -50,6 +49,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
 
     @Override
     public Product saveProduct(ProductDTO productDTO, User seller) throws NotVerifiedException {
+        if (isNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE)) throw new ProductException("Cannot save a product that expiration date are not in within " + DAY_RANGE + " after the harvest date");
         if (!seller.isVerified()) throw new NotVerifiedException("Cannot update a product because user with id of " + seller.getId() + " are not yet been verified! Consider register shop first then get verified afterwards");
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
@@ -235,5 +235,11 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
 
         log.debug("Pending order items with ids {} are set to {}", pendingOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
         log.debug("Accepted order items with ids {} are set to {}", acceptedOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
+    }
+
+    public boolean isNotInRange(LocalDate harvestDate, LocalDate expirationDate, int rangeInDays) {
+        LocalDate dateRange = harvestDate.plusDays(rangeInDays);
+
+        return expirationDate.isAfter(dateRange) || expirationDate.isBefore(harvestDate);
     }
 }

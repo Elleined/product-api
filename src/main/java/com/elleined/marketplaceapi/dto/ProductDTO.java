@@ -49,7 +49,7 @@ public class ProductDTO {
 
     @NotNull(message = "Expiration date cannot null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @FutureOrPresent(message = "Please provide expiration date")
+
     private LocalDate expirationDate;
 
     private LocalDate listingDate;
