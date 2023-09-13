@@ -1,9 +1,9 @@
 package com.elleined.marketplaceapi.service.otp;
 
 import com.elleined.marketplaceapi.dto.email.OTPMessage;
-import com.elleined.marketplaceapi.exception.otp.OTPNotExpiredException;
 import com.elleined.marketplaceapi.exception.otp.OTPExpiredException;
 import com.elleined.marketplaceapi.exception.otp.OTPMismatchException;
+import com.elleined.marketplaceapi.exception.otp.OTPNotExpiredException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 
 public interface OTPService {

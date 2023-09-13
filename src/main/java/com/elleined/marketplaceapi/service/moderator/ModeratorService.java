@@ -14,7 +14,6 @@ import com.elleined.marketplaceapi.exception.user.UserVerificationRejectionExcep
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.user.PasswordService;
 
 import java.util.List;
 import java.util.Set;

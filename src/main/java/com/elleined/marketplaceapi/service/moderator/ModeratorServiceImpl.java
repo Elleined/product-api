@@ -5,8 +5,6 @@ import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
-import com.elleined.marketplaceapi.exception.field.password.PasswordException;
-import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
