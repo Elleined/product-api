@@ -126,8 +126,9 @@ public class Product {
     }
 
     public boolean isExpired() {
-        return this.state == State.EXPIRED;
+        return LocalDate.now().isAfter(expirationDate) || this.state == State.EXPIRED;
     }
+
     public boolean isListed() {
         return this.getState() == State.LISTING;
     }

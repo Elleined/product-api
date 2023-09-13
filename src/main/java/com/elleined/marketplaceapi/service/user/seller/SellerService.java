@@ -18,7 +18,8 @@ import java.util.List;
 
 public interface SellerService {
 
-    Product saveProduct(ProductDTO productDTO, User seller) throws NotVerifiedException;
+    Product saveProduct(ProductDTO productDTO, User seller)
+            throws NotVerifiedException;
 
     void updateProduct(User seller, Product product, ProductDTO productDTO)
             throws NotOwnedException,
