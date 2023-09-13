@@ -100,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Pending products
         expiredProducts.stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == Product.State.PENDING)
                 .forEach(product -> {
                     product.setState(Product.State.EXPIRED);
@@ -108,6 +109,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Listing products
         expiredProducts.stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == Product.State.LISTING)
                 .forEach(product -> {
                     product.setState(Product.State.EXPIRED);
