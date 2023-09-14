@@ -156,12 +156,4 @@ public class Product {
     public boolean isExceedingToAvailableQuantity(int userOrderQuantity) {
         return userOrderQuantity > this.getAvailableQuantity();
     }
-
-    public boolean isCriticalFieldsChanged(ProductDTO productDTO) {
-        return this.getPricePerUnit() != productDTO.getPricePerUnit() ||
-                this.getAvailableQuantity() != productDTO.getAvailableQuantity() ||
-                this.getQuantityPerUnit() != productDTO.getQuantityPerUnit() ||
-                this.getCrop().getName().equalsIgnoreCase(productDTO.getCropName()) ||
-                this.getUnit().getName().equalsIgnoreCase(productDTO.getUnitName());
-    }
 }
