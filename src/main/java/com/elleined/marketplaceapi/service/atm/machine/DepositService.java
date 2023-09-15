@@ -70,6 +70,7 @@ public class DepositService {
                 .trn(trn)
                 .amount(depositedAmount)
                 .transactionDate(LocalDateTime.now())
+                .status(Transaction.Status.PENDING)
                 .user(user)
                 .build();
 

@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tbl_deposit_transaction")
+@Table(name = "tbl_transaction_deposit")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -30,8 +30,8 @@ public class DepositTransaction extends Transaction {
     private User user;
 
     @Builder
-    public DepositTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, User user) {
-        super(id, trn, amount, transactionDate);
+    public DepositTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Transaction.Status status, User user) {
+        super(id, trn, amount, transactionDate, status);
         this.user = user;
     }
 }

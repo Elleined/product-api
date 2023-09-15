@@ -84,6 +84,7 @@ public class PeerToPeerService {
                 .trn(trn)
                 .amount(sentAmount)
                 .transactionDate(LocalDateTime.now())
+                .status(Transaction.Status.RELEASE)
                 .sender(sender)
                 .receiver(receiver)
                 .build();

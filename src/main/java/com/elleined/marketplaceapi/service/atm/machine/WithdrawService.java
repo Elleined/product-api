@@ -73,6 +73,7 @@ public class WithdrawService {
                 .trn(trn)
                 .amount(withdrawalAmount)
                 .transactionDate(LocalDateTime.now())
+                .status(Transaction.Status.PENDING)
                 .user(user)
                 .build();
 

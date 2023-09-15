@@ -56,4 +56,13 @@ public abstract class Transaction {
             nullable = false
     )
     private LocalDateTime transactionDate;
+
+    @Column(name = "status")
+    private Status status;
+
+    public enum Status {
+        RELEASE,
+        PENDING,
+        REJECTED
+    }
 }

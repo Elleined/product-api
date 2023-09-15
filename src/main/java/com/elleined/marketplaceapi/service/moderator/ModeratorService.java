@@ -21,14 +21,11 @@ import java.util.Set;
 public interface ModeratorService {
 
     // Premium users are priority
-    // Users that are newly registered and not have shop registration will not be included
     List<UserDTO> getAllUnverifiedUser();
-
 
     // Premium users are priority
     List<ProductDTO> getAllPendingProduct();
 
-    // Send email
     void verifyUser(Moderator moderator, User userToBeVerified)
             throws NoShopRegistrationException,
             UserAlreadyVerifiedException,
@@ -36,12 +33,11 @@ public interface ModeratorService {
 
     void verifyAllUser(Moderator moderator, Set<User> usersToBeVerified) throws NoShopRegistrationException;
 
-    // Send email to seller
     void listProduct(Moderator moderator, Product productToBeListed);
 
     void listAllProduct(Moderator moderator, Set<Product> productsToBeListed);
 
-    // set the valid id to make user rejected
+    // set the valid id to null make user rejected
     void rejectUser(User userToBeRejected, String reason)
             throws UserAlreadyVerifiedException,
             NotValidBodyException;
