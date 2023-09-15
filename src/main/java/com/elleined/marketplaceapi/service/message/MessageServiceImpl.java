@@ -32,7 +32,7 @@ public class MessageServiceImpl implements MessageService {
     public PrivateMessage sendPrivateMessage(int recipientId, String message)
             throws NoLoggedInUserException, NotValidBodyException, ResourceNotFoundException {
 
-        if (!userService.existsById(recipientId)) throw new ResourceNotFoundException("Recipient with id of " + recipientId +  " does not exists!");
+        if (!userService.existsById(recipientId)) throw new ResourceNotFoundException("Recipient does not exists!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Body cannot be null, empty, or blank");
 
         // alias for currentUser

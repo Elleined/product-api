@@ -26,7 +26,6 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
-import com.elleined.marketplaceapi.service.user.UserCredentialValidator;
 import com.elleined.marketplaceapi.service.user.UserService;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +54,6 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     private final PremiumRepository premiumRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final UserCredentialValidator userCredentialValidator;
     private final UserMapper userMapper;
 
     private final FeeService feeService;
@@ -128,9 +126,12 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
             UserVerificationRejectionException,
             UserAlreadyVerifiedException {
 
-        if (userToBeVerified.isVerified()) throw new UserAlreadyVerifiedException("This user is already been verified");
-        if (!userToBeVerified.hasShopRegistration()) throw new NoShopRegistrationException("User with id of " + userToBeVerified.getId() + " doesn't have pending shop registration! must send a shop registration first!");
-        if (userToBeVerified.hasShopRegistration() && userToBeVerified.isRejected()) throw new UserVerificationRejectionException("You're verification are been rejected by moderator try re-sending you're valid id and check email for reason why you're verification application are rejected... Thanks");
+        if (userToBeVerified.isVerified())
+            throw new UserAlreadyVerifiedException("This user is already been verified");
+        if (!userToBeVerified.hasShopRegistration())
+            throw new NoShopRegistrationException("This user doesn't have pending shop registration! must send a shop registration first!");
+        if (userToBeVerified.hasShopRegistration() && userToBeVerified.isRejected())
+            throw new UserVerificationRejectionException("You're verification are been rejected by moderator try re-sending you're valid id and check email for reason why you're verification application are rejected... Thanks");
 
         if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
         User invitingUser = userService.getInvitingUser(userToBeVerified);
@@ -179,8 +180,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     public void rejectUser(User userToBeRejected, String reason)
             throws UserAlreadyVerifiedException,
             NotValidBodyException {
-        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you rejecting this user... Thanks");
-        if (userToBeRejected.isVerified()) throw new UserAlreadyVerifiedException("Rejection failed! because user with id of " + userToBeRejected.getId() + " verification that are already been verified!");
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you rejecting this user...");
+        if (userToBeRejected.isVerified()) throw new UserAlreadyVerifiedException("Rejection failed! because this user verification request are already been verified!");
 
         userToBeRejected.getUserVerification().setStatus(UserVerification.Status.NOT_VERIFIED);
         userToBeRejected.getUserVerification().setValidId(null);
@@ -195,8 +196,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
             throws ProductAlreadyListedException,
             NotValidBodyException {
 
-        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting this product... Thanks");
-        if (productToBeRejected.isListed()) throw new ProductAlreadyListedException("Rejection failed! because product with id of " + productToBeRejected.getId() + " already been listed");
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting this product...");
+        if (productToBeRejected.isListed()) throw new ProductAlreadyListedException("Rejection failed! because this product already been listed");
         productToBeRejected.setState(Product.State.REJECTED);
         moderator.addRejectedProduct(productToBeRejected);
 
@@ -209,7 +210,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
     @Override
     public Moderator getById(int moderatorId) throws ResourceNotFoundException {
-        return moderatorRepository.findById(moderatorId).orElseThrow(() -> new ResourceNotFoundException("Moderator with id of " + moderatorId + " does not exists!"));
+        return moderatorRepository.findById(moderatorId).orElseThrow(() -> new ResourceNotFoundException("Moderator does not exists!"));
     }
 
     @Override
@@ -225,7 +226,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     public ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
         String email = moderatorCredentialDTO.getEmail();
         if (!moderatorRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
-        Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Moderator with email of " + email + " does not exists!"));
+        Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Moderator does not exists!"));
 
         String rawPassword = moderatorCredentialDTO.getPassword();
         String encodedPassword = moderator.getModeratorCredential().getPassword();
