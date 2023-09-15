@@ -69,16 +69,26 @@ public class CartItemServiceProxy implements CartItemService {
             BuyerAlreadyRejectedException {
         Product product = productService.getById(cartItemDTO.getProductId());
 
-        if (product.isExpired()) throw new ProductExpiredException("Cannot add to cart because this product is already expired!");
-        if (currentUser.isProductAlreadyInCart(product)) throw new AlreadyExistException("Cannot add to cart this product! Because user with id of " + currentUser.getId() + " has already a product with id of " + product.getId() + " in his cart");
-        if (buyerOrderChecker.isBuyerHasPendingOrderToProduct(currentUser, product)) throw new ProductHasPendingOrderException("User with id of " + currentUser.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
-        if (buyerOrderChecker.isBuyerHasAcceptedOrderToProduct(currentUser, product)) throw new ProductHasAcceptedOrderException("User with id of " + currentUser.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
-        if (currentUser.hasProduct(product)) throw new ResourceOwnedException("You cannot order your own product listing!");
-        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
-        if (product.isSold()) throw new ProductAlreadySoldException("Product with id of " + product.getId() + " are already been sold!");
-        if (!product.isListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
-        if (product.isExceedingToAvailableQuantity(cartItemDTO.getOrderQuantity())) throw new OrderQuantiantyExceedsException("You are trying to order that exceeds to available amount!");
-        if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product)) throw new BuyerAlreadyRejectedException("Cannot add to cart! Because seller with id of " + product.getSeller().getId() +  " already rejected this currentUser for this product! Don't spam bro :)");
+        if (product.isExpired())
+            throw new ProductExpiredException("Cannot add to cart! because this product is already expired!");
+        if (currentUser.isProductAlreadyInCart(product))
+            throw new AlreadyExistException("Cannot add to cart! because you already have this product in your cart.");
+        if (buyerOrderChecker.isBuyerHasPendingOrderToProduct(currentUser, product))
+            throw new ProductHasPendingOrderException("Cannot add to cart! because you already has pending order for this product. Please wait until seller take action in you order request!");
+        if (buyerOrderChecker.isBuyerHasAcceptedOrderToProduct(currentUser, product))
+            throw new ProductHasAcceptedOrderException("Cannot add to cart! because you already have accepted order for this product. Please contact the seller to settle your order");
+        if (currentUser.hasProduct(product))
+            throw new ResourceOwnedException("Cannot add to cart! you cannot add to your cart your own product!");
+        if (product.isDeleted())
+            throw new ResourceNotFoundException("Cannot add to cart! because this product might already been deleted or does not exists!");
+        if (product.isSold())
+            throw new ProductAlreadySoldException("Cannot add to cart! because this product already been sold");
+        if (!product.isListed())
+            throw new ProductNotListedException("Cannot add to cart! because this product are not yet listed");
+        if (product.isExceedingToAvailableQuantity(cartItemDTO.getOrderQuantity()))
+            throw new OrderQuantiantyExceedsException("Cannot add to cart! because trying to order that exceeds to available amount!");
+        if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product))
+            throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before!");
 
         double price = productService.calculateOrderPrice(product, cartItemDTO.getOrderQuantity());
         cartItemDTO.setPrice(price);
