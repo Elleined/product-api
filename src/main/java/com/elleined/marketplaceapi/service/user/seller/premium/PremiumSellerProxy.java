@@ -75,7 +75,8 @@ public class PremiumSellerProxy implements SellerService {
     public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientBalanceException {
         double orderPrice = orderItem.getPrice();
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
-        if (isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee)) throw new InsufficientBalanceException("Seller with id of " + seller.getId() + " doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + SUCCESSFUL_TRANSACTION_FEE + "% of order price of " + orderPrice);
+        if (isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee))
+            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice);
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
         sellerService.soldOrder(seller, orderItem);
