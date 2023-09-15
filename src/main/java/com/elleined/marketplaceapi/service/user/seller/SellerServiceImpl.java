@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.exception.product.ProductExpirationLimitException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
@@ -47,9 +48,14 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
     private final OrderItemRepository orderItemRepository;
 
     @Override
-    public Product saveProduct(ProductDTO productDTO, User seller) throws NotVerifiedException {
-        if (isNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE)) throw new ProductException("Cannot save a product that expiration date are not in within " + DAY_RANGE + " after the harvest date");
-        if (!seller.isVerified()) throw new NotVerifiedException("Cannot update a product because user with id of " + seller.getId() + " are not yet been verified! Consider register shop first then get verified afterwards");
+    public Product saveProduct(ProductDTO productDTO, User seller)
+            throws NotVerifiedException,
+            ProductExpirationLimitException {
+
+        if (isNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE))
+            throw new ProductExpirationLimitException("Cannot save a product that expiration date are not in within " + DAY_RANGE + " after the harvest date");
+        if (!seller.isVerified())
+            throw new NotVerifiedException("Cannot update a product because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
 
@@ -68,13 +74,20 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
             ProductHasAcceptedOrderException,
             ProductHasPendingOrderException {
 
-        if (product.hasAcceptedOrder()) throw new ProductHasAcceptedOrderException("You cannot update this product with id of " + product.getId() + " because theres an accepted order...");
-        if (product.hasPendingOrder()) throw new ProductHasPendingOrderException("You cannot update this product with id of " + product.getId() + " because theres an pending order...");
-        if (product.hasSoldOrder()) throw new ProductAlreadySoldException("You cannot this product with id of " + product.getId() + " because theres an sold order!");
-        if (!seller.isVerified()) throw new NotVerifiedException("Cannot update a product because user with id of " + seller.getId() + " are not yet been verified! Consider register shop first then get verified afterwards");
-        if (!seller.hasProduct(product))  throw new NotOwnedException("Seller user with id of " + seller.getId() + " does not have product with id of " + product.getId());
-        if (product.isSold()) throw new ProductAlreadySoldException("Cannot update this product with id of " + product.getId() + " because this product is already sold");
-        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
+        if (product.hasAcceptedOrder())
+            throw new ProductHasAcceptedOrderException("Cannot update! because theres an accepted order for this product.");
+        if (product.hasPendingOrder())
+            throw new ProductHasPendingOrderException("Cannot update! because theres an pending order for this product");
+        if (product.hasSoldOrder())
+            throw new ProductAlreadySoldException("Cannot update! because this product is already been sold!");
+        if (!seller.isVerified())
+            throw new NotVerifiedException("Cannot update! because you are not yet been verified! Consider register shop first then get verified afterwards to update this product!");
+        if (!seller.hasProduct(product))
+            throw new NotOwnedException("Cannot update! because you don't owned this product!");
+        if (product.isSold())
+            throw new ProductAlreadySoldException("Cannot update! because this product is already sold!");
+        if (product.isDeleted())
+            throw new ResourceNotFoundException("Cannot update! because this product does not exists or might already been deleted!");
 
         product.setState(Product.State.PENDING);
         updatePendingAndAcceptedOrderStatus(product.getOrders(), OrderItem.OrderItemStatus.CANCELLED);
@@ -93,11 +106,16 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
             ProductHasPendingOrderException,
             ProductHasAcceptedOrderException {
 
-        if (!seller.isVerified()) throw new NotVerifiedException("Cannot update a product because user with id of " + seller.getId() + " are not yet been verified! Consider register shop first then get verified afterwards");
-        if (!seller.hasProduct(product)) throw new NotOwnedException("Seller user with id of " + seller.getId() + " does not have product with id of " + product.getId());
-        if (product.isSold()) throw new ProductAlreadySoldException("Cannot update this product with id of " + product.getId() + " because this product is already sold");
-        if (product.hasPendingOrder()) throw new ProductHasPendingOrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a pending orders. Please settle first the pending products to delete this");
-        if (product.hasAcceptedOrder()) throw new ProductHasAcceptedOrderException("Cannot delete this product! Because product with id of " + product.getId() + " has a accepted orders. Please settle first the accepted products to delete this");
+        if (!seller.isVerified())
+            throw new NotVerifiedException("Cannot delete! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
+        if (!seller.hasProduct(product))
+            throw new NotOwnedException("Cannot delete! because you don't owned this product!");
+        if (product.isSold())
+            throw new ProductAlreadySoldException("Cannot delete! because this product is already sold");
+        if (product.hasPendingOrder())
+            throw new ProductHasPendingOrderException("Cannot delete! because this product has pending orders. Please settle first the pending order to delete this");
+        if (product.hasAcceptedOrder())
+            throw new ProductHasAcceptedOrderException("Cannot delete! because this product has accepted orders. Please settle first the accepted order to delete this");
 
         product.setStatus(Product.Status.INACTIVE);
         List<OrderItem> orderItems = product.getOrders();
@@ -114,9 +132,12 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
             NotValidBodyException,
             ProductRejectedException {
 
-        if (orderItem.getProduct().isRejected()) throw new ProductRejectedException("Cannot accept order because with this product is rejected by the moderator!");
-        if (!isSellerHasOrder(seller, orderItem)) throw new NotOwnedException("Seller with id of " + seller.getId() + " doesn't have order with id of " + orderItem.getId());
-        if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
+        if (orderItem.getProduct().isRejected())
+            throw new ProductRejectedException("Cannot accept order! because with this product is rejected by the moderator!");
+        if (!isSellerHasOrder(seller, orderItem))
+            throw new NotOwnedException("Cannot accept order! because you don't own this order!");
+        if (StringUtil.isNotValid(messageToBuyer))
+            throw new NotValidBodyException("Cannot accept order! please provide a message for buyer.");
 
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.ACCEPTED);
@@ -133,8 +154,10 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
             throws NotOwnedException,
             NotValidBodyException {
 
-        if (!isSellerHasOrder(seller, orderItem)) throw new NotOwnedException("Seller with id of " + seller.getId() + " doesn't have order with id of " + orderItem.getId());
-        if (StringUtil.isNotValid(messageToBuyer)) throw new NotValidBodyException("Please provide a message for the buyer... can be anything thanks");
+        if (!isSellerHasOrder(seller, orderItem))
+            throw new NotOwnedException("Cannot reject order! because you don't own this order!");
+        if (StringUtil.isNotValid(messageToBuyer))
+            throw new NotValidBodyException("Cannot reject order! please provide a message for the buyer");
 
         final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.REJECTED);
@@ -147,7 +170,8 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
 
     @Override
     public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException {
-        if (!isSellerHasOrder(seller, orderItem)) throw new NotOwnedException("Seller with id of " + seller.getId() + " doesn't have an order item with id of " + orderItem.getId());
+        if (!isSellerHasOrder(seller, orderItem))
+            throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
         Product product = orderItem.getProduct();
         product.setState(Product.State.SOLD);

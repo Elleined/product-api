@@ -2,10 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
-import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
-import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductRejectedException;
+import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -19,7 +16,8 @@ import java.util.List;
 public interface SellerService {
 
     Product saveProduct(ProductDTO productDTO, User seller)
-            throws NotVerifiedException;
+            throws NotVerifiedException,
+            ProductExpirationLimitException;
 
     void updateProduct(User seller, Product product, ProductDTO productDTO)
             throws NotOwnedException,

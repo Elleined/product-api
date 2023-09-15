@@ -2,10 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller.premium;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
-import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
-import com.elleined.marketplaceapi.exception.product.ProductHasAcceptedOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductHasPendingOrderException;
-import com.elleined.marketplaceapi.exception.product.ProductRejectedException;
+import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -37,7 +34,8 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public Product saveProduct(ProductDTO productDTO, User seller) throws NotVerifiedException {
+    public Product saveProduct(ProductDTO productDTO, User seller)
+            throws NotVerifiedException, ProductExpirationLimitException {
         // add validation for here for premium seller for future
         return sellerService.saveProduct(productDTO, seller);
     }
