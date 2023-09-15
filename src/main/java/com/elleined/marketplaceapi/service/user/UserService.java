@@ -3,6 +3,7 @@ package com.elleined.marketplaceapi.service.user;
 import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
@@ -11,6 +12,7 @@ import com.elleined.marketplaceapi.exception.field.password.WeakPasswordExceptio
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
+import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -37,7 +39,10 @@ public interface UserService extends PasswordService {
     User getById(int id) throws ResourceNotFoundException;
     Set<User> getAllById(Set<Integer> userIds) throws ResourceNotFoundException;
 
-    void resendValidId(User currentUser, String validId) throws UserAlreadyVerifiedException;
+    void resendValidId(User currentUser, String validId)
+            throws UserAlreadyVerifiedException,
+            NoShopRegistrationException,
+            FieldException;
 
     // After this principal will be set to be use in web socket
     User login(CredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;

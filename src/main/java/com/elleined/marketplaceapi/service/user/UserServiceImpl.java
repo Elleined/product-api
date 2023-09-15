@@ -15,6 +15,7 @@ import com.elleined.marketplaceapi.exception.field.password.WeakPasswordExceptio
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
+import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Shop;
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public User getById(int id) throws ResourceNotFoundException {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id of " + id + " does not exists!"));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exists!"));
     }
 
     @Override
@@ -109,16 +110,25 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     }
 
     @Override
-    public void resendValidId(User currentUser, String validId) throws UserAlreadyVerifiedException {
-        if (StringUtil.isNotValid(validId)) throw new FieldException("Please provide your new valid id in valid id input... Thanks!");
-        if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! User with id of " + currentUser.getId() + " are already been verified");
+    public void resendValidId(User currentUser, String validId)
+            throws UserAlreadyVerifiedException,
+            NoShopRegistrationException,
+            FieldException {
+
+        if (StringUtil.isNotValid(validId)) throw new FieldException("Please provide your new valid id in valid id input...");
+        if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! you are already been verified");
+        if (!currentUser.hasShopRegistration()) throw new NoShopRegistrationException("Cannot resent valid id! you need to submit a shop registration before resending you valid id.");
+
         currentUser.getUserVerification().setValidId(validId);
         userRepository.save(currentUser);
-        log.debug("User with id of {} resended  valid id {}", currentUser.getId(), validId);
+        log.debug("User with id of {} resended valid id {}", currentUser.getId(), validId);
     }
 
     @Override
-    public User login(CredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
+    public User login(CredentialDTO userCredentialDTO)
+            throws ResourceNotFoundException,
+            InvalidUserCredentialException {
+
         String email = userCredentialDTO.getEmail();
         if (!userRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
 
@@ -131,7 +141,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public User getByEmail(String email) throws ResourceNotFoundException {
-        return userRepository.fetchByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email of " + email + " does not exists!"));
+        return userRepository.fetchByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User does not exists!"));
     }
 
     @Override
@@ -154,8 +164,8 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public void sendShopRegistration(User owner, ShopDTO shopDTO) throws AlreadyExistException {
-        if (owner.isVerified()) throw new AlreadyExistException("Cannot resend shop registration! because user with id of " + owner.getId() + " are already been verified!");
-        if (owner.hasShopRegistration()) throw new AlreadyExistException("User with id of " + owner.getId() + " already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
+        if (owner.isVerified()) throw new AlreadyExistException("Cannot resend shop registration! because you are already been verified!");
+        if (owner.hasShopRegistration()) throw new AlreadyExistException("Cannot resend shop registration! because you already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
 
         Shop shop = Shop.builder()
                 .picture(shopDTO.getPicture())
@@ -172,12 +182,12 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException {
-        return orderItemRepository.findById((long) orderItemId).orElseThrow(() -> new ResourceNotFoundException("Order item with id of " + orderItemId + " does not exists!"));
+        return orderItemRepository.findById((long) orderItemId).orElseThrow(() -> new ResourceNotFoundException("Order item does not exists!"));
     }
 
     @Override
     public User getByReferralCode(String referralCode) throws ResourceNotFoundException {
-        return userRepository.fetchByReferralCode(referralCode).orElseThrow(() -> new ResourceNotFoundException("User with referral code of " + referralCode +  " does not exists!"));
+        return userRepository.fetchByReferralCode(referralCode).orElseThrow(() -> new ResourceNotFoundException("User does not exists!"));
     }
 
     @Override
