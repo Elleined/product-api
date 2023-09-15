@@ -99,15 +99,22 @@ public class CartItemServiceProxy implements CartItemService {
 
         Product product = cartItem.getProduct();
 
-        if (product.isExpired()) throw new ProductExpiredException("Cannot order! because this product is already expired!");
-        if (buyerOrderChecker.isBuyerHasPendingOrderToProduct(currentUser, product)) throw new ProductHasPendingOrderException("User with id of " + currentUser.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
-        if (buyerOrderChecker.isBuyerHasAcceptedOrderToProduct(currentUser, product)) throw new ProductHasAcceptedOrderException("User with id of " + currentUser.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
-        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
-        if (product.isSold()) throw new ProductAlreadySoldException("Product with id of " + product.getId() + " are already been sold!");
-        if (!product.isListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
-        if (product.isExceedingToAvailableQuantity(cartItem.getOrderQuantity())) throw new OrderQuantiantyExceedsException("You are trying to order that exceeds to available amount!");
-        if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product)) throw new BuyerAlreadyRejectedException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product with id of " + product.getId() + " Don't spam bro :)");
-
+        if (product.isExpired())
+            throw new ProductExpiredException("Cannot order! because this product is already expired!");
+        if (buyerOrderChecker.isBuyerHasPendingOrderToProduct(currentUser, product))
+            throw new ProductHasPendingOrderException("Cannot order! because you already pending order for this product. Please wait until seller take action in you order request!");
+        if (buyerOrderChecker.isBuyerHasAcceptedOrderToProduct(currentUser, product))
+            throw new ProductHasAcceptedOrderException("Cannot order! because you already have a accepted order for this product. Please contact the seller to settle your order!");
+        if (product.isDeleted())
+            throw new ResourceNotFoundException("Cannot order! because this product does not exist or might already been deleted");
+        if (product.isSold())
+            throw new ProductAlreadySoldException("Cannot order! because this product has already been sold");
+        if (!product.isListed())
+            throw new ProductNotListedException("Cannot order! because this product is not yet been listed");
+        if (product.isExceedingToAvailableQuantity(cartItem.getOrderQuantity()))
+            throw new OrderQuantiantyExceedsException("Cannot order! because you are trying to order that exceeds to available amount!");
+        if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product))
+            throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before!");
         return cartItemService.moveToOrderItem(currentUser, cartItem);
     }
 
