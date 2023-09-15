@@ -22,9 +22,13 @@ public class PremiumService {
     private final FeeService feeService;
 
 
-    public void upgradeToPremium(User user) throws InsufficientBalanceException, AlreadyExistException {
-        if (user.isPremium() && !user.isPremiumSubscriptionExpired()) throw new AlreadyExistException("User with id of " + user.getId() + " has already a premium member please wait for your premium account to expired which is " + user.getPremium().getRegistrationDate().plusMonths(1) + " before purchasing again");
-        if (user.isBalanceNotEnoughForPremium()) throw new InsufficientBalanceException("User with id of " + user.getId() + " doesn't have enough balance to pay for the premium user fee amounting " + FeeService.PREMIUM_USER_FEE);
+    public void upgradeToPremium(User user)
+            throws InsufficientBalanceException, AlreadyExistException {
+
+        if (user.isPremium() && !user.isPremiumSubscriptionExpired())
+            throw new AlreadyExistException("Cannot buy premium! because you already purchased our premium account please wait for your premium account to expired which is " + user.getPremium().getRegistrationDate().plusMonths(1) + " before purchasing again");
+        if (user.isBalanceNotEnoughForPremium())
+            throw new InsufficientBalanceException("Cannot buy premium because! you doesn't have enough balance to pay for the premium user fee amounting " + FeeService.PREMIUM_USER_FEE);
         Premium premium = Premium.builder()
                 .registrationDate(LocalDateTime.now())
                 .user(user)

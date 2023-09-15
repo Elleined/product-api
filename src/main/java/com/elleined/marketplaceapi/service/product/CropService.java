@@ -22,7 +22,7 @@ public class CropService implements BaseEntityService<Crop> {
 
     @Override
     public Crop getById(int id) throws ResourceNotFoundException {
-        return cropRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Crop with id of " + id + " does not exists!"));
+        return cropRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Crop does not exists!"));
     }
 
 
@@ -46,7 +46,7 @@ public class CropService implements BaseEntityService<Crop> {
         return cropRepository.findAll().stream()
                 .filter(crop -> crop.getName().equalsIgnoreCase(name))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Crop with name of " + name + " does not exists!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Crop does not exists!"));
     }
 
     @Override

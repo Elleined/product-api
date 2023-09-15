@@ -21,7 +21,7 @@ public class UnitService implements BaseEntityService<Unit> {
 
     @Override
     public Unit getById(int id) throws ResourceNotFoundException {
-        return unitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Unit with id of " + id + " does not exists!"));
+        return unitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Unit does not exists!"));
     }
 
     @Override
@@ -37,7 +37,7 @@ public class UnitService implements BaseEntityService<Unit> {
         return unitRepository.findAll().stream()
                 .filter(unit -> unit.getName().equalsIgnoreCase(name))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Unit with name of " + name + " does not exists!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Unit does not exists!"));
     }
 
     @Override
