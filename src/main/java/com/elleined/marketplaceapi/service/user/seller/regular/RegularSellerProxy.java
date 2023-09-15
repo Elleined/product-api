@@ -19,6 +19,7 @@ import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
+import com.elleined.marketplaceapi.service.user.seller.premium.PremiumSellerProxy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
@@ -121,17 +122,17 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             InsufficientBalanceException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
-            throw new SellerMaxAcceptedOrderException("Cannot save product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
+            throw new SellerMaxAcceptedOrderException("Cannot save product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxPendingOrder(seller))
-            throw new SellerMaxPendingOrderException("Cannot save product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed.");
+            throw new SellerMaxPendingOrderException("Cannot save product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxListingPerDay(seller))
-            throw new SellerMaxListingException("Cannot save product! because already reached the limit of product listing per day which is " + MAX_LISTING_PER_DAY);
+            throw new SellerMaxListingException("Cannot save product! because already reached the limit of product listing per day which is " + MAX_LISTING_PER_DAY + ". Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
 
         double totalPrice = productService.calculateTotalPrice(productDTO.getPricePerUnit(), productDTO.getQuantityPerUnit(), productDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
         if (isBalanceNotEnoughToPayListingFee(seller, listingFee))
-            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice);
+            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice + ". Consider buying premium account to remove listing fee.");
 
         feeService.deductListingFee(seller, listingFee);
         return sellerService.saveProduct(productDTO, seller);
@@ -149,9 +150,9 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             SellerMaxPendingOrderException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
-            throw new SellerMaxAcceptedOrderException("Cannot update product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
+            throw new SellerMaxAcceptedOrderException("Cannot update product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxPendingOrder(seller))
-            throw new SellerMaxPendingOrderException("Cannot update product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed...");
+            throw new SellerMaxPendingOrderException("Cannot update product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed. Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
 
         sellerService.updateProduct(seller, product, productDTO);
@@ -168,9 +169,9 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             SellerMaxPendingOrderException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
-            throw new SellerMaxAcceptedOrderException("Cannot delete product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
+            throw new SellerMaxAcceptedOrderException("Cannot delete product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxPendingOrder(seller))
-            throw new SellerMaxPendingOrderException("Cannot delete product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed...");
+            throw new SellerMaxPendingOrderException("Cannot delete product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed. Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
 
         sellerService.deleteProduct(seller, product);
@@ -184,7 +185,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             SellerMaxAcceptedOrderException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
-            throw new SellerMaxAcceptedOrderException("Cannot accept order! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed!");
+            throw new SellerMaxAcceptedOrderException("Cannot accept order! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
 
         sellerService.acceptOrder(seller, orderItem, messageToBuyer);
@@ -198,9 +199,9 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             SellerMaxPendingOrderException {
 
         if (isExceedsToMaxPendingOrder(seller))
-            throw new SellerMaxPendingOrderException("Cannot reject order! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed.");
+            throw new SellerMaxPendingOrderException("Cannot reject order! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxRejectionPerDay(seller))
-            throw new MaxOrderRejectionException("Cannot reject order! because you already reached the rejection limit per day which is " + MAX_ORDER_REJECTION_PER_DAY + " come back again tomorrow.");
+            throw new MaxOrderRejectionException("Cannot reject order! because you already reached the rejection limit per day which is " + MAX_ORDER_REJECTION_PER_DAY + " come back again tomorrow. Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
 
         sellerService.rejectOrder(seller, orderItem, messageToBuyer);
@@ -214,7 +215,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         double orderPrice = orderItem.getPrice();
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
         if (isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee))
-            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice);
+            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice + ". Consider buying premium account to lessen the successful transaction fee to" + PremiumSellerProxy.SUCCESSFUL_TRANSACTION_FEE);
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
         sellerService.soldOrder(seller, orderItem);

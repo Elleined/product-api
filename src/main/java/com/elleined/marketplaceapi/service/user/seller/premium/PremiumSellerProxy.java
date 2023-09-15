@@ -24,7 +24,7 @@ import java.util.List;
 @Transactional
 @Qualifier("premiumSellerProxy")
 public class PremiumSellerProxy implements SellerService {
-    private final float SUCCESSFUL_TRANSACTION_FEE = 2;
+    public static final float SUCCESSFUL_TRANSACTION_FEE = 2;
     private final SellerService sellerService;
     private final FeeService feeService;
 
