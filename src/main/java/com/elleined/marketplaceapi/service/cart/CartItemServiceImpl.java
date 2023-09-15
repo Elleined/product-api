@@ -82,7 +82,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException {
-        return cartItemRepository.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("You are trying to access cart item that does not exists!"));
+        return cartItemRepository.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("You are trying to access cart item that does not exists or might already been deleted!"));
     }
 
     @Override
@@ -90,7 +90,7 @@ public class CartItemServiceImpl implements CartItemService {
         return currentUser.getCartItems().stream()
                 .filter(cartItem -> cartItem.getProduct().equals(product))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("You don't have this products"));
+                .orElseThrow(() -> new ResourceNotFoundException("Your cart does not have this product!"));
     }
 
     @Override
