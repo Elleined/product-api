@@ -50,19 +50,28 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
             ProductExpiredException {
 
         Product product = productService.getById(orderItemDTO.getProductId());
-        if (product.isExpired()) throw new ProductExpiredException("Cannot order! Because this product is already expired!");
-        if (product.isRejected()) throw new ProductRejectedException("You cannot order a product with id of " + product.getId() + "  because this product is rejected by moderator!");
-        if (isBuyerHasPendingOrderToProduct(buyer, product)) throw new ProductHasPendingOrderException("User with id of " + buyer.getId() + " has already pending order this product with id of " + product.getId() + " please wait until seller take action in you order request!");
-        if (isBuyerHasAcceptedOrderToProduct(buyer, product)) throw new ProductHasAcceptedOrderException("User with id of " + buyer.getId() + " has accepted order for this product with id of " + product.getId() + " please contact the seller to settle your order");
-        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + product.getId() + " does not exists or might already been deleted!");
-        if (product.isSold()) throw new ProductAlreadySoldException("Product with id of " + product.getId() + " are already been sold!");
-        if (!product.isListed()) throw new ProductNotListedException("Product with id of " + product.getId() + " are not yet listed!");
-        if (buyer.hasProduct(product)) throw new ResourceOwnedException("You cannot order your own product listing!");
-        if (product.isExceedingToAvailableQuantity(orderItemDTO.getOrderQuantity())) throw new OrderQuantiantyExceedsException("You are trying to order that exceeds to available amount!");
-        if (isBuyerAlreadyBeenRejected(buyer, product)) throw new BuyerAlreadyRejectedException("Cannot order! Because seller with id of " + product.getSeller().getId() +  " already rejected this buyer for this product with id of " + product.getId() + " Don't spam bro :)");
+        if (product.isExpired())
+            throw new ProductExpiredException("Cannot order this product! because this product is already expired!");
+        if (product.isRejected())
+            throw new ProductRejectedException("Cannot order this product! because this product is rejected by moderator!");
+        if (isBuyerHasPendingOrderToProduct(buyer, product))
+            throw new ProductHasPendingOrderException("Cannot order this product! because you already have pending order. Please wait until seller take action in you order request!");
+        if (isBuyerHasAcceptedOrderToProduct(buyer, product))
+            throw new ProductHasAcceptedOrderException("Cannot order this product! because you already have accepted order. Please contact the seller to settle your order");
+        if (product.isDeleted())
+            throw new ResourceNotFoundException("Cannot order this product! because this product does not exists or might already been deleted!");
+        if (product.isSold())
+            throw new ProductAlreadySoldException("Cannot order this product! because this product are already been sold!");
+        if (!product.isListed())
+            throw new ProductNotListedException("Cannot order this product! because this product are not yet listed!");
+        if (buyer.hasProduct(product))
+            throw new ResourceOwnedException("You cannot order your own product listing!");
+        if (product.isExceedingToAvailableQuantity(orderItemDTO.getOrderQuantity()))
+            throw new OrderQuantiantyExceedsException("Cannot order this product! because you are trying to order that exceeds to available amount!");
+        if (isBuyerAlreadyBeenRejected(buyer, product))
+            throw new BuyerAlreadyRejectedException("Cannot order this product! because seller of this product is rejected you order request before!");
 
         OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
-
         double price = productService.calculateOrderPrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
         orderItem.setUpdatedAt(LocalDateTime.now());
         orderItem.setPrice(price);
@@ -88,9 +97,11 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
             OrderAlreadyAcceptedException,
             OrderAlreadyRejectedException {
 
-        if (!buyer.hasOrder(orderItem)) throw new NotOwnedException("User with id of " + buyer.getId() +  " does not have order item with id of " + orderItem.getId());
-        if (orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.REJECTED) throw new OrderAlreadyRejectedException("You cannot cancel these order with id of " + orderItem.getId() + " because seller already rejected your order!");
-        if (orderItem.isAccepted()) throw new OrderAlreadyAcceptedException("Cannot cancel order because order with id of " + orderItem.getId() + " are already accepted by the seller!");
+        if (!buyer.hasOrder(orderItem))
+            throw new NotOwnedException("Cannot cancel order! because you don't owned this order");
+        if (orderItem.isAccepted())
+            throw new OrderAlreadyAcceptedException("Cannot cancel order! because seller already accepted your order request for this product!");
+
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
         orderItem.setUpdatedAt(LocalDateTime.now());
         orderItemRepository.save(orderItem);
