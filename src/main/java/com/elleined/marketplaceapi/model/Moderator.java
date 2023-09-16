@@ -97,8 +97,8 @@ public class Moderator {
                     referencedColumnName = "moderator_id"
             ),
             inverseJoinColumns = @JoinColumn(
-                    name = "user_id",
-                    referencedColumnName = "user_id"
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
             )
     )
     private Set<DepositTransaction> releaseDepositRequest;
@@ -111,8 +111,8 @@ public class Moderator {
                     referencedColumnName = "moderator_id"
             ),
             inverseJoinColumns = @JoinColumn(
-                    name = "user_id",
-                    referencedColumnName = "user_id"
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
             )
     )
     private Set<DepositTransaction> rejectedDepositRequest;
@@ -125,8 +125,8 @@ public class Moderator {
                     referencedColumnName = "moderator_id"
             ),
             inverseJoinColumns = @JoinColumn(
-                    name = "user_id",
-                    referencedColumnName = "user_id"
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
             )
     )
     private Set<WithdrawTransaction> releaseWithdrawRequests;
@@ -139,8 +139,8 @@ public class Moderator {
                     referencedColumnName = "moderator_id"
             ),
             inverseJoinColumns = @JoinColumn(
-                    name = "user_id",
-                    referencedColumnName = "user_id"
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
             )
     )
     private Set<WithdrawTransaction> rejectedWithdrawRequests;
