@@ -1,6 +1,8 @@
 package com.elleined.marketplaceapi.exception.atm.limit;
 
-public class LimitException extends RuntimeException {
+import com.elleined.marketplaceapi.exception.atm.ATMException;
+
+public class LimitException extends ATMException {
 
     public LimitException(String message) {
         super(message);

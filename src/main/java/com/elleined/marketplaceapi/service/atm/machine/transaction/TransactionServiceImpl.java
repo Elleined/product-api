@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.service.atm.machine.transaction;
 
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
@@ -24,6 +26,27 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Transaction save(Transaction atmTransaction) {
         return transactionRepository.save(atmTransaction);
+    }
+
+    @Override
+    public Transaction getById(int id) throws ResourceNotFoundException {
+        return transactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Transaction with id of " + id + " does't exists!"));
+    }
+
+    @Override
+    public WithdrawTransaction getWithdrawTransactionById(User currentUser, int withdrawTransactionId) {
+         return currentUser.getWithdrawTransactions().stream()
+                 .filter(transaction -> transaction.getId() == withdrawTransactionId)
+                 .findFirst()
+                 .orElseThrow(() -> new ResourceNotFoundException("You don't owned this transaction!"));
+    }
+
+    @Override
+    public DepositTransaction getDepositTransactionById(User currentUser, int depositTransactionId) {
+        return currentUser.getDepositTransactions().stream()
+                .filter(transaction -> transaction.getId() == depositTransactionId)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("You don't owned this transaction!"));
     }
 
     @Override

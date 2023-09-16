@@ -63,6 +63,7 @@ public abstract class Transaction {
     public enum Status {
         RELEASE,
         PENDING,
-        REJECTED
+        REJECTED,
+        RECEIVE
     }
 }

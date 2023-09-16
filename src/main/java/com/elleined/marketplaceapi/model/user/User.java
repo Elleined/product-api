@@ -7,6 +7,7 @@ import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
@@ -179,5 +180,8 @@ public class User {
 
     public boolean hasNotBeenRejected() {
         return this.getUserVerification().getValidId() != null;
+    }
+    public boolean hasWithdrawTransaction(Transaction transaction) {
+        return this.getWithdrawTransactions().stream().anyMatch(transaction::equals);
     }
 }

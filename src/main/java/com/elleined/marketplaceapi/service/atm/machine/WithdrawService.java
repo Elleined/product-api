@@ -4,6 +4,7 @@ package com.elleined.marketplaceapi.service.atm.machine;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.limit.LimitException;
+import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitPerDayException;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
@@ -40,14 +41,14 @@ public class WithdrawService {
     private final ATMFeeService feeService;
     private final AppWalletService appWalletService;
 
-    public WithdrawTransaction withdraw(User currentUser, @NonNull BigDecimal withdrawalAmount)
+    public void receiveWithdrawRequest(User currentUser, @NonNull BigDecimal withdrawalAmount)
             throws InsufficientFundException,
             NotValidAmountException,
-            LimitException {
+            WithdrawLimitException {
 
         if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(currentUser, withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
-        if (isWithdrawAmountAboveLimit(withdrawalAmount)) throw new LimitException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + WITHDRAWAL_LIMIT_PER_DAY);
+        if (isWithdrawAmountAboveLimit(withdrawalAmount)) throw new WithdrawLimitException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + WITHDRAWAL_LIMIT_PER_DAY);
         if (isUserReachedWithdrawLimitPerDay(currentUser)) throw new WithdrawLimitPerDayException("Cannot withdraw! You already reached withdrawal limit per day which is " + WITHDRAWAL_LIMIT_PER_DAY);
 
         BigDecimal oldBalance = currentUser.getBalance();
@@ -57,16 +58,19 @@ public class WithdrawService {
         userRepository.save(currentUser);
         appWalletService.addAndSaveBalance(withdrawalFee);
 
-        WithdrawTransaction withdrawTransaction = saveWithdrawTransaction(currentUser, withdrawalAmount);
         log.debug("User with id of {} withdraw amounting {} from {} because of withdrawal fee of {} which is the {}% of withdrawn amount and has new balance of {} from {}", currentUser.getId(), finalWithdrawalAmount, withdrawalAmount, withdrawalFee, ATMFeeService.WITHDRAWAL_FEE_PERCENTAGE, currentUser.getBalance(), oldBalance);
-        return withdrawTransaction;
     }
 
-    private boolean isWithdrawAmountAboveLimit(BigDecimal withdrawalAmount) {
-        return withdrawalAmount.compareTo(new BigDecimal(WITHDRAWAL_LIMIT_PER_DAY)) > 0;
-    }
+    public WithdrawTransaction requestWithdraw(@NonNull User user, @NonNull BigDecimal withdrawalAmount)
+            throws InsufficientFundException,
+            NotValidAmountException,
+            WithdrawLimitException {
 
-    private WithdrawTransaction saveWithdrawTransaction(@NonNull User user, @NonNull BigDecimal withdrawalAmount) {
+        if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
+        if (atmValidator.isBalanceEnough(user, withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
+        if (isWithdrawAmountAboveLimit(withdrawalAmount)) throw new WithdrawLimitException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + WITHDRAWAL_LIMIT_PER_DAY);
+        if (isUserReachedWithdrawLimitPerDay(user)) throw new WithdrawLimitPerDayException("Cannot withdraw! You already reached withdrawal limit per day which is " + WITHDRAWAL_LIMIT_PER_DAY);
+
         String trn = UUID.randomUUID().toString();
 
         WithdrawTransaction withdrawTransaction = WithdrawTransaction.builder()
@@ -82,7 +86,12 @@ public class WithdrawService {
         return withdrawTransaction;
     }
 
-    public boolean isUserReachedWithdrawLimitPerDay(User currentUser) {
+    private boolean isWithdrawAmountAboveLimit(BigDecimal withdrawalAmount) {
+        return withdrawalAmount.compareTo(new BigDecimal(WITHDRAWAL_LIMIT_PER_DAY)) > 0;
+    }
+
+
+    private boolean isUserReachedWithdrawLimitPerDay(User currentUser) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         List<WithdrawTransaction> userWithdrawTransactions = currentUser.getWithdrawTransactions();

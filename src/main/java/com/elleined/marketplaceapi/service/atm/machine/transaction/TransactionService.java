@@ -1,4 +1,5 @@
 package com.elleined.marketplaceapi.service.atm.machine.transaction;
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
@@ -10,6 +11,10 @@ import java.util.List;
 public interface TransactionService {
 
     Transaction save(Transaction transaction);
+
+    Transaction getById(int id) throws ResourceNotFoundException;
+    WithdrawTransaction getWithdrawTransactionById(User currentUser, int withdrawTransactionId);
+    DepositTransaction getDepositTransactionById(User currentUser, int depositTransactionId);
 
     List<WithdrawTransaction> getAllWithdrawalTransactions(User currentUser);
     List<DepositTransaction> getAllDepositTransactions(User currentUser);
