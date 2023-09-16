@@ -5,7 +5,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.atm.transaction.TransactionRepository;
+import com.elleined.marketplaceapi.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class TransactionServiceImpl implements TransactionService {
-    private final TransactionRepository<Transaction> transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     @Override
     public Transaction save(Transaction atmTransaction) {

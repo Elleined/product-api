@@ -19,37 +19,44 @@ import java.util.List;
 import java.util.Set;
 
 public interface ModeratorService {
+    Moderator getById(int moderatorId) throws ResourceNotFoundException;
 
-    // Premium users are priority
-    List<UserDTO> getAllUnverifiedUser();
+    Moderator save(ModeratorDTO moderatorDTO);
 
+    ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
+
+    /** User **/
     // Premium users are priority
-    List<ProductDTO> getAllPendingProduct();
+    List<User> getAllUnverifiedUser();
 
     void verifyUser(Moderator moderator, User userToBeVerified)
             throws NoShopRegistrationException,
             UserAlreadyVerifiedException,
             UserVerificationRejectionException;
 
-    void verifyAllUser(Moderator moderator, Set<User> usersToBeVerified) throws NoShopRegistrationException;
+    void verifyAllUser(Moderator moderator, Set<User> usersToBeVerified);
+
+    // set the valid id to null make user rejected
+    void rejectUser(Moderator moderator, User userToBeRejected)
+            throws UserAlreadyVerifiedException;
+
+    void rejectAllUser(Moderator moderator, Set<User> usersToBeRejected);
+
+
+    /** Product **/
+    // Premium users are priority
+    List<Product> getAllPendingProduct();
 
     void listProduct(Moderator moderator, Product productToBeListed);
 
     void listAllProduct(Moderator moderator, Set<Product> productsToBeListed);
 
-    // set the valid id to null make user rejected
-    void rejectUser(User userToBeRejected, String reason)
-            throws UserAlreadyVerifiedException,
-            NotValidBodyException;
+    void rejectProduct(Moderator moderator, Product productToBeRejected)
+            throws ProductAlreadyListedException;
 
-    void rejectProduct(Moderator moderator, Product productToBeRejected, String reason)
-            throws ProductAlreadyListedException,
-            NotValidBodyException;
+    void rejectAllProduct(Moderator moderator, Set<Product> productsToBeRejected);
 
+    /** Deposit **/
 
-    Moderator getById(int moderatorId) throws ResourceNotFoundException;
-
-    Moderator save(ModeratorDTO moderatorDTO);
-
-    ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
+    /** Withdraw **/
 }
