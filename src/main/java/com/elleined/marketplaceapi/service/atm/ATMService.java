@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.atm;
 
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
+import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
@@ -17,14 +18,19 @@ import java.math.BigDecimal;
 public interface ATMService {
 
     DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount)
-            throws NotValidAmountException, DepositLimitException;
+            throws NotValidAmountException,
+            DepositLimitException,
+            MinimumAmountException;
 
     void receiveDepositRequest(User currentUser, DepositTransaction depositTransaction)
-            throws NotValidAmountException, DepositLimitException;
+            throws NotValidAmountException,
+            MinimumAmountException,
+            DepositLimitException;
 
     WithdrawTransaction requestWithdraw(User currentUser, BigDecimal withdrawnAmount)
             throws InsufficientFundException,
             NotValidAmountException,
+            MinimumAmountException,
             WithdrawLimitException;
 
     void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction)
@@ -32,6 +38,7 @@ public interface ATMService {
             NotOwnedException,
             NotValidAmountException,
             WithdrawLimitException,
+            MinimumAmountException,
             TransactionNotYetReleaseException;
 
     PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount)

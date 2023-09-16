@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.atm;
 
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
+import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
@@ -38,22 +39,22 @@ public class WebATMService implements ATMService {
     private final PeerToPeerService peerToPeerService;
 
     @Override
-    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount) throws NotValidAmountException, DepositLimitException {
+    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount) throws NotValidAmountException, DepositLimitException, MinimumAmountException {
         return null;
     }
 
     @Override
-    public void receiveDepositRequest(User currentUser, DepositTransaction depositTransaction) throws NotValidAmountException, DepositLimitException {
+    public void receiveDepositRequest(User currentUser, DepositTransaction depositTransaction) throws NotValidAmountException, MinimumAmountException, DepositLimitException {
 
     }
 
     @Override
-    public WithdrawTransaction requestWithdraw(User currentUser, BigDecimal withdrawnAmount) throws InsufficientFundException, NotValidAmountException, WithdrawLimitException {
+    public WithdrawTransaction requestWithdraw(User currentUser, BigDecimal withdrawnAmount) throws InsufficientFundException, NotValidAmountException, MinimumAmountException, WithdrawLimitException {
         return withdrawService.requestWithdraw(currentUser, withdrawnAmount);
     }
 
     @Override
-    public void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction) throws InsufficientFundException, NotOwnedException, NotValidAmountException, WithdrawLimitException, TransactionNotYetReleaseException {
+    public void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction) throws InsufficientFundException, NotOwnedException, NotValidAmountException, WithdrawLimitException, MinimumAmountException, TransactionNotYetReleaseException {
         if (!currentUser.hasWithdrawTransaction(withdrawTransaction)) throw new NotOwnedException("Cannot receive withdraw request! You don't have or you don't owned this withdraw transaction!");
         if (withdrawTransaction.isRelease()) throw new TransactionException("Cannot receive withdraw! because this transaction is already been release!");
         if (!withdrawTransaction.isRelease()) throw new TransactionNotYetReleaseException("Cannot receive withdraw request! because this transaction are not yet been release by the moderator.");
