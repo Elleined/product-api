@@ -35,7 +35,7 @@ public class WithdrawTransaction extends Transaction {
         this.user = user;
     }
 
-    public boolean isNotYetRelease() {
-        return this.getStatus() != Status.RELEASE;
+    public boolean isRelease() {
+        return this.getStatus() == Status.RELEASE;
     }
 }

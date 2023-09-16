@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
+import com.elleined.marketplaceapi.exception.atm.transaction.TransactionException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionNotYetReleaseException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
@@ -54,7 +55,8 @@ public class WebATMService implements ATMService {
     @Override
     public void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction) throws InsufficientFundException, NotOwnedException, NotValidAmountException, WithdrawLimitException, TransactionNotYetReleaseException {
         if (!currentUser.hasWithdrawTransaction(withdrawTransaction)) throw new NotOwnedException("Cannot receive withdraw request! You don't have or you don't owned this withdraw transaction!");
-        if (withdrawTransaction.isNotYetRelease()) throw new TransactionNotYetReleaseException("Cannot receive withdraw request! because this transaction are not yet been release by the moderator.");
+        if (withdrawTransaction.isRelease()) throw new TransactionException("Cannot receive withdraw! because this transaction is already been release!");
+        if (!withdrawTransaction.isRelease()) throw new TransactionNotYetReleaseException("Cannot receive withdraw request! because this transaction are not yet been release by the moderator.");
 
         withdrawTransaction.setStatus(Transaction.Status.RECEIVE);
         transactionRepository.save(withdrawTransaction);
@@ -65,6 +67,6 @@ public class WebATMService implements ATMService {
 
     @Override
     public PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount) throws SendingToHimselfException, InsufficientFundException, NotValidAmountException {
-        return null;
+        return peerToPeerService.peerToPeer(sender, receiver, sentAmount);
     }
 }
