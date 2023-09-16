@@ -10,6 +10,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
@@ -36,7 +37,7 @@ public class WithdrawService {
 
     private final ATMValidator atmValidator;
 
-    private final TransactionService transactionService;
+    private final WithdrawTransactionRepository withdrawTransactionRepository;
 
     private final ATMFeeService feeService;
     private final AppWalletService appWalletService;
@@ -81,7 +82,7 @@ public class WithdrawService {
                 .user(user)
                 .build();
 
-        transactionService.save(withdrawTransaction);
+        withdrawTransactionRepository.save(withdrawTransaction);
         log.debug("Withdraw transaction saved with trn of {}", trn);
         return withdrawTransaction;
     }

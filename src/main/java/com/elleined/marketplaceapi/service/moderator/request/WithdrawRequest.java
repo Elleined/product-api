@@ -10,6 +10,7 @@ import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.atm.TransactionRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,24 +31,19 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
 
     private final ModeratorRepository moderatorRepository;
 
-    private final TransactionRepository transactionRepository;
+    private final WithdrawTransactionRepository withdrawTransactionRepository;
 
     @Override
     public List<WithdrawTransaction> getAllRequest() {
         List<WithdrawTransaction> premiumUsersWithdrawRequest = premiumRepository.findAll().stream()
                 .map(Premium::getUser)
-                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
-                .filter(User::hasShopRegistration)
-                .filter(User::hasNotBeenRejected) // Checking for rejected user
                 .map(User::getWithdrawTransactions)
                 .flatMap(Collection::stream)
                 .filter(withdrawTransaction -> withdrawTransaction.getStatus() == Transaction.Status.PENDING)
                 .toList();
 
         List<WithdrawTransaction> regularUsersWithdrawRequest = userRepository.findAll().stream()
-                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
-                .filter(User::hasShopRegistration)
-                .filter(User::hasNotBeenRejected) // Checking for rejected user
+                .filter(user -> !user.isPremium())
                 .map(User::getWithdrawTransactions)
                 .flatMap(Collection::stream)
                 .filter(withdrawTransaction -> withdrawTransaction.getStatus() == Transaction.Status.PENDING)
@@ -65,7 +61,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
         moderator.addReleaseWithdrawRequest(withdrawTransaction);
 
         moderatorRepository.save(moderator);
-        transactionRepository.save(withdrawTransaction);
+        withdrawTransactionRepository.save(withdrawTransaction);
 
         log.debug("Transaction with id of {} are now set to relase", withdrawTransaction.getId());
     }
@@ -76,7 +72,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
         moderator.getReleaseWithdrawRequests().addAll(withdrawTransactions);
 
         moderatorRepository.save(moderator);
-        transactionRepository.saveAll(withdrawTransactions);
+        withdrawTransactionRepository.saveAll(withdrawTransactions);
 
         log.debug("Transactions with ids of {} are now set to release", withdrawTransactions.stream().map(Transaction::getId).toList());
     }
@@ -87,7 +83,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
         moderator.addRejectedWithdrawRequest(withdrawTransaction);
 
         moderatorRepository.save(moderator);
-        transactionRepository.save(withdrawTransaction);
+        withdrawTransactionRepository.save(withdrawTransaction);
 
         log.debug("Transaction with id of {} are now set to rejected", withdrawTransaction.getId());
     }
@@ -98,7 +94,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
         moderator.getRejectedWithdrawRequests().addAll(withdrawTransactions);
 
         moderatorRepository.save(moderator);
-        transactionRepository.saveAll(withdrawTransactions);
+        withdrawTransactionRepository.saveAll(withdrawTransactions);
 
         log.debug("Transactions with ids of {} are now set to rejected", withdrawTransactions.stream().map(Transaction::getId).toList());
     }

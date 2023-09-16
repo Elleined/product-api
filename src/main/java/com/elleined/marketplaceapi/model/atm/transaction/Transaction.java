@@ -58,6 +58,7 @@ public abstract class Transaction {
     private LocalDateTime transactionDate;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     public enum Status {

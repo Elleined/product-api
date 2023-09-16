@@ -8,6 +8,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
@@ -34,7 +35,7 @@ public class DepositService {
 
     private final ATMValidator atmValidator;
 
-    private final TransactionService transactionService;
+    private final DepositTransactionRepository depositTransactionRepository;
 
     private final ATMFeeService feeService;
 
@@ -73,7 +74,7 @@ public class DepositService {
                 .user(user)
                 .build();
 
-        transactionService.save(depositTransaction);
+        depositTransactionRepository.save(depositTransaction);
         log.debug("Deposit transaction saved with trn of {}", trn);
         return depositTransaction;
     }

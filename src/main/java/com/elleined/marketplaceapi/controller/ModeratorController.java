@@ -162,7 +162,7 @@ public class ModeratorController {
         productsToBeRejected.forEach(rejectedProduct -> emailService.sendRejectedProductEmail(rejectedProduct, reason));
     }
 
-    @GetMapping("/getAllPendingWithdrawRequest")
+    @GetMapping("/withdraw-requests")
     List<WithdrawTransactionDTO> getAllPendingWithdrawRequest() {
         return moderatorService.getAllPendingWithdrawRequest().stream()
                 .map(transactionMapper::toWithdrawTransactionDTO)
