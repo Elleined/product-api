@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
@@ -137,6 +138,31 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     @Override
     public void rejectAllProduct(Moderator moderator, Set<Product> productsToBeRejected) {
         productRequest.rejectAll(moderator, productsToBeRejected);
+    }
+
+    @Override
+    public List<WithdrawTransaction> getAllPendingWithdrawRequest() {
+        return withdrawRequest.getAllRequest();
+    }
+
+    @Override
+    public void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction) {
+        withdrawRequest.accept(moderator, withdrawTransaction);
+    }
+
+    @Override
+    public void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
+        withdrawRequest.acceptAll(moderator, withdrawTransactions);
+    }
+
+    @Override
+    public void rejectWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction) {
+        withdrawRequest.reject(moderator, withdrawTransaction);
+    }
+
+    @Override
+    public void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
+        withdrawRequest.rejectAll(moderator, withdrawTransactions);
     }
 
     @Override

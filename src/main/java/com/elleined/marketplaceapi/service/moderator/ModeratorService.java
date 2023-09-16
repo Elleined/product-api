@@ -13,11 +13,15 @@ import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.exception.user.UserVerificationRejectionException;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.service.atm.machine.WithdrawService;
+import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 
 import java.util.List;
 import java.util.Set;
 
+// Also acts as proxy for request inheritance
 public interface ModeratorService {
     Moderator getById(int moderatorId) throws ResourceNotFoundException;
 
@@ -59,4 +63,9 @@ public interface ModeratorService {
     /** Deposit **/
 
     /** Withdraw **/
+    List<WithdrawTransaction> getAllPendingWithdrawRequest();
+    void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction);
+    void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
+    void rejectWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction);
+    void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
 }
