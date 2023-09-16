@@ -7,17 +7,19 @@ import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TransactionService {
 
     Transaction save(Transaction transaction);
 
     Transaction getById(int id) throws ResourceNotFoundException;
-    WithdrawTransaction getWithdrawTransactionById(User currentUser, int withdrawTransactionId);
-    DepositTransaction getDepositTransactionById(User currentUser, int depositTransactionId);
+    WithdrawTransaction getWithdrawTransactionById(int withdrawTransactionId);
 
+    List<WithdrawTransaction> getAllWithdrawTransactions(Set<Integer> withdrawTransactionIds);
     List<WithdrawTransaction> getAllWithdrawalTransactions(User currentUser);
     List<DepositTransaction> getAllDepositTransactions(User currentUser);
     List<PeerToPeerTransaction> getAllReceiveMoneyTransactions(User currentUser);
     List<PeerToPeerTransaction> getAllSentMoneyTransactions(User currentUser);
+
 }

@@ -8,7 +8,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
-import com.elleined.marketplaceapi.repository.TransactionRepository;
+import com.elleined.marketplaceapi.repository.atm.TransactionRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

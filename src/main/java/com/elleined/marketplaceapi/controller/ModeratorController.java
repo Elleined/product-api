@@ -5,12 +5,17 @@ import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.dto.atm.dto.WithdrawTransactionDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.mapper.TransactionMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.service.atm.ATMService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -21,6 +26,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +45,10 @@ public class ModeratorController {
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
 
+    private final ATMService atmService;
+    private final TransactionService transactionService;
+    private final TransactionMapper transactionMapper;
+
     @PostMapping("/login")
     public ModeratorDTO login(@Valid @RequestBody CredentialDTO moderatorCredentialDTO,
                               HttpSession session) {
@@ -52,26 +62,6 @@ public class ModeratorController {
         return moderatorService.getAllUnverifiedUser().stream()
                 .map(userMapper::toDTO)
                 .toList();
-    }
-
-    @GetMapping("/getAllPendingProduct")
-    public List<ProductDTO> getAllPendingProduct() {
-        return moderatorService.getAllPendingProduct().stream()
-                .map(productMapper::toDTO)
-                .toList();
-    }
-
-
-    @PatchMapping("/rejectUser/{userToBeRejectedId}")
-    public void rejectUser(@PathVariable("userToBeRejectedId") int userToBeRejectedId,
-                           @RequestParam("reason") String reason) {
-
-        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting this user...");
-
-        Moderator moderator = moderatorService.getById(1);
-        User userToBeRejected = userService.getById(userToBeRejectedId);
-        moderatorService.rejectUser(moderator, userToBeRejected);
-        emailService.sendRejectedVerificationEmail(userToBeRejected, reason);
     }
 
     @PatchMapping("/{moderatorId}/verifyUser/{userToBeVerifiedId}")
@@ -93,19 +83,39 @@ public class ModeratorController {
         moderatorService.verifyAllUser(moderator, usersToBeVerified);
     }
 
-    @PatchMapping("/{moderatorId}/rejectProduct/{productToBeRejectedId}")
-    public void rejectProduct(@PathVariable("moderatorId") int moderatorId,
-                              @PathVariable("productToBeRejectedId") int productToBeRejectedId,
-                              @RequestParam("reason") String reason) {
+    @PatchMapping("/{moderatorId}/rejectUser/{userToBeRejectedId}")
+    public void rejectUser(@PathVariable("moderatorId") int moderatorId,
+                           @PathVariable("userToBeRejectedId") int userToBeRejectedId,
+                           @RequestParam("reason") String reason) {
 
-        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting this product...");
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting this user...");
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        Product productToBeRejected = productService.getById(productToBeRejectedId);
-        moderatorService.rejectProduct(moderator, productToBeRejected);
-        emailService.sendRejectedProductEmail(productToBeRejected, reason);
+        User userToBeRejected = userService.getById(userToBeRejectedId);
+        moderatorService.rejectUser(moderator, userToBeRejected);
+        emailService.sendRejectedVerificationEmail(userToBeRejected, reason);
     }
 
+    @PatchMapping("/{moderatorId}/rejectUser")
+    public void rejectAllUser(@PathVariable("moderatorId") int moderatorId,
+                              @RequestParam("reason") String reason,
+                              @RequestBody Set<Integer> userToBeRejectedIds) {
+
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting all this user...");
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        Set<User> usersToBeRejected = userService.getAllById(userToBeRejectedIds);
+        moderatorService.rejectAllUser(moderator, usersToBeRejected);
+
+        usersToBeRejected.forEach(rejectedUser -> emailService.sendRejectedVerificationEmail(rejectedUser, reason));
+    }
+
+    @GetMapping("/getAllPendingProduct")
+    public List<ProductDTO> getAllPendingProduct() {
+        return moderatorService.getAllPendingProduct().stream()
+                .map(productMapper::toDTO)
+                .toList();
+    }
 
     @PatchMapping("/{moderatorId}/listProduct/{productToBeListedId}")
     public void listProduct(@PathVariable("moderatorId") int moderatorId,
@@ -124,5 +134,74 @@ public class ModeratorController {
         Moderator moderator = moderatorService.getById(moderatorId);
         Set<Product> productsToBeListed = productService.getAllById(productsToBeListedId);
         moderatorService.listAllProduct(moderator, productsToBeListed);
+    }
+
+    @PatchMapping("/{moderatorId}/rejectProduct/{productToBeRejectedId}")
+    public void rejectProduct(@PathVariable("moderatorId") int moderatorId,
+                              @PathVariable("productToBeRejectedId") int productToBeRejectedId,
+                              @RequestParam("reason") String reason) {
+
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting this product...");
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        Product productToBeRejected = productService.getById(productToBeRejectedId);
+        moderatorService.rejectProduct(moderator, productToBeRejected);
+        emailService.sendRejectedProductEmail(productToBeRejected, reason);
+    }
+
+    @PatchMapping("/{moderatorId}/rejectProduct")
+    public void rejectAllProduct(@PathVariable("moderatorId") int moderatorId,
+                                 @RequestParam("reason") String reason,
+                                 @RequestBody Set<Integer> productToBeRejectedIds) {
+
+        if (StringUtil.isNotValid(reason)) throw new NotValidBodyException("Please provide the reason why you are rejecting all this product...");
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        Set<Product> productsToBeRejected = productService.getAllById(productToBeRejectedIds);
+        moderatorService.rejectAllProduct(moderator, productsToBeRejected);
+        productsToBeRejected.forEach(rejectedProduct -> emailService.sendRejectedProductEmail(rejectedProduct, reason));
+    }
+
+    @GetMapping("/getAllPendingWithdrawRequest")
+    List<WithdrawTransactionDTO> getAllPendingWithdrawRequest() {
+        return moderatorService.getAllPendingWithdrawRequest().stream()
+                .map(transactionMapper::toWithdrawTransactionDTO)
+                .toList();
+    }
+
+    @PatchMapping("/{moderatorId}/withdraw/release/{withdrawTransactionId}")
+    void releaseWithdrawRequest(@PathVariable("moderatorId") int moderatorId,
+                                @PathVariable("withdrawTransactionId") Integer withdrawTransactionId) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
+        moderatorService.releaseWithdrawRequest(moderator, withdrawTransaction);
+    }
+
+    @PatchMapping("/{moderatorId}/withdraw/release")
+    void releaseAllWithdrawRequest(@PathVariable("moderatorId") int moderatorId,
+                                   @RequestBody Set<Integer> withdrawTransactionIds) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        Set<WithdrawTransaction> withdrawTransactions = new HashSet<>(transactionService.getAllWithdrawTransactions(withdrawTransactionIds));
+        moderatorService.releaseAllWithdrawRequest(moderator, withdrawTransactions);
+    }
+
+    @PatchMapping("/{moderatorId}/withdraw/reject/{withdrawTransactionId}")
+    void rejectWithdrawRequest(@PathVariable("moderatorId") int moderatorId,
+                               @PathVariable("withdrawTransactionId") Integer withdrawTransactionId) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
+        moderatorService.rejectWithdrawRequest(moderator, withdrawTransaction);
+    }
+
+    @PatchMapping("/{moderatorId}/withdraw/reject")
+    void rejectAllWithdrawRequest(@PathVariable("moderatorId") int moderatorId,
+                                  @RequestBody Set<Integer> withdrawTransactionIds) {
+
+        Moderator moderator = moderatorService.getById(moderatorId);
+        Set<WithdrawTransaction> withdrawTransactions = new HashSet<>(transactionService.getAllWithdrawTransactions(withdrawTransactionIds));
+        moderatorService.rejectAllWithdrawRequest(moderator, withdrawTransactions);
     }
 }

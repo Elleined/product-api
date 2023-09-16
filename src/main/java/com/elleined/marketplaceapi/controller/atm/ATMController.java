@@ -50,7 +50,7 @@ public class ATMController  {
     public WithdrawTransactionDTO receiveWithdrawTransaction(@PathVariable("currentUserId") int currentUserId,
                                                              @PathVariable("withdrawTransactionId") int withdrawTransactionId) {
         User currentUser = userService.getById(currentUserId);
-        WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(currentUser, withdrawTransactionId);
+        WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
         atmService.receiveWithdrawRequest(currentUser, withdrawTransaction);
 
         return transactionMapper.toWithdrawTransactionDTO(withdrawTransaction);
