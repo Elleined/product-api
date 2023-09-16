@@ -53,8 +53,8 @@ public class WebATMService implements ATMService {
 
     @Override
     public void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction) throws InsufficientFundException, NotOwnedException, NotValidAmountException, WithdrawLimitException, TransactionNotYetReleaseException {
-        if (withdrawTransaction.isNotYetRelease()) throw new TransactionNotYetReleaseException("Cannot receive withdraw request! because this transaction are not yet been release by the moderator.");
         if (!currentUser.hasWithdrawTransaction(withdrawTransaction)) throw new NotOwnedException("Cannot receive withdraw request! You don't have or you don't owned this withdraw transaction!");
+        if (withdrawTransaction.isNotYetRelease()) throw new TransactionNotYetReleaseException("Cannot receive withdraw request! because this transaction are not yet been release by the moderator.");
 
         withdrawTransaction.setStatus(Transaction.Status.RECEIVE);
         transactionRepository.save(withdrawTransaction);
