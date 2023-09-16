@@ -59,7 +59,6 @@ public class ProductRequest implements Request<Product> {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void accept(Moderator moderator, Product productToBeListed) {
         productToBeListed.setState(Product.State.LISTING);
         moderator.addListedProducts(productToBeListed);
@@ -77,7 +76,6 @@ public class ProductRequest implements Request<Product> {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void reject(Moderator moderator, Product productToBeRejected) {
         productToBeRejected.setState(Product.State.REJECTED);
         moderator.addRejectedProduct(productToBeRejected);

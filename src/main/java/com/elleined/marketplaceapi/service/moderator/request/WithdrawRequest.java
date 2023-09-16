@@ -58,10 +58,10 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
         withdrawTransaction.setStatus(Transaction.Status.RELEASE);
         moderator.addReleaseWithdrawRequest(withdrawTransaction);
 
-        moderatorRepository.save(moderator);
         withdrawTransactionRepository.save(withdrawTransaction);
+        moderatorRepository.save(moderator);
 
-        log.debug("Transaction with id of {} are now set to relase", withdrawTransaction.getId());
+        log.debug("Transaction with id of {} are now set to release", withdrawTransaction.getId());
     }
 
     @Override

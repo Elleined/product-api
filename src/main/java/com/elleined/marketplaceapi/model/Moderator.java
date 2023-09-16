@@ -158,18 +158,18 @@ public class Moderator {
     }
 
     public void addReleaseWithdrawRequest(WithdrawTransaction withdrawTransaction) {
-        this.releaseWithdrawRequests.add(withdrawTransaction);
+        this.getReleaseWithdrawRequests().add(withdrawTransaction);
     }
 
     public void addRejectedWithdrawRequest(WithdrawTransaction withdrawTransaction) {
-        this.rejectedWithdrawRequests.add(withdrawTransaction);
+        this.getRejectedWithdrawRequests().add(withdrawTransaction);
     }
 
     public void addReleaseDepositRequest(DepositTransaction depositTransaction) {
-        this.releaseDepositRequest.add(depositTransaction);
+        this.getReleaseDepositRequest().add(depositTransaction);
     }
 
     public void addRejectedDepositRequest(DepositTransaction depositTransaction) {
-        this.rejectedDepositRequest.add(depositTransaction);
+        this.getRejectedDepositRequest().add(depositTransaction);
     }
 }

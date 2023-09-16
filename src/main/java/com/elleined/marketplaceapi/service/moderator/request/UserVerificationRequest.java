@@ -54,7 +54,6 @@ public class UserVerificationRequest implements Request<User> {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void accept(Moderator moderator, User userToBeVerified) {
         if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
         User invitingUser = userService.getInvitingUser(userToBeVerified);
