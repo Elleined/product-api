@@ -7,6 +7,9 @@ import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionNotYetReleaseException;
+import com.elleined.marketplaceapi.exception.atm.transaction.TransactionPendingException;
+import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReceiveException;
+import com.elleined.marketplaceapi.exception.atm.transaction.TransactionRejectedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
@@ -39,7 +42,10 @@ public interface ATMService {
             NotValidAmountException,
             WithdrawLimitException,
             MinimumAmountException,
-            TransactionNotYetReleaseException;
+            TransactionNotYetReleaseException,
+            TransactionPendingException,
+            TransactionRejectedException,
+            TransactionReceiveException;
 
     PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount)
             throws SendingToHimselfException,

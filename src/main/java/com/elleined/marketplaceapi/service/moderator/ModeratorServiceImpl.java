@@ -2,6 +2,9 @@ package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
+import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReceiveException;
+import com.elleined.marketplaceapi.exception.atm.transaction.TransactionRejectedException;
+import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReleaseException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
@@ -141,7 +144,14 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction) {
+    public void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction)
+            throws TransactionReleaseException,
+            TransactionReceiveException,
+            TransactionRejectedException {
+        if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
+        if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
+        if (withdrawTransaction.isReceive()) throw new TransactionReceiveException("Cannot release withdraw! because this transaction is already been receive by the requesting user!");
+
         withdrawRequest.accept(moderator, withdrawTransaction);
     }
 

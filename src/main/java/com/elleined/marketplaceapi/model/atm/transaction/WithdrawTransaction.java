@@ -34,8 +34,4 @@ public class WithdrawTransaction extends Transaction {
         super(id, trn, amount, transactionDate, status);
         this.user = user;
     }
-
-    public boolean isRelease() {
-        return this.getStatus() == Status.RELEASE;
-    }
 }

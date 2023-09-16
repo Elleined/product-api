@@ -6,8 +6,7 @@ import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
-import com.elleined.marketplaceapi.exception.atm.transaction.TransactionException;
-import com.elleined.marketplaceapi.exception.atm.transaction.TransactionNotYetReleaseException;
+import com.elleined.marketplaceapi.exception.atm.transaction.*;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
@@ -54,9 +53,21 @@ public class WebATMService implements ATMService {
     }
 
     @Override
-    public void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction) throws InsufficientFundException, NotOwnedException, NotValidAmountException, WithdrawLimitException, MinimumAmountException, TransactionNotYetReleaseException {
+    public void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction)
+            throws InsufficientFundException,
+            NotOwnedException,
+            NotValidAmountException,
+            WithdrawLimitException,
+            MinimumAmountException,
+            TransactionNotYetReleaseException,
+            TransactionRejectedException,
+            TransactionPendingException,
+            TransactionReceiveException {
+
         if (!currentUser.hasWithdrawTransaction(withdrawTransaction)) throw new NotOwnedException("Cannot receive withdraw request! You don't have or you don't owned this withdraw transaction!");
-        if (withdrawTransaction.isRelease()) throw new TransactionException("Cannot receive withdraw! because this transaction is already been release!");
+        if (withdrawTransaction.isReceive()) throw new TransactionReceiveException("Cannot receive withdraw! because this transaction is already been receive!");
+        if (withdrawTransaction.isPending()) throw new TransactionPendingException("Cannot receive withdraw! because this transaction is in pending. Please wait until we settle this transaction!");
+        if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot receive withdraw! because this transaction is been rejected by moderator!");
         if (!withdrawTransaction.isRelease()) throw new TransactionNotYetReleaseException("Cannot receive withdraw request! because this transaction are not yet been release by the moderator.");
 
         withdrawTransaction.setStatus(Transaction.Status.RECEIVE);
