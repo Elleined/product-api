@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.scheduler;
 
 
-import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

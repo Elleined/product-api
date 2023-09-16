@@ -3,7 +3,6 @@ package com.elleined.marketplaceapi.service.atm.machine;
 
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
-import com.elleined.marketplaceapi.exception.atm.limit.LimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitPerDayException;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
@@ -13,7 +12,6 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
-import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

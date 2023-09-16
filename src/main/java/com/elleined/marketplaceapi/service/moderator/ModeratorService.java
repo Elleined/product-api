@@ -2,9 +2,6 @@ package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
-import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
@@ -15,8 +12,6 @@ import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.atm.machine.WithdrawService;
-import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 
 import java.util.List;
 import java.util.Set;

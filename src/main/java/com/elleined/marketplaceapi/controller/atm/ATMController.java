@@ -6,7 +6,6 @@ import com.elleined.marketplaceapi.dto.atm.dto.WithdrawTransactionDTO;
 import com.elleined.marketplaceapi.mapper.TransactionMapper;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
-import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.atm.ATMService;

@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.model;
 
-import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;

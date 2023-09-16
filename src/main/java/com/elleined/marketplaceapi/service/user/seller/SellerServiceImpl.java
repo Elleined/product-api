@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
-import com.elleined.marketplaceapi.exception.product.ProductExpirationLimitException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
