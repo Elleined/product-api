@@ -15,5 +15,6 @@ public class TransactionDTO {
     private int id;
     private String trn;
     private BigDecimal amount;
+    private String status;
     private LocalDateTime transactionDate;
 }

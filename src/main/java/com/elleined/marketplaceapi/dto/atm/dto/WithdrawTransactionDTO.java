@@ -16,8 +16,8 @@ public class WithdrawTransactionDTO extends TransactionDTO {
 
     @Builder(builderMethodName = "withdrawTransactionDTOBuilder")
 
-    public WithdrawTransactionDTO(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, int userId) {
-        super(id, trn, amount, transactionDate);
+    public WithdrawTransactionDTO(int id, String trn, BigDecimal amount, String status, LocalDateTime transactionDate, int userId) {
+        super(id, trn, amount, status, transactionDate);
         this.userId = userId;
     }
 }

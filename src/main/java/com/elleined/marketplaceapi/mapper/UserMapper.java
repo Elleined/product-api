@@ -29,6 +29,11 @@ public interface UserMapper {
             @Mapping(target = "userVerification.status", expression = "java(UserVerification.Status.NOT_VERIFIED)"),
             @Mapping(target = "userDetails", expression = "java(toUserDetailsEntity(userDTO.getUserDetailsDTO()))"),
             @Mapping(target = "userCredential", source = "userCredentialDTO"),
+
+            @Mapping(target = "depositTransactions", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "receiveMoneyTransactions", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "sentMoneyTransactions", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "withdrawTransactions", expression = "java(new java.util.ArrayList<>())")
     })
     User toEntity(UserDTO userDTO);
 
