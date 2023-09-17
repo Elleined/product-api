@@ -58,9 +58,13 @@ public interface ModeratorService {
 
     /** Deposit **/
     List<DepositTransaction> getAllPendingDepositRequest();
-    void release(Moderator moderator, DepositTransaction depositTransaction);
+    void release(Moderator moderator, DepositTransaction depositTransaction)
+            throws TransactionReleaseException,
+            TransactionRejectedException;
+
     void releaseAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions);
-    void reject(Moderator moderator, DepositTransaction depositTransaction);
+    void reject(Moderator moderator, DepositTransaction depositTransaction)
+            throws TransactionReleaseException;
     void rejectAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions);
 
 

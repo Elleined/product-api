@@ -151,7 +151,9 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void release(Moderator moderator, DepositTransaction depositTransaction) {
+    public void release(Moderator moderator, DepositTransaction depositTransaction) throws TransactionReleaseException, TransactionRejectedException {
+        if (depositTransaction.isRelease()) throw new TransactionReleaseException("Cannot release deposit! because this transaction is already been released!");
+        if (depositTransaction.isRejected()) throw new TransactionRejectedException("Cannot release deposit! because this transaction is already been rejected");
         // Add validation here
         depositRequest.accept(moderator, depositTransaction);
     }
@@ -163,7 +165,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void reject(Moderator moderator, DepositTransaction depositTransaction) {
+    public void reject(Moderator moderator, DepositTransaction depositTransaction) throws TransactionReleaseException {
+        if (depositTransaction.isRelease()) throw new TransactionReleaseException("Cannot reject deposit! because this transaction is already been released!");
         // Add validation here
         depositRequest.reject(moderator, depositTransaction);
     }
