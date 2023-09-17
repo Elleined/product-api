@@ -14,8 +14,9 @@ public interface TransactionService {
     Transaction save(Transaction transaction);
 
     Transaction getById(int id) throws ResourceNotFoundException;
-    WithdrawTransaction getWithdrawTransactionById(int withdrawTransactionId);
-
+    WithdrawTransaction getWithdrawTransactionById(int withdrawTransactionId) throws ResourceNotFoundException;
+    DepositTransaction getDepositTransactionById(int depositTransactionId) throws ResourceNotFoundException;
+    List<DepositTransaction> getAllDepositTransactionById(Set<Integer> depositTransactionIds);
     List<WithdrawTransaction> getAllWithdrawTransactions(Set<Integer> withdrawTransactionIds);
     List<WithdrawTransaction> getAllWithdrawalTransactions(User currentUser);
     List<DepositTransaction> getAllDepositTransactions(User currentUser);

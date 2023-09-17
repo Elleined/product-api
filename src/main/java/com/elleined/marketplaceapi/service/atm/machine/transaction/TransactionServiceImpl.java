@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.repository.atm.TransactionRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.Set;
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final WithdrawTransactionRepository withdrawTransactionRepository;
+    private final DepositTransactionRepository depositTransactionRepository;
 
     @Override
     public Transaction save(Transaction atmTransaction) {
@@ -38,6 +40,16 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public WithdrawTransaction getWithdrawTransactionById(int withdrawTransactionId) {
         return withdrawTransactionRepository.findById(withdrawTransactionId).orElseThrow(() -> new ResourceNotFoundException("Withdraw transaction with id of " + withdrawTransactionId + " doesn't exists!"));
+    }
+
+    @Override
+    public DepositTransaction getDepositTransactionById(int depositTransactionId) throws ResourceNotFoundException {
+        return depositTransactionRepository.findById(depositTransactionId).orElseThrow(() -> new ResourceNotFoundException("Transaction with id of " + depositTransactionId + " does't exists!"));
+    }
+
+    @Override
+    public List<DepositTransaction> getAllDepositTransactionById(Set<Integer> depositTransactionIds) {
+        return depositTransactionRepository.findAllById(depositTransactionIds);
     }
 
     @Override
