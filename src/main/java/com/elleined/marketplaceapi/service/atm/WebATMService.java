@@ -1,9 +1,6 @@
 package com.elleined.marketplaceapi.service.atm;
 
-import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
-import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
-import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
-import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
+import com.elleined.marketplaceapi.exception.atm.*;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.transaction.*;
@@ -38,17 +35,18 @@ public class WebATMService implements ATMService {
     private final PeerToPeerService peerToPeerService;
 
     @Override
-    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount) throws NotValidAmountException, DepositLimitException, MinimumAmountException {
-        return null;
+    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount, String proofOfTransaction) throws NotValidAmountException, MalformedProofOfTransaction, DepositLimitException, MinimumAmountException {
+        // Add validation here
+        return depositService.requestDeposit(currentUser, depositAmount, proofOfTransaction);
     }
 
     @Override
-    public void receiveDepositRequest(User currentUser, DepositTransaction depositTransaction) throws NotValidAmountException, MinimumAmountException, DepositLimitException {
+    public WithdrawTransaction requestWithdraw(User currentUser, BigDecimal withdrawnAmount)
+            throws InsufficientFundException,
+            NotValidAmountException,
+            MinimumAmountException,
+            WithdrawLimitException {
 
-    }
-
-    @Override
-    public WithdrawTransaction requestWithdraw(User currentUser, BigDecimal withdrawnAmount) throws InsufficientFundException, NotValidAmountException, MinimumAmountException, WithdrawLimitException {
         return withdrawService.requestWithdraw(currentUser, withdrawnAmount);
     }
 

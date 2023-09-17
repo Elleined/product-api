@@ -16,9 +16,12 @@ public class DepositTransactionDTO extends TransactionDTO {
 
     private int userId;
 
+    private String proofOfTransaction;
+
     @Builder(builderMethodName = "depositTransactionBuilder")
-    public DepositTransactionDTO(int id, String trn, BigDecimal amount, String status, LocalDateTime transactionDate, int userId) {
+    public DepositTransactionDTO(int id, String trn, BigDecimal amount, String status, LocalDateTime transactionDate, int userId, String proofOfTransaction) {
         super(id, trn, amount, status, transactionDate);
         this.userId = userId;
+        this.proofOfTransaction = proofOfTransaction;
     }
 }

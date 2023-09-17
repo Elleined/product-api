@@ -28,10 +28,11 @@ public class ATMController  {
 
     @PostMapping("/deposit")
     public DepositTransactionDTO requestDeposit(@PathVariable("currentUserId") int currentUserId,
-                                         @RequestParam("amount") BigDecimal amount) {
+                                                @RequestParam("amount") BigDecimal amount,
+                                                @RequestParam("proofOfTransaction") String proofOfTransaction) {
 
         User currentUser = userService.getById(currentUserId);
-        DepositTransaction depositTransaction = atmService.requestDeposit(currentUser, amount);
+        DepositTransaction depositTransaction = atmService.requestDeposit(currentUser, amount, proofOfTransaction);
         return transactionMapper.toDepositTransactionDTO(depositTransaction);
     }
 
