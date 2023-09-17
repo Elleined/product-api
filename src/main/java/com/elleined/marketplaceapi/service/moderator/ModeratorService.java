@@ -26,7 +26,6 @@ public interface ModeratorService {
     ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 
     /** User **/
-    // Premium users are priority
     List<User> getAllUnverifiedUser();
 
     void verifyUser(Moderator moderator, User userToBeVerified)
@@ -44,7 +43,6 @@ public interface ModeratorService {
 
 
     /** Product **/
-    // Premium users are priority
     List<Product> getAllPendingProduct();
 
     void listProduct(Moderator moderator, Product productToBeListed);
@@ -77,6 +75,8 @@ public interface ModeratorService {
             InsufficientBalanceException;
 
     void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
-    void reject(Moderator moderator, WithdrawTransaction withdrawTransaction);
+    void reject(Moderator moderator, WithdrawTransaction withdrawTransaction)
+            throws TransactionReleaseException,
+            TransactionReceiveException;
     void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
 }

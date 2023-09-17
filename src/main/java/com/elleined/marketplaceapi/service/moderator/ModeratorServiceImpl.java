@@ -191,7 +191,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
         User requestingUserToWithdraw = withdrawTransaction.getUser();
         BigDecimal amountToBeWithdrawn = withdrawTransaction.getAmount();
-        if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance is below the requesting amount to be withdrawn. Reject it!");
+        if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance has only balance of " + requestingUserToWithdraw.getBalance() + " is below to requesting amount to be withdrawn which is " + amountToBeWithdrawn + ". Reject it!");
         if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
         if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
         if (withdrawTransaction.isReceive()) throw new TransactionReceiveException("Cannot release withdraw! because this transaction is already been receive by the requesting user!");
@@ -206,7 +206,9 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void reject(Moderator moderator, WithdrawTransaction withdrawTransaction) {
+    public void reject(Moderator moderator, WithdrawTransaction withdrawTransaction) throws TransactionReleaseException, TransactionReceiveException {
+        if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot reject withdraw request! because this transaction is already been released!");
+        if (withdrawTransaction.isReceive()) throw new TransactionReceiveException("Cannot reject withdraw request! because this transaction is already been receive!");
         // Add validation here
         withdrawRequest.reject(moderator, withdrawTransaction);
     }
