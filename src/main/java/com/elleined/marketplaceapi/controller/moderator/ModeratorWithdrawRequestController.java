@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.mapper.TransactionMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,8 @@ public class ModeratorWithdrawRequestController {
     private final TransactionMapper transactionMapper;
     private final TransactionService transactionService;
 
+    private final EmailService emailService;
+
     @GetMapping
     List<WithdrawTransactionDTO> getAllPendingWithdrawRequest() {
         return moderatorService.getAllPendingWithdrawRequest().stream()
@@ -38,6 +41,7 @@ public class ModeratorWithdrawRequestController {
         Moderator moderator = moderatorService.getById(moderatorId);
         WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
         moderatorService.release(moderator, withdrawTransaction);
+        emailService.sendReleaseWithdrawMail(withdrawTransaction);
     }
 
     @PatchMapping("/release")
@@ -56,6 +60,7 @@ public class ModeratorWithdrawRequestController {
         Moderator moderator = moderatorService.getById(moderatorId);
         WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
         moderatorService.reject(moderator, withdrawTransaction);
+        emailService.sendRejectedWithdrawMail(withdrawTransaction);
     }
 
     @PatchMapping("/reject")
