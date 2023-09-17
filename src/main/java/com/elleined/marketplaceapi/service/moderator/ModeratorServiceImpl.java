@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.exception.user.*;
 import com.elleined.marketplaceapi.mapper.ModeratorMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
@@ -90,7 +91,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
             throw new NoShopRegistrationException("This user doesn't have pending shop registration! must send a shop registration first!");
         if (userToBeVerified.hasShopRegistration() && userToBeVerified.isRejected())
             throw new UserVerificationRejectionException("You're verification are been rejected by moderator try re-sending you're valid id and check email for reason why you're verification application are rejected.");
-        // Add more validation in the future
+        // Add validation here
 
         userVerificationRequest.accept(moderator, userToBeVerified);
     }
@@ -103,11 +104,13 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     @Override
     public void rejectUser(Moderator moderator, User userToBeRejected) throws UserAlreadyVerifiedException {
         if (userToBeRejected.isVerified()) throw new UserAlreadyVerifiedException("Rejection failed! because this user verification request are already been verified!");
+        // Add validation here
         userVerificationRequest.reject(moderator, userToBeRejected);
     }
 
     @Override
     public void rejectAllUser(Moderator moderator, Set<User> usersToBeRejected) {
+        // Add validation here
         userVerificationRequest.rejectAll(moderator, usersToBeRejected);
     }
 
@@ -118,11 +121,13 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
     @Override
     public void listProduct(Moderator moderator, Product productToBeListed) {
+        // Add validation here
         productRequest.accept(moderator, productToBeListed);
     }
 
     @Override
     public void listAllProduct(Moderator moderator, Set<Product> productsToBeListed) {
+        // Add validation here
         productRequest.acceptAll(moderator, productsToBeListed);
     }
 
@@ -130,12 +135,43 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     @Override
     public void rejectProduct(Moderator moderator, Product productToBeRejected) throws ProductAlreadyListedException {
         if (productToBeRejected.isListed()) throw new ProductAlreadyListedException("Rejection failed! because this product already been listed");
+        // Add validation here
         productRequest.reject(moderator, productToBeRejected);
     }
 
     @Override
     public void rejectAllProduct(Moderator moderator, Set<Product> productsToBeRejected) {
+        // Add validation here
         productRequest.rejectAll(moderator, productsToBeRejected);
+    }
+
+    @Override
+    public List<DepositTransaction> getAllPendingDepositRequest() {
+        return depositRequest.getAllRequest();
+    }
+
+    @Override
+    public void release(Moderator moderator, DepositTransaction depositTransaction) {
+        // Add validation here
+        depositRequest.accept(moderator, depositTransaction);
+    }
+
+    @Override
+    public void releaseAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions) {
+        // Add validation here
+        depositRequest.acceptAll(moderator, depositTransactions);
+    }
+
+    @Override
+    public void reject(Moderator moderator, DepositTransaction depositTransaction) {
+        // Add validation here
+        depositRequest.reject(moderator, depositTransaction);
+    }
+
+    @Override
+    public void rejectAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions) {
+        // Add validation here
+        depositRequest.rejectAll(moderator, depositTransactions);
     }
 
     @Override
@@ -144,7 +180,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction)
+    public void release(Moderator moderator, WithdrawTransaction withdrawTransaction)
             throws TransactionReleaseException,
             TransactionReceiveException,
             TransactionRejectedException,
@@ -156,22 +192,25 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
         if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
         if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
         if (withdrawTransaction.isReceive()) throw new TransactionReceiveException("Cannot release withdraw! because this transaction is already been receive by the requesting user!");
-
+        // Add validation here
         withdrawRequest.accept(moderator, withdrawTransaction);
     }
 
     @Override
     public void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
+        // Add validation here
         withdrawRequest.acceptAll(moderator, withdrawTransactions);
     }
 
     @Override
-    public void rejectWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction) {
+    public void reject(Moderator moderator, WithdrawTransaction withdrawTransaction) {
+        // Add validation here
         withdrawRequest.reject(moderator, withdrawTransaction);
     }
 
     @Override
     public void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
+        // Add validation here
         withdrawRequest.rejectAll(moderator, withdrawTransactions);
     }
 

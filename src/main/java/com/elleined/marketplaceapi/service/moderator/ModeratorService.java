@@ -10,6 +10,7 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.*;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 
@@ -56,16 +57,22 @@ public interface ModeratorService {
     void rejectAllProduct(Moderator moderator, Set<Product> productsToBeRejected);
 
     /** Deposit **/
+    List<DepositTransaction> getAllPendingDepositRequest();
+    void release(Moderator moderator, DepositTransaction depositTransaction);
+    void releaseAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions);
+    void reject(Moderator moderator, DepositTransaction depositTransaction);
+    void rejectAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions);
+
 
     /** Withdraw **/
     List<WithdrawTransaction> getAllPendingWithdrawRequest();
-    void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction)
+    void release(Moderator moderator, WithdrawTransaction withdrawTransaction)
             throws TransactionReleaseException,
             TransactionReceiveException,
             TransactionRejectedException,
             InsufficientBalanceException;
 
     void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
-    void rejectWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction);
+    void reject(Moderator moderator, WithdrawTransaction withdrawTransaction);
     void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
 }

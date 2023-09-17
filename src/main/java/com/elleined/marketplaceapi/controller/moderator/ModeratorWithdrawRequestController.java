@@ -37,7 +37,7 @@ public class ModeratorWithdrawRequestController {
 
         Moderator moderator = moderatorService.getById(moderatorId);
         WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
-        moderatorService.releaseWithdrawRequest(moderator, withdrawTransaction);
+        moderatorService.release(moderator, withdrawTransaction);
     }
 
     @PatchMapping("/release")
@@ -55,7 +55,7 @@ public class ModeratorWithdrawRequestController {
 
         Moderator moderator = moderatorService.getById(moderatorId);
         WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
-        moderatorService.rejectWithdrawRequest(moderator, withdrawTransaction);
+        moderatorService.reject(moderator, withdrawTransaction);
     }
 
     @PatchMapping("/reject")
