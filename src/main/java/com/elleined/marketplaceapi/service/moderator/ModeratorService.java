@@ -72,6 +72,7 @@ public interface ModeratorService {
             throws TransactionReleaseException,
             TransactionReceiveException,
             TransactionRejectedException,
+            TransactionReleaseException,
             InsufficientBalanceException;
 
     void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);

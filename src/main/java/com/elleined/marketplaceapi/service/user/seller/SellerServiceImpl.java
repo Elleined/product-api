@@ -56,7 +56,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
             throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException {
 
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
-            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request.");
+            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (isHarvestAndExpirationDateNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE))
             throw new ProductExpirationLimitException("Cannot save product! because expiration date should be within " + DAY_RANGE + " after the harvest date");
         if (!seller.isVerified())
@@ -177,7 +177,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
     @Override
     public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
-            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request.");
+            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (!isSellerHasOrder(seller, orderItem))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
