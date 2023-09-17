@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.seller.regular;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.order.MaxOrderRejectionException;
 import com.elleined.marketplaceapi.exception.product.*;
@@ -114,12 +115,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
 
     @Override
     public Product saveProduct(ProductDTO productDTO, User seller)
-            throws NotVerifiedException,
-            ProductExpirationLimitException,
-            SellerMaxAcceptedOrderException,
-            SellerMaxListingException,
-            SellerMaxPendingOrderException,
-            InsufficientBalanceException {
+            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot save product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
@@ -209,8 +205,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
 
     @Override
     public void soldOrder(User seller, OrderItem orderItem)
-            throws NotOwnedException,
-            InsufficientBalanceException {
+            throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
 
         double orderPrice = orderItem.getPrice();
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);

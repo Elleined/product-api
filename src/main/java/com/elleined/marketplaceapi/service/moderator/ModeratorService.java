@@ -7,10 +7,7 @@ import com.elleined.marketplaceapi.exception.atm.transaction.TransactionRejected
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReleaseException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
-import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
-import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
-import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
-import com.elleined.marketplaceapi.exception.user.UserVerificationRejectionException;
+import com.elleined.marketplaceapi.exception.user.*;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
@@ -65,8 +62,9 @@ public interface ModeratorService {
     void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction)
             throws TransactionReleaseException,
             TransactionReceiveException,
-            TransactionRejectedException;
-    
+            TransactionRejectedException,
+            InsufficientBalanceException;
+
     void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
     void rejectWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction);
     void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);

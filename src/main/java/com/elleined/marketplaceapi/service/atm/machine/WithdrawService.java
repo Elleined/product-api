@@ -42,18 +42,7 @@ public class WithdrawService {
     private final ATMFeeService feeService;
     private final AppWalletService appWalletService;
 
-    public void receiveWithdrawRequest(User currentUser, @NonNull BigDecimal withdrawalAmount)
-            throws InsufficientFundException,
-            NotValidAmountException,
-            MinimumAmountException,
-            WithdrawLimitException {
-
-        if (isBelowMinimumWithdrawAmount(withdrawalAmount)) throw new MinimumAmountException("Cannot withdraw! because you are trying to withdraw an amount that below to minimum amount which is " + MINIMUM_WITHDRAW_AMOUNT);
-        if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
-        if (atmValidator.isBalanceEnough(currentUser, withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
-        if (isWithdrawAmountAboveLimit(withdrawalAmount)) throw new WithdrawLimitException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + WITHDRAWAL_LIMIT_PER_DAY);
-        if (isUserReachedWithdrawLimitPerDay(currentUser)) throw new WithdrawLimitPerDayException("Cannot withdraw! You already reached withdrawal limit per day which is " + WITHDRAWAL_LIMIT_PER_DAY);
-
+    public void receiveWithdrawRequest(User currentUser, @NonNull BigDecimal withdrawalAmount) {
         BigDecimal oldBalance = currentUser.getBalance();
         float withdrawalFee = feeService.getWithdrawalFee(withdrawalAmount);
         BigDecimal finalWithdrawalAmount = feeService.deductWithdrawalFee(withdrawalAmount, withdrawalFee);
@@ -70,6 +59,7 @@ public class WithdrawService {
             MinimumAmountException,
             WithdrawLimitException {
 
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(user)) throw new InsufficientFundException("Cannot withdraw! because you're total pending withdraw requests exceeds to your current balance!");
         if (isBelowMinimumWithdrawAmount(withdrawalAmount)) throw new MinimumAmountException("Cannot withdraw! because you are trying to withdraw an amount that below to minimum amount which is " + MINIMUM_WITHDRAW_AMOUNT);
         if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(user, withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");

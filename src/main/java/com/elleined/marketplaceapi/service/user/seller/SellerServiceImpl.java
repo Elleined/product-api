@@ -1,9 +1,11 @@
 package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
@@ -12,6 +14,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
+import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.UnitService;
 import com.elleined.marketplaceapi.utils.StringUtil;
@@ -46,15 +49,19 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
 
     private final OrderItemRepository orderItemRepository;
 
+    private final ATMValidator atmValidator;
+
     @Override
     public Product saveProduct(ProductDTO productDTO, User seller)
-            throws NotVerifiedException,
-            ProductExpirationLimitException {
+            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException {
 
-        if (isNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE))
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request.");
+        if (isHarvestAndExpirationDateNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE))
             throw new ProductExpirationLimitException("Cannot save product! because expiration date should be within " + DAY_RANGE + " after the harvest date");
         if (!seller.isVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
+
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
 
@@ -168,7 +175,9 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
     }
 
     @Override
-    public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException {
+    public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request.");
         if (!isSellerHasOrder(seller, orderItem))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
@@ -257,7 +266,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker {
         log.debug("Accepted order items with ids {} are set to {}", acceptedOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
     }
 
-    public boolean isNotInRange(LocalDate harvestDate, LocalDate expirationDate, int rangeInDays) {
+    public boolean isHarvestAndExpirationDateNotInRange(LocalDate harvestDate, LocalDate expirationDate, int rangeInDays) {
         LocalDate dateRange = harvestDate.plusDays(rangeInDays);
 
         return expirationDate.isAfter(dateRange) || expirationDate.isBefore(harvestDate);

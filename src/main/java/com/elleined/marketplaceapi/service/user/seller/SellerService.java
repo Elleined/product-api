@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
@@ -17,6 +18,7 @@ public interface SellerService {
 
     Product saveProduct(ProductDTO productDTO, User seller)
             throws NotVerifiedException,
+            InsufficientFundException,
             ProductExpirationLimitException;
 
     void updateProduct(User seller, Product product, ProductDTO productDTO)
@@ -43,7 +45,10 @@ public interface SellerService {
             throws NotOwnedException,
             NotValidBodyException;
 
-    void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientBalanceException;
+    void soldOrder(User seller, OrderItem orderItem)
+            throws NotOwnedException,
+            InsufficientFundException,
+            InsufficientBalanceException;
 
     boolean isBalanceNotEnoughToPaySuccessfulTransactionFee(User seller, double successfulTransactionFee);
 

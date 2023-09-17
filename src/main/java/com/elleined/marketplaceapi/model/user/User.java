@@ -184,4 +184,5 @@ public class User {
     public boolean hasWithdrawTransaction(Transaction transaction) {
         return this.getWithdrawTransactions().stream().anyMatch(transaction::equals);
     }
+
 }

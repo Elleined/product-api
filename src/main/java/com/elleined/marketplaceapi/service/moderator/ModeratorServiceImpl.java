@@ -7,16 +7,14 @@ import com.elleined.marketplaceapi.exception.atm.transaction.TransactionRejected
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReleaseException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
-import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
-import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
-import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
-import com.elleined.marketplaceapi.exception.user.UserVerificationRejectionException;
+import com.elleined.marketplaceapi.exception.user.*;
 import com.elleined.marketplaceapi.mapper.ModeratorMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
+import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
 import com.elleined.marketplaceapi.service.moderator.request.ProductRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
@@ -28,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +38,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     private final ModeratorRepository moderatorRepository;
     private final ModeratorMapper moderatorMapper;
 
+    private final ATMValidator atmValidator;
     private final PasswordEncoder passwordEncoder;
 
     private final UserVerificationRequest userVerificationRequest;
@@ -147,7 +147,12 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     public void releaseWithdrawRequest(Moderator moderator, WithdrawTransaction withdrawTransaction)
             throws TransactionReleaseException,
             TransactionReceiveException,
-            TransactionRejectedException {
+            TransactionRejectedException,
+            InsufficientBalanceException {
+
+        User requestingUserToWithdraw = withdrawTransaction.getUser();
+        BigDecimal amountToBeWithdrawn = withdrawTransaction.getAmount();
+        if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance is below the requesting amount to be withdrawn. Reject it!");
         if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
         if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
         if (withdrawTransaction.isReceive()) throw new TransactionReceiveException("Cannot release withdraw! because this transaction is already been receive by the requesting user!");

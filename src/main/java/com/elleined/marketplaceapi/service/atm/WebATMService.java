@@ -54,15 +54,11 @@ public class WebATMService implements ATMService {
 
     @Override
     public void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction)
-            throws InsufficientFundException,
-            NotOwnedException,
-            NotValidAmountException,
-            WithdrawLimitException,
-            MinimumAmountException,
-            TransactionNotYetReleaseException,
-            TransactionRejectedException,
+            throws NotOwnedException,
+            TransactionReceiveException,
             TransactionPendingException,
-            TransactionReceiveException {
+            TransactionRejectedException,
+            TransactionNotYetReleaseException {
 
         if (!currentUser.hasWithdrawTransaction(withdrawTransaction)) throw new NotOwnedException("Cannot receive withdraw request! You don't have or you don't owned this withdraw transaction!");
         if (withdrawTransaction.isReceive()) throw new TransactionReceiveException("Cannot receive withdraw! because this transaction is already been receive!");

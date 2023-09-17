@@ -1,10 +1,7 @@
 package com.elleined.marketplaceapi.model.atm.transaction;
 
 import com.elleined.marketplaceapi.model.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,9 +26,16 @@ public class DepositTransaction extends Transaction {
     )
     private User user;
 
+    @Column(
+            name = "proof_of_transaction",
+            nullable = false
+    )
+    private String proofOfTransaction;
+
     @Builder
-    public DepositTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Transaction.Status status, User user) {
+    public DepositTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, User user, String proofOfTransaction) {
         super(id, trn, amount, transactionDate, status);
         this.user = user;
+        this.proofOfTransaction = proofOfTransaction;
     }
 }
