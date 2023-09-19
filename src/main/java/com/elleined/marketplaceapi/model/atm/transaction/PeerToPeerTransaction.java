@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tbl_peer_to_peer_transaction")
+@Table(name = "tbl_transaction_peer_to_peer")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -40,8 +40,8 @@ public class PeerToPeerTransaction extends Transaction {
     private User receiver;
 
     @Builder
-    public PeerToPeerTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, User sender, User receiver) {
-        super(id, trn, amount, transactionDate);
+    public PeerToPeerTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, User sender, User receiver) {
+        super(id, trn, amount, transactionDate, status);
         this.sender = sender;
         this.receiver = receiver;
     }

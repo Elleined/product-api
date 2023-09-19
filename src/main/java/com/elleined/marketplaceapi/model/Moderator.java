@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.model;
 
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -87,11 +89,65 @@ public class Moderator {
     )
     private Set<User> verifiedUsers;
 
+    // This unidirectional mapping
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_moderator_release_deposit_request",
+            joinColumns = @JoinColumn(name = "moderator_id",
+                    referencedColumnName = "moderator_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
+            )
+    )
+    private Set<DepositTransaction> releaseDepositRequest;
+
+    // This unidirectional mapping
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_moderator_rejected_deposit_request",
+            joinColumns = @JoinColumn(name = "moderator_id",
+                    referencedColumnName = "moderator_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
+            )
+    )
+    private Set<DepositTransaction> rejectedDepositRequest;
+
+    // This unidirectional mapping
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_moderator_release_withdraw_request",
+            joinColumns = @JoinColumn(name = "moderator_id",
+                    referencedColumnName = "moderator_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
+            )
+    )
+    private Set<WithdrawTransaction> releaseWithdrawRequests;
+
+    // This unidirectional mapping
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_moderator_rejected_withdraw_request",
+            joinColumns = @JoinColumn(name = "moderator_id",
+                    referencedColumnName = "moderator_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "transaction_id",
+                    referencedColumnName = "transaction_id"
+            )
+    )
+    private Set<WithdrawTransaction> rejectedWithdrawRequests;
 
     public void addVerifiedUser(User userToBeVerified) {
         this.getVerifiedUsers().add(userToBeVerified);
     }
-
 
     public void addListedProducts(Product product) {
         this.getListedProducts().add(product);
@@ -99,5 +155,21 @@ public class Moderator {
 
     public void addRejectedProduct(Product productToBeRejected) {
         this.getRejectedProducts().add(productToBeRejected);
+    }
+
+    public void addReleaseWithdrawRequest(WithdrawTransaction withdrawTransaction) {
+        this.getReleaseWithdrawRequests().add(withdrawTransaction);
+    }
+
+    public void addRejectedWithdrawRequest(WithdrawTransaction withdrawTransaction) {
+        this.getRejectedWithdrawRequests().add(withdrawTransaction);
+    }
+
+    public void addReleaseDepositRequest(DepositTransaction depositTransaction) {
+        this.getReleaseDepositRequest().add(depositTransaction);
+    }
+
+    public void addRejectedDepositRequest(DepositTransaction depositTransaction) {
+        this.getRejectedDepositRequest().add(depositTransaction);
     }
 }

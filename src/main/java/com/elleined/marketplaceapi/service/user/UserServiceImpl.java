@@ -124,6 +124,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         log.debug("User with id of {} resended valid id {}", currentUser.getId(), validId);
     }
 
+
     @Override
     public User login(CredentialDTO userCredentialDTO)
             throws ResourceNotFoundException,

@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.repository;
+package com.elleined.marketplaceapi.repository.atm;
 
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;

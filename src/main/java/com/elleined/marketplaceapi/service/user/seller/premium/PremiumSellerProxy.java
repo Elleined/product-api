@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.seller.premium;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
@@ -35,7 +36,7 @@ public class PremiumSellerProxy implements SellerService {
 
     @Override
     public Product saveProduct(ProductDTO productDTO, User seller)
-            throws NotVerifiedException, ProductExpirationLimitException {
+            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException {
         // add validation for here for premium seller for future
         return sellerService.saveProduct(productDTO, seller);
     }
@@ -72,7 +73,7 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientBalanceException {
+    public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         double orderPrice = orderItem.getPrice();
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
         if (isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee))

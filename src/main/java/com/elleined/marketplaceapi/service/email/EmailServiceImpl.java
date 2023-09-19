@@ -4,6 +4,8 @@ import com.elleined.marketplaceapi.client.EmailClient;
 import com.elleined.marketplaceapi.dto.email.EmailMessage;
 import com.elleined.marketplaceapi.dto.email.OTPMessage;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +66,58 @@ public class EmailServiceImpl implements EmailService {
                 .build();
         // emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending product rejection email for seller with id {} of in his/her product with id of {} success", seller.getId(), product.getId());
+    }
+
+    @Override
+    public void sendReleaseWithdrawMail(WithdrawTransaction withdrawTransaction) {
+        String receiverEmail = withdrawTransaction.getUser().getUserCredential().getEmail();
+        final String message = "Hello " + withdrawTransaction.getUser().getUserDetails().getFirstName() + " we want to inform you that your request for withdrawal transaction amounting " + withdrawTransaction.getAmount() + " has already been release. You can now receive it to successfully complete the transaction. Thank you";
+        EmailMessage emailMessage = EmailMessage.builder()
+                .subject("Withdrawal Request Release")
+                .messageBody(message)
+                .receiver(receiverEmail)
+                .build();
+        // emailClient.sendSimpleMail(emailMessage);
+        log.debug("Sending release withdrawal request email for {} success", receiverEmail);
+    }
+
+    @Override
+    public void sendRejectedWithdrawMail(WithdrawTransaction withdrawTransaction) {
+        String receiverEmail = withdrawTransaction.getUser().getUserCredential().getEmail();
+        final String message = "Hello " + withdrawTransaction.getUser().getUserDetails().getFirstName() + " we want to inform you that you withdrawal request transaction amounting " + withdrawTransaction.getAmount() + " are been rejected.";
+        EmailMessage emailMessage = EmailMessage.builder()
+                .subject("Withdrawal Request Rejected")
+                .messageBody(message)
+                .receiver(receiverEmail)
+                .build();
+        // emailClient.sendSimpleMail(emailMessage);
+        log.debug("Sending withdrawal rejection mail for {} success", receiverEmail);
+    }
+
+    @Override
+    public void sendReleaseDepositMail(DepositTransaction depositTransaction) {
+        String receiverEmail = depositTransaction.getUser().getUserCredential().getEmail();
+        final String message = " Hello " + depositTransaction.getUser().getUserDetails().getFirstName() + " we want to inform you that you're deposit request transaction amounting " + depositTransaction.getAmount() + " has been release. The deposit request will are now reflected in your account";
+        EmailMessage emailMessage = EmailMessage.builder()
+                .subject("Deposit Request Release")
+                .messageBody(message)
+                .receiver(receiverEmail)
+                .build();
+        // emailClient.sendSimpleMail(emailMessage);
+        log.debug("Sending release deposit request email for requesting user {} success", receiverEmail);
+    }
+
+    @Override
+    public void sendRejectDepositMail(DepositTransaction depositTransaction) {
+        String receiverEmail = depositTransaction.getUser().getUserCredential().getEmail();
+        final String message = "Hello " + depositTransaction.getUser().getUserDetails().getFirstName() + " we want to inform you that you're deposit request transaction has been rejected amounting " + depositTransaction.getAmount();
+        EmailMessage emailMessage = EmailMessage.builder()
+                .subject("Deposit Request Rejected")
+                .messageBody(message)
+                .receiver(receiverEmail)
+                .build();
+        // emailClient.sendSimpleMail(emailMessage);
+        log.debug("Sending rejected deposit request email for requesting user {} success!", receiverEmail);
     }
 
     @Override

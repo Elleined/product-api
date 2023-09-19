@@ -56,4 +56,31 @@ public abstract class Transaction {
             nullable = false
     )
     private LocalDateTime transactionDate;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    public enum Status {
+        RELEASE,
+        PENDING,
+        REJECTED,
+        RECEIVE
+    }
+
+    public boolean isRejected() {
+        return this.getStatus() == Status.REJECTED;
+    }
+
+    public boolean isRelease() {
+        return this.getStatus() == Status.RELEASE;
+    }
+
+    public boolean isReceive() {
+        return this.getStatus() == Status.RECEIVE;
+    }
+
+    public boolean isPending() {
+        return this.getStatus() == Status.PENDING;
+    }
 }
