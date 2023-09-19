@@ -154,7 +154,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         double totalPrice = productService.calculateTotalPrice(productDTO.getPricePerUnit(), productDTO.getQuantityPerUnit(), productDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
         if (isBalanceNotEnoughToPayListingFee(seller, listingFee))
-            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice + ". Consider buying premium account to remove listing fee.");
 
         sellerService.updateProduct(seller, product, productDTO);
     }
