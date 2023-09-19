@@ -52,7 +52,7 @@ public class CartItemController {
     }
 
 
-    @PostMapping("/orderCartItem/{cartItemId}")
+    @PostMapping("/{cartItemId}/order")
     public OrderItemDTO moveToOrderItem(@PathVariable("currentUserId") int currentUserId,
                                         @PathVariable("cartItemId") int cartItemId) {
 
@@ -64,7 +64,7 @@ public class CartItemController {
     }
 
 
-    @PostMapping("/orderAllCartItem")
+    @PostMapping("/order")
     public List<OrderItemDTO> moveAllToOrderItem(@PathVariable("currentUserId") int currentUserId,
                                                  @RequestBody List<Integer> cartItemIds) {
         User currentUser = userService.getById(currentUserId);
