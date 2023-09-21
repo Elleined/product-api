@@ -23,6 +23,7 @@ public class GetAllUtilityServiceImpl implements GetAllUtilityService {
     private final CropService cropService;
     private final UnitService unitService;
 
+
     @Override
     public List<String> getAllEmail() {
         return userRepository.fetchAllEmail();

@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,6 +79,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     public List<User> getAllUnverifiedUser() {
         return userVerificationRequest.getAllRequest();
     }
+
+
 
     @Override
     public void verifyUser(Moderator moderator, User userToBeVerified)

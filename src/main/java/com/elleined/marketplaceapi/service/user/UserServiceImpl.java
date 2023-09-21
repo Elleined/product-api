@@ -69,6 +69,15 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         return userRepository.findAllById(userIds).stream().collect(Collectors.toUnmodifiableSet());
     }
 
+    @Override
+    public Set<User> getAllSeller() {
+        return userRepository.findAll().stream()
+                .filter(User::isVerified)
+                .filter(User::hasShopRegistration)
+                .filter(User::hasNotBeenRejected) // Checking for rejected user
+                .collect(Collectors.toSet());
+    }
+
 
     @Override
     public User saveByDTO(UserDTO userDTO)

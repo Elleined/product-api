@@ -38,6 +38,7 @@ public interface UserService extends PasswordService {
 
     User getById(int id) throws ResourceNotFoundException;
     Set<User> getAllById(Set<Integer> userIds) throws ResourceNotFoundException;
+    Set<User> getAllSeller();
 
     void resendValidId(User currentUser, String validId)
             throws UserAlreadyVerifiedException,

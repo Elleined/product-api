@@ -80,4 +80,5 @@ public interface ModeratorService {
             throws TransactionReleaseException,
             TransactionReceiveException;
     void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
+
 }
