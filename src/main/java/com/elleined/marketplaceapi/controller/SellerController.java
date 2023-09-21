@@ -2,14 +2,17 @@ package com.elleined.marketplaceapi.controller;
 
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.mapper.ShopMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.UserService;
+import com.elleined.marketplaceapi.service.user.seller.SellerGetAllService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,23 +27,29 @@ public class SellerController {
 
     private final UserService userService;
 
+    private final SellerGetAllService sellerGetAllService;
     private final SellerService regularSeller;
     private final SellerService premiumSeller;
 
     private final ProductService productService;
+
+
+    private final ShopMapper shopMapper;
     private final ProductMapper productMapper;
     private final ItemMapper itemMapper;
 
     public SellerController(UserService userService,
-                            SellerService regularSeller,
+                            SellerGetAllService sellerGetAllService, SellerService regularSeller,
                             @Qualifier("premiumSellerProxy") SellerService premiumSeller,
                             ProductService productService,
-                            ProductMapper productMapper,
+                            ShopMapper shopMapper, ProductMapper productMapper,
                             ItemMapper itemMapper) {
         this.userService = userService;
+        this.sellerGetAllService = sellerGetAllService;
         this.regularSeller = regularSeller;
         this.premiumSeller = premiumSeller;
         this.productService = productService;
+        this.shopMapper = shopMapper;
         this.productMapper = productMapper;
         this.itemMapper = itemMapper;
     }
@@ -49,15 +58,15 @@ public class SellerController {
     public List<ProductDTO> getAllProductByState(@PathVariable("currentUserId") int sellerId,
                                                  @RequestParam("productState") String state) {
         User seller = userService.getById(sellerId);
-        if (seller.isPremiumAndNotExpired()) {
-            return premiumSeller.getAllProductByState(seller, Product.State.valueOf(state)).stream()
-                    .map(productMapper::toDTO)
-                    .toList();
-        }
-
-        return regularSeller.getAllProductByState(seller, Product.State.valueOf(state)).stream()
+        return sellerGetAllService.getAllProductByState(seller, Product.State.valueOf(state)).stream()
                 .map(productMapper::toDTO)
                 .toList();
+    }
+
+    @GetMapping("/shop")
+    public ShopDTO getShop(@PathVariable("currentUserId") int currentUserId) {
+        User seller = userService.getById(currentUserId);
+        return shopMapper.toDTO(seller.getShop());
     }
 
     @PatchMapping("/acceptOrder/{orderItemId}")
@@ -107,12 +116,7 @@ public class SellerController {
                                                                @RequestParam("orderItemStatus") String orderItemStatus) {
 
         User seller = userService.getById(sellerId);
-        if (seller.isPremiumAndNotExpired()) {
-            return premiumSeller.getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()
-                    .map(itemMapper::toOrderItemDTO)
-                    .toList();
-        }
-        return regularSeller.getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()
+        return sellerGetAllService.getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()
                 .map(itemMapper::toOrderItemDTO)
                 .toList();
     }

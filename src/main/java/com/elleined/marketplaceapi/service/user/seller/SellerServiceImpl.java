@@ -37,7 +37,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 @Qualifier("sellerServiceImpl")
-public class SellerServiceImpl implements SellerService, SellerOrderChecker {
+public class SellerServiceImpl implements SellerService, SellerOrderChecker, SellerGetAllService {
 
     private static final int DAY_RANGE = 14;
 

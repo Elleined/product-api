@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -219,16 +218,6 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
         sellerService.soldOrder(seller, orderItem);
-    }
-
-    @Override
-    public List<Product> getAllProductByState(User seller, Product.State state) {
-        return sellerService.getAllProductByState(seller, state);
-    }
-
-    @Override
-    public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        return sellerService.getAllSellerProductOrderByStatus(seller, orderItemStatus);
     }
 
     private double getListingFee(double productTotalPrice) {

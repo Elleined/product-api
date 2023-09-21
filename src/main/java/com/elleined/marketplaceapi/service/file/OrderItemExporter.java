@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.file;
 
-import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.utils.Formatter;
 import com.elleined.marketplaceapi.utils.OrderItemUtils;

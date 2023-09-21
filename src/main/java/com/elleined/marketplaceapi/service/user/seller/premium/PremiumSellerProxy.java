@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Slf4j
 @Transactional
@@ -86,16 +84,6 @@ public class PremiumSellerProxy implements SellerService {
     @Override
     public boolean isBalanceNotEnoughToPaySuccessfulTransactionFee(User seller, double successfulTransactionFee) {
         return sellerService.isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee);
-    }
-
-    @Override
-    public List<Product> getAllProductByState(User seller, Product.State state) {
-        return sellerService.getAllProductByState(seller, state);
-    }
-
-    @Override
-    public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        return sellerService.getAllSellerProductOrderByStatus(seller, orderItemStatus);
     }
 
     @Override

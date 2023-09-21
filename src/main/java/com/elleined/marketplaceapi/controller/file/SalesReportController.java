@@ -4,9 +4,9 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.file.Exporter;
 import com.elleined.marketplaceapi.service.user.UserService;
-import com.elleined.marketplaceapi.service.user.seller.SellerService;
+import com.elleined.marketplaceapi.service.user.seller.SellerGetAllService;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -14,21 +14,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users/{userId}/export/pdf")
 public class SalesReportController {
 
     private final UserService userService;
-    private final SellerService sellerService;
+    private final SellerGetAllService sellerGetAllService;
 
     private final Exporter<List<OrderItem>> orderItemExporter;
-
-    public SalesReportController(UserService userService,
-                                 @Qualifier("sellerServiceImpl") SellerService sellerService,
-                                 Exporter<List<OrderItem>> orderItemExporter) {
-        this.userService = userService;
-        this.sellerService = sellerService;
-        this.orderItemExporter = orderItemExporter;
-    }
 
     @GetMapping("/sales-report-by-date-range")
     public void exportSalesReport(HttpServletResponse response,
@@ -41,7 +34,7 @@ public class SalesReportController {
         response.setHeader(headerKey, headerValue);
 
         User user = userService.getById(userId);
-        List<OrderItem> soldOrders = sellerService.getAllSellerProductOrderByStatus(user, OrderItem.OrderItemStatus.SOLD);
+        List<OrderItem> soldOrders = sellerGetAllService.getAllSellerProductOrderByStatus(user, OrderItem.OrderItemStatus.SOLD);
         orderItemExporter.export(response, soldOrders, start, end);
     }
 
@@ -54,7 +47,7 @@ public class SalesReportController {
         response.setHeader(headerKey, headerValue);
 
         User user = userService.getById(userId);
-        List<OrderItem> soldOrders = sellerService.getAllSellerProductOrderByStatus(user, OrderItem.OrderItemStatus.SOLD);
+        List<OrderItem> soldOrders = sellerGetAllService.getAllSellerProductOrderByStatus(user, OrderItem.OrderItemStatus.SOLD);
         orderItemExporter.export(response, soldOrders);
     }
 }
