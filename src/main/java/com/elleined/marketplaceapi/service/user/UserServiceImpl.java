@@ -42,7 +42,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class UserServiceImpl implements UserService, EntityPasswordEncoder<User> {
+public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>,
+        ReferralService, RegistrationPromoService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;

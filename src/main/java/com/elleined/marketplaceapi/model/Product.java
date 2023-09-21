@@ -30,7 +30,7 @@ public class Product {
     )
     private int id;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "MEDIUMTEXT")
     private String description;
 
     @Column(name = "available_quantity", nullable = false)

@@ -8,6 +8,8 @@ import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.fee.FeeService;
+import com.elleined.marketplaceapi.service.user.ReferralService;
+import com.elleined.marketplaceapi.service.user.RegistrationPromoService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,8 @@ import java.util.Set;
 public class UserVerificationRequest implements Request<User> {
     private final UserRepository userRepository;
     private final UserService userService;
+    private final RegistrationPromoService registrationPromoService;
+    private final ReferralService referralService;
     private final PremiumRepository premiumRepository;
 
     private final ModeratorRepository moderatorRepository;
@@ -54,8 +58,8 @@ public class UserVerificationRequest implements Request<User> {
 
     @Override
     public void accept(Moderator moderator, User userToBeVerified) {
-        if (userService.isLegibleForRegistrationPromo()) userService.availRegistrationPromo(userToBeVerified);
-        User invitingUser = userService.getInvitingUser(userToBeVerified);
+        if (registrationPromoService.isLegibleForRegistrationPromo()) registrationPromoService.availRegistrationPromo(userToBeVerified);
+        User invitingUser = referralService.getInvitingUser(userToBeVerified);
         if (invitingUser != null) feeService.payInvitingUserForHisReferral(invitingUser);
         if (invitingUser != null && feeService.isInvitingUserLegibleForExtraReferralReward(invitingUser)) feeService.payExtraReferralRewardForInvitingUser(invitingUser);
 

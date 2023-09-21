@@ -52,20 +52,10 @@ public interface UserService extends PasswordService {
 
     boolean existsById(int userId);
 
-    // First 500 registrants
-    boolean isLegibleForRegistrationPromo();
-
-    // First 500 registrants will receive a registration promo of 50 pesos
-    void availRegistrationPromo(User registratingUser);
-
     void sendShopRegistration(User user, ShopDTO shopDTO) throws AlreadyExistException;
 
     OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException;
 
     User getByReferralCode(String referralCode) throws ResourceNotFoundException;
 
-    void addInvitedUser(String invitingUserReferralCode, User invitedUser);
-
-    // returns the inviting user of invited user
-    User getInvitingUser(User invitedUser) throws ResourceNotFoundException;
 }
