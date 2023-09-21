@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.atm.machine;
 
+import com.elleined.marketplaceapi.exception.atm.MalformedProofOfTransaction;
 import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
@@ -9,7 +10,6 @@ import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
-import com.elleined.marketplaceapi.exception.atm.MalformedProofOfTransaction;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.utils.StringUtil;
