@@ -8,7 +8,7 @@ import com.elleined.marketplaceapi.exception.user.NoLoggedInUserException;
 
 
 // connect in /http://localhost:8083/api/v1/marketplace/ws
-// subscribe to /user/private-chat to get the private messages
+// subscribe to /user/private-chat/{chatRoomId} to get the private messages
 // subscribe to /public-chat/topic to get public message
 public interface MessageService {
 

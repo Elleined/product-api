@@ -20,7 +20,6 @@ import org.springframework.web.util.HtmlUtils;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Primary
 public class MessageServiceImpl implements MessageService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserService userService;

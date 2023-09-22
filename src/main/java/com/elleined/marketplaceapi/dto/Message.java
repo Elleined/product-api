@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Message {
-    String message;
-    int senderId;
+    private String message;
+    private int senderId;
 }

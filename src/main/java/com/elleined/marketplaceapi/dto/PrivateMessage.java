@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PrivateMessage extends Message {
-    int recipientId;
+    private int recipientId;
 
 
     @Builder
