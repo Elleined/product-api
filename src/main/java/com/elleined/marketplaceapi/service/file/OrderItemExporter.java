@@ -32,7 +32,7 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
         document.open();
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA, 20);
         headerFont.setStyle(Font.BOLDITALIC);
-        Paragraph header = new Paragraph("Sales report", headerFont);
+        Paragraph header = new Paragraph("Sales Report", headerFont);
         header.setAlignment(Paragraph.ALIGN_CENTER);
 
         PdfPTable table = new PdfPTable(5);
