@@ -35,11 +35,11 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
         Paragraph header = new Paragraph("Sales Report", headerFont);
         header.setAlignment(Paragraph.ALIGN_CENTER);
 
-        PdfPTable table = new PdfPTable(5);
-        table.setWidths(new int[] {2, 2, 2, 2, 2});
+        PdfPTable table = new PdfPTable(6);
+        table.setWidths(new int[] {2, 2, 2, 2, 2 ,2});
         table.setSpacingBefore(10);
 
-        writeColumnNames(table, Arrays.asList("Product id", "Product name", "Total price", "Order quantity", "Date sold"));
+        writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
         writeTableData(table, orderItems);
 
         document.add(header);
@@ -62,11 +62,11 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
         Paragraph header = new Paragraph("Sales report", headerFont);
         header.setAlignment(Paragraph.ALIGN_CENTER);
 
-        PdfPTable table = new PdfPTable(5);
-        table.setWidths(new int[] {2, 2, 2, 2, 2});
+        PdfPTable table = new PdfPTable(6);
+        table.setWidths(new int[] {2, 2, 2, 2, 2, 2});
         table.setSpacingBefore(10);
 
-        writeColumnNames(table, Arrays.asList("Product id", "Product name", "Total price", "Order quantity", "Date sold"));
+        writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
         List<OrderItem> rangedOrderItems = OrderItemUtils.getOrderItemsByRange(orderItems, start, end);
         writeTableData(table, rangedOrderItems);
 
@@ -79,6 +79,7 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
 
     private void writeTableData(PdfPTable table, List<OrderItem> orders) {
         for (OrderItem orderItem : orders) {
+            table.addCell(String.valueOf(orderItem.getProduct().getSeller().getId()));
             table.addCell(String.valueOf(orderItem.getProduct().getId()));
             table.addCell(orderItem.getProduct().getCrop().getName());
             table.addCell(String.valueOf(orderItem.getPrice()));

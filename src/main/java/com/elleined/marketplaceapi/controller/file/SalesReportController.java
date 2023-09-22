@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,8 +54,35 @@ public class SalesReportController {
         orderItemExporter.export(response, soldOrders);
     }
 
-    @GetMapping("/z")
-    public void exportAllSalesReport(HttpServletResponse response) {
+    @GetMapping("/sellers-sales-report")
+    public void exportAllSalesReport(HttpServletResponse response) throws IOException {
         Set<User> sellers = userService.getAllSeller();
+
+        response.setContentType("application/pdf");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=sales-report.pdf";
+        response.setHeader(headerKey, headerValue);
+
+        List<OrderItem> sellersAllSoldOrder = sellers.stream()
+                .flatMap(seller -> sellerGetAllService.getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.SOLD).stream())
+                .toList();
+        orderItemExporter.export(response, sellersAllSoldOrder);
+    }
+
+    @GetMapping("/sellers-sales-report-by-range")
+    public void exportAllSalesReport(HttpServletResponse response,
+                                     @RequestParam("startDate") LocalDate start,
+                                     @RequestParam("endDate") LocalDate end) throws IOException {
+        Set<User> sellers = userService.getAllSeller();
+
+        response.setContentType("application/pdf");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=sales-report.pdf";
+        response.setHeader(headerKey, headerValue);
+
+        List<OrderItem> sellersAllSoldOrder = sellers.stream()
+                .flatMap(seller -> sellerGetAllService.getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.SOLD).stream())
+                .toList();
+        orderItemExporter.export(response, sellersAllSoldOrder, start, end);
     }
 }
