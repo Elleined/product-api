@@ -11,6 +11,8 @@ import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.model.message.ChatMessage;
+import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import jakarta.persistence.*;
@@ -111,19 +113,23 @@ public class User {
 
     // sender id reference is in peer to peer transaction table
     @OneToMany(mappedBy = "sender")
-    List<PeerToPeerTransaction> sentMoneyTransactions;
+    private List<PeerToPeerTransaction> sentMoneyTransactions;
 
     // recipient id reference is in peer to peer transaction table
     @OneToMany(mappedBy = "receiver")
-    List<PeerToPeerTransaction> receiveMoneyTransactions;
+    private List<PeerToPeerTransaction> receiveMoneyTransactions;
 
     // user id reference is in withdraw transaction table
     @OneToMany(mappedBy = "user")
-    List<WithdrawTransaction> withdrawTransactions;
+    private List<WithdrawTransaction> withdrawTransactions;
 
     // user id reference is in withdraw transaction table
     @OneToMany(mappedBy = "user")
-    List<DepositTransaction> depositTransactions;
+    private List<DepositTransaction> depositTransactions;
+
+    // user id reference is in chat room message table
+    @OneToMany(mappedBy = "sender")
+    private List<ChatMessage> chatMessages;
 
     public void addInvitedUser(User invitedUser) {
         this.getReferredUsers().add(invitedUser);
