@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 public class PrivateChatMessage extends ChatMessage {
 
-    @Builder(builderMethodName = "privateChatMessageBuilder")
+    @Builder(builderMethodName = "privateMessageBuilder")
     public PrivateChatMessage(int id, String message, ChatRoom chatRoom, User sender, Status status) {
         super(id, message, chatRoom, sender, status);
     }

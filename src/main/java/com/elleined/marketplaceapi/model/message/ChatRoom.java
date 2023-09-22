@@ -37,6 +37,6 @@ public abstract class ChatRoom {
     private int id;
 
     // Chat room id reference is in tbl_chat_room_message
-    @OneToMany(mappedBy = "privateChatRoom")
+    @OneToMany(mappedBy = "chatRoom")
     private List<ChatMessage> chatMessages;
 }
