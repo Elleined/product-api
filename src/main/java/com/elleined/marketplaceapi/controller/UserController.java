@@ -12,7 +12,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.email.EmailService;
-import com.elleined.marketplaceapi.service.message.MessageService;
+import com.elleined.marketplaceapi.service.message.WSMessageService;
 import com.elleined.marketplaceapi.service.user.PasswordService;
 import com.elleined.marketplaceapi.service.user.PremiumService;
 import com.elleined.marketplaceapi.service.user.UserService;
@@ -34,7 +34,7 @@ public class UserController {
     private final EmailService emailService;
 
     private final PasswordService passwordService;
-    private final MessageService messageService;
+    private final WSMessageService WSMessageService;
 
     private final PremiumService premiumService;
     private final UserMapper userMapper;
