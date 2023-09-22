@@ -8,6 +8,10 @@ import com.elleined.marketplaceapi.model.user.User;
 public interface PrivateChatRoomService {
     boolean hasAlreadyHaveConversation(User sender, Product productToSettle);
 
+
+
+    PrivateChatRoom getBySenderAndProduct(User sender, Product productToSettle) throws ResourceNotFoundException;
+
     PrivateChatRoom getById(int privateChatId) throws ResourceNotFoundException;
 
     PrivateChatRoom createPrivateChatRoom(Product productToSettle);

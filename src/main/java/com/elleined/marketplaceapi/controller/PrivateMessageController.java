@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/users/{senderId}/rooms/{privateChatRoomId}/private-chat")
+@RequestMapping("/users/{senderId}/private-chat")
 public class PrivateMessageController {
     private final PrivateChatMessageService privateChatMessageService;
     private final PrivateChatRoomService privateChatRoomService;
@@ -28,16 +28,15 @@ public class PrivateMessageController {
 
     @PostMapping
     public PrivateChatMessageDTO sendPrivateMessage(@PathVariable("senderId") int senderId,
-                                                    @PathVariable("privateChatRoomId") int privateChatRoomId,
                                                     @RequestParam("productToSettleId") int productToSettleId,
                                                     @RequestParam("message") String message) {
 
         User sender = userService.getById(senderId);
         Product productToSettle = productService.getById(productToSettleId);
 
-        // Sends to existing chat room else create a new chat room
+        // Sends to existing private chat room else create a new chat room
         if (privateChatRoomService.hasAlreadyHaveConversation(sender, productToSettle)) {
-            PrivateChatRoom privateChatRoom = privateChatRoomService.getById(privateChatRoomId);
+            PrivateChatRoom privateChatRoom = privateChatRoomService.getBySenderAndProduct(sender, productToSettle);
             PrivateChatMessage privateChatMessage = privateChatMessageService.save(privateChatRoom, sender, productToSettle, message);
             return chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
         }

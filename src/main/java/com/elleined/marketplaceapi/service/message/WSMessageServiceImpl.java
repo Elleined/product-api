@@ -23,7 +23,8 @@ public class WSMessageServiceImpl implements WSMessageService {
         PrivateChatMessageDTO privateChatMessageDTO = chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
 
         final String privateChatRoomId = String.valueOf(privateChatRoom.getId());
-        final String destination = "/private-chat/" + privateChatRoomId;
+        final int sellerId = privateChatRoom.getProductToSettle().getId();
+        final String destination = "/private-chat/" + privateChatRoomId + "/" + sellerId; // /private-chat/1/2
         simpMessagingTemplate.convertAndSendToUser(privateChatRoomId, destination, privateChatMessageDTO);
         log.debug("Private message successfully broadcasted to {}", destination);
     }

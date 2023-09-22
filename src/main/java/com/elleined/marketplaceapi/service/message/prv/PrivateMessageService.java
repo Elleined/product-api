@@ -51,6 +51,15 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
+    public PrivateChatRoom getBySenderAndProduct(User sender, Product productToSettle) throws ResourceNotFoundException {
+        return sender.getPrivateChatMessages().stream()
+                .map(PrivateChatMessage::getPrivateChatRoom)
+                .filter(privateChatRoom -> privateChatRoom.getProductToSettle().equals(productToSettle))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Chat does not exist with product to settle with id of " + productToSettle.getId() + " and sender with id of " + sender.getId()));
+    }
+
+    @Override
     public PrivateChatRoom getById(int privateChatId) throws ResourceNotFoundException {
         return privateChatRoomRepository.findById(privateChatId).orElseThrow(() -> new ResourceNotFoundException("Private chat room with id of " + privateChatId + " does not exists!"));
     }
