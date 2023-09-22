@@ -5,8 +5,8 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.message.PrivateChatMessageRepository;
-import com.elleined.marketplaceapi.repository.message.PrivateChatRoomRepository;
+import com.elleined.marketplaceapi.repository.message.ChatMessageRepository;
+import com.elleined.marketplaceapi.repository.message.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
-    private final PrivateChatRoomRepository privateChatRoomRepository;
-    private final PrivateChatMessageRepository privateChatMessageRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
