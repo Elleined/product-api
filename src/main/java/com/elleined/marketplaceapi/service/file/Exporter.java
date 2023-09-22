@@ -5,8 +5,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collection;
 
 public interface Exporter<T> {
-    void export(HttpServletResponse httpServletResponse, T t) throws DocumentException, IOException;
-    void export(HttpServletResponse httpServletResponse, T t, LocalDate start, LocalDate end) throws DocumentException, IOException;
+    void export(HttpServletResponse httpServletResponse, T t)
+            throws DocumentException, IOException;
+
+    void export(HttpServletResponse httpServletResponse, T t, LocalDate start, LocalDate end)
+            throws DocumentException, IOException;
 }

@@ -11,7 +11,6 @@ import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    //@Query("SELECT p FROM Province p WHERE p.locationName LIKE CONCAT('%', :locationName, '%') ORDER BY p.id")
     @Query("SELECT u FROM User u WHERE u.userDetails.firstName LIKE CONCAT('%', :username, '%') ORDER BY u.userDetails.firstName ASC")
     Set<User> searchByUserName(@Param("username") String username);
 

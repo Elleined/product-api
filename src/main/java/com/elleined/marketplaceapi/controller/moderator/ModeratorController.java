@@ -36,4 +36,11 @@ public class ModeratorController {
                 .map(userMapper::toDTO)
                 .collect(Collectors.toSet());
     }
+
+    @GetMapping("/sellers/search")
+    public Set<UserDTO> searchByName(@RequestParam("username") String username) {
+        return userService.searchAllSellerByName(username).stream()
+                .map(userMapper::toDTO)
+                .collect(Collectors.toSet());
+    }
 }

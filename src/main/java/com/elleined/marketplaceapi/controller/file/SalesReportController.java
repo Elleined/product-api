@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,5 +50,10 @@ public class SalesReportController {
         User user = userService.getById(userId);
         List<OrderItem> soldOrders = sellerGetAllService.getAllSellerProductOrderByStatus(user, OrderItem.OrderItemStatus.SOLD);
         orderItemExporter.export(response, soldOrders);
+    }
+
+    @GetMapping("/z")
+    public void exportAllSalesReport(HttpServletResponse response) {
+        Set<User> sellers = userService.getAllSeller();
     }
 }
