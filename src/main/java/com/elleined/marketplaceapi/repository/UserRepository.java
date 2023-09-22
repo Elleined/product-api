@@ -7,8 +7,14 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
+
+    //@Query("SELECT p FROM Province p WHERE p.locationName LIKE CONCAT('%', :locationName, '%') ORDER BY p.id")
+    @Query("SELECT u FROM User u WHERE u.userDetails.firstName LIKE CONCAT('%', :username, '%') ORDER BY u.userDetails.firstName ASC")
+    Set<User> searchByUserName(@Param("username") String username);
+
     @Query("select u from User u where u.userCredential.email = ?1")
     Optional<User> fetchByEmail(String email);
     @Query("SELECT u FROM User u WHERE u.referralCode = :referralCode")

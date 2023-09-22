@@ -78,6 +78,14 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public Set<User> searchAllSellerByName(String username) {
+        return userRepository.searchByUserName(username).stream()
+                .filter(User::isVerified)
+                .filter(User::hasShopRegistration)
+                .filter(User::hasNotBeenRejected) // Checking for rejected user
+                .collect(Collectors.toSet());
+    }
 
     @Override
     public User saveByDTO(UserDTO userDTO)
