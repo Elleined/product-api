@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.message.prv;
 
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
 import com.elleined.marketplaceapi.model.Product;
@@ -8,6 +9,8 @@ import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.message.PrivateChatMessageRepository;
 import com.elleined.marketplaceapi.repository.message.PrivateChatRoomRepository;
+import com.elleined.marketplaceapi.service.message.WSMessageService;
+import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,11 +26,17 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     private final PrivateChatMessageRepository privateChatMessageRepository;
     private final PrivateChatRoomRepository privateChatRoomRepository;
 
+    private final WSMessageService wsMessageService;
+
     private final ChatMessageMapper chatMessageMapper;
     @Override
-    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, String message) {
+    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, String message) throws NotValidBodyException {
+        if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
+
         PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, sender, message);
         privateChatMessageRepository.save(privateChatMessage);
+        wsMessageService.broadCastPrivateMessage(privateChatMessage);
+
         log.debug("Private chat saved successfully with id of {} ", privateChatMessage.getId());
         return privateChatMessage;
     }
@@ -47,7 +56,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
-    public PrivateChatRoom save(Product productToSettle) {
+    public PrivateChatRoom createPrivateChatRoom(Product productToSettle) {
         PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
                 .productToSettle(productToSettle)
                 .build();

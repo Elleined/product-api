@@ -10,5 +10,5 @@ public interface PrivateChatRoomService {
 
     PrivateChatRoom getById(int privateChatId) throws ResourceNotFoundException;
 
-    PrivateChatRoom save(Product productToSettle);
+    PrivateChatRoom createPrivateChatRoom(Product productToSettle);
 }
