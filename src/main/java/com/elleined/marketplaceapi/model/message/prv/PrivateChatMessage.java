@@ -5,6 +5,8 @@ import com.elleined.marketplaceapi.model.message.ChatMessage;
 import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +20,18 @@ import lombok.Setter;
 @Setter
 public class PrivateChatMessage extends ChatMessage {
 
+    @ManyToOne(optional = false)
+    @JoinColumn(
+            name = "private_chat_room_id",
+            referencedColumnName = "chat_room_id",
+            nullable = false,
+            updatable = false
+    )
+    private PrivateChatRoom privateChatRoom;
+
     @Builder(builderMethodName = "privateMessageBuilder")
-    public PrivateChatMessage(int id, String message, ChatRoom chatRoom, User sender, Status status) {
-        super(id, message, chatRoom, sender, status);
+    public PrivateChatMessage(int id, String message, User sender, Status status, PrivateChatRoom privateChatRoom) {
+        super(id, message, sender, status);
+        this.privateChatRoom = privateChatRoom;
     }
 }

@@ -35,17 +35,12 @@ public abstract class ChatMessage {
     )
     private int id;
 
-    @Column(name = "message", nullable = false, columnDefinition = "MEDIUMTEXT")
-    private String message;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(
-            name = "chat_room_id",
-            referencedColumnName = "chat_room_id",
+    @Column(
+            name = "message",
             nullable = false,
-            updatable = false
+            columnDefinition = "MEDIUMTEXT"
     )
-    private ChatRoom chatRoom;
+    private String message;
 
     @ManyToOne(optional = false)
     @JoinColumn(

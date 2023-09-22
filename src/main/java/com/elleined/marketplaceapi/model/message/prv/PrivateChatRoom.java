@@ -4,10 +4,7 @@ package com.elleined.marketplaceapi.model.message.prv;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.message.ChatMessage;
 import com.elleined.marketplaceapi.model.message.ChatRoom;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,9 +28,14 @@ public class PrivateChatRoom extends ChatRoom {
     )
     private Product productToSettle;
 
+    // chat room id reference is in tbl private chat message table
+    @OneToMany(mappedBy = "privateChatRoom")
+    private List<PrivateChatMessage> privateChatMessages;
+
     @Builder(builderMethodName = "privateChatRoomBuilder")
-    public PrivateChatRoom(int id, List<ChatMessage> chatMessages, Product productToSettle) {
-        super(id, chatMessages);
+    public PrivateChatRoom(int id, Product productToSettle, List<PrivateChatMessage> privateChatMessages) {
+        super(id);
         this.productToSettle = productToSettle;
+        this.privateChatMessages = privateChatMessages;
     }
 }

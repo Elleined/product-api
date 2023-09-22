@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.message;
 
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
@@ -12,9 +13,9 @@ import com.elleined.marketplaceapi.model.user.User;
 // subscribe to /public-chat/topic to get public message
 public interface MessageService {
     PrivateChatMessage sendPrivateMessage(
-            final PrivateChatRoom privateChatRoom,
-            final String message,
-            final User sender
+            final User sender,
+            final Product productToSettle,
+            final String message
     ) throws NotValidBodyException, ResourceNotFoundException;
 
 }
