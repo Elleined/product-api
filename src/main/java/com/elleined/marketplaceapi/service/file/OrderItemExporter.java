@@ -26,7 +26,7 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
     public void export(HttpServletResponse response, List<OrderItem> orderItems) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
         PdfWriter.getInstance(document, response.getOutputStream());
-        document.addTitle("Sales report");
+        document.addTitle("Sales Report");
         document.addCreationDate();
 
         document.open();
