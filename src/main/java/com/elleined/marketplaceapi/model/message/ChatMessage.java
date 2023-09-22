@@ -1,21 +1,32 @@
 package com.elleined.marketplaceapi.model.message;
 
-
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 @Entity
 @Table(name = "tbl_chat_room_message")
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Getter
 @Setter
-public class ChatMessage {
+@AllArgsConstructor
+@NoArgsConstructor
+public abstract class ChatMessage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.TABLE,
+            generator = "chatRoomMessageAutoIncrement"
+    )
+    @SequenceGenerator(
+            allocationSize = 1,
+            name = "chatRoomMessageAutoIncrement",
+            sequenceName = "chatRoomMessageAutoIncrement"
+    )
     @Column(
             name = "chat_room_message_id",
             nullable = false,

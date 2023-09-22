@@ -1,6 +1,9 @@
 package com.elleined.marketplaceapi.controller;
 
-import com.elleined.marketplaceapi.dto.*;
+import com.elleined.marketplaceapi.dto.APIResponse;
+import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ShopDTO;
+import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
@@ -116,18 +119,6 @@ public class UserController {
         User currentUser = userService.getById(currentUserId);
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, deliveryAddressId);
         return addressMapper.toDeliveryAddressDTO(deliveryAddress);
-    }
-
-
-    @PostMapping("/sendPrivateMessage/{recipientId}")
-    public PrivateMessage sendPrivateMessage(@PathVariable("recipientId") int recipientId,
-                                             @RequestParam("message") String message) {
-        return messageService.sendPrivateMessage(recipientId, message);
-    }
-
-    @PostMapping("/sendPublicMessage")
-    public Message sendPublicMessage(@RequestParam("message") String message) {
-        return messageService.sendPublicMessage(message);
     }
 
     @PatchMapping("/{currentUserId}/account/changePassword")

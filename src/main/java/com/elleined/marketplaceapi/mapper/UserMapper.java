@@ -33,7 +33,9 @@ public interface UserMapper {
             @Mapping(target = "depositTransactions", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "receiveMoneyTransactions", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "sentMoneyTransactions", expression = "java(new java.util.ArrayList<>())"),
-            @Mapping(target = "withdrawTransactions", expression = "java(new java.util.ArrayList<>())")
+            @Mapping(target = "withdrawTransactions", expression = "java(new java.util.ArrayList<>())"),
+
+            @Mapping(target = "privateChatMessages", expression = "java(new java.util.ArrayList<>())")
     })
     User toEntity(UserDTO userDTO);
 

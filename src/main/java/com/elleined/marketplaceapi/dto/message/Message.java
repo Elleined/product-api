@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.dto;
+package com.elleined.marketplaceapi.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,4 +12,5 @@ import lombok.Setter;
 public class Message {
     private String message;
     private int senderId;
+    private String status;
 }

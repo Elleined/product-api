@@ -19,7 +19,11 @@ public interface ModeratorMapper {
             @Mapping(target = "listedProducts", expression = "java(new java.util.HashSet<>())"),
             @Mapping(target = "verifiedUsers", expression = "java(new java.util.HashSet<>())"),
             @Mapping(target = "moderatorCredential", source = "moderatorCredentialDTO"),
-            @Mapping(target = "rejectedProducts", expression = "java(new java.util.HashSet<>())")
+            @Mapping(target = "rejectedProducts", expression = "java(new java.util.HashSet<>())"),
+            @Mapping(target = "rejectedDepositRequest", expression = "java(new java.util.HashSet<>())"),
+            @Mapping(target = "rejectedWithdrawRequests", expression = "java(new java.util.HashSet<>())"),
+            @Mapping(target = "releaseDepositRequest", expression = "java(new java.util.HashSet<>())"),
+            @Mapping(target = "releaseWithdrawRequests", expression = "java(new java.util.HashSet<>())")
     })
     Moderator toEntity(ModeratorDTO moderatorDTO);
 }
