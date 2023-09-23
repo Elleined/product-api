@@ -17,11 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
+// sender and creator are the same
 public class PrivateMessageService implements PrivateChatRoomService, PrivateChatMessageService {
     private final PrivateChatMessageRepository privateChatMessageRepository;
     private final PrivateChatRoomRepository privateChatRoomRepository;
@@ -41,33 +43,40 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         return privateChatMessage;
     }
 
+
     @Override
-    public boolean hasAlreadyHaveConversation(User sender, Product productToSettle) {
+    public boolean hasAlreadyHaveChatRoom(User sender, User participant, Product productToSettle) {
         return productToSettle.getPrivateChatRooms().stream()
-                .map(PrivateChatRoom::getPrivateChatMessages)
-                .flatMap(Collection::stream)
-                .map(PrivateChatMessage::getSender)
+                .map(PrivateChatRoom::getSender)
+                .anyMatch(sender::equals) ||
+
+        productToSettle.getPrivateChatRooms().stream()
+                .map(PrivateChatRoom::getSender)
+                .anyMatch(participant::equals) ||
+
+        productToSettle.getPrivateChatRooms().stream()
+                .map(PrivateChatRoom::getParticipant)
+                .anyMatch(participant::equals) ||
+
+        productToSettle.getPrivateChatRooms().stream()
+                .map(PrivateChatRoom::getParticipant)
                 .anyMatch(sender::equals);
     }
 
     @Override
-    public PrivateChatRoom getBySenderAndProduct(User sender, Product productToSettle) throws ResourceNotFoundException {
-        return sender.getPrivateChatMessages().stream()
-                .map(PrivateChatMessage::getPrivateChatRoom)
-                .filter(privateChatRoom -> privateChatRoom.getProductToSettle().equals(productToSettle))
+    public PrivateChatRoom getChatRoomBy(User sender, User participant, Product productToSettle) throws ResourceNotFoundException {
+        return productToSettle.getPrivateChatRooms().stream()
+                .filter(privateChatRoom -> privateChatRoom.getSender().equals(sender) || privateChatRoom.getSender().equals(participant))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Chat does not exist with product to settle with id of " + productToSettle.getId() + " and sender with id of " + sender.getId()));
+                .orElseThrow();
     }
 
     @Override
-    public PrivateChatRoom getById(int privateChatId) throws ResourceNotFoundException {
-        return privateChatRoomRepository.findById(privateChatId).orElseThrow(() -> new ResourceNotFoundException("Private chat room with id of " + privateChatId + " does not exists!"));
-    }
-
-    @Override
-    public PrivateChatRoom createPrivateChatRoom(Product productToSettle) {
+    public PrivateChatRoom createPrivateChatRoom(User sender, User participant, Product productToSettle) {
         PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
                 .productToSettle(productToSettle)
+                .sender(sender)
+                .participant(participant)
                 .build();
 
         privateChatRoomRepository.save(privateChatRoom);
