@@ -15,6 +15,6 @@ public interface PrivateChatMessageService {
     PrivateChatMessage getById(int privateMessageId)
             throws ResourceNotFoundException;
 
-    void deleteMessage(User sender, PrivateChatRoom privateChatRoom, PrivateChatMessage privateChatMessage)
+    void unsentMessage(User sender, PrivateChatRoom privateChatRoom, PrivateChatMessage privateChatMessage)
             throws NotOwnedException, ResourceNotFoundException;
 }

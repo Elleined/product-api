@@ -50,7 +50,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
-    public void deleteMessage(User sender, PrivateChatRoom privateChatRoom, PrivateChatMessage privateChatMessage) throws NotOwnedException, ResourceNotFoundException {
+    public void unsentMessage(User sender, PrivateChatRoom privateChatRoom, PrivateChatMessage privateChatMessage) throws NotOwnedException, ResourceNotFoundException {
         if (!sender.getPrivateChatMessages().contains(privateChatMessage)) throw new NotOwnedException("Cannot delete message! because you don't own these message!");
         if (!privateChatRoom.getPrivateChatMessages().contains(privateChatMessage)) throw new ResourceNotFoundException("Cannot delete message! because this private chat room doesn't have this private message!");
 
@@ -109,6 +109,8 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
     @Override
     public List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom) {
-        return privateChatRoom.getPrivateChatMessages();
+        return privateChatRoom.getPrivateChatMessages().stream()
+                .filter(PrivateChatMessage::isNotDeleted)
+                .toList();
     }
 }

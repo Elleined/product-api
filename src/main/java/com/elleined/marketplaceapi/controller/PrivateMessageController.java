@@ -52,7 +52,7 @@ public class PrivateMessageController {
 
 
     @DeleteMapping("/chat-rooms/{roomId}/messages/{messageId}")
-    public void deletePrivateMessage(@PathVariable("senderId") int senderId,
+    public void unsentPrivateMessage(@PathVariable("senderId") int senderId,
                                      @PathVariable("roomId") int roomId,
                                      @PathVariable("messageId") int messageId) {
 
@@ -60,7 +60,7 @@ public class PrivateMessageController {
         PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
         PrivateChatMessage privateChatMessage = privateChatMessageService.getById(messageId);
 
-        privateChatMessageService.deleteMessage(sender, privateChatRoom, privateChatMessage);
+        privateChatMessageService.unsentMessage(sender, privateChatRoom, privateChatMessage);
     }
 
     @GetMapping("/chat-rooms/{roomId}")
