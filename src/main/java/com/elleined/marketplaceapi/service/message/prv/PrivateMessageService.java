@@ -2,8 +2,10 @@ package com.elleined.marketplaceapi.service.message.prv;
 
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.message.ChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
@@ -15,9 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -41,6 +40,14 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
         log.debug("Private chat saved successfully with id of {} ", privateChatMessage.getId());
         return privateChatMessage;
+    }
+
+    @Override
+    public void deleteMessage(User sender, PrivateChatMessage privateChatMessage) throws NotOwnedException {
+        if (!sender.getPrivateChatMessages().contains(privateChatMessage)) throw new NotOwnedException("Cannot delete message! because you don't own these message!");
+        privateChatMessage.setStatus(ChatMessage.Status.INACTIVE);
+        privateChatMessageRepository.save(privateChatMessage);
+        log.debug("Private chat message with id of {} are now inactive", privateChatMessage.getId());
     }
 
 
