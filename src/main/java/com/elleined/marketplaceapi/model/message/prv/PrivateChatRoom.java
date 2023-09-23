@@ -41,23 +41,23 @@ public class PrivateChatRoom extends ChatRoom {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-            name = "participant_id",
+            name = "receiver_id",
             referencedColumnName = "user_id",
             nullable = false,
             updatable = false
     )
-    private User participant;
+    private User receiver;
 
     // chat room id reference is in tbl private chat message table
     @OneToMany(mappedBy = "privateChatRoom")
     private List<PrivateChatMessage> privateChatMessages;
 
     @Builder(builderMethodName = "privateChatRoomBuilder")
-    public PrivateChatRoom(int id, Product productToSettle, User sender, User participant, List<PrivateChatMessage> privateChatMessages) {
+    public PrivateChatRoom(int id, Product productToSettle, User sender, User receiver, List<PrivateChatMessage> privateChatMessages) {
         super(id);
         this.productToSettle = productToSettle;
         this.sender = sender;
-        this.participant = participant;
+        this.receiver = receiver;
         this.privateChatMessages = privateChatMessages;
     }
 }

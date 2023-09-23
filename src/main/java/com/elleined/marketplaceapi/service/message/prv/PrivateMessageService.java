@@ -52,38 +52,38 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
 
     @Override
-    public boolean hasAlreadyHaveChatRoom(User sender, User participant, Product productToSettle) {
+    public boolean hasAlreadyHaveChatRoom(User sender, User receiver, Product productToSettle) {
         return productToSettle.getPrivateChatRooms().stream()
                 .map(PrivateChatRoom::getSender)
                 .anyMatch(sender::equals) ||
 
         productToSettle.getPrivateChatRooms().stream()
                 .map(PrivateChatRoom::getSender)
-                .anyMatch(participant::equals) ||
+                .anyMatch(receiver::equals) ||
 
         productToSettle.getPrivateChatRooms().stream()
-                .map(PrivateChatRoom::getParticipant)
-                .anyMatch(participant::equals) ||
+                .map(PrivateChatRoom::getReceiver)
+                .anyMatch(receiver::equals) ||
 
         productToSettle.getPrivateChatRooms().stream()
-                .map(PrivateChatRoom::getParticipant)
+                .map(PrivateChatRoom::getReceiver)
                 .anyMatch(sender::equals);
     }
 
     @Override
-    public PrivateChatRoom getChatRoomBy(User sender, User participant, Product productToSettle) throws ResourceNotFoundException {
+    public PrivateChatRoom getChatRoomBy(User sender, User receiver, Product productToSettle) throws ResourceNotFoundException {
         return productToSettle.getPrivateChatRooms().stream()
-                .filter(privateChatRoom -> privateChatRoom.getSender().equals(sender) || privateChatRoom.getSender().equals(participant))
+                .filter(privateChatRoom -> privateChatRoom.getSender().equals(sender) || privateChatRoom.getSender().equals(receiver))
                 .findFirst()
                 .orElseThrow();
     }
 
     @Override
-    public PrivateChatRoom createPrivateChatRoom(User sender, User participant, Product productToSettle) {
+    public PrivateChatRoom createPrivateChatRoom(User sender, User receiver, Product productToSettle) {
         PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
                 .productToSettle(productToSettle)
                 .sender(sender)
-                .participant(participant)
+                .receiver(receiver)
                 .build();
 
         privateChatRoomRepository.save(privateChatRoom);

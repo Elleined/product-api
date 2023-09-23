@@ -136,7 +136,7 @@ public class User {
     private List<PrivateChatRoom> createdChatRooms;
 
     // user id reference is in private chat room table
-    @OneToMany(mappedBy = "participant")
+    @OneToMany(mappedBy = "receiver")
     private List<PrivateChatRoom> participatingChatRooms;
 
     public void addInvitedUser(User invitedUser) {

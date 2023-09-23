@@ -6,9 +6,9 @@ import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 
 public interface PrivateChatRoomService {
-    boolean hasAlreadyHaveChatRoom(User sender, User participant, Product productToSettle);
+    boolean hasAlreadyHaveChatRoom(User sender, User receiver, Product productToSettle);
 
-    PrivateChatRoom getChatRoomBy(User sender, User participant, Product productToSettle) throws ResourceNotFoundException;
+    PrivateChatRoom getChatRoomBy(User sender, User receiver, Product productToSettle) throws ResourceNotFoundException;
 
-    PrivateChatRoom createPrivateChatRoom(User sender, User participant, Product productToSettle);
+    PrivateChatRoom createPrivateChatRoom(User sender, User receiver, Product productToSettle);
 }
