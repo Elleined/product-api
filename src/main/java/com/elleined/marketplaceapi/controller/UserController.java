@@ -16,7 +16,6 @@ import com.elleined.marketplaceapi.service.message.WSMessageService;
 import com.elleined.marketplaceapi.service.user.PasswordService;
 import com.elleined.marketplaceapi.service.user.PremiumService;
 import com.elleined.marketplaceapi.service.user.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -77,10 +76,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserDTO login(@Valid @RequestBody CredentialDTO userCredentialDTO,
-                         HttpSession session) {
+    public UserDTO login(@Valid @RequestBody CredentialDTO userCredentialDTO) {
         User currentUser = userService.login(userCredentialDTO);
-        session.setAttribute("currentUser", currentUser);
         return userMapper.toDTO(currentUser);
     }
 
