@@ -21,7 +21,7 @@ public class WSConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/private-chat", "/public-chat", "/notification");
+        registry.enableSimpleBroker("/private", "/public", "/notification");
         registry.setApplicationDestinationPrefixes("/app");
     }
 }
