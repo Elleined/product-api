@@ -63,7 +63,7 @@ public class PrivateMessageController {
         privateChatMessageService.unsentMessage(sender, privateChatRoom, privateChatMessage);
     }
 
-    @GetMapping("/chat-rooms/{roomId}")
+    @GetMapping("/chat-rooms/{roomId}/messages")
     private List<PrivateChatMessageDTO> getAllMessage(@PathVariable("roomId") int roomId) {
         PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
         return privateChatRoomService.getAllPrivateMessage(privateChatRoom).stream()
