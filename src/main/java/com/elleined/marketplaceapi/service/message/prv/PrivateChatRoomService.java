@@ -9,12 +9,12 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.util.List;
 
 public interface PrivateChatRoomService {
-    boolean hasAlreadyHaveChatRoom(User sender, User receiver, Product productToSettle);
 
     PrivateChatRoom getChatRoom(User sender, User receiver, Product productToSettle) throws ResourceNotFoundException;
 
     PrivateChatRoom getChatRoom(int roomId) throws ResourceNotFoundException;
-    PrivateChatRoom createPrivateChatRoom(User sender, User receiver, Product productToSettle);
 
     List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom);
+
+    PrivateChatRoom getOrCreateChatRoom(User sender, User receiver, Product productToSettle);
 }

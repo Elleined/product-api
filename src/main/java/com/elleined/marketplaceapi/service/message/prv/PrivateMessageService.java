@@ -61,26 +61,6 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         log.debug("Private chat message with id of {} are now inactive", privateChatMessage.getId());
     }
 
-
-    @Override
-    public boolean hasAlreadyHaveChatRoom(User sender, User receiver, Product productToSettle) {
-        return productToSettle.getPrivateChatRooms().stream()
-                .map(PrivateChatRoom::getSender)
-                .anyMatch(sender::equals) ||
-
-        productToSettle.getPrivateChatRooms().stream()
-                .map(PrivateChatRoom::getSender)
-                .anyMatch(receiver::equals) ||
-
-        productToSettle.getPrivateChatRooms().stream()
-                .map(PrivateChatRoom::getReceiver)
-                .anyMatch(receiver::equals) ||
-
-        productToSettle.getPrivateChatRooms().stream()
-                .map(PrivateChatRoom::getReceiver)
-                .anyMatch(sender::equals);
-    }
-
     @Override
     public PrivateChatRoom getChatRoom(User sender, User receiver, Product productToSettle) throws ResourceNotFoundException {
         return productToSettle.getPrivateChatRooms().stream()
@@ -95,7 +75,20 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
-    public PrivateChatRoom createPrivateChatRoom(User sender, User receiver, Product productToSettle) {
+    public List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom) {
+        return privateChatRoom.getPrivateChatMessages().stream()
+                .filter(PrivateChatMessage::isNotDeleted)
+                .toList();
+    }
+
+    @Override
+    public PrivateChatRoom getOrCreateChatRoom(User sender, User receiver, Product productToSettle) {
+        if (hasAlreadyHaveChatRoom(sender, receiver, productToSettle))
+            return getChatRoom(sender, receiver, productToSettle);
+
+        return createPrivateChatRoom(sender, receiver, productToSettle);
+    }
+    private PrivateChatRoom createPrivateChatRoom(User sender, User receiver, Product productToSettle) {
         PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
                 .productToSettle(productToSettle)
                 .sender(sender)
@@ -107,10 +100,22 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         return privateChatRoom;
     }
 
-    @Override
-    public List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom) {
-        return privateChatRoom.getPrivateChatMessages().stream()
-                .filter(PrivateChatMessage::isNotDeleted)
-                .toList();
+    private boolean hasAlreadyHaveChatRoom(User sender, User receiver, Product productToSettle) {
+        return productToSettle.getPrivateChatRooms().stream()
+                .map(PrivateChatRoom::getSender)
+                .anyMatch(sender::equals) ||
+
+                productToSettle.getPrivateChatRooms().stream()
+                        .map(PrivateChatRoom::getSender)
+                        .anyMatch(receiver::equals) ||
+
+                productToSettle.getPrivateChatRooms().stream()
+                        .map(PrivateChatRoom::getReceiver)
+                        .anyMatch(receiver::equals) ||
+
+                productToSettle.getPrivateChatRooms().stream()
+                        .map(PrivateChatRoom::getReceiver)
+                        .anyMatch(sender::equals);
     }
+
 }

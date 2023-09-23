@@ -17,7 +17,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/users/{senderId}/private-chat")
+@RequestMapping("/users/{senderId}/private")
 public class PrivateMessageController {
     private final PrivateChatMessageService privateChatMessageService;
     private final PrivateChatRoomService privateChatRoomService;
@@ -28,26 +28,30 @@ public class PrivateMessageController {
 
     private final ChatMessageMapper chatMessageMapper;
 
-    @PostMapping("/receiver/{receiverId}/sendPrivateMessage")
+    @PostMapping("/chat-rooms/{roomId}")
     public PrivateChatMessageDTO sendPrivateMessage(@PathVariable("senderId") int senderId,
-                                                    @PathVariable("receiverId") int receiverId,
+                                                    @PathVariable("roomId") int roomId,
                                                     @RequestParam("productToSettleId") int productToSettleId,
                                                     @RequestParam("message") String message) {
+
+        User sender = userService.getById(senderId);
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
+        Product productToSettle = productService.getById(productToSettleId);
+
+        PrivateChatMessage privateChatMessage = privateChatMessageService.save(privateChatRoom, sender, productToSettle, message);
+        return chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
+    }
+
+    @GetMapping("/chat-rooms/receiver/{receiverId}/product/{productToSettleId}")
+    public int getOrCreateChatRoom(@PathVariable("senderId") int senderId,
+                             @PathVariable("receiverId") int receiverId,
+                             @PathVariable("productToSettleId") int productToSettleId) {
 
         User sender = userService.getById(senderId);
         User receiver = userService.getById(receiverId);
         Product productToSettle = productService.getById(productToSettleId);
 
-        // Sends to existing private chat room else create a new chat room
-        if (privateChatRoomService.hasAlreadyHaveChatRoom(sender, receiver, productToSettle)) {
-            PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(sender, receiver, productToSettle);
-            PrivateChatMessage privateChatMessage = privateChatMessageService.save(privateChatRoom, sender, productToSettle, message);
-            return chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
-        }
-
-        PrivateChatRoom privateChatRoom = privateChatRoomService.createPrivateChatRoom(sender, receiver, productToSettle);
-        PrivateChatMessage privateChatMessage = privateChatMessageService.save(privateChatRoom, sender, productToSettle, message);
-        return chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
+        return privateChatRoomService.getOrCreateChatRoom(sender, receiver, productToSettle).getId();
     }
 
 
