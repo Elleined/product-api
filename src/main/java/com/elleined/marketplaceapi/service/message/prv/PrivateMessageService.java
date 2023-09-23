@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,10 +45,19 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
-    public void deleteMessage(User sender, PrivateChatMessage privateChatMessage) throws NotOwnedException {
+    public PrivateChatMessage getById(int privateMessageId) throws ResourceNotFoundException {
+        return privateChatMessageRepository.findById(privateMessageId).orElseThrow(() -> new ResourceNotFoundException("Private message with id of " + privateMessageId + " doesn't exists!"));
+    }
+
+    @Override
+    public void deleteMessage(User sender, PrivateChatRoom privateChatRoom, PrivateChatMessage privateChatMessage) throws NotOwnedException, ResourceNotFoundException {
         if (!sender.getPrivateChatMessages().contains(privateChatMessage)) throw new NotOwnedException("Cannot delete message! because you don't own these message!");
+        if (!privateChatRoom.getPrivateChatMessages().contains(privateChatMessage)) throw new ResourceNotFoundException("Cannot delete message! because this private chat room doesn't have this private message!");
+
         privateChatMessage.setStatus(ChatMessage.Status.INACTIVE);
         privateChatMessageRepository.save(privateChatMessage);
+        wsMessageService.broadCastPrivateMessage(privateChatMessage);
+
         log.debug("Private chat message with id of {} are now inactive", privateChatMessage.getId());
     }
 
@@ -71,11 +82,16 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
-    public PrivateChatRoom getChatRoomBy(User sender, User receiver, Product productToSettle) throws ResourceNotFoundException {
+    public PrivateChatRoom getChatRoom(User sender, User receiver, Product productToSettle) throws ResourceNotFoundException {
         return productToSettle.getPrivateChatRooms().stream()
                 .filter(privateChatRoom -> privateChatRoom.getSender().equals(sender) || privateChatRoom.getSender().equals(receiver))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    @Override
+    public PrivateChatRoom getChatRoom(int roomId) throws ResourceNotFoundException {
+        return privateChatRoomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Private chat room with id of " + roomId + " doesn't exists!"));
     }
 
     @Override
@@ -89,5 +105,10 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         privateChatRoomRepository.save(privateChatRoom);
         log.debug("Private chat room saved successfully with id of {}", privateChatRoom.getId());
         return privateChatRoom;
+    }
+
+    @Override
+    public List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom) {
+        return privateChatRoom.getPrivateChatMessages();
     }
 }

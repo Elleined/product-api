@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.model.message.prv;
 
 
 import com.elleined.marketplaceapi.model.message.ChatMessage;
-import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

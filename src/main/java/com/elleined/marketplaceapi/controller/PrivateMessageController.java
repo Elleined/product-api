@@ -13,6 +13,8 @@ import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users/{senderId}/private-chat")
@@ -26,7 +28,7 @@ public class PrivateMessageController {
 
     private final ChatMessageMapper chatMessageMapper;
 
-    @PostMapping("/{receiverId}/sendPrivateMessage")
+    @PostMapping("/receiver/{receiverId}/sendPrivateMessage")
     public PrivateChatMessageDTO sendPrivateMessage(@PathVariable("senderId") int senderId,
                                                     @PathVariable("receiverId") int receiverId,
                                                     @RequestParam("productToSettleId") int productToSettleId,
@@ -38,7 +40,7 @@ public class PrivateMessageController {
 
         // Sends to existing private chat room else create a new chat room
         if (privateChatRoomService.hasAlreadyHaveChatRoom(sender, receiver, productToSettle)) {
-            PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoomBy(sender, receiver, productToSettle);
+            PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(sender, receiver, productToSettle);
             PrivateChatMessage privateChatMessage = privateChatMessageService.save(privateChatRoom, sender, productToSettle, message);
             return chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
         }
@@ -49,4 +51,23 @@ public class PrivateMessageController {
     }
 
 
+    @DeleteMapping("/chat-rooms/{roomId}/messages/{messageId}")
+    public void deletePrivateMessage(@PathVariable("senderId") int senderId,
+                                     @PathVariable("roomId") int roomId,
+                                     @PathVariable("messageId") int messageId) {
+
+        User sender = userService.getById(senderId);
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
+        PrivateChatMessage privateChatMessage = privateChatMessageService.getById(messageId);
+
+        privateChatMessageService.deleteMessage(sender, privateChatRoom, privateChatMessage);
+    }
+
+    @GetMapping("/chat-rooms/{roomId}")
+    private List<PrivateChatMessageDTO> getAllMessage(@PathVariable("roomId") int roomId) {
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
+        return privateChatRoomService.getAllPrivateMessage(privateChatRoom).stream()
+                .map(chatMessageMapper::toPrivateChatMessageDTO)
+                .toList();
+    }
 }
