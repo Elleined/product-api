@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "tbl_chat_room_message")
@@ -50,6 +52,12 @@ public abstract class ChatMessage {
             updatable = false
     )
     private User sender;
+
+    @Column(
+            name = "created_at",
+            nullable = false
+    )
+    private LocalDateTime createdAt;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

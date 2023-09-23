@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "tbl_private_chat_message")
 @NoArgsConstructor
@@ -29,8 +31,8 @@ public class PrivateChatMessage extends ChatMessage {
     private PrivateChatRoom privateChatRoom;
 
     @Builder(builderMethodName = "privateMessageBuilder")
-    public PrivateChatMessage(int id, String message, User sender, Status status, PrivateChatRoom privateChatRoom) {
-        super(id, message, sender, status);
+    public PrivateChatMessage(int id, String message, User sender, LocalDateTime createdAt, Status status, PrivateChatRoom privateChatRoom) {
+        super(id, message, sender, createdAt, status);
         this.privateChatRoom = privateChatRoom;
     }
 }
