@@ -64,8 +64,7 @@ public abstract class Transaction {
     public enum Status {
         RELEASE,
         PENDING,
-        REJECTED,
-        RECEIVE
+        REJECTED
     }
 
     public boolean isRejected() {
@@ -74,10 +73,6 @@ public abstract class Transaction {
 
     public boolean isRelease() {
         return this.getStatus() == Status.RELEASE;
-    }
-
-    public boolean isReceive() {
-        return this.getStatus() == Status.RECEIVE;
     }
 
     public boolean isPending() {
