@@ -28,7 +28,8 @@ public class DepositTransaction extends Transaction {
 
     @Column(
             name = "proof_of_transaction",
-            nullable = false
+            nullable = false,
+            updatable = false
     )
     private String proofOfTransaction;
 

@@ -2,9 +2,9 @@ package com.elleined.marketplaceapi.service.moderator;
 
 import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
-import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReceiveException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionRejectedException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReleaseException;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.*;
@@ -68,17 +68,15 @@ public interface ModeratorService {
 
     /** Withdraw **/
     List<WithdrawTransaction> getAllPendingWithdrawRequest();
-    void release(Moderator moderator, WithdrawTransaction withdrawTransaction)
-            throws TransactionReleaseException,
-            TransactionReceiveException,
-            TransactionRejectedException,
+    void release(Moderator moderator, WithdrawTransaction withdrawTransaction, String proofOfTransaction)
+            throws TransactionRejectedException,
             TransactionReleaseException,
+            NotValidBodyException,
             InsufficientBalanceException;
 
     void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
     void reject(Moderator moderator, WithdrawTransaction withdrawTransaction)
-            throws TransactionReleaseException,
-            TransactionReceiveException;
+            throws TransactionReleaseException;
     void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
 
 }
