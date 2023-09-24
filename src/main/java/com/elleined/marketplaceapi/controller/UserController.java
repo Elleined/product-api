@@ -1,6 +1,9 @@
 package com.elleined.marketplaceapi.controller;
 
-import com.elleined.marketplaceapi.dto.*;
+import com.elleined.marketplaceapi.dto.APIResponse;
+import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ShopDTO;
+import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
@@ -9,11 +12,10 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.email.EmailService;
-import com.elleined.marketplaceapi.service.message.MessageService;
+import com.elleined.marketplaceapi.service.message.WSMessageService;
 import com.elleined.marketplaceapi.service.user.PasswordService;
 import com.elleined.marketplaceapi.service.user.PremiumService;
 import com.elleined.marketplaceapi.service.user.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,7 @@ public class UserController {
     private final EmailService emailService;
 
     private final PasswordService passwordService;
-    private final MessageService messageService;
+    private final WSMessageService WSMessageService;
 
     private final PremiumService premiumService;
     private final UserMapper userMapper;
@@ -74,10 +76,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserDTO login(@Valid @RequestBody CredentialDTO userCredentialDTO,
-                         HttpSession session) {
+    public UserDTO login(@Valid @RequestBody CredentialDTO userCredentialDTO) {
         User currentUser = userService.login(userCredentialDTO);
-        session.setAttribute("currentUser", currentUser);
         return userMapper.toDTO(currentUser);
     }
 
@@ -116,18 +116,6 @@ public class UserController {
         User currentUser = userService.getById(currentUserId);
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, deliveryAddressId);
         return addressMapper.toDeliveryAddressDTO(deliveryAddress);
-    }
-
-
-    @PostMapping("/sendPrivateMessage/{recipientId}")
-    public PrivateMessage sendPrivateMessage(@PathVariable("recipientId") int recipientId,
-                                             @RequestParam("message") String message) {
-        return messageService.sendPrivateMessage(recipientId, message);
-    }
-
-    @PostMapping("/sendPublicMessage")
-    public Message sendPublicMessage(@RequestParam("message") String message) {
-        return messageService.sendPublicMessage(message);
     }
 
     @PatchMapping("/{currentUserId}/account/changePassword")

@@ -11,8 +11,8 @@ import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
-import com.elleined.marketplaceapi.model.message.ChatMessage;
-import com.elleined.marketplaceapi.model.message.ChatRoom;
+import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
+import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import jakarta.persistence.*;
@@ -127,9 +127,17 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<DepositTransaction> depositTransactions;
 
-    // user id reference is in chat room message table
+    // user id reference is in private chat room message table
     @OneToMany(mappedBy = "sender")
-    private List<ChatMessage> chatMessages;
+    private List<PrivateChatMessage> privateChatMessages;
+
+    // user id reference is in private chat room table
+    @OneToMany(mappedBy = "sender")
+    private List<PrivateChatRoom> createdChatRooms;
+
+    // user id reference is in private chat room table
+    @OneToMany(mappedBy = "receiver")
+    private List<PrivateChatRoom> participatingChatRooms;
 
     public void addInvitedUser(User invitedUser) {
         this.getReferredUsers().add(invitedUser);

@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.model;
 
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
-import com.elleined.marketplaceapi.model.message.ChatRoom;
+import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -110,7 +110,7 @@ public class Product {
 
     // product id is in chat room table
     @OneToMany(mappedBy = "productToSettle")
-    private List<ChatRoom> chatRooms;
+    private List<PrivateChatRoom> privateChatRooms;
 
     public enum State {
         PENDING,

@@ -12,18 +12,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WSConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final UserHandshakeHandler userHandshakeHandler;
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setHandshakeHandler(userHandshakeHandler)
                 .setAllowedOriginPatterns("*") // Used to allow other ports to connect in this websocket
                 .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/private-chat", "/public-chat", "/notification");
+        registry.enableSimpleBroker("/private", "/public", "/notification");
         registry.setApplicationDestinationPrefixes("/app");
     }
 }

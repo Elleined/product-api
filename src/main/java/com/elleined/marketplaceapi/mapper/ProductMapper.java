@@ -47,6 +47,7 @@ public abstract class ProductMapper {
 
             @Mapping(target = "addedToCarts", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "orders", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "privateChatRooms", expression = "java(new java.util.ArrayList<>())")
     })
     public abstract Product toEntity(ProductDTO productDTO, @Context User seller) throws ResourceNotFoundException;
 
@@ -58,10 +59,10 @@ public abstract class ProductMapper {
             @Mapping(target = "listingDate", ignore = true),
             @Mapping(target = "state", ignore = true),
             @Mapping(target = "seller", ignore = true),
+            @Mapping(target = "privateChatRooms", ignore = true),
 
             @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
             @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
-
     })
     public abstract Product toUpdate(@MappingTarget Product product, ProductDTO productDTO);
 }

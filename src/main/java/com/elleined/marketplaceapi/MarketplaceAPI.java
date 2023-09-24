@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @EnableTransactionManagement
@@ -24,10 +23,5 @@ public class MarketplaceAPI {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
 	}
 }
