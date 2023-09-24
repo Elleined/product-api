@@ -9,6 +9,7 @@ import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
+import com.elleined.marketplaceapi.service.atm.machine.WithdrawService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
 
     private final ModeratorRepository moderatorRepository;
 
+    private final WithdrawService withdrawService;
     private final WithdrawTransactionRepository withdrawTransactionRepository;
 
     @Override
@@ -55,6 +57,8 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
 
     @Override
     public void accept(Moderator moderator, WithdrawTransaction withdrawTransaction) {
+        withdrawService.withdraw(withdrawTransaction.getUser(), withdrawTransaction.getAmount());
+
         withdrawTransaction.setStatus(Transaction.Status.RELEASE);
         moderator.addReleaseWithdrawRequest(withdrawTransaction);
 

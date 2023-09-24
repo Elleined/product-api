@@ -46,17 +46,6 @@ public class ATMController  {
         return transactionMapper.toWithdrawTransactionDTO(withdrawTransaction);
     }
 
-    @PatchMapping("/withdraw/receive/{withdrawTransactionId}")
-    public WithdrawTransactionDTO receiveWithdrawTransaction(@PathVariable("currentUserId") int currentUserId,
-                                                             @PathVariable("withdrawTransactionId") int withdrawTransactionId) {
-        User currentUser = userService.getById(currentUserId);
-        WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
-        atmService.receiveWithdrawRequest(currentUser, withdrawTransaction);
-
-        return transactionMapper.toWithdrawTransactionDTO(withdrawTransaction);
-    }
-
-
     @PostMapping("/send-money/{receiverId}")
     public PeerToPeerTransactionDTO peerToPeer(@PathVariable("currentUserId") int senderId,
                                                @RequestParam("amount") BigDecimal sentAmount,

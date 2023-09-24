@@ -43,7 +43,7 @@ public class WithdrawService {
     private final ATMFeeService feeService;
     private final AppWalletService appWalletService;
 
-    public void receiveWithdrawRequest(User currentUser, @NonNull BigDecimal withdrawalAmount) {
+    public void withdraw(User currentUser, @NonNull BigDecimal withdrawalAmount) {
         BigDecimal oldBalance = currentUser.getBalance();
         float withdrawalFee = feeService.getWithdrawalFee(withdrawalAmount);
         BigDecimal finalWithdrawalAmount = feeService.deductWithdrawalFee(withdrawalAmount, withdrawalFee);
@@ -85,7 +85,6 @@ public class WithdrawService {
     private boolean isAboveMinimum(BigDecimal withdrawalAmount) {
         return withdrawalAmount.compareTo(new BigDecimal(MAXIMUM_WITHDRAW_AMOUNT)) > 0;
     }
-
 
     private boolean isUserReachedWithdrawLimitPerDay(User currentUser) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);

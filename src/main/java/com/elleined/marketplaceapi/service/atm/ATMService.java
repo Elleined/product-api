@@ -28,12 +28,6 @@ public interface ATMService {
             MinimumAmountException,
             WithdrawLimitException;
 
-    void receiveWithdrawRequest(User currentUser, WithdrawTransaction withdrawTransaction)
-            throws NotOwnedException,
-            TransactionPendingException,
-            TransactionRejectedException,
-            TransactionNotYetReleaseException;
-
     PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount)
             throws SendingToHimselfException,
             InsufficientFundException,
