@@ -26,11 +26,7 @@ public class WithdrawTransaction extends Transaction {
     )
     private User user;
 
-    @Column(
-            name = "proof_of_transaction",
-            nullable = false,
-            updatable = false
-    )
+    @Column(name = "proof_of_transaction")
     private String proofOfTransaction;
 
     @Builder

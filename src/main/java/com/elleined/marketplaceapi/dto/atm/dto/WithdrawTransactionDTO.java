@@ -14,10 +14,12 @@ import java.time.LocalDateTime;
 public class WithdrawTransactionDTO extends TransactionDTO {
     private int userId;
 
-    @Builder(builderMethodName = "withdrawTransactionDTOBuilder")
+    private String proofOfTransaction;
 
-    public WithdrawTransactionDTO(int id, String trn, BigDecimal amount, String status, LocalDateTime transactionDate, int userId) {
+    @Builder(builderMethodName = "withdrawTransactionDTOBuilder")
+    public WithdrawTransactionDTO(int id, String trn, BigDecimal amount, String status, LocalDateTime transactionDate, int userId, String proofOfTransaction) {
         super(id, trn, amount, status, transactionDate);
         this.userId = userId;
+        this.proofOfTransaction = proofOfTransaction;
     }
 }

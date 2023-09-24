@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionRejectedException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionReleaseException;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadyListedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.*;
@@ -14,12 +15,14 @@ import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
+import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
 import com.elleined.marketplaceapi.service.moderator.request.ProductRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
 import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
+import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +48,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     private final ProductRequest productRequest;
     private final WithdrawRequest withdrawRequest;
     private final DepositRequest depositRequest;
+
+    private final WithdrawTransactionRepository withdrawTransactionRepository;
 
     @Override
     public Moderator getById(int moderatorId) throws ResourceNotFoundException {
@@ -184,15 +189,20 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void release(Moderator moderator, WithdrawTransaction withdrawTransaction)
-            throws TransactionRejectedException, TransactionReleaseException, InsufficientBalanceException {
+    public void release(Moderator moderator, WithdrawTransaction withdrawTransaction, String proofOfTransaction)
+            throws TransactionRejectedException, TransactionReleaseException, NotValidBodyException, InsufficientBalanceException {
 
         User requestingUserToWithdraw = withdrawTransaction.getUser();
         BigDecimal amountToBeWithdrawn = withdrawTransaction.getAmount();
+        if (StringUtil.isNotValid(proofOfTransaction)) throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
         if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
         if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
         if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance has only balance of " + requestingUserToWithdraw.getBalance() + " is below to requesting amount to be withdrawn which is " + amountToBeWithdrawn + ". Reject it!");
         // Add validation here
+
+        withdrawTransaction.setProofOfTransaction(proofOfTransaction);
+        withdrawTransactionRepository.save(withdrawTransaction);
+
         withdrawRequest.accept(moderator, withdrawTransaction);
     }
 

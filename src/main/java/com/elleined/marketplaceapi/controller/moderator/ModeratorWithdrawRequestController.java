@@ -36,11 +36,12 @@ public class ModeratorWithdrawRequestController {
 
     @PatchMapping("/{withdrawTransactionId}/release")
     void releaseWithdrawRequest(@PathVariable("moderatorId") int moderatorId,
-                                @PathVariable("withdrawTransactionId") Integer withdrawTransactionId) {
+                                @PathVariable("withdrawTransactionId") Integer withdrawTransactionId,
+                                @RequestParam("proofOfTransaction") String proofOfTransaction) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
         WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
-        moderatorService.release(moderator, withdrawTransaction);
+        moderatorService.release(moderator, withdrawTransaction, proofOfTransaction);
         emailService.sendReleaseWithdrawMail(withdrawTransaction);
     }
 
