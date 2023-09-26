@@ -48,5 +48,55 @@
       "confirmPassword": "@cardoDalisay1"
     },
     "invitationReferralCode": ""
+  },
+  {
+    "userDetailsDTO": {
+      "firstName": "John Conrad",
+      "middleName": "Cirilo",
+      "lastName": "Abalos",
+      "gender": "MALE",
+      "birthDate": "2001-09-22",
+      "mobileNumber": "09277352967",
+      "picture": "jcProfilePicture.jpg",
+      "suffix": "NONE"
+    },
+    "addressDTO": {
+      "details": "Lot 15 Blk 9, Elizaville Subdivision, Purok 2",
+      "regionName": "Region III",
+      "provinceName": "Nueva Ecija",
+      "cityName": "Cabanatuan City",
+      "baranggayName": "Kalikid Sur"
+    },
+    "userCredentialDTO": {
+      "email": "jc4balos@gmail.com",
+      "password": "@Qwerty1",
+      "confirmPassword": "@Qwerty1"
+    },
+    "invitationReferralCode": ""
+  },
+  {
+    "userDetailsDTO": {
+      "firstName": "Denielle Mar",
+      "middleName": "Miranda",
+      "lastName": "De Guzman",
+      "gender": "MALE",
+      "birthDate": "2002-10-03",
+      "mobileNumber": "09913929345",
+      "picture": "denielleProfilePicture.jpg",
+      "suffix": "NONE"
+    },
+    "addressDTO": {
+      "details": "#103 Purok 3 Tramo St.",
+      "regionName": "Region III",
+      "provinceName": "Nueva Ecija",
+      "cityName": "Cabanatuan City",
+      "baranggayName": "Sumacab Este"
+    },
+    "userCredentialDTO": {
+      "email": "demadegu@gmail.com",
+      "password": "@Qwerty1",
+      "confirmPassword": "@Qwerty1"
+    },
+    "invitationReferralCode": ""
   }
 ]
