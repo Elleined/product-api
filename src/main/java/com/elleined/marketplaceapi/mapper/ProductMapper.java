@@ -26,7 +26,7 @@ public abstract class ProductMapper {
     @Mappings({
             @Mapping(target = "state", source = "product.state"),
             @Mapping(target = "sellerId", source = "product.seller.id"),
-            @Mapping(target = "sellerName", source = "product.seller.userDetails.firstName"),
+            @Mapping(target = "sellerName", expression = "java(getFullName(product.getSeller()))"),
             @Mapping(target = "cropName", source = "product.crop.name"),
             @Mapping(target = "unitName", source = "product.unit.name"),
             @Mapping(target = "shopName", source = "product.seller.shop.name"),
@@ -65,4 +65,8 @@ public abstract class ProductMapper {
             @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
     })
     public abstract Product toUpdate(@MappingTarget Product product, ProductDTO productDTO);
+
+    final protected String getFullName(User user) {
+        return user.getUserDetails().getFirstName() + " " + user.getUserDetails().getMiddleName() + " " + user.getUserDetails().getLastName();
+    }
 }
