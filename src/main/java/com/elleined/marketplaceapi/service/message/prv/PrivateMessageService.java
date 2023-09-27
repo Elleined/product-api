@@ -1,11 +1,13 @@
 package com.elleined.marketplaceapi.service.message.prv;
 
+import com.elleined.marketplaceapi.exception.message.MessageAgreementNotAcceptedException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.message.ChatMessage;
+import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
@@ -25,7 +27,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-// sender and creator are the same
 public class PrivateMessageService implements PrivateChatRoomService, PrivateChatMessageService {
     private final PrivateChatMessageRepository privateChatMessageRepository;
     private final PrivateChatRoomRepository privateChatRoomRepository;
@@ -34,10 +35,12 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
     private final ChatMessageMapper chatMessageMapper;
     @Override
-    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, String message) throws NotValidBodyException {
+    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, String message) throws NotValidBodyException {
+        if (privateChatRoom.getSender().equals(currentUser) && privateChatRoom.getIsSenderAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
+        if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
 
-        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, sender, message);
+        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, message);
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 
@@ -76,6 +79,22 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
+    public void acceptAgreement(User user, PrivateChatRoom privateChatRoom) throws NotOwnedException {
+        if (privateChatRoom.getSender().equals(user)) privateChatRoom.setIsSenderAcceptedAgreement(ChatRoom.Status.ACCEPTED);
+        else if (privateChatRoom.getReceiver().equals(user)) privateChatRoom.setIsReceiverAcceptedAgreement(ChatRoom.Status.ACCEPTED);
+        else throw new NotOwnedException("Cannot accept chat agreement! because user with id of " + user.getId() + " doesn't have this private chat!");
+        privateChatRoomRepository.save(privateChatRoom);
+        log.debug("User with id of {} acccepted chat agreement", user.getId());
+    }
+
+    @Override
+    public ChatRoom.Status getStatus(User user, PrivateChatRoom privateChatRoom) throws NotOwnedException {
+        if (privateChatRoom.getReceiver().equals(user)) return privateChatRoom.getIsReceiverAcceptedAgreement();
+        else if (privateChatRoom.getSender().equals(user)) return privateChatRoom.getIsSenderAcceptedAgreement();
+        else throw new NotOwnedException("Cannot get status chat agreement! because user with id of " + user.getId() + " doesn't have this private chat!");
+    }
+
+    @Override
     public List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom) {
         return privateChatRoom.getPrivateChatMessages().stream()
                 .filter(PrivateChatMessage::isNotDeleted)
@@ -85,14 +104,14 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
     @Override
     public PrivateChatRoom getOrCreateChatRoom(User sender, User receiver, Product productToSettle) {
-        if (hasAlreadyHaveChatRoom(sender, receiver, productToSettle))
-            return getChatRoom(sender, receiver, productToSettle);
-
+        if (hasAlreadyHaveChatRoom(sender, receiver, productToSettle)) return getChatRoom(sender, receiver, productToSettle);
         return createPrivateChatRoom(sender, receiver, productToSettle);
     }
     private PrivateChatRoom createPrivateChatRoom(User sender, User receiver, Product productToSettle) {
         PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
                 .productToSettle(productToSettle)
+                .isReceiverAcceptedAgreement(ChatRoom.Status.NOT_ACCEPTED)
+                .isSenderAcceptedAgreement(ChatRoom.Status.NOT_ACCEPTED)
                 .sender(sender)
                 .receiver(receiver)
                 .build();
