@@ -3,6 +3,7 @@ package com.elleined.marketplaceapi.controller;
 import com.elleined.marketplaceapi.dto.message.PrivateChatMessageDTO;
 import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/users/{senderId}/private")
+@RequestMapping("/users/{senderId}/private/chat-rooms")
 public class PrivateMessageController {
     private final PrivateChatMessageService privateChatMessageService;
     private final PrivateChatRoomService privateChatRoomService;
@@ -28,7 +29,7 @@ public class PrivateMessageController {
 
     private final ChatMessageMapper chatMessageMapper;
 
-    @PostMapping("/chat-rooms/{roomId}")
+    @PostMapping("/{roomId}")
     public PrivateChatMessageDTO sendPrivateMessage(@PathVariable("senderId") int senderId,
                                                     @PathVariable("roomId") int roomId,
                                                     @RequestParam("productToSettleId") int productToSettleId,
@@ -42,10 +43,10 @@ public class PrivateMessageController {
         return chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
     }
 
-    @GetMapping("/chat-rooms/receiver/{receiverId}/product/{productToSettleId}")
+    @GetMapping("/receiver/{receiverId}/product/{productToSettleId}")
     public int getOrCreateChatRoom(@PathVariable("senderId") int senderId,
-                             @PathVariable("receiverId") int receiverId,
-                             @PathVariable("productToSettleId") int productToSettleId) {
+                                   @PathVariable("receiverId") int receiverId,
+                                   @PathVariable("productToSettleId") int productToSettleId) {
 
         User sender = userService.getById(senderId);
         User receiver = userService.getById(receiverId);
@@ -55,7 +56,7 @@ public class PrivateMessageController {
     }
 
 
-    @DeleteMapping("/chat-rooms/{roomId}/messages/{messageId}")
+    @DeleteMapping("/{roomId}/messages/{messageId}")
     public void unsentPrivateMessage(@PathVariable("senderId") int senderId,
                                      @PathVariable("roomId") int roomId,
                                      @PathVariable("messageId") int messageId) {
@@ -67,11 +68,27 @@ public class PrivateMessageController {
         privateChatMessageService.unsentMessage(sender, privateChatRoom, privateChatMessage);
     }
 
-    @GetMapping("/chat-rooms/{roomId}/messages")
-    private List<PrivateChatMessageDTO> getAllMessage(@PathVariable("roomId") int roomId) {
+    @GetMapping("/{roomId}/messages")
+    public List<PrivateChatMessageDTO> getAllMessage(@PathVariable("roomId") int roomId) {
         PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
         return privateChatRoomService.getAllPrivateMessage(privateChatRoom).stream()
                 .map(chatMessageMapper::toPrivateChatMessageDTO)
                 .toList();
+    }
+
+    @PatchMapping("/{roomId}/accept-agreement")
+    public void acceptAgreement(@PathVariable("senderId") int senderId,
+                                @PathVariable("roomId") int roomId) {
+        User user = userService.getById(senderId);
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
+        privateChatRoomService.acceptAgreement(user, privateChatRoom);
+    }
+
+    @GetMapping("/{roomId}/agreement-status")
+    public ChatRoom.Status getPrivateChatRoomStatus(@PathVariable("senderId") int senderId,
+                                                    @PathVariable("roomId") int roomId) {
+        User user = userService.getById(senderId);
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
+        return privateChatRoomService.getStatus(user, privateChatRoom);
     }
 }

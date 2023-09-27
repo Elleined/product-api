@@ -33,4 +33,14 @@ public abstract class ChatRoom {
             unique = true
     )
     private int id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sender_agreement_status", nullable = false)
+    private Status isSenderAcceptedAgreement;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "receiver_agreement_status", nullable = false)
+    private Status isReceiverAcceptedAgreement;
+
+    public enum Status { ACCEPTED, NOT_ACCEPTED }
 }

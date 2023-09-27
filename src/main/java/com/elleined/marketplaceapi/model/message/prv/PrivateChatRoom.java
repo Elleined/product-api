@@ -51,9 +51,10 @@ public class PrivateChatRoom extends ChatRoom {
     @OneToMany(mappedBy = "privateChatRoom")
     private List<PrivateChatMessage> privateChatMessages;
 
+
     @Builder(builderMethodName = "privateChatRoomBuilder")
-    public PrivateChatRoom(int id, Product productToSettle, User sender, User receiver, List<PrivateChatMessage> privateChatMessages) {
-        super(id);
+    public PrivateChatRoom(int id, Status isSenderAcceptedAgreement, Status isReceiverAcceptedAgreement, Product productToSettle, User sender, User receiver, List<PrivateChatMessage> privateChatMessages) {
+        super(id, isSenderAcceptedAgreement, isReceiverAcceptedAgreement);
         this.productToSettle = productToSettle;
         this.sender = sender;
         this.receiver = receiver;
