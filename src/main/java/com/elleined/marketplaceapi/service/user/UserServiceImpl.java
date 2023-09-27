@@ -24,8 +24,13 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
+import com.elleined.marketplaceapi.service.validator.EmailValidator;
+import com.elleined.marketplaceapi.service.validator.FullNameValidator;
+import com.elleined.marketplaceapi.service.validator.NumberValidator;
+import com.elleined.marketplaceapi.service.validator.PasswordValidator;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +52,6 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
-    private final UserCredentialValidator userCredentialValidator;
-    private final UserDetailsValidator userDetailsValidator;
     private final UserMapper userMapper;
 
     private final OrderItemRepository orderItemRepository;
@@ -58,6 +61,13 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     private final AddressService addressService;
 
     private final ForumClient forumClient;
+
+    private final GetAllUtilityService getAllUtilityService;
+
+    private final EmailValidator emailValidator;
+    private final PasswordValidator passwordValidator;
+    private final NumberValidator numberValidator;
+    private final FullNameValidator fullNameValidator;
 
     @Override
     public User getById(int id) throws ResourceNotFoundException {
@@ -97,13 +107,18 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
             AlreadyExistException,
             MobileNumberException {
 
-        userDetailsValidator.validatePhoneNumber(userDTO.getUserDetailsDTO());
-        userDetailsValidator.validateFullName(userDTO.getUserDetailsDTO());
-        userCredentialValidator.validateEmail(userDTO.getUserCredentialDTO());
+        String email = userDTO.getUserCredentialDTO().getEmail();
+        String mobileNumber = userDTO.getUserDetailsDTO().getMobileNumber();
         String password = userDTO.getUserCredentialDTO().getPassword();
         String confirmPassword = userDTO.getUserCredentialDTO().getConfirmPassword();
+
+        numberValidator.validate(mobileNumber);
+        fullNameValidator.validate(userDTO.getUserDetailsDTO());
+        emailValidator.validate(email);
+        passwordValidator.validate(password);
         if (isTwoPasswordNotMatch(password, confirmPassword)) throw new PasswordNotMatchException("Password and confirm password not match!");
-        userCredentialValidator.validatePassword(password);
+        if (getAllUtilityService.getAllEmail().contains(email)) throw new AlreadyExistException("This email " + email + " is already associated with an account!");
+        if (getAllUtilityService.getAllMobileNumber().contains(mobileNumber)) throw new AlreadyExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
 
         User registeringUser = userMapper.toEntity(userDTO);
         this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
@@ -240,7 +255,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
         User user = getByEmail(email);
         if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
-        userCredentialValidator.validatePassword(newPassword);
+        passwordValidator.validate(newPassword);
 
         this.encodePassword(user, newPassword);
         userRepository.save(user);
@@ -252,7 +267,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         String encodedPassword = user.getUserCredential().getPassword();
         if (!passwordEncoder.matches(oldPassword, encodedPassword)) throw new PasswordNotMatchException("Old password didn't match to your current password!");
         if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
-        userCredentialValidator.validatePassword(newPassword);
+        passwordValidator.validate(newPassword);
 
         this.encodePassword(user, newPassword);
         userRepository.save(user);

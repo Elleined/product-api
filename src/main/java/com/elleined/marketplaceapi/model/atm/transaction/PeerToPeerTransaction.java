@@ -40,8 +40,8 @@ public class PeerToPeerTransaction extends Transaction {
     private User receiver;
 
     @Builder
-    public PeerToPeerTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, User sender, User receiver) {
-        super(id, trn, amount, transactionDate, status);
+    public PeerToPeerTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, String proofOfTransaction, User sender, User receiver) {
+        super(id, trn, amount, transactionDate, status, proofOfTransaction);
         this.sender = sender;
         this.receiver = receiver;
     }

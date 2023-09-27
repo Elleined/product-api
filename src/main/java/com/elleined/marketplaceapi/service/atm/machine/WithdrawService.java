@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitPerDayException;
+import com.elleined.marketplaceapi.exception.field.MobileNumberException;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
@@ -13,6 +14,7 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.validator.NumberValidator;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class WithdrawService {
     private final UserRepository userRepository;
 
     private final ATMValidator atmValidator;
+    private final NumberValidator numberValidator;
 
     private final WithdrawTransactionRepository withdrawTransactionRepository;
 
@@ -54,12 +57,14 @@ public class WithdrawService {
         log.debug("User with id of {} withdraw amounting {} from {} because of withdrawal fee of {} which is the {}% of withdrawn amount and has new balance of {} from {}", currentUser.getId(), finalWithdrawalAmount, withdrawalAmount, withdrawalFee, ATMFeeService.WITHDRAWAL_FEE_PERCENTAGE, currentUser.getBalance(), oldBalance);
     }
 
-    public WithdrawTransaction requestWithdraw(@NonNull User user, @NonNull BigDecimal withdrawalAmount)
+    public WithdrawTransaction requestWithdraw(@NonNull User user, @NonNull BigDecimal withdrawalAmount, String gcashNumber)
             throws InsufficientFundException,
             NotValidAmountException,
             MinimumAmountException,
-            WithdrawLimitException {
+            WithdrawLimitException,
+            MobileNumberException {
 
+        numberValidator.validate(gcashNumber);
         if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(user, withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(user)) throw new InsufficientFundException("Cannot withdraw! because you're total pending withdraw requests exceeds to your current balance!");
@@ -74,6 +79,7 @@ public class WithdrawService {
                 .amount(withdrawalAmount)
                 .transactionDate(LocalDateTime.now())
                 .status(Transaction.Status.PENDING)
+                .gcashNumber(gcashNumber)
                 .user(user)
                 .build();
 

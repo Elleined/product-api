@@ -61,6 +61,9 @@ public abstract class Transaction {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "proof_of_transaction")
+    private String proofOfTransaction;
+
     public enum Status {
         RELEASE,
         PENDING,

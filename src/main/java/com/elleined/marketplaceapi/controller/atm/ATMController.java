@@ -39,10 +39,11 @@ public class ATMController  {
 
     @PostMapping("/withdraw")
     public WithdrawTransactionDTO requestWithdraw(@PathVariable("currentUserId") int currentUserId,
-                                                  @RequestParam("amount") BigDecimal amount) {
+                                                  @RequestParam("amount") BigDecimal amount,
+                                                  @RequestParam("gcashNumber") String gcashNumber) {
 
         User currentUser = userService.getById(currentUserId);
-        WithdrawTransaction withdrawTransaction = atmService.requestWithdraw(currentUser, amount);
+        WithdrawTransaction withdrawTransaction = atmService.requestWithdraw(currentUser, amount, gcashNumber);
         return transactionMapper.toWithdrawTransactionDTO(withdrawTransaction);
     }
 

@@ -26,17 +26,9 @@ public class DepositTransaction extends Transaction {
     )
     private User user;
 
-    @Column(
-            name = "proof_of_transaction",
-            nullable = false,
-            updatable = false
-    )
-    private String proofOfTransaction;
-
     @Builder
-    public DepositTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, User user, String proofOfTransaction) {
-        super(id, trn, amount, transactionDate, status);
+    public DepositTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, String proofOfTransaction, User user) {
+        super(id, trn, amount, transactionDate, status, proofOfTransaction);
         this.user = user;
-        this.proofOfTransaction = proofOfTransaction;
     }
 }

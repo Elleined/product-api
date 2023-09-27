@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionNotYetReleaseException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionPendingException;
 import com.elleined.marketplaceapi.exception.atm.transaction.TransactionRejectedException;
+import com.elleined.marketplaceapi.exception.field.MobileNumberException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
@@ -22,11 +23,12 @@ public interface ATMService {
             DepositLimitException,
             MalformedProofOfTransaction;
 
-    WithdrawTransaction requestWithdraw(User currentUser, BigDecimal withdrawnAmount)
+    WithdrawTransaction requestWithdraw(User currentUser, BigDecimal withdrawnAmount, String gcashNumber)
             throws InsufficientFundException,
             NotValidAmountException,
             MinimumAmountException,
-            WithdrawLimitException;
+            WithdrawLimitException,
+            MobileNumberException;
 
     PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount)
             throws SendingToHimselfException,

@@ -26,13 +26,17 @@ public class WithdrawTransaction extends Transaction {
     )
     private User user;
 
-    @Column(name = "proof_of_transaction")
-    private String proofOfTransaction;
+    @Column(
+            name = "gcash_number",
+            nullable = false,
+            updatable = false
+    )
+    private String gcashNumber;
 
     @Builder
-    public WithdrawTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, User user, String proofOfTransaction) {
-        super(id, trn, amount, transactionDate, status);
+    public WithdrawTransaction(int id, String trn, BigDecimal amount, LocalDateTime transactionDate, Status status, String proofOfTransaction, User user, String gcashNumber) {
+        super(id, trn, amount, transactionDate, status, proofOfTransaction);
         this.user = user;
-        this.proofOfTransaction = proofOfTransaction;
+        this.gcashNumber = gcashNumber;
     }
 }

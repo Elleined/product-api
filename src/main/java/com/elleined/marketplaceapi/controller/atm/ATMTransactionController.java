@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{currentUserId}/atm-transactions")
 @RequiredArgsConstructor
-public class TransactionController {
+public class ATMTransactionController {
     private final UserService userService;
 
     private final TransactionService transactionService;

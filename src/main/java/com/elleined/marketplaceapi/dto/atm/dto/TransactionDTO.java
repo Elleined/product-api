@@ -17,4 +17,5 @@ public class TransactionDTO {
     private BigDecimal amount;
     private String status;
     private LocalDateTime transactionDate;
+    private String proofOfTransaction;
 }

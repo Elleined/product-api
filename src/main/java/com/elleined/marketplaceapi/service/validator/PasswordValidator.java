@@ -1,31 +1,17 @@
-package com.elleined.marketplaceapi.service.user;
+package com.elleined.marketplaceapi.service.validator;
 
 import com.elleined.marketplaceapi.dto.CredentialDTO;
-import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
-import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.utils.StringUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor
-public class UserCredentialValidator {
-    private final GetAllUtilityService getAllUtilityService;
-
-    public void validateEmail(CredentialDTO userCredentialDTO)
-            throws MalformedEmailException, AlreadyExistException {
-        String email = userCredentialDTO.getEmail();
-        if (!email.endsWith("@gmail.com")) throw new MalformedEmailException("Email must ends with @gmail.com!");
-        if (email.startsWith("@")) throw new MalformedEmailException("Email should not starts with @!");
-        if (getAllUtilityService.getAllEmail().contains(email)) throw new AlreadyExistException("This email " + email + " is already associated with an account!");
-    }
-
-    public void validatePassword(String password) throws WeakPasswordException {
+@Service
+public class PasswordValidator implements Validator<String> {
+    @Override
+    public void validate(String password) throws WeakPasswordException {
         List<Character> specialChars = Arrays.asList('@', '#', '$', '_', '/');
         List<Character> letters = StringUtil.toCharArray(password);
 

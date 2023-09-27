@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.dto.atm.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +15,12 @@ import java.time.LocalDateTime;
 public class WithdrawTransactionDTO extends TransactionDTO {
     private int userId;
 
-    private String proofOfTransaction;
+    private String gcashNumber;
 
     @Builder(builderMethodName = "withdrawTransactionDTOBuilder")
-    public WithdrawTransactionDTO(int id, String trn, BigDecimal amount, String status, LocalDateTime transactionDate, int userId, String proofOfTransaction) {
-        super(id, trn, amount, status, transactionDate);
+    public WithdrawTransactionDTO(int id, String trn, BigDecimal amount, String status, LocalDateTime transactionDate, String proofOfTransaction, int userId, String gcashNumber) {
+        super(id, trn, amount, status, transactionDate, proofOfTransaction);
         this.userId = userId;
-        this.proofOfTransaction = proofOfTransaction;
+        this.gcashNumber = gcashNumber;
     }
 }

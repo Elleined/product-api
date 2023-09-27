@@ -15,10 +15,9 @@ import org.mapstruct.Mappings;
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {
 
-    TransactionDTO toTransactionDTO(Transaction transaction);
-
     @Mapping(target = "userId", source = "user.id")
     DepositTransactionDTO toDepositTransactionDTO(DepositTransaction depositTransaction);
+
     @Mapping(target = "userId", source = "user.id")
     WithdrawTransactionDTO toWithdrawTransactionDTO(WithdrawTransaction withdrawTransaction);
     @Mappings({
