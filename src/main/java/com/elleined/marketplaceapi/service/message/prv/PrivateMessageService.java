@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.message.prv;
 
+import com.elleined.marketplaceapi.exception.message.MessageAgreementNotAcceptedException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -26,7 +27,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-// sender and creator are the same
 public class PrivateMessageService implements PrivateChatRoomService, PrivateChatMessageService {
     private final PrivateChatMessageRepository privateChatMessageRepository;
     private final PrivateChatRoomRepository privateChatRoomRepository;
@@ -35,10 +35,12 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
     private final ChatMessageMapper chatMessageMapper;
     @Override
-    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, String message) throws NotValidBodyException {
+    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, String message) throws NotValidBodyException {
+        if (privateChatRoom.getSender().equals(currentUser) && privateChatRoom.getIsSenderAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
+        if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
 
-        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, sender, message);
+        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, message);
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 

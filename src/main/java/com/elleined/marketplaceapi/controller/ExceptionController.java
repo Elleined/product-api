@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.APIResponse;
 import com.elleined.marketplaceapi.exception.atm.ATMException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordException;
+import com.elleined.marketplaceapi.exception.message.MessageException;
 import com.elleined.marketplaceapi.exception.order.OrderException;
 import com.elleined.marketplaceapi.exception.otp.OTPException;
 import com.elleined.marketplaceapi.exception.product.ProductException;
@@ -54,7 +55,9 @@ public class ExceptionController {
             BuyerException.class,
 
             ResourceException.class,
-            ATMException.class
+            ATMException.class,
+
+            MessageException.class
     })
     public ResponseEntity<APIResponse> handleBadRequestExceptions(RuntimeException ex) {
         var responseMessage = new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
