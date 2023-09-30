@@ -69,7 +69,7 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
         if (product.isExceedingToAvailableQuantity(orderItemDTO.getOrderQuantity()))
             throw new OrderQuantiantyExceedsException("Cannot order this product! because you are trying to order that exceeds to available amount!");
         if (isBuyerAlreadyBeenRejected(buyer, product))
-            throw new BuyerAlreadyRejectedException("Cannot order this product! because seller of this product is rejected you order request before!");
+            throw new BuyerAlreadyRejectedException("Cannot order this product! because seller of this product is rejected you order request before!. Please wait after 1 day to re-oder this product");
 
         OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
         double price = productService.calculateOrderPrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
@@ -127,6 +127,9 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
     public boolean isBuyerAlreadyBeenRejected(User buyer, Product product) {
         return buyer.getOrderedItems().stream()
                 .filter(orderItem -> orderItem.getProduct().equals(product))
-                .anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.REJECTED);
+                .anyMatch(orderItem -> {
+                    LocalDateTime reOrderingDate = orderItem.getUpdatedAt().plusDays(1);
+                    return orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.REJECTED && LocalDateTime.now().isBefore(reOrderingDate);
+                });
     }
 }
