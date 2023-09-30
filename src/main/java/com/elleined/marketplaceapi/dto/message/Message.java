@@ -16,4 +16,5 @@ public class Message {
     private int senderId;
     private String status;
     private LocalDateTime createdAt;
+    private String picture;
 }

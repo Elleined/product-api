@@ -40,9 +40,17 @@ public abstract class ChatMessage {
     @Column(
             name = "message",
             nullable = false,
+            updatable = false,
             columnDefinition = "MEDIUMTEXT"
     )
     private String message;
+
+    @Column(
+            name = "picture",
+            updatable = false,
+            columnDefinition = "MEDIUMTEXT"
+    )
+    private String picture;
 
     @ManyToOne(optional = false)
     @JoinColumn(
@@ -55,6 +63,7 @@ public abstract class ChatMessage {
 
     @Column(
             name = "created_at",
+            updatable = false,
             nullable = false
     )
     private LocalDateTime createdAt;

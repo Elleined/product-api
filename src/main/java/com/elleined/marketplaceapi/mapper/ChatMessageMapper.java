@@ -19,10 +19,12 @@ public interface ChatMessageMapper {
             @Mapping(target = "message", expression = "java(message)"),
             @Mapping(target = "sender", expression = "java(currentUser)"),
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
-            @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+            @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
+            @Mapping(target = "picture", expression = "java(picture)")
     })
     PrivateChatMessage toPrivateChatMessageEntity(PrivateChatRoom privateChatRoom,
                                                   @Context User currentUser,
+                                                  String picture,
                                                   @Context String message);
 
     @Mappings({

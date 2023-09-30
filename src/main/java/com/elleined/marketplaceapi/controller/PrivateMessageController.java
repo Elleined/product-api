@@ -33,13 +33,14 @@ public class PrivateMessageController {
     public PrivateChatMessageDTO sendPrivateMessage(@PathVariable("senderId") int senderId,
                                                     @PathVariable("roomId") int roomId,
                                                     @RequestParam("productToSettleId") int productToSettleId,
+                                                    @RequestParam(value = "picture", required = false) String picture,
                                                     @RequestParam("message") String message) {
 
         User sender = userService.getById(senderId);
         PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);
         Product productToSettle = productService.getById(productToSettleId);
 
-        PrivateChatMessage privateChatMessage = privateChatMessageService.save(privateChatRoom, sender, productToSettle, message);
+        PrivateChatMessage privateChatMessage = privateChatMessageService.save(privateChatRoom, sender, productToSettle, picture, message);
         return chatMessageMapper.toPrivateChatMessageDTO(privateChatMessage);
     }
 

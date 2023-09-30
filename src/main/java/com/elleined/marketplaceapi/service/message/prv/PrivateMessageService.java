@@ -35,12 +35,12 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
     private final ChatMessageMapper chatMessageMapper;
     @Override
-    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, String message) throws NotValidBodyException {
+    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, String picture, String message) throws NotValidBodyException {
         if (privateChatRoom.getSender().equals(currentUser) && privateChatRoom.getIsSenderAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
 
-        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, message);
+        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, picture, message);
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 

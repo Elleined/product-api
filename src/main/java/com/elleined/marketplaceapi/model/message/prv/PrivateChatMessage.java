@@ -31,8 +31,8 @@ public class PrivateChatMessage extends ChatMessage {
     private PrivateChatRoom privateChatRoom;
 
     @Builder(builderMethodName = "privateMessageBuilder")
-    public PrivateChatMessage(int id, String message, User sender, LocalDateTime createdAt, Status status, PrivateChatRoom privateChatRoom) {
-        super(id, message, sender, createdAt, status);
+    public PrivateChatMessage(int id, String message, String picture, User sender, LocalDateTime createdAt, Status status, PrivateChatRoom privateChatRoom) {
+        super(id, message, picture, sender, createdAt, status);
         this.privateChatRoom = privateChatRoom;
     }
 }

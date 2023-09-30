@@ -10,7 +10,7 @@ import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 
 public interface PrivateChatMessageService {
-    PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, String message)
+    PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, String picture, String message)
             throws NotValidBodyException, MessageAgreementNotAcceptedException;
 
     PrivateChatMessage getById(int privateMessageId)
