@@ -199,4 +199,7 @@ public class User {
         return this.getWithdrawTransactions().stream().anyMatch(transaction::equals);
     }
 
+    public String getFullName() {
+        return this.getUserDetails().getFirstName() + " " + this.getUserDetails().getMiddleName() + " " + this.getUserDetails().getLastName();
+    }
 }

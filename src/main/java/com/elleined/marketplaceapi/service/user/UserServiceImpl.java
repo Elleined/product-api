@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     private void saveForumUser(User user) {
         ForumUserDTO forumUserDTO = ForumUserDTO.builder()
                 .picture(user.getUserDetails().getPicture())
-                .name(user.getUserDetails().getFirstName())
+                .name(user.getFullName())
                 .email(user.getUserCredential().getEmail())
                 .UUID(user.getReferralCode())
                 .build();
