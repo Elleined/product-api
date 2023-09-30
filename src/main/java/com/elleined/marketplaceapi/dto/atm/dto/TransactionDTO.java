@@ -18,4 +18,5 @@ public class TransactionDTO {
     private String status;
     private LocalDateTime transactionDate;
     private String proofOfTransaction;
+    private float transactionFee;
 }

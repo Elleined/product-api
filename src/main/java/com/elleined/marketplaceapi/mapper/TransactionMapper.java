@@ -8,21 +8,35 @@ import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
+import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring")
-public interface TransactionMapper {
+public abstract class TransactionMapper {
 
-    @Mapping(target = "userId", source = "user.id")
-    DepositTransactionDTO toDepositTransactionDTO(DepositTransaction depositTransaction);
+    @Autowired @Lazy
+    protected ATMFeeService atmFeeService;
 
-    @Mapping(target = "userId", source = "user.id")
-    WithdrawTransactionDTO toWithdrawTransactionDTO(WithdrawTransaction withdrawTransaction);
+    @Mappings({
+            @Mapping(target = "transactionFee", expression = "java(atmFeeService.getDepositFee(depositTransaction.getAmount()))"),
+            @Mapping(target = "userId", source = "user.id")
+    })
+    public abstract DepositTransactionDTO toDepositTransactionDTO(DepositTransaction depositTransaction);
+
+
+    @Mappings({
+            @Mapping(target = "userId", source = "user.id"),
+            @Mapping(target = "transactionFee", expression = "java(atmFeeService.getWithdrawalFee(withdrawTransaction.getAmount()))")
+    })
+    public abstract WithdrawTransactionDTO toWithdrawTransactionDTO(WithdrawTransaction withdrawTransaction);
     @Mappings({
             @Mapping(target = "senderId", source = "sender.id"),
-            @Mapping(target = "receiverId", source = "receiver.id")
+            @Mapping(target = "receiverId", source = "receiver.id"),
+            @Mapping(target = "transactionFee", expression = "java(atmFeeService.getP2pFee(peerToPeerTransaction.getAmount()))")
     })
-    PeerToPeerTransactionDTO toPeer2PeerTransactionDTO(PeerToPeerTransaction peerToPeerTransaction);
+    public abstract PeerToPeerTransactionDTO toPeer2PeerTransactionDTO(PeerToPeerTransaction peerToPeerTransaction);
 }
