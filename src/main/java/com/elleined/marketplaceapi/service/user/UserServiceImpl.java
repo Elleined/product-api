@@ -179,11 +179,6 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     }
 
     @Override
-    public boolean existsById(int userId) {
-        return userRepository.existsById(userId);
-    }
-
-    @Override
     public boolean isLegibleForRegistrationPromo() {
         return userRepository.findAll().size() <= REGISTRATION_LIMIT_PROMO;
     }
@@ -198,8 +193,9 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public void sendShopRegistration(User owner, ShopDTO shopDTO) throws AlreadyExistException {
-        if (owner.isVerified()) throw new AlreadyExistException("Cannot resend shop registration! because you are already been verified!");
-        if (owner.hasShopRegistration()) throw new AlreadyExistException("Cannot resend shop registration! because you already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
+        if (owner.isVerified()) throw new AlreadyExistException("Cannot send shop registration! because you are already been verified!");
+        if (owner.hasShopRegistration()) throw new AlreadyExistException("Cannot send shop registration! because you already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
+        if (isShopNameAlreadyExists(shopDTO.getShopName())) throw new AlreadyExistException("Cannot send shop registration! because the shop name you provided " + shopDTO.getShopName() + " already been taken by another seller!");
 
         Shop shop = Shop.builder()
                 .picture(shopDTO.getPicture())
@@ -272,5 +268,12 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         this.encodePassword(user, newPassword);
         userRepository.save(user);
         log.debug("User with id of {} successfully changed his/her password", user.getId());
+    }
+
+
+    private boolean isShopNameAlreadyExists(String shopName) {
+        return shopRepository.findAll().stream()
+                .map(Shop::getName)
+                .anyMatch(shopName::equals);
     }
 }

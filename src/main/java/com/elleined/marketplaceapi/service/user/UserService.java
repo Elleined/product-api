@@ -52,8 +52,6 @@ public interface UserService extends PasswordService {
 
     User getByEmail(String email) throws ResourceNotFoundException;
 
-    boolean existsById(int userId);
-
     void sendShopRegistration(User user, ShopDTO shopDTO) throws AlreadyExistException;
 
     OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException;
