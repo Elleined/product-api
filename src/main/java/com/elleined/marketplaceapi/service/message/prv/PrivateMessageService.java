@@ -98,7 +98,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     public List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom) {
         return privateChatRoom.getPrivateChatMessages().stream()
                 .filter(PrivateChatMessage::isNotDeleted)
-                .sorted(Comparator.comparing(PrivateChatMessage::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(PrivateChatMessage::getCreatedAt))
                 .toList();
     }
 
