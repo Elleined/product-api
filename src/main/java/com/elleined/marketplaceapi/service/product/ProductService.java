@@ -28,4 +28,6 @@ public interface ProductService {
     Set<Product> getAllById(Set<Integer> productsToBeListedId);
 
     void deleteExpiredProducts();
+
+    List<Product> searchProductByCropName(String cropName);
 }

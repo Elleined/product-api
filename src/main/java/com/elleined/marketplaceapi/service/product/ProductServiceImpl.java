@@ -8,13 +8,16 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.utils.PageSorter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,9 +49,9 @@ public class ProductServiceImpl implements ProductService {
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
                 .map(User::getProducts)
-                .flatMap(products -> products.stream()
-                        .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                        .filter(product -> product.getState() == Product.State.LISTING))
+                .flatMap(Collection::stream)
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(product -> product.getState() == Product.State.LISTING)
                 .toList();
 
         List<Product> regularUserProducts = userRepository.findAll().stream()
@@ -56,9 +59,9 @@ public class ProductServiceImpl implements ProductService {
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
                 .map(User::getProducts)
-                .flatMap(products -> products.stream()
-                        .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                        .filter(product -> product.getState() == Product.State.LISTING))
+                .flatMap(Collection::stream)
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(product -> product.getState() == Product.State.LISTING)
                 .toList();
 
         List<Product> products = new ArrayList<>();
@@ -116,6 +119,14 @@ public class ProductServiceImpl implements ProductService {
                     updatePendingAndAcceptedOrderStatus(product.getOrders());
                 });
         productRepository.saveAll(expiredProducts);
+    }
+
+    @Override
+    public List<Product> searchProductByCropName(String cropName) {
+        return productRepository.searchProductByCropName(cropName).stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(product -> product.getState() == Product.State.LISTING)
+                .toList();
     }
 
     private void updatePendingAndAcceptedOrderStatus(List<OrderItem> orderItems) {

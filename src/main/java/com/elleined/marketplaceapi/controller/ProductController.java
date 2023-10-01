@@ -53,4 +53,11 @@ public class ProductController {
         Product product = productService.getById(productId);
         return productService.calculateOrderPrice(product, userOrderQuantity);
     }
+
+    @GetMapping("/search-by-crop-name")
+    public List<ProductDTO> searchProductByCropName(@RequestParam("cropName") String cropName) {
+        return productService.searchProductByCropName(cropName).stream()
+                .map(productMapper::toDTO)
+                .toList();
+    }
 }
