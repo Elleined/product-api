@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 // Also acts as proxy for request inheritance
-public interface ModeratorService {
+public interface    ModeratorService {
     Moderator getById(int moderatorId) throws ResourceNotFoundException;
 
     Moderator save(ModeratorDTO moderatorDTO);

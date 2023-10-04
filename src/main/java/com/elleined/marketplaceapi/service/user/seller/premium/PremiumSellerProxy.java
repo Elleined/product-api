@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Qualifier("premiumSellerProxy")
 public class PremiumSellerProxy implements SellerService {
-    public static final float SUCCESSFUL_TRANSACTION_FEE = 2;
+    public static final float SUCCESSFUL_TRANSACTION_FEE = 1;
     private final SellerService sellerService;
     private final FeeService feeService;
 
