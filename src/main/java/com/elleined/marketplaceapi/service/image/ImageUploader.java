@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.exception.PathNotValidException;
 import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ImageUploader implements Uploader {
     @Override
     public void upload(String fullPathDirectory, MultipartFile attachment) throws IOException, PathNotValidException {
@@ -19,5 +21,6 @@ public class ImageUploader implements Uploader {
         if (attachment == null) throw new ResourceException("Please specify you attachment to be saved!");
         final String fullPathDirectoryWithImg = fullPathDirectory + attachment.getOriginalFilename();
         attachment.transferTo(new File(fullPathDirectoryWithImg));
+        log.debug("Picture uploaded successfully to {}", fullPathDirectoryWithImg);
     }
 }
