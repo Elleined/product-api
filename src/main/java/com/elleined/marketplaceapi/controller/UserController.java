@@ -57,7 +57,7 @@ public class UserController {
     @PostMapping("/save")
     public UserDTO save(@Valid @RequestPart("userDTO") UserDTO userDTO,
                         @Valid @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) throws IOException {
-        User registeringUser = userService.saveByDTO(userDTO);
+        User registeringUser = userService.saveByDTO(userDTO, profilePicture);
         emailService.sendWelcomeEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
     }
