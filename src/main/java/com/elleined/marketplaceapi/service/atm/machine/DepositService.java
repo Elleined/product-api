@@ -5,6 +5,7 @@ import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitPerDayException;
+import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.user.User;
@@ -12,13 +13,18 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.image.ImageUploader;
+import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +48,11 @@ public class DepositService {
 
     private final AppWalletService appWalletService;
 
+    private final ImageUploader imageUploader;
+
+    @Value("${cropTrade.img.directory}")
+    private String cropTradeImgDirectory;
+
     public void deposit(User currentUser, BigDecimal depositedAmount) {
         BigDecimal oldBalance = currentUser.getBalance();
         float depositFee = feeService.getDepositFee(depositedAmount);
@@ -57,13 +68,12 @@ public class DepositService {
         return depositedAmount.compareTo(new BigDecimal(MINIMUM_DEPOSIT_AMOUNT)) < 0;
     }
 
-    public DepositTransaction requestDeposit(User user, BigDecimal depositedAmount, String proofOfTransaction)
+    public DepositTransaction requestDeposit(User user, BigDecimal depositedAmount, MultipartFile proofOfTransaction)
             throws NotValidAmountException,
             MinimumAmountException,
-            DepositLimitException,
-            MalformedProofOfTransaction {
+            DepositLimitException, IOException {
 
-        if (StringUtil.isNotValid(proofOfTransaction)) throw new MalformedProofOfTransaction("Cannot request deposit! please provide your proof of transaction.");
+        if (proofOfTransaction.isEmpty()) throw new ResourceException("Cannot deposit! Please provide proof of transaction!");
         if (isBelowMinimumDepositAmount(depositedAmount)) throw new MinimumAmountException("Cannot deposit! because you are trying to deposit an amount that is below minimum which is " + MINIMUM_DEPOSIT_AMOUNT);
         if (atmValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (isDepositAmountAboveLimit(depositedAmount)) throw new DepositLimitException("You cannot deposit an amount that is greater than to deposit limit which is " + DEPOSIT_LIMIT_PER_DAY);
@@ -76,11 +86,12 @@ public class DepositService {
                 .amount(depositedAmount)
                 .transactionDate(LocalDateTime.now())
                 .status(Transaction.Status.PENDING)
-                .proofOfTransaction(proofOfTransaction)
+                .proofOfTransaction(proofOfTransaction.getOriginalFilename())
                 .user(user)
                 .build();
 
         depositTransactionRepository.save(depositTransaction);
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.DEPOSIT_TRANSACTIONS_FOLDER, proofOfTransaction);
         log.debug("Deposit transaction saved with trn of {}", trn);
         return depositTransaction;
     }

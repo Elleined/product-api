@@ -13,7 +13,9 @@ import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionSe
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 @RestController
@@ -29,7 +31,7 @@ public class ATMController  {
     @PostMapping("/deposit")
     public DepositTransactionDTO requestDeposit(@PathVariable("currentUserId") int currentUserId,
                                                 @RequestParam("amount") BigDecimal amount,
-                                                @RequestParam("proofOfTransaction") String proofOfTransaction) {
+                                                @RequestPart("proofOfTransaction") MultipartFile proofOfTransaction) throws IOException {
 
         User currentUser = userService.getById(currentUserId);
         DepositTransaction depositTransaction = atmService.requestDeposit(currentUser, amount, proofOfTransaction);

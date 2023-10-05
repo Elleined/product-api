@@ -17,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 @Service
@@ -33,7 +35,7 @@ public class WebATMService implements ATMService {
     private final PeerToPeerService peerToPeerService;
 
     @Override
-    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount, String proofOfTransaction) throws NotValidAmountException, MalformedProofOfTransaction, DepositLimitException, MinimumAmountException {
+    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount, MultipartFile proofOfTransaction) throws NotValidAmountException, MalformedProofOfTransaction, DepositLimitException, MinimumAmountException, IOException {
         // Add validation here
         return depositService.requestDeposit(currentUser, depositAmount, proofOfTransaction);
     }
