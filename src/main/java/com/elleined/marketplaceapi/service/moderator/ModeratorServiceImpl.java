@@ -17,18 +17,23 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
+import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
 import com.elleined.marketplaceapi.service.moderator.request.ProductRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
 import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
+import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
@@ -50,6 +55,12 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     private final DepositRequest depositRequest;
 
     private final WithdrawTransactionRepository withdrawTransactionRepository;
+
+    private final ImageUploader imageUploader;
+
+    @Value("${cropTrade.img.directory}")
+    private String cropTradeImgDirectory;
+
 
     @Override
     public Moderator getById(int moderatorId) throws ResourceNotFoundException {
@@ -189,19 +200,20 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void release(Moderator moderator, WithdrawTransaction withdrawTransaction, String proofOfTransaction)
-            throws TransactionRejectedException, TransactionReleaseException, NotValidBodyException, InsufficientBalanceException {
+    public void release(Moderator moderator, WithdrawTransaction withdrawTransaction, MultipartFile proofOfTransaction)
+            throws TransactionRejectedException, TransactionReleaseException, NotValidBodyException, InsufficientBalanceException, IOException {
 
         User requestingUserToWithdraw = withdrawTransaction.getUser();
         BigDecimal amountToBeWithdrawn = withdrawTransaction.getAmount();
-        if (StringUtil.isNotValid(proofOfTransaction)) throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
+        if (proofOfTransaction.isEmpty()) throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
         if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
         if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
         if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance has only balance of " + requestingUserToWithdraw.getBalance() + " is below to requesting amount to be withdrawn which is " + amountToBeWithdrawn + ". Reject it!");
         // Add validation here
 
-        withdrawTransaction.setProofOfTransaction(proofOfTransaction);
+        withdrawTransaction.setProofOfTransaction(proofOfTransaction.getOriginalFilename());
         withdrawTransactionRepository.save(withdrawTransaction);
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.WITHDRAW_TRANSACTIONS_FOLDER, proofOfTransaction);
 
         withdrawRequest.accept(moderator, withdrawTransaction);
     }

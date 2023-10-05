@@ -13,7 +13,9 @@ import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -68,11 +70,11 @@ public interface    ModeratorService {
 
     /** Withdraw **/
     List<WithdrawTransaction> getAllPendingWithdrawRequest();
-    void release(Moderator moderator, WithdrawTransaction withdrawTransaction, String proofOfTransaction)
+    void release(Moderator moderator, WithdrawTransaction withdrawTransaction, MultipartFile proofOfTransaction)
             throws TransactionRejectedException,
             TransactionReleaseException,
             NotValidBodyException,
-            InsufficientBalanceException;
+            InsufficientBalanceException, IOException;
 
     void releaseAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions);
     void reject(Moderator moderator, WithdrawTransaction withdrawTransaction)

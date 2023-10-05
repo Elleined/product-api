@@ -9,7 +9,9 @@ import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +39,7 @@ public class ModeratorWithdrawRequestController {
     @PatchMapping("/{withdrawTransactionId}/release")
     void releaseWithdrawRequest(@PathVariable("moderatorId") int moderatorId,
                                 @PathVariable("withdrawTransactionId") Integer withdrawTransactionId,
-                                @RequestParam("proofOfTransaction") String proofOfTransaction) {
+                                @RequestPart("proofOfTransaction") MultipartFile proofOfTransaction) throws IOException {
 
         Moderator moderator = moderatorService.getById(moderatorId);
         WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
