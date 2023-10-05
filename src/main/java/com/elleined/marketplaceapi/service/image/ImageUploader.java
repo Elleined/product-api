@@ -18,7 +18,7 @@ public class ImageUploader implements Uploader {
     @Override
     public void upload(String fullPathDirectory, MultipartFile attachment) throws IOException, PathNotValidException {
         if (StringUtil.isNotValid(fullPathDirectory)) throw new PathNotValidException("Please specify valid full path url!");
-        if (attachment == null) throw new ResourceException("Please specify you attachment to be saved!");
+        if (attachment == null) throw new ResourceException("Picture attachment cannot be null!");
         final String fullPathDirectoryWithImg = fullPathDirectory + attachment.getOriginalFilename();
         attachment.transferTo(new File(fullPathDirectoryWithImg));
         log.debug("Picture uploaded successfully to {}", fullPathDirectoryWithImg);
