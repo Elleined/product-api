@@ -57,7 +57,7 @@ public class UserController {
 
     @PostMapping("/save")
     public UserDTO save(@Valid @RequestPart("userDTO") UserDTO userDTO,
-                        @Valid @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) throws IOException {
+                        @RequestPart(value = "profilePicture") MultipartFile profilePicture) throws IOException {
         User registeringUser = userService.saveByDTO(userDTO, profilePicture);
         userService.saveForumUser(registeringUser);
 

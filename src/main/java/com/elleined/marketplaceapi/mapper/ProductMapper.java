@@ -37,6 +37,7 @@ public abstract class ProductMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(target = "picture", ignore = true),
 
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "state", expression = "java(State.PENDING)"),

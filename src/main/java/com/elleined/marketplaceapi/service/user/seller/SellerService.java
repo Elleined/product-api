@@ -11,13 +11,17 @@ import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface SellerService extends SellerTransactionFeeService {
 
-    Product saveProduct(ProductDTO productDTO, User seller)
+    Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
             throws NotVerifiedException,
             InsufficientFundException,
-            ProductExpirationLimitException;
+            ProductExpirationLimitException,
+            IOException;
 
     void updateProduct(User seller, Product product, ProductDTO productDTO)
             throws NotOwnedException,

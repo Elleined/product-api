@@ -17,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -33,10 +36,10 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public Product saveProduct(ProductDTO productDTO, User seller)
-            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException {
+    public Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
+            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         // add validation for here for premium seller for future
-        return sellerService.saveProduct(productDTO, seller);
+        return sellerService.saveProduct(seller, productDTO, productPicture);
     }
 
     @Override

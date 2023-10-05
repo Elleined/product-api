@@ -26,7 +26,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -113,8 +115,8 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public Product saveProduct(ProductDTO productDTO, User seller)
-            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException {
+    public Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
+            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot save product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
@@ -130,7 +132,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice + ". Consider buying premium account to remove listing fee.");
 
         feeService.deductListingFee(seller, listingFee);
-        return sellerService.saveProduct(productDTO, seller);
+        return sellerService.saveProduct(seller, productDTO, productPicture);
     }
 
     @Override
