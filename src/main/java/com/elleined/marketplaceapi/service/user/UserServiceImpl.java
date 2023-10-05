@@ -140,9 +140,9 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
         User registeringUser = saveByDTO(dto);
 
+        imageUploader.upload(DirectoryPaths.PROFILE_PICTURES_PATH, profilePicture);
         registeringUser.getUserDetails().setPicture(profilePicture.getOriginalFilename());
         userRepository.save(registeringUser);
-        imageUploader.upload(DirectoryPaths.PROFILE_PICTURES_PATH, profilePicture);
 
         return registeringUser;
     }
