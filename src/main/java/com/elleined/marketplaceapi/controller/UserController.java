@@ -12,15 +12,19 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.email.EmailService;
+import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.WSMessageService;
 import com.elleined.marketplaceapi.service.user.PasswordService;
 import com.elleined.marketplaceapi.service.user.PremiumService;
 import com.elleined.marketplaceapi.service.user.UserService;
+import com.elleined.marketplaceapi.utils.DirectoryPaths;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -28,12 +32,12 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
+    private final ImageUploader imageUploader;
     private final UserService userService;
 
     private final EmailService emailService;
 
     private final PasswordService passwordService;
-    private final WSMessageService WSMessageService;
 
     private final PremiumService premiumService;
     private final UserMapper userMapper;
@@ -45,6 +49,15 @@ public class UserController {
 
     @PostMapping
     public UserDTO save(@Valid @RequestBody UserDTO userDTO) {
+        User registeringUser = userService.saveByDTO(userDTO);
+        emailService.sendWelcomeEmail(registeringUser);
+        return userMapper.toDTO(registeringUser);
+    }
+
+    @PostMapping("/save")
+    public UserDTO save(@Valid @RequestPart("userDTO") UserDTO userDTO,
+                        @Valid @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) throws IOException {
+        imageUploader.upload(DirectoryPaths.PROFILE_PICTURES_PATH, profilePicture);
         User registeringUser = userService.saveByDTO(userDTO);
         emailService.sendWelcomeEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
