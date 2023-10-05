@@ -215,8 +215,8 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public void sendShopRegistration(User owner, String shopName, String description, MultipartFile shopPicture, MultipartFile validId) throws AlreadyExistException, IOException {
-        if (validId == null) throw new ResourceException("Valid id Picture attachment cannot be null!");
-        if (shopPicture == null) throw new ResourceException("Shop Picture attachment cannot be null!");
+        if (validId.isEmpty()) throw new ResourceException("Valid id Picture attachment cannot be null!");
+        if (shopPicture.isEmpty()) throw new ResourceException("Shop Picture attachment cannot be null!");
         if (StringUtil.isNotValid(shopName)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop name!");
         if (StringUtil.isNotValid(description)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop description!");
         if (owner.isVerified()) throw new AlreadyExistException("Cannot send shop registration! because you are already been verified!");
