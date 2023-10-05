@@ -12,10 +12,10 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.email.EmailService;
-import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.user.PasswordService;
 import com.elleined.marketplaceapi.service.user.PremiumService;
 import com.elleined.marketplaceapi.service.user.UserService;
+import com.elleined.marketplaceapi.service.user.VerificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final ImageUploader imageUploader;
+    private final VerificationService verificationService;
     private final UserService userService;
 
     private final EmailService emailService;
@@ -85,7 +85,7 @@ public class UserController {
                                  @RequestParam("newValidId") String newValidId) {
 
         User currentUser = userService.getById(currentUserId);
-        userService.resendValidId(currentUser, newValidId);
+        verificationService.resendValidId(currentUser, newValidId);
         return userMapper.toDTO(currentUser);
     }
 
@@ -101,7 +101,7 @@ public class UserController {
                                 @Valid @RequestBody ShopDTO shopDTO) {
 
         User currentUser = userService.getById(currentUserId);
-        userService.sendShopRegistration(currentUser, shopDTO);
+        verificationService.sendShopRegistration(currentUser, shopDTO);
         return shopDTO;
     }
 

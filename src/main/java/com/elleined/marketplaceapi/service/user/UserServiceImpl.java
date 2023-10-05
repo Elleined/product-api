@@ -53,7 +53,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional
 public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>,
-        ReferralService, RegistrationPromoService {
+        ReferralService, RegistrationPromoService, VerificationService {
+
     private final PasswordEncoder passwordEncoder;
 
     private final ImageUploader imageUploader;

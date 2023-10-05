@@ -54,10 +54,6 @@ public interface UserService extends PasswordService {
 
     void saveForumUser(User user);
 
-    void resendValidId(User currentUser, String validId)
-            throws UserAlreadyVerifiedException,
-            NoShopRegistrationException,
-            FieldException;
 
 
     // After this principal will be set to be use in web socket
@@ -65,7 +61,6 @@ public interface UserService extends PasswordService {
 
     User getByEmail(String email) throws ResourceNotFoundException;
 
-    void sendShopRegistration(User user, ShopDTO shopDTO) throws AlreadyExistException;
 
     OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException;
 
