@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     private final NumberValidator numberValidator;
     private final FullNameValidator fullNameValidator;
 
-    @Value("cropTrade.img.directory")
+    @Value("${cropTrade.img.directory}")
     private String cropTradeImgDirectory;
 
     @Override
