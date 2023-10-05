@@ -7,6 +7,7 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
@@ -98,11 +99,18 @@ public class UserController {
 
     @PostMapping("/{currentUserId}/registerShop")
     public ShopDTO registerShop(@PathVariable("currentUserId") int currentUserId,
-                                @Valid @RequestBody ShopDTO shopDTO) {
+                                @RequestParam("shopName") String shopName,
+                                @RequestParam("shopDescription") String shopDescription,
+                                @RequestPart("validId") MultipartFile validId,
+                                @RequestPart("shopPicture") MultipartFile shopPicture) throws IOException {
 
         User currentUser = userService.getById(currentUserId);
-        verificationService.sendShopRegistration(currentUser, shopDTO);
-        return shopDTO;
+        verificationService.sendShopRegistration(currentUser, shopName, shopDescription, shopPicture, validId);
+        return ShopDTO.builder()
+                .shopName(shopName)
+                .description(shopDescription)
+                .picture(shopPicture.getOriginalFilename())
+                .build();
     }
 
 

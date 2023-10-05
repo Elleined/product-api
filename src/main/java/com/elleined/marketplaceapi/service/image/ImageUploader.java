@@ -15,7 +15,6 @@ import java.io.IOException;
 public class ImageUploader implements Uploader {
     @Override
     public void upload(String uploadPath, MultipartFile attachment) throws IOException {
-        if (attachment == null) throw new ResourceException("Picture attachment cannot be null!");
         final String uploadPathWithImg = uploadPath + attachment.getOriginalFilename();
         attachment.transferTo(new File(uploadPathWithImg));
         log.debug("Picture uploaded successfully to {}", uploadPathWithImg);

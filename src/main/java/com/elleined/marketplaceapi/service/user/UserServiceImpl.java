@@ -2,16 +2,17 @@ package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.client.ForumClient;
 import com.elleined.marketplaceapi.dto.CredentialDTO;
-import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.forum.ForumUserDTO;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
@@ -142,12 +143,13 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
+        if (profilePicture == null) throw new ResourceException("Profile picture attachment cannot be null!");
         User registeringUser = saveByDTO(dto);
 
-        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PROFILE_PICTURES_FOLDER, profilePicture);
         registeringUser.getUserDetails().setPicture(profilePicture.getOriginalFilename());
         userRepository.save(registeringUser);
 
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PROFILE_PICTURES_FOLDER, profilePicture);
         return registeringUser;
     }
 
@@ -166,13 +168,14 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     @Override
     public void resendValidId(User currentUser, MultipartFile validId)
             throws UserAlreadyVerifiedException, NoShopRegistrationException, IOException {
-
+        if (validId == null) throw new ResourceException("Picture attachment cannot be null!");
         if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! you are already been verified");
         if (!currentUser.hasShopRegistration()) throw new NoShopRegistrationException("Cannot resent valid id! you need to submit a shop registration before resending you valid id.");
 
-        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.VALID_IDS_FOLDER, validId);
         currentUser.getUserVerification().setValidId(validId.getOriginalFilename());
         userRepository.save(currentUser);
+
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.VALID_IDS_FOLDER, validId);
         log.debug("User with id of {} resended valid id {}", currentUser.getId(), validId);
     }
 
@@ -211,21 +214,28 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     }
 
     @Override
-    public void sendShopRegistration(User owner, ShopDTO shopDTO) throws AlreadyExistException {
+    public void sendShopRegistration(User owner, String shopName, String description, MultipartFile shopPicture, MultipartFile validId) throws AlreadyExistException, IOException {
+        if (validId == null) throw new ResourceException("Valid id Picture attachment cannot be null!");
+        if (shopPicture == null) throw new ResourceException("Shop Picture attachment cannot be null!");
+        if (StringUtil.isNotValid(shopName)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop name!");
+        if (StringUtil.isNotValid(description)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop description!");
         if (owner.isVerified()) throw new AlreadyExistException("Cannot send shop registration! because you are already been verified!");
         if (owner.hasShopRegistration()) throw new AlreadyExistException("Cannot send shop registration! because you already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
-        if (isShopNameAlreadyExists(shopDTO.getShopName())) throw new AlreadyExistException("Cannot send shop registration! because the shop name you provided " + shopDTO.getShopName() + " already been taken by another seller!");
+        if (isShopNameAlreadyExists(shopName)) throw new AlreadyExistException("Cannot send shop registration! because the shop name you provided " + shopName + " already been taken by another seller!");
 
         Shop shop = Shop.builder()
-                .picture(shopDTO.getPicture())
-                .name(shopDTO.getShopName())
-                .description(shopDTO.getDescription())
+                .picture(shopPicture.getOriginalFilename())
+                .name(shopName)
+                .description(description)
                 .owner(owner)
                 .build();
-        owner.getUserVerification().setValidId(shopDTO.getValidId());
+        owner.getUserVerification().setValidId(validId.getOriginalFilename());
 
         userRepository.save(owner);
         shopRepository.save(shop);
+
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.VALID_IDS_FOLDER, validId);
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.SHOP_PICTURES_FOLDER, shopPicture);
         log.debug("Shop registration of owner with id of {} success his verification are now visible in moderator", owner.getId());
     }
 

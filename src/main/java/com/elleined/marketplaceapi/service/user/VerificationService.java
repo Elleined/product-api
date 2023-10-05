@@ -1,9 +1,10 @@
 package com.elleined.marketplaceapi.service.user;
 
-import com.elleined.marketplaceapi.dto.ShopDTO;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,7 @@ public interface VerificationService {
             throws UserAlreadyVerifiedException,
             NoShopRegistrationException, IOException;
 
-    void sendShopRegistration(User user, ShopDTO shopDTO) throws AlreadyExistException;
+    void sendShopRegistration(User user, String shopName, String description, MultipartFile shopPicture, MultipartFile validId)
+            throws AlreadyExistException, NotValidBodyException, IOException;
 
 }

@@ -13,10 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ShopDTO {
 
-    @NotBlank(message = "Please provide your shop name")
     private String shopName;
 
-    @NotBlank(message = "Please provide short description about your shop")
     private String description;
 
     private String picture;
