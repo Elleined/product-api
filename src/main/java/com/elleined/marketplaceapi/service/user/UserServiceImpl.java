@@ -26,18 +26,22 @@ import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
 import com.elleined.marketplaceapi.service.validator.EmailValidator;
 import com.elleined.marketplaceapi.service.validator.FullNameValidator;
 import com.elleined.marketplaceapi.service.validator.NumberValidator;
 import com.elleined.marketplaceapi.service.validator.PasswordValidator;
+import com.elleined.marketplaceapi.utils.DirectoryPaths;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Set;
@@ -50,6 +54,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>,
         ReferralService, RegistrationPromoService {
     private final PasswordEncoder passwordEncoder;
+
+    private final ImageUploader imageUploader;
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -128,6 +134,17 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
         saveForumUser(registeringUser);
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
+        return registeringUser;
+    }
+
+    @Override
+    public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
+        User registeringUser = saveByDTO(dto);
+        
+        imageUploader.upload(DirectoryPaths.PROFILE_PICTURES_PATH, profilePicture);
+        registeringUser.getUserDetails().setPicture(profilePicture.getOriginalFilename());
+        userRepository.save(registeringUser);
+
         return registeringUser;
     }
 

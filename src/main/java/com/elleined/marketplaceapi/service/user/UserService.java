@@ -16,7 +16,9 @@ import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -35,6 +37,15 @@ public interface UserService extends PasswordService {
             MalformedEmailException,
             AlreadyExistException,
             MobileNumberException;
+
+    User saveByDTO(UserDTO dto, MultipartFile profilePicture)
+            throws ResourceNotFoundException,
+            HasDigitException,
+            PasswordNotMatchException,
+            WeakPasswordException,
+            MalformedEmailException,
+            AlreadyExistException,
+            MobileNumberException, IOException;
 
     User getById(int id) throws ResourceNotFoundException;
     Set<User> getAllById(Set<Integer> userIds) throws ResourceNotFoundException;
