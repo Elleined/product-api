@@ -5,7 +5,6 @@ import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.forum.ForumUserDTO;
-import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
@@ -165,16 +164,14 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     }
 
     @Override
-    public void resendValidId(User currentUser, String validId)
-            throws UserAlreadyVerifiedException,
-            NoShopRegistrationException,
-            FieldException {
+    public void resendValidId(User currentUser, MultipartFile validId)
+            throws UserAlreadyVerifiedException, NoShopRegistrationException, IOException {
 
-        if (StringUtil.isNotValid(validId)) throw new FieldException("Please provide your new valid id in valid id input...");
         if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! you are already been verified");
         if (!currentUser.hasShopRegistration()) throw new NoShopRegistrationException("Cannot resent valid id! you need to submit a shop registration before resending you valid id.");
 
-        currentUser.getUserVerification().setValidId(validId);
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.VALID_IDS_FOLDER, validId);
+        currentUser.getUserVerification().setValidId(validId.getOriginalFilename());
         userRepository.save(currentUser);
         log.debug("User with id of {} resended valid id {}", currentUser.getId(), validId);
     }

@@ -82,7 +82,7 @@ public class UserController {
 
     @PatchMapping("/{currentUserId}/resendValidId")
     public UserDTO resendValidId(@PathVariable("currentUserId") int currentUserId,
-                                 @RequestParam("newValidId") String newValidId) {
+                                 @RequestPart("newValidId") MultipartFile newValidId) throws IOException {
 
         User currentUser = userService.getById(currentUserId);
         verificationService.resendValidId(currentUser, newValidId);
