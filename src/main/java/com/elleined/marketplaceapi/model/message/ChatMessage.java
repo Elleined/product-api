@@ -47,8 +47,7 @@ public abstract class ChatMessage {
 
     @Column(
             name = "picture",
-            updatable = false,
-            columnDefinition = "MEDIUMTEXT"
+            updatable = false
     )
     private String picture;
 

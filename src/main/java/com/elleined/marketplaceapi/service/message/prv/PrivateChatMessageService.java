@@ -8,10 +8,14 @@ import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface PrivateChatMessageService {
-    PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, String picture, String message)
-            throws NotValidBodyException, MessageAgreementNotAcceptedException;
+    PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, MultipartFile picture, String message)
+            throws NotValidBodyException,
+            MessageAgreementNotAcceptedException, IOException;
 
     PrivateChatMessage getById(int privateMessageId)
             throws ResourceNotFoundException;

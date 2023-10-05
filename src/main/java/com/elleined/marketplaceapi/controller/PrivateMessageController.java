@@ -13,7 +13,9 @@ import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -33,8 +35,8 @@ public class PrivateMessageController {
     public PrivateChatMessageDTO sendPrivateMessage(@PathVariable("senderId") int senderId,
                                                     @PathVariable("roomId") int roomId,
                                                     @RequestParam("productToSettleId") int productToSettleId,
-                                                    @RequestParam(value = "picture", required = false) String picture,
-                                                    @RequestParam("message") String message) {
+                                                    @RequestPart(value = "picture", required = false) MultipartFile picture,
+                                                    @RequestParam("message") String message) throws IOException {
 
         User sender = userService.getById(senderId);
         PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(roomId);

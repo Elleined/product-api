@@ -13,13 +13,18 @@ import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.message.PrivateChatMessageRepository;
 import com.elleined.marketplaceapi.repository.message.PrivateChatRoomRepository;
+import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.WSMessageService;
+import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -34,16 +39,23 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     private final WSMessageService wsMessageService;
 
     private final ChatMessageMapper chatMessageMapper;
+
+    private final ImageUploader imageUploader;
+
+    @Value("${cropTrade.img.directory}")
+    private String cropTradeImgDirectory;
+
     @Override
-    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, String picture, String message) throws NotValidBodyException {
+    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, MultipartFile picture, String message) throws NotValidBodyException, MessageAgreementNotAcceptedException, IOException {
         if (privateChatRoom.getSender().equals(currentUser) && privateChatRoom.getIsSenderAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
 
-        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, picture, message);
+        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, picture.getOriginalFilename(), message);
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 
+        if (!picture.isEmpty()) imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRIVATE_CHAT_FOLDER, picture);
         log.debug("Private chat saved successfully with id of {} ", privateChatMessage.getId());
         return privateChatMessage;
     }
