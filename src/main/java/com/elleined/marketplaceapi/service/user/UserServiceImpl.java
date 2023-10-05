@@ -132,7 +132,6 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
-        saveForumUser(registeringUser);
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
         return registeringUser;
     }
@@ -148,7 +147,8 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         return registeringUser;
     }
 
-    private void saveForumUser(User user) {
+    @Override
+    public void saveForumUser(User user) {
         ForumUserDTO forumUserDTO = ForumUserDTO.builder()
                 .picture(user.getUserDetails().getPicture())
                 .name(user.getFullName())

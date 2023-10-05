@@ -52,6 +52,8 @@ public interface UserService extends PasswordService {
     Set<User> getAllSeller();
     Set<User> searchAllSellerByName(String username);
 
+    void saveForumUser(User user);
+
     void resendValidId(User currentUser, String validId)
             throws UserAlreadyVerifiedException,
             NoShopRegistrationException,
