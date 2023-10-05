@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Collection;
 
 public interface Exporter<T> {
     void export(HttpServletResponse httpServletResponse, T t)

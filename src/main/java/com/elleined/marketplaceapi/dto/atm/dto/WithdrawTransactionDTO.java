@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.dto.atm.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

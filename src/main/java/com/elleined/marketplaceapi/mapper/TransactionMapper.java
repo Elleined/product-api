@@ -2,11 +2,9 @@ package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.atm.dto.DepositTransactionDTO;
 import com.elleined.marketplaceapi.dto.atm.dto.PeerToPeerTransactionDTO;
-import com.elleined.marketplaceapi.dto.atm.dto.TransactionDTO;
 import com.elleined.marketplaceapi.dto.atm.dto.WithdrawTransactionDTO;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
-import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import org.mapstruct.Mapper;

@@ -32,10 +32,11 @@ import com.elleined.marketplaceapi.service.validator.EmailValidator;
 import com.elleined.marketplaceapi.service.validator.FullNameValidator;
 import com.elleined.marketplaceapi.service.validator.NumberValidator;
 import com.elleined.marketplaceapi.service.validator.PasswordValidator;
-import com.elleined.marketplaceapi.utils.DirectoryPaths;
+import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +75,9 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     private final PasswordValidator passwordValidator;
     private final NumberValidator numberValidator;
     private final FullNameValidator fullNameValidator;
+
+    @Value("cropTrade.img.directory")
+    private String cropTradeImgDirectory;
 
     @Override
     public User getById(int id) throws ResourceNotFoundException {
@@ -140,7 +144,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
         User registeringUser = saveByDTO(dto);
 
-        imageUploader.upload(DirectoryPaths.PROFILE_PICTURES_PATH, profilePicture);
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PROFILE_PICTURES_FOLDER, profilePicture);
         registeringUser.getUserDetails().setPicture(profilePicture.getOriginalFilename());
         userRepository.save(registeringUser);
 

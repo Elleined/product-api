@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.validator;
 
-import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import org.springframework.stereotype.Service;
