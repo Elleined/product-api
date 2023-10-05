@@ -43,15 +43,15 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public void updateProduct(User seller, Product product, ProductDTO productDTO)
+    public void updateProduct(User seller, Product product, ProductDTO productDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
             ResourceNotFoundException,
             ProductHasAcceptedOrderException,
-            ProductHasPendingOrderException  {
+            ProductHasPendingOrderException, IOException {
         // add validation for here for premium seller for future
-        sellerService.updateProduct(seller, product, productDTO);
+        sellerService.updateProduct(seller, product, productDTO, productPicture);
     }
 
     @Override

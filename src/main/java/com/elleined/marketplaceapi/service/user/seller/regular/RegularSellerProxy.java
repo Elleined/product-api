@@ -136,7 +136,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public void updateProduct(User seller, Product product, ProductDTO productDTO)
+    public void updateProduct(User seller, Product product, ProductDTO productDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
@@ -144,7 +144,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             ProductHasAcceptedOrderException,
             ProductHasPendingOrderException,
             SellerMaxAcceptedOrderException,
-            SellerMaxPendingOrderException {
+            SellerMaxPendingOrderException, IOException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot update product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
@@ -157,7 +157,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         if (isBalanceNotEnoughToPayListingFee(seller, listingFee))
             throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice + ". Consider buying premium account to remove listing fee.");
 
-        sellerService.updateProduct(seller, product, productDTO);
+        sellerService.updateProduct(seller, product, productDTO, productPicture);
     }
 
     @Override

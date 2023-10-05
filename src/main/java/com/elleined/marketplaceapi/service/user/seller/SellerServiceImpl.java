@@ -86,14 +86,15 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     }
 
     @Override
-    public void updateProduct(User seller, Product product, ProductDTO productDTO)
+    public void updateProduct(User seller, Product product, ProductDTO productDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
             ResourceNotFoundException,
             ProductHasAcceptedOrderException,
-            ProductHasPendingOrderException {
+            ProductHasPendingOrderException, IOException {
 
+        if (productPicture == null) throw new ResourceException("Cannot save product! please provide product picture!");
         if (product.hasAcceptedOrder())
             throw new ProductHasAcceptedOrderException("Cannot update product! because theres an accepted order for this product.");
         if (product.hasPendingOrder())
@@ -114,7 +115,10 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
         Product updatedProduct = productMapper.toUpdate(product, productDTO);
+        updatedProduct.setPicture(productPicture.getOriginalFilename());
         productRepository.save(updatedProduct);
+
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
         log.debug("Product with id of {} updated successfully!", updatedProduct.getId());
     }
 

@@ -141,15 +141,16 @@ public class SellerController {
     @PutMapping("/updateProduct/{productId}")
     public ProductDTO update(@PathVariable("currentUserId") int sellerId,
                              @PathVariable("productId") int productId,
-                             @Valid @RequestBody ProductDTO productDTO) {
+                             @Valid @RequestPart("productDTO") ProductDTO productDTO,
+                             @RequestPart("productPicture") MultipartFile productPicture) throws IOException {
 
         User seller = userService.getById(sellerId);
         Product product = productService.getById(productId);
         if (seller.isPremiumAndNotExpired()) {
-            premiumSeller.updateProduct(seller, product, productDTO);
+            premiumSeller.updateProduct(seller, product, productDTO, productPicture);
             return productMapper.toDTO(product);
         }
-        regularSeller.updateProduct(seller, product, productDTO);
+        regularSeller.updateProduct(seller, product, productDTO, productPicture);
         return productMapper.toDTO(product);
     }
 

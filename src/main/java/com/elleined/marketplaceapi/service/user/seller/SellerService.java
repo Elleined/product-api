@@ -23,13 +23,13 @@ public interface SellerService extends SellerTransactionFeeService {
             ProductExpirationLimitException,
             IOException;
 
-    void updateProduct(User seller, Product product, ProductDTO productDTO)
+    void updateProduct(User seller, Product product, ProductDTO productDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
             ResourceNotFoundException,
             ProductHasAcceptedOrderException,
-            ProductHasPendingOrderException;
+            ProductHasPendingOrderException, IOException;
 
     void deleteProduct(User seller, Product product)
             throws NotOwnedException,
