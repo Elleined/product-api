@@ -28,7 +28,6 @@ public class ProductDTO {
     @NotBlank(message = "Description cannot be null, blank, or empty")
     private String description;
 
-    @NotBlank(message = "Picture cannot be null, blank, or empty")
     private String picture;
 
     @NotBlank(message = "Keyword cannot be null, blank, or empty")

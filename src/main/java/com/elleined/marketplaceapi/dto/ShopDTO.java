@@ -19,9 +19,7 @@ public class ShopDTO {
     @NotBlank(message = "Please provide short description about your shop")
     private String description;
 
-    @NotBlank(message = "Please provide shop picture")
     private String picture;
-
-    @NotBlank(message = "Please provide valid id for verification")
+    
     private String validId;
 }

@@ -72,7 +72,6 @@ public class UserDTO {
         @NotBlank(message = "Mobile number cannot be blank, null, or empty")
         private String mobileNumber;
 
-        @NotBlank(message = "Picture cannot be blank, null, or empty")
         private String picture;
 
         @NotBlank(message = "Suffix id cannot be less than zero. If user has no suffix use NONE")
