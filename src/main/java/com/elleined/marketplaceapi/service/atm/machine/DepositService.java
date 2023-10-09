@@ -14,6 +14,7 @@ import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
+import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
@@ -73,7 +74,7 @@ public class DepositService {
             MinimumAmountException,
             DepositLimitException, IOException {
 
-        if (proofOfTransaction.isEmpty()) throw new ResourceException("Cannot deposit! Please provide proof of transaction!");
+        if (Validator.notValidMultipartFile(proofOfTransaction)) throw new ResourceException("Cannot deposit! Please provide proof of transaction!");
         if (isBelowMinimumDepositAmount(depositedAmount)) throw new MinimumAmountException("Cannot deposit! because you are trying to deposit an amount that is below minimum which is " + MINIMUM_DEPOSIT_AMOUNT);
         if (atmValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (isDepositAmountAboveLimit(depositedAmount)) throw new DepositLimitException("You cannot deposit an amount that is greater than to deposit limit which is " + DEPOSIT_LIMIT_PER_DAY);

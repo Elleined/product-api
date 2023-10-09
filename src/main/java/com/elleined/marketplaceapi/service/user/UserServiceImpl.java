@@ -28,10 +28,7 @@ import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
-import com.elleined.marketplaceapi.service.validator.EmailValidator;
-import com.elleined.marketplaceapi.service.validator.FullNameValidator;
-import com.elleined.marketplaceapi.service.validator.NumberValidator;
-import com.elleined.marketplaceapi.service.validator.PasswordValidator;
+import com.elleined.marketplaceapi.service.validator.*;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -143,7 +140,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
-        if (profilePicture == null) throw new ResourceException("Profile picture attachment cannot be null!");
+        if (Validator.notValidMultipartFile(profilePicture)) throw new ResourceException("Profile picture attachment cannot be null!");
         User registeringUser = saveByDTO(dto);
 
         registeringUser.getUserDetails().setPicture(profilePicture.getOriginalFilename());
@@ -168,7 +165,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     @Override
     public void resendValidId(User currentUser, MultipartFile validId)
             throws UserAlreadyVerifiedException, NoShopRegistrationException, IOException {
-        if (validId == null) throw new ResourceException("Picture attachment cannot be null!");
+        if (Validator.notValidMultipartFile(validId)) throw new ResourceException("Picture attachment cannot be null!");
         if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! you are already been verified");
         if (!currentUser.hasShopRegistration()) throw new NoShopRegistrationException("Cannot resent valid id! you need to submit a shop registration before resending you valid id.");
 
@@ -215,8 +212,8 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public void sendShopRegistration(User owner, String shopName, String description, MultipartFile shopPicture, MultipartFile validId) throws AlreadyExistException, IOException {
-        if (validId.isEmpty()) throw new ResourceException("Valid id Picture attachment cannot be null!");
-        if (shopPicture.isEmpty()) throw new ResourceException("Shop Picture attachment cannot be null!");
+        if (Validator.notValidMultipartFile(validId)) throw new ResourceException("Valid id Picture attachment cannot be null!");
+        if (Validator.notValidMultipartFile(shopPicture)) throw new ResourceException("Shop Picture attachment cannot be null!");
         if (StringUtil.isNotValid(shopName)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop name!");
         if (StringUtil.isNotValid(description)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop description!");
         if (owner.isVerified()) throw new AlreadyExistException("Cannot send shop registration! because you are already been verified!");

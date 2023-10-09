@@ -23,6 +23,7 @@ import com.elleined.marketplaceapi.service.moderator.request.ProductRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
 import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
+import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -205,7 +206,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
         User requestingUserToWithdraw = withdrawTransaction.getUser();
         BigDecimal amountToBeWithdrawn = withdrawTransaction.getAmount();
-        if (proofOfTransaction.isEmpty()) throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
+        if (Validator.notValidMultipartFile(proofOfTransaction)) throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
         if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
         if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
         if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance has only balance of " + requestingUserToWithdraw.getBalance() + " is below to requesting amount to be withdrawn which is " + amountToBeWithdrawn + ". Reject it!");

@@ -19,6 +19,7 @@ import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.UnitService;
+import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     public Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
             throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
 
-        if (productPicture == null) throw new ResourceException("Cannot save product! please provide product picture!");
+        if (Validator.notValidMultipartFile(productPicture)) throw new ResourceException("Cannot save product! please provide product picture!");
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (isHarvestAndExpirationDateNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE))
@@ -94,7 +95,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
             ProductHasAcceptedOrderException,
             ProductHasPendingOrderException, IOException {
 
-        if (productPicture == null) throw new ResourceException("Cannot save product! please provide product picture!");
+        if (Validator.notValidMultipartFile(productPicture)) throw new ResourceException("Cannot save product! please provide product picture!");
         if (product.hasAcceptedOrder())
             throw new ProductHasAcceptedOrderException("Cannot update product! because theres an accepted order for this product.");
         if (product.hasPendingOrder())
