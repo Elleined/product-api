@@ -98,5 +98,30 @@
       "confirmPassword": "@Qwerty1"
     },
     "invitationReferralCode": ""
+  },
+  {
+    "userDetailsDTO": {
+      "firstName": "Jhames King",
+      "middleName": "",
+      "lastName": "Jamot",
+      "gender": "MALE",
+      "birthDate": "2002-05-11",
+      "mobileNumber": "09125236343",
+      "picture": "jhamesKingProfilePicture.jpg",
+      "suffix": "NONE"
+    },
+    "addressDTO": {
+      "details": "Purok 7, Sitio Osmeña",
+      "regionName": "Region III",
+      "provinceName": "Nueva Ecija",
+      "cityName": "Quezon",
+      "baranggayName": "Dulong Bayan"
+    },
+    "userCredentialDTO": {
+      "email": "jhameskingjamot@gmail.com",
+      "password": "@Jhamesking015",
+      "confirmPassword": "@Jhamesking015"
+    },
+    "invitationReferralCode": ""
   }
 ]
