@@ -52,10 +52,6 @@ public interface UserService extends PasswordService {
     Set<User> getAllSeller();
     Set<User> searchAllSellerByName(String username);
 
-    void saveForumUser(User user);
-
-
-
     // After this principal will be set to be use in web socket
     User login(CredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 

@@ -132,6 +132,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
+        saveForumUser(registeringUser);
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
@@ -150,8 +151,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         return registeringUser;
     }
 
-    @Override
-    public void saveForumUser(User user) {
+    private void saveForumUser(User user) {
         ForumUserDTO forumUserDTO = ForumUserDTO.builder()
                 .picture(user.getUserDetails().getPicture())
                 .name(user.getFullName())

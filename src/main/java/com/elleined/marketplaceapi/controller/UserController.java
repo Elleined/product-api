@@ -49,7 +49,6 @@ public class UserController {
     @PostMapping
     public UserDTO save(@Valid @RequestBody UserDTO userDTO) {
         User registeringUser = userService.saveByDTO(userDTO);
-        userService.saveForumUser(registeringUser);
 
         emailService.sendWelcomeEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
@@ -59,7 +58,6 @@ public class UserController {
     public UserDTO save(@Valid @RequestPart("userDTO") UserDTO userDTO,
                         @RequestPart(value = "profilePicture") MultipartFile profilePicture) throws IOException {
         User registeringUser = userService.saveByDTO(userDTO, profilePicture);
-        userService.saveForumUser(registeringUser);
 
         emailService.sendWelcomeEmail(registeringUser);
         return userMapper.toDTO(registeringUser);
