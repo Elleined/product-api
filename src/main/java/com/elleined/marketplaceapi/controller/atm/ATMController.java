@@ -24,8 +24,6 @@ import java.math.BigDecimal;
 public class ATMController  {
     private final ATMService atmService;
     private final UserService userService;
-
-    private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
 
     @PostMapping("/deposit")

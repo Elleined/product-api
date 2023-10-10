@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 public interface UserService extends PasswordService {
-    int REGISTRATION_LIMIT_PROMO = 200;
     BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
 
     // Info will also be saved in forum api

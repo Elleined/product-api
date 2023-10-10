@@ -18,8 +18,9 @@ import java.time.LocalDateTime;
 @Transactional
 @RequiredArgsConstructor
 public class PremiumService {
+
     private final PremiumRepository premiumRepository;
-    private final FeeService feeService;
+    private final FeeSssssssservice feeService;
 
 
     public void upgradeToPremium(User user)

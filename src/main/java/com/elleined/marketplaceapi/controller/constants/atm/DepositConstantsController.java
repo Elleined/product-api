@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.controller.atm.constants;
+package com.elleined.marketplaceapi.controller.constants.atm;
 
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.DepositService;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/deposit")
+@RequestMapping("/constants/deposit")
 @RequiredArgsConstructor
 public class DepositConstantsController {
 
