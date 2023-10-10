@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.image;
 
-import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -50,7 +50,7 @@ public class PeerToPeerService {
         if (isSenderReachedSentLimitPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
 
         float p2pFee = feeService.getP2pFee(sentAmount);
-        BigDecimal finalSentAmount = feeService.deductP2pFee(sentAmount, p2pFee);
+        BigDecimal finalSentAmount = sentAmount.subtract(new BigDecimal(p2pFee));
         BigDecimal senderOldBalance = sender.getBalance();
         BigDecimal receiverOldBalance = receiver.getBalance();
 

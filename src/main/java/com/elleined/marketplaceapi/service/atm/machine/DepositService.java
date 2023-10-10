@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.atm.machine;
 
-import com.elleined.marketplaceapi.exception.atm.MalformedProofOfTransaction;
 import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
@@ -16,7 +15,6 @@ import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
-import com.elleined.marketplaceapi.utils.StringUtil;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +34,8 @@ import java.util.UUID;
 @Slf4j
 @Transactional
 public class DepositService {
-    final int DEPOSIT_LIMIT_PER_DAY = 10_000;
-    final int MINIMUM_DEPOSIT_AMOUNT = 500;
+    public static final int DEPOSIT_LIMIT_PER_DAY = 10_000;
+    public static final int MINIMUM_DEPOSIT_AMOUNT = 500;
 
     private final UserRepository userRepository;
 
@@ -57,7 +55,7 @@ public class DepositService {
     public void deposit(User currentUser, BigDecimal depositedAmount) {
         BigDecimal oldBalance = currentUser.getBalance();
         float depositFee = feeService.getDepositFee(depositedAmount);
-        BigDecimal finalDepositedAmount = feeService.deductDepositFee(depositedAmount, depositFee);
+        BigDecimal finalDepositedAmount = depositedAmount.subtract(new BigDecimal(depositFee));
         currentUser.setBalance(oldBalance.add(finalDepositedAmount));
         userRepository.save(currentUser);
         appWalletService.addAndSaveBalance(depositFee);
@@ -65,9 +63,6 @@ public class DepositService {
         log.debug("User with id of {} deposited amounting {} from {} because of deposit fee of {} which is the {}% of the deposited amount and now has new balance of {} from {}", currentUser.getId(), finalDepositedAmount, depositedAmount, depositFee, ATMFeeService.DEPOSIT_FEE_PERCENTAGE, currentUser.getBalance(), oldBalance);
     }
 
-    private boolean isBelowMinimumDepositAmount(BigDecimal depositedAmount) {
-        return depositedAmount.compareTo(new BigDecimal(MINIMUM_DEPOSIT_AMOUNT)) < 0;
-    }
 
     public DepositTransaction requestDeposit(User user, BigDecimal depositedAmount, MultipartFile proofOfTransaction)
             throws NotValidAmountException,
@@ -95,6 +90,10 @@ public class DepositService {
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.DEPOSIT_TRANSACTIONS_FOLDER, proofOfTransaction);
         log.debug("Deposit transaction saved with trn of {}", trn);
         return depositTransaction;
+    }
+
+    private boolean isBelowMinimumDepositAmount(BigDecimal depositedAmount) {
+        return depositedAmount.compareTo(new BigDecimal(MINIMUM_DEPOSIT_AMOUNT)) < 0;
     }
 
     private boolean isDepositAmountAboveLimit(BigDecimal depositedAmount) {

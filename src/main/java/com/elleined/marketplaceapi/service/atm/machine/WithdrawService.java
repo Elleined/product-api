@@ -32,9 +32,9 @@ import java.util.UUID;
 @Slf4j
 @Transactional
 public class WithdrawService {
-    final int WITHDRAWAL_LIMIT_PER_DAY = 10_000;
-    final int MAXIMUM_WITHDRAW_AMOUNT = 10_000;
-    final int MINIMUM_WITHDRAW_AMOUNT = 500;
+    public static final int WITHDRAWAL_LIMIT_PER_DAY = 10_000;
+    public static final int MAXIMUM_WITHDRAW_AMOUNT = 10_000;
+    public static final int MINIMUM_WITHDRAW_AMOUNT = 500;
 
     private final UserRepository userRepository;
 
@@ -49,7 +49,7 @@ public class WithdrawService {
     public void withdraw(User currentUser, @NonNull BigDecimal withdrawalAmount) {
         BigDecimal oldBalance = currentUser.getBalance();
         float withdrawalFee = feeService.getWithdrawalFee(withdrawalAmount);
-        BigDecimal finalWithdrawalAmount = feeService.deductWithdrawalFee(withdrawalAmount, withdrawalFee);
+        BigDecimal finalWithdrawalAmount = withdrawalAmount.subtract(new BigDecimal(withdrawalFee));
         currentUser.setBalance(oldBalance.subtract(withdrawalAmount));
         userRepository.save(currentUser);
         appWalletService.addAndSaveBalance(withdrawalFee);

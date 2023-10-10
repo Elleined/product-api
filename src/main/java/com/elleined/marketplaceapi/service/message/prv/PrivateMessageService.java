@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.service.message.prv;
 
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.message.MessageAgreementNotAcceptedException;
-import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
@@ -16,7 +15,6 @@ import com.elleined.marketplaceapi.repository.message.PrivateChatMessageReposito
 import com.elleined.marketplaceapi.repository.message.PrivateChatRoomRepository;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.WSMessageService;
-import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;

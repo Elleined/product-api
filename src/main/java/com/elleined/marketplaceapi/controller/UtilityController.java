@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.controller.utility;
+package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import lombok.RequiredArgsConstructor;

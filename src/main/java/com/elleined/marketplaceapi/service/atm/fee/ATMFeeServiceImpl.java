@@ -27,19 +27,4 @@ public class ATMFeeServiceImpl implements ATMFeeService {
     public float getP2pFee(BigDecimal sentAmount) {
         return (sentAmount.intValue() * (P2P_FEE_PERCENTAGE / 100f));
     }
-
-    @Override
-    public BigDecimal deductDepositFee(BigDecimal depositedAmount, float depositFee) {
-        return depositedAmount.subtract(new BigDecimal(depositFee));
-    }
-
-    @Override
-    public BigDecimal deductWithdrawalFee(BigDecimal withdrawnAmount, float withdrawalFee) {
-        return withdrawnAmount.subtract(new BigDecimal(withdrawalFee));
-    }
-
-    @Override
-    public BigDecimal deductP2pFee(BigDecimal sentAmount, float p2pFee) {
-        return sentAmount.subtract(new BigDecimal(p2pFee));
-    }
 }

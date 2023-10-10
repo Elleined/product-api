@@ -10,10 +10,4 @@ public interface ATMFeeService {
     float getWithdrawalFee(BigDecimal withdrawalAmount);
     float getDepositFee(BigDecimal depositedAmount);
     float getP2pFee(BigDecimal sentAmount);
-
-    BigDecimal deductDepositFee(BigDecimal depositedAmount, float depositFee);
-
-    BigDecimal deductWithdrawalFee(BigDecimal withdrawnAmount, float withdrawalFee);
-
-    BigDecimal deductP2pFee(BigDecimal sentAmount, float p2pFee);
 }

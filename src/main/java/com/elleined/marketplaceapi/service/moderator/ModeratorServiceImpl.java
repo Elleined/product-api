@@ -25,7 +25,6 @@ import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
-import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
