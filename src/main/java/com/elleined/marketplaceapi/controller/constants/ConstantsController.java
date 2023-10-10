@@ -32,4 +32,9 @@ public class ConstantsController {
     public int getRegistrationLimit() {
         return RegistrationPromoService.REGISTRATION_LIMIT_PROMO;
     }
+
+    @GetMapping("/extra-referral-reward-legibility")
+    public int getExtraReferralRewardLegibility() {
+        return FeeService.EXTRA_REFERRAL_FEE_LEGIBILITY;
+    }
 }
