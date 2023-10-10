@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PremiumSellerConstantController {
 
     @GetMapping("/transaction-fee")
-    public float getPremiumSellerSuccessfulTransactionFee() {
+    public float getTransactionFee() {
         return PremiumSellerProxy.SUCCESSFUL_TRANSACTION_FEE;
     }
 }

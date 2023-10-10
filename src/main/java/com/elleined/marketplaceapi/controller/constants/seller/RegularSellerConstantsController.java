@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RegularSellerConstantsController {
     @GetMapping("/listing-fee")
-    public float getRegularSellerListingFee() {
+    public float getListingFee() {
         return RegularSellerProxy.LISTING_FEE_PERCENTAGE;
     }
 
     @GetMapping("/transaction-fee")
-    public float getRegularSellerSuccessfulTransactionFee() {
+    public float getTransactionFee() {
         return RegularSellerProxy.SUCCESSFUL_TRANSACTION_FEE;
     }
 
