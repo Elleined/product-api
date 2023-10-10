@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.utils;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,5 +56,11 @@ public interface Formatter {
                 deliveryAddress.getBaranggayName(),
                 deliveryAddress.getCityName(),
                 deliveryAddress.getProvinceName());
+    }
+
+    static double formatDouble(double target) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        String formattedTarget = decimalFormat.format(target);
+        return Double.parseDouble(formattedTarget);
     }
 }

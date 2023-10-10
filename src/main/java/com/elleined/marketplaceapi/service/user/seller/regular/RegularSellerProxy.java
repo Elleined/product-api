@@ -21,6 +21,7 @@ import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import com.elleined.marketplaceapi.service.user.seller.premium.PremiumSellerProxy;
+import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
@@ -38,8 +39,8 @@ import java.util.Collection;
 @Transactional
 @Primary
 public class RegularSellerProxy implements SellerService, RegularSellerRestriction {
-    private final float LISTING_FEE_PERCENTAGE = 2;
-    private final float SUCCESSFUL_TRANSACTION_FEE = 2;
+    public final static float LISTING_FEE_PERCENTAGE = 2;
+    public final static float SUCCESSFUL_TRANSACTION_FEE = 2;
     private final SellerService sellerService;
 
     private final OrderItemRepository orderItemRepository;
@@ -129,7 +130,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         double totalPrice = productService.calculateTotalPrice(productDTO.getPricePerUnit(), productDTO.getQuantityPerUnit(), productDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
         if (isBalanceNotEnoughToPayListingFee(seller, listingFee))
-            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
 
         feeService.deductListingFee(seller, listingFee);
         return sellerService.saveProduct(seller, productDTO, productPicture);
@@ -155,7 +156,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         double totalPrice = productService.calculateTotalPrice(productDTO.getPricePerUnit(), productDTO.getQuantityPerUnit(), productDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
         if (isBalanceNotEnoughToPayListingFee(seller, listingFee))
-            throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + listingFee + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + totalPrice + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
 
         sellerService.updateProduct(seller, product, productDTO, productPicture);
     }
