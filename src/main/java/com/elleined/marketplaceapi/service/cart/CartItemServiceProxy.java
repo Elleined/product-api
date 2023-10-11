@@ -88,7 +88,7 @@ public class CartItemServiceProxy implements CartItemService {
         if (product.isExceedingToAvailableQuantity(cartItemDTO.getOrderQuantity()))
             throw new OrderQuantiantyExceedsException("Cannot add to cart! because trying to order that exceeds to available amount!");
         if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product))
-            throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before!");
+            throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
         double price = productService.calculateOrderPrice(product, cartItemDTO.getOrderQuantity());
         cartItemDTO.setPrice(price);
@@ -124,7 +124,7 @@ public class CartItemServiceProxy implements CartItemService {
         if (product.isExceedingToAvailableQuantity(cartItem.getOrderQuantity()))
             throw new OrderQuantiantyExceedsException("Cannot order! because you are trying to order that exceeds to available amount!");
         if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product))
-            throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before!");
+            throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
         return cartItemService.moveToOrderItem(currentUser, cartItem);
     }
 
