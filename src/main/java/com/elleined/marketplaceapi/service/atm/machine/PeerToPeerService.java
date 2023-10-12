@@ -29,7 +29,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class PeerToPeerService {
-    final int PEER_TO_PEER_LIMIT_PER_DAY = 10_000;
+    public static final int PEER_TO_PEER_LIMIT_PER_DAY = 10_000;
+    public static final int MAXIMUM_AMOUNT = 10_000;
+    public static final int MINIMUM_AMOUNT = 500;
 
     private final UserRepository userRepository;
     private final ATMFeeService feeService;
@@ -46,6 +48,7 @@ public class PeerToPeerService {
         if (atmValidator.isSenderSendingToHimself(sender, receiver)) throw new SendingToHimselfException("You cannot send to yourself");
         if (atmValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Cannot send money! because amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(sender, sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
+        if (isSentAmountBelowMinimum(sentAmount)) throw new LimitException("Cannot send money! because minimum amount that can be sent is " + MINIMUM_AMOUNT);
         if (isSentAmountAboveLimit(sentAmount)) throw new LimitException("Cannot send money! because you cannot send money that is greater than sent amount limit which is " + PEER_TO_PEER_LIMIT_PER_DAY);
         if (isSenderReachedSentLimitPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
 
@@ -65,6 +68,10 @@ public class PeerToPeerService {
         log.debug("Sender with id of {} has now new balance of {} from {}.", sender.getId(), sender.getBalance(), senderOldBalance);
         log.debug("Receiver with id of {} has now new balance of {} from {}", receiver.getId(), receiver.getBalance(), receiverOldBalance);
         return peerToPeerTransaction;
+    }
+
+    private boolean isSentAmountBelowMinimum(BigDecimal sentAmount) {
+        return sentAmount.compareTo(new BigDecimal(MINIMUM_AMOUNT)) < 0;
     }
 
     private void updateSenderBalance(User sender, BigDecimal amountToBeDeducted) {
@@ -97,7 +104,7 @@ public class PeerToPeerService {
     }
 
     public boolean isSentAmountAboveLimit(BigDecimal sentAmount) {
-        return sentAmount.compareTo(new BigDecimal(PEER_TO_PEER_LIMIT_PER_DAY)) > 0;
+        return sentAmount.compareTo(new BigDecimal(MAXIMUM_AMOUNT)) > 0;
     }
     public boolean isSenderReachedSentLimitPerDay(User currentUser) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
