@@ -142,9 +142,8 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     @Override
     public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
         if (Validator.notValidMultipartFile(profilePicture)) throw new ResourceException("Profile picture attachment cannot be null!");
+        dto.getUserDetailsDTO().setPicture(profilePicture.getOriginalFilename());
         User registeringUser = saveByDTO(dto);
-
-        registeringUser.getUserDetails().setPicture(profilePicture.getOriginalFilename());
         userRepository.save(registeringUser);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PROFILE_PICTURES_FOLDER, profilePicture);
