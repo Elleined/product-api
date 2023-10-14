@@ -57,7 +57,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 
-        if (!Validator.notValidMultipartFile(picture))  imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRIVATE_CHAT_FOLDER, picture);
+        if (picture != null && !picture.isEmpty())  imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRIVATE_CHAT_FOLDER, picture);
         log.debug("Private chat saved successfully with id of {} ", privateChatMessage.getId());
         return privateChatMessage;
     }
