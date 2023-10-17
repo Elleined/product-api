@@ -9,7 +9,6 @@ import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.atm.ATMService;
-import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

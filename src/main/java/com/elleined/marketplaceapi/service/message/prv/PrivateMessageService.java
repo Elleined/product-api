@@ -15,10 +15,9 @@ import com.elleined.marketplaceapi.repository.message.PrivateChatMessageReposito
 import com.elleined.marketplaceapi.repository.message.PrivateChatRoomRepository;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.WSMessageService;
+import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
-import com.elleined.marketplaceapi.service.validator.Validator;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

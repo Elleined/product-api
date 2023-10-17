@@ -2,8 +2,6 @@ package com.elleined.marketplaceapi.controller.constants.atm;
 
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.PeerToPeerService;
-import com.elleined.marketplaceapi.service.atm.machine.WithdrawService;
-import com.elleined.marketplaceapi.service.fee.FeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

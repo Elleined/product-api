@@ -7,7 +7,6 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
-import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;

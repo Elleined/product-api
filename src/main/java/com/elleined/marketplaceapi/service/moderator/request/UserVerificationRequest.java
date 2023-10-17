@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.service.moderator.request;
 
 import com.elleined.marketplaceapi.model.Moderator;
-import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserVerification;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 

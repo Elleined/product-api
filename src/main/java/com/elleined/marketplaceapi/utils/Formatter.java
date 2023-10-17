@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.utils;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
-import com.elleined.marketplaceapi.service.validator.Validator;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DecimalFormat;

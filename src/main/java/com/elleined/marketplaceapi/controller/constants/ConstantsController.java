@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.controller.constants;
 
 import com.elleined.marketplaceapi.service.fee.FeeService;
-import com.elleined.marketplaceapi.service.user.PremiumService;
 import com.elleined.marketplaceapi.service.user.RegistrationPromoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
