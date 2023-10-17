@@ -7,4 +7,8 @@ public interface Validator<T> {
     static boolean notValidMultipartFile(MultipartFile multipartFile) {
         return multipartFile == null || multipartFile.isEmpty();
     }
+
+    static boolean validMultipartFile(MultipartFile multipartFile) {
+        return multipartFile != null && !multipartFile.isEmpty();
+    }
 }

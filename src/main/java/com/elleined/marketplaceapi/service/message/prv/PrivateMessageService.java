@@ -53,11 +53,12 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
 
-        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, picture.getOriginalFilename(), message);
+        String pictureImage = Validator.validMultipartFile(picture) ? picture.getOriginalFilename() : null;
+        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, pictureImage, message);
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 
-        if (picture != null && !picture.isEmpty())  imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRIVATE_CHAT_FOLDER, picture);
+        if (Validator.validMultipartFile(picture)) imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRIVATE_CHAT_FOLDER, picture);
         log.debug("Private chat saved successfully with id of {} ", privateChatMessage.getId());
         return privateChatMessage;
     }
