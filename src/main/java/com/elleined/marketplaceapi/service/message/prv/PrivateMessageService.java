@@ -17,6 +17,8 @@ import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.WSMessageService;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
+import com.elleined.marketplaceapi.service.validator.Validator;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +57,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 
-        if (!picture.isEmpty()) imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRIVATE_CHAT_FOLDER, picture);
+        if (picture != null && !picture.isEmpty())  imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRIVATE_CHAT_FOLDER, picture);
         log.debug("Private chat saved successfully with id of {} ", privateChatMessage.getId());
         return privateChatMessage;
     }

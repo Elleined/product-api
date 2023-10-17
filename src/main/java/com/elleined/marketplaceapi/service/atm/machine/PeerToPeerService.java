@@ -48,8 +48,6 @@ public class PeerToPeerService {
         if (atmValidator.isSenderSendingToHimself(sender, receiver)) throw new SendingToHimselfException("You cannot send to yourself");
         if (atmValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Cannot send money! because amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(sender, sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
-        if (isSentAmountBelowMinimum(sentAmount)) throw new LimitException("Cannot send money! because minimum amount that can be sent is " + MINIMUM_AMOUNT);
-        if (isSentAmountAboveLimit(sentAmount)) throw new LimitException("Cannot send money! because you cannot send money that is greater than sent amount limit which is " + PEER_TO_PEER_LIMIT_PER_DAY);
         if (isSenderReachedSentLimitPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
 
         float p2pFee = feeService.getP2pFee(sentAmount);
