@@ -15,8 +15,10 @@ import java.util.Objects;
 public class ImageUploader implements Uploader {
     @Override
     public void upload(String uploadPath, MultipartFile attachment) throws IOException {
-        final String uploadPathWithImg = uploadPath + attachment.getOriginalFilename();
-        attachment.transferTo(new File(uploadPathWithImg));
+        final String path = uploadPath + attachment.getOriginalFilename();
+        File uploadPathWithImg = new File(path);
+        if (uploadPathWithImg.exists()) return;
+        attachment.transferTo(uploadPathWithImg);
         log.debug("Picture uploaded successfully to {}", uploadPathWithImg);
     }
 }
