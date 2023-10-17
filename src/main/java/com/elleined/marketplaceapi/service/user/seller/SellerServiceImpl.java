@@ -112,7 +112,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
             throw new ResourceNotFoundException("Cannot update product! because this product does not exists or might already been deleted!");
 
         product.setState(Product.State.PENDING);
-        updatePendingAndAcceptedOrderStatus(product.getOrders(), OrderItem.OrderItemStatus.CANCELLED);
+        updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
         if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
         if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
         Product updatedProduct = productMapper.toUpdate(product, productDTO);
@@ -143,11 +143,10 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
             throw new ProductHasAcceptedOrderException("Cannot delete product! because this product has accepted orders. Please settle first the accepted order to delete this");
 
         product.setStatus(Product.Status.INACTIVE);
-        List<OrderItem> orderItems = product.getOrders();
-        updatePendingAndAcceptedOrderStatus(orderItems, OrderItem.OrderItemStatus.CANCELLED);
+        updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
 
         productRepository.save(product);
-        orderItemRepository.saveAll(orderItems);
+        orderItemRepository.saveAll(product.getOrders());
         log.debug("Product with id of {} are now inactive", product.getId());
     }
 
@@ -156,6 +155,10 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
             throws NotOwnedException,
             NotValidBodyException,
             ProductRejectedException {
+
+        Product product = orderItem.getProduct();
+        int newAvailableQuantity = product.getAvailableQuantity() - orderItem.getOrderQuantity();
+        if (newAvailableQuantity <= 0) throw new ProductAlreadySoldException("Cannot accept order! because this product is already been sold and there are now available quantity!");
 
         if (orderItem.getProduct().isRejected())
             throw new ProductRejectedException("Cannot accept order! because with this product is rejected by the moderator!");
@@ -196,20 +199,30 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     @Override
     public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
-            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
+            throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (!isSellerHasOrder(seller, orderItem))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
         Product product = orderItem.getProduct();
-        product.setState(Product.State.SOLD);
-        productRepository.save(product);
+        int newAvailableQuantity = product.getAvailableQuantity() - orderItem.getOrderQuantity();
+        if (newAvailableQuantity <= 0) {
+            product.setState(Product.State.SOLD);
+            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
+            updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.SOLD);
 
-        List<OrderItem> orderItems = product.getOrders();
+            productRepository.save(product);
+            orderItemRepository.save(orderItem);
+            orderItemRepository.saveAll(product.getOrders());
+            return;
+        }
+
+        product.setAvailableQuantity(newAvailableQuantity);
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
-        updatePendingAndAcceptedOrderStatus(orderItems, OrderItem.OrderItemStatus.SOLD);
+        updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
 
+        productRepository.save(product);
         orderItemRepository.save(orderItem);
-        orderItemRepository.saveAll(orderItems);
+        orderItemRepository.saveAll(product.getOrders());
     }
 
     @Override
@@ -263,22 +276,22 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
                 .anyMatch(orderItem::equals);
     }
 
-    private void updatePendingAndAcceptedOrderStatus(List<OrderItem> orderItems, OrderItem.OrderItemStatus orderItemStatus) {
-        List<OrderItem> pendingOrders = orderItems.stream()
+    private void updatePendingAndAcceptedOrderStatus(Product product, OrderItem.OrderItemStatus orderItemStatus) {
+        List<OrderItem> pendingOrders = product.getOrders().stream()
                 .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
                 .toList();
 
-        List<OrderItem> acceptedOrders = orderItems.stream()
+        List<OrderItem> acceptedOrders = product.getOrders().stream()
                 .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
                 .toList();
 
-        pendingOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(orderItemStatus);
-            orderItem.setUpdatedAt(LocalDateTime.now());
+        pendingOrders.forEach(pendingOrder -> {
+            pendingOrder.setOrderItemStatus(orderItemStatus);
+            pendingOrder.setUpdatedAt(LocalDateTime.now());
         });
-        acceptedOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(orderItemStatus);
-            orderItem.setUpdatedAt(LocalDateTime.now());
+        acceptedOrders.forEach(acceptedOrder -> {
+            acceptedOrder.setOrderItemStatus(orderItemStatus);
+            acceptedOrder.setUpdatedAt(LocalDateTime.now());
         });
 
         log.debug("Pending order items with ids {} are set to {}", pendingOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
