@@ -15,10 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +37,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
                 .map(User::getWithdrawTransactions)
                 .flatMap(Collection::stream)
                 .filter(withdrawTransaction -> withdrawTransaction.getStatus() == Transaction.Status.PENDING)
+                .sorted(Comparator.comparing(WithdrawTransaction::getTransactionDate).reversed())
                 .toList();
 
         List<WithdrawTransaction> regularUsersWithdrawRequest = userRepository.findAll().stream()
@@ -47,6 +45,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
                 .map(User::getWithdrawTransactions)
                 .flatMap(Collection::stream)
                 .filter(withdrawTransaction -> withdrawTransaction.getStatus() == Transaction.Status.PENDING)
+                .sorted(Comparator.comparing(WithdrawTransaction::getTransactionDate).reversed())
                 .toList();
 
         List<WithdrawTransaction> withdrawTransactions = new ArrayList<>();

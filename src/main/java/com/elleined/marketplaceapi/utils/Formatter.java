@@ -1,11 +1,14 @@
 package com.elleined.marketplaceapi.utils;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
+import com.elleined.marketplaceapi.service.validator.Validator;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public interface Formatter {
 
@@ -62,5 +65,9 @@ public interface Formatter {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         String formattedTarget = decimalFormat.format(target);
         return Double.parseDouble(formattedTarget);
+    }
+
+    static String formatImgFileName(MultipartFile attachment) {
+        return Objects.requireNonNull(attachment.getOriginalFilename()).replace(" ", "_");
     }
 }

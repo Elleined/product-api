@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.moderator.request;
 
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +41,7 @@ public class ProductRequest implements Request<Product> {
                 .flatMap(products -> products.stream()
                         .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                         .filter(product -> product.getState() == Product.State.PENDING))
+                .sorted(Comparator.comparing(Product::getListingDate).reversed())
                 .toList();
 
         List<Product> regularUserProducts = userRepository.findAll().stream()
@@ -49,6 +52,7 @@ public class ProductRequest implements Request<Product> {
                 .flatMap(products -> products.stream()
                         .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                         .filter(product -> product.getState() == Product.State.PENDING))
+                .sorted(Comparator.comparing(Product::getListingDate).reversed())
                 .toList();
 
         List<Product> products = new ArrayList<>();

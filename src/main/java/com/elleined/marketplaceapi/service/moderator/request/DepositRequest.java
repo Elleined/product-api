@@ -15,10 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +37,7 @@ public class DepositRequest implements Request<DepositTransaction> {
                 .map(User::getDepositTransactions)
                 .flatMap(Collection::stream)
                 .filter(depositTransaction -> depositTransaction.getStatus() == Transaction.Status.PENDING)
+                .sorted(Comparator.comparing(DepositTransaction::getTransactionDate).reversed())
                 .toList();
 
         List<DepositTransaction> regularUserDepositRequests = userRepository.findAll().stream()
@@ -47,6 +45,7 @@ public class DepositRequest implements Request<DepositTransaction> {
                 .map(User::getDepositTransactions)
                 .flatMap(Collection::stream)
                 .filter(depositTransaction -> depositTransaction.getStatus() == Transaction.Status.PENDING)
+                .sorted(Comparator.comparing(DepositTransaction::getTransactionDate).reversed())
                 .toList();
 
         List<DepositTransaction> depositTransactions = new ArrayList<>();
