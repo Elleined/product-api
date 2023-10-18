@@ -121,6 +121,13 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         if (hasAlreadyHaveChatRoom(sender, receiver, productToSettle)) return getChatRoom(sender, receiver, productToSettle);
         return createPrivateChatRoom(sender, receiver, productToSettle);
     }
+
+    @Override
+    public void deleteAllMessages(PrivateChatRoom privateChatRoom) {
+        privateChatMessageRepository.deleteAll(privateChatRoom.getPrivateChatMessages());
+        log.debug("Private messages in private chat room with id of {} are now all deleted", privateChatRoom.getId());
+    }
+
     private PrivateChatRoom createPrivateChatRoom(User sender, User receiver, Product productToSettle) {
         PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
                 .productToSettle(productToSettle)

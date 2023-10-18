@@ -12,11 +12,13 @@ import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ProductRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
+import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.UnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
@@ -46,6 +48,8 @@ import java.util.List;
 @Qualifier("sellerServiceImpl")
 public class SellerServiceImpl implements SellerService, SellerOrderChecker, SellerGetAllService {
     public static final int DAY_RANGE = 14;
+
+    private final PrivateChatRoomService privateChatRoomService;
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
@@ -158,7 +162,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
 
         Product product = orderItem.getProduct();
         int newAvailableQuantity = product.getAvailableQuantity() - orderItem.getOrderQuantity();
-        if (newAvailableQuantity <= 0) throw new ProductAlreadySoldException("Cannot accept order! because this product is already been sold and there are now available quantity!");
+        if (newAvailableQuantity < 0) throw new ProductAlreadySoldException("Cannot accept order! because this product is already been sold and there are now available quantity!");
 
         if (orderItem.getProduct().isRejected())
             throw new ProductRejectedException("Cannot accept order! because with this product is rejected by the moderator!");
@@ -210,6 +214,9 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
             orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
             updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.SOLD);
 
+            PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(seller, orderItem.getPurchaser(), product);
+            privateChatRoomService.deleteAllMessages(privateChatRoom);
+
             productRepository.save(product);
             orderItemRepository.save(orderItem);
             orderItemRepository.saveAll(product.getOrders());
@@ -219,6 +226,9 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         product.setAvailableQuantity(newAvailableQuantity);
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
         updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
+
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(seller, orderItem.getPurchaser(), product);
+        privateChatRoomService.deleteAllMessages(privateChatRoom);
 
         productRepository.save(product);
         orderItemRepository.save(orderItem);

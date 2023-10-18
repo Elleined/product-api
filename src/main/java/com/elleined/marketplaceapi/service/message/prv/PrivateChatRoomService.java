@@ -23,4 +23,6 @@ public interface PrivateChatRoomService {
     List<PrivateChatMessage> getAllPrivateMessage(PrivateChatRoom privateChatRoom);
 
     PrivateChatRoom getOrCreateChatRoom(User sender, User receiver, Product productToSettle);
+
+    void deleteAllMessages(PrivateChatRoom privateChatRoom);
 }
