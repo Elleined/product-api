@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
+import com.elleined.marketplaceapi.exception.order.OrderReachedCancellingTimeLimitException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -39,5 +40,6 @@ public interface BuyerService {
     void cancelOrderItem(User buyer, OrderItem orderItem)
             throws NotOwnedException,
             OrderAlreadyAcceptedException,
+            OrderReachedCancellingTimeLimitException,
             OrderAlreadyRejectedException;
 }

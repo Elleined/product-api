@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
+import com.elleined.marketplaceapi.exception.order.OrderReachedCancellingTimeLimitException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -93,14 +94,14 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
 
     @Override
     public void cancelOrderItem(User buyer, OrderItem orderItem)
-            throws NotOwnedException,
-            OrderAlreadyAcceptedException,
-            OrderAlreadyRejectedException {
+            throws NotOwnedException, OrderAlreadyAcceptedException, OrderReachedCancellingTimeLimitException, OrderAlreadyRejectedException {
 
         if (!buyer.hasOrder(orderItem))
             throw new NotOwnedException("Cannot cancel order! because you don't owned this order");
         if (orderItem.isAccepted())
             throw new OrderAlreadyAcceptedException("Cannot cancel order! because seller already accepted your order request for this product!");
+        if (orderItem.reachedCancellingTimeLimit())
+            throw new OrderReachedCancellingTimeLimitException("Cannot cancel order! because orders can only be canceled within the first 24 hours from the time of purchase. This order has exceeded the cancellation window.");
 
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
         orderItem.setUpdatedAt(LocalDateTime.now());

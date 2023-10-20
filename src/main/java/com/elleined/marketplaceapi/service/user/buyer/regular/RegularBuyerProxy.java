@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
+import com.elleined.marketplaceapi.exception.order.OrderReachedCancellingTimeLimitException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -66,9 +67,7 @@ public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction 
 
     @Override
     public void cancelOrderItem(User buyer, OrderItem orderItem)
-            throws NotOwnedException,
-            OrderAlreadyAcceptedException,
-            OrderAlreadyRejectedException {
+            throws NotOwnedException, OrderAlreadyAcceptedException, OrderReachedCancellingTimeLimitException, OrderAlreadyRejectedException {
         // Add more validation for regular buyer here for future
         buyerService.cancelOrderItem(buyer, orderItem);
     }

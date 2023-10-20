@@ -36,6 +36,11 @@ public class OrderItem extends Item {
         this.updatedAt = updatedAt;
     }
 
+    public boolean reachedCancellingTimeLimit() {
+        LocalDateTime maxCancelDateTime = this.getUpdatedAt().plusDays(1);
+        return LocalDateTime.now().isAfter(maxCancelDateTime);
+    }
+
     public enum OrderItemStatus {
         CANCELLED,
         PENDING,
