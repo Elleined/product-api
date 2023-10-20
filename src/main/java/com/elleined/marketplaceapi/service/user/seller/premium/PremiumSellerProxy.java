@@ -37,7 +37,7 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, FieldException, ProductNotListedException {
+    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
         // add validation for here for premium seller for future
         return sellerService.saleProduct(seller, product, salePercentage);
     }
