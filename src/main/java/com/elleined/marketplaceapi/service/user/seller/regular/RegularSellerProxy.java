@@ -117,7 +117,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, FieldException, ProductNotListedException {
+    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
         // Add more validation for regular seller here for future
         return sellerService.saleProduct(seller, product, salePercentage);
     }

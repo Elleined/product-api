@@ -20,6 +20,7 @@ public interface SellerService extends SellerTransactionFeeService {
 
     Product saleProduct(User seller, Product product, int salePercentage)
             throws NotOwnedException,
+            ProductSaleException,
             FieldException,
             ProductNotListedException;
 

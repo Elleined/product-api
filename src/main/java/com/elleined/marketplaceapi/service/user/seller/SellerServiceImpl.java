@@ -21,6 +21,7 @@ import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
 import com.elleined.marketplaceapi.service.product.CropService;
+import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.UnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
@@ -53,6 +54,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     private final PrivateChatRoomService privateChatRoomService;
 
     private final ProductRepository productRepository;
+    private final ProductService productService;
     private final ProductMapper productMapper;
 
     private final ImageUploader imageUploader;
@@ -68,7 +70,17 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     private String cropTradeImgDirectory;
 
     @Override
-    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, FieldException, ProductNotListedException {
+    public Product saleProduct(User seller, Product product, int salePercentage)
+            throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+
+        if (salePercentage <= 0) throw new FieldException("Cannot sale this product! Sale percentage must be a positive value. Please ensure that the sale percentage is greater than 0.");
+        if (!seller.hasProduct(product)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
+        if (!product.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
+
+        double totalPrice = productService.calculateTotalPrice(product.getPricePerUnit(), product.getQuantityPerUnit(), product.getAvailableQuantity());
+        double salePrice = (totalPrice * (salePercentage / 100f));
+        if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
+
         return null;
     }
 
