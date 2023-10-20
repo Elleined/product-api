@@ -125,6 +125,15 @@ public class Product {
         INACTIVE
     }
 
+    public enum PricingOption {
+        WHOLE_SALE,
+        RETAIL
+    }
+
+    public enum SaleStatus {
+        SALE,
+        NOT_ON_SALE
+    }
     public boolean hasSoldOrder() {
         return this.getOrders().stream().anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.SOLD);
     }
