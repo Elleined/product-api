@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
+import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
@@ -16,6 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface SellerService extends SellerTransactionFeeService {
+
+    Product saleProduct(User seller, Product product, int salePercentage)
+            throws NotOwnedException,
+            FieldException,
+            ProductNotListedException;
 
     Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
             throws NotVerifiedException,

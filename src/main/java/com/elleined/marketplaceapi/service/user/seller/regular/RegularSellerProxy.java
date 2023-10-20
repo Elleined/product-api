@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller.regular;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
+import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.order.MaxOrderRejectionException;
 import com.elleined.marketplaceapi.exception.product.*;
@@ -113,6 +114,12 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
                 .flatMap(Collection::stream)
                 .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
                 .count() >= MAX_PENDING_ORDER;
+    }
+
+    @Override
+    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, FieldException, ProductNotListedException {
+        // Add more validation for regular seller here for future
+        return sellerService.saleProduct(seller, product, salePercentage);
     }
 
     @Override

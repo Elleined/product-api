@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller.premium;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
+import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
@@ -33,6 +34,12 @@ public class PremiumSellerProxy implements SellerService {
     public PremiumSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService, FeeService feeService) {
         this.sellerService = sellerService;
         this.feeService = feeService;
+    }
+
+    @Override
+    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, FieldException, ProductNotListedException {
+        // add validation for here for premium seller for future
+        return sellerService.saleProduct(seller, product, salePercentage);
     }
 
     @Override

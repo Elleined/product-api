@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
+import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.ResourceException;
@@ -65,6 +66,11 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
 
     @Value("${cropTrade.img.directory}")
     private String cropTradeImgDirectory;
+
+    @Override
+    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, FieldException, ProductNotListedException {
+        return null;
+    }
 
     @Override
     public Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
