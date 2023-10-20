@@ -68,8 +68,14 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     private String cropTradeImgDirectory;
 
     @Override
-    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, FieldException, ProductNotListedException {
-        return null;
+    public Product saleProduct(User seller, Product product, int salePercentage)
+            throws NotOwnedException,
+            FieldException,
+            ProductNotListedException {
+
+        if (salePercentage <= 0) throw new FieldException("Cannot sale this product! Sale percentage must be a positive value. Please ensure that the sale percentage is greater than 0.");
+        if (!seller.hasProduct(product)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
+        if (!product.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
     }
 
     @Override
