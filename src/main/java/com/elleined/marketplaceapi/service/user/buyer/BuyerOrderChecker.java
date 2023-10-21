@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
 
 public interface BuyerOrderChecker {

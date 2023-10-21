@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.message.PrivateChatMessageDTO;
 import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;

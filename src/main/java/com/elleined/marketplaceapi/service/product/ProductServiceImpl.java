@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.service.product;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;

@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.model.item;
 
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.Entity;

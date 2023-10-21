@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Moderator;
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import com.elleined.marketplaceapi.service.product.ProductService;

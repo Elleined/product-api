@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.repository;
 
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

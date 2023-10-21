@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.populator;
 
-import com.elleined.marketplaceapi.model.Unit;
+import com.elleined.marketplaceapi.model.unit.Unit;
 import com.elleined.marketplaceapi.repository.UnitRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;

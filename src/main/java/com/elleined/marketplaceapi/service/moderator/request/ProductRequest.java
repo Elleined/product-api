@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.service.moderator.request;
 
 import com.elleined.marketplaceapi.model.Moderator;
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;

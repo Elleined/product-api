@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.model.user;
 
 import com.elleined.marketplaceapi.model.Credential;
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;

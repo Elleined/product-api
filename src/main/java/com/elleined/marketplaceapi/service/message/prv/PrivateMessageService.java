@@ -5,7 +5,7 @@ import com.elleined.marketplaceapi.exception.message.MessageAgreementNotAccepted
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.message.ChatMessage;
 import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;

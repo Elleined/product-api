@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.model.message.prv;
 
 
-import com.elleined.marketplaceapi.model.Product;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;

@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.model;
 
+import com.elleined.marketplaceapi.model.product.Product;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;

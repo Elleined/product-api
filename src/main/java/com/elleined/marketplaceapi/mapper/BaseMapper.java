@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.model.Crop;
-import com.elleined.marketplaceapi.model.Unit;
+import com.elleined.marketplaceapi.model.unit.Unit;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
