@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.product;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.mapper.CropMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.repository.CropRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,25 +15,22 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class CropService implements BaseEntityService<Crop> {
+public class CropService {
 
     private final CropRepository cropRepository;
-    private final BaseMapper baseMapper;
+    private final CropMapper cropMapper;
 
-    @Override
     public Crop getById(int id) throws ResourceNotFoundException {
         return cropRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Crop does not exists!"));
     }
 
 
-    @Override
     public boolean existsByName(String name) {
         return cropRepository.findAll().stream()
                 .map(Crop::getName)
                 .anyMatch(name::equalsIgnoreCase);
     }
 
-    @Override
     public List<String> getAll() {
         return cropRepository.findAll().stream()
                 .map(Crop::getName)
@@ -40,7 +38,6 @@ public class CropService implements BaseEntityService<Crop> {
                 .toList();
     }
 
-    @Override
     public Crop getByName(String name) throws ResourceNotFoundException {
         return cropRepository.findAll().stream()
                 .filter(crop -> crop.getName().equalsIgnoreCase(name))
@@ -48,9 +45,8 @@ public class CropService implements BaseEntityService<Crop> {
                 .orElseThrow(() -> new ResourceNotFoundException("Crop does not exists!"));
     }
 
-    @Override
     public Crop save(String name) {
-        Crop crop = baseMapper.toCropEntity(name);
+        Crop crop = cropMapper.toEntity(name);
         cropRepository.save(crop);
         log.debug("Crop with name of {} saved successfully with id of {}", crop.getName(), crop.getId());
         return crop;
