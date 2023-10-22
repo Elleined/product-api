@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
+import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.unit.Unit;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
@@ -28,13 +29,13 @@ public class RetailProduct extends Product {
     @Column(name = "quantity_per_unit", nullable = false)
     private int quantityPerUnit;
 
-//    @ManyToOne(optional = false)
-//    @JoinColumn(
-//            name = "unit_id",
-//            referencedColumnName = "id",
-//            nullable = false
-//    )
-//    private Unit unit;
+    @ManyToOne(optional = false)
+    @JoinColumn(
+            name = "retail_unit_id",
+            referencedColumnName = "id",
+            nullable = false
+    )
+    private RetailUnit retailUnit;
 
 
     @Builder(builderMethodName = "retailProductBuilder")
