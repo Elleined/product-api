@@ -28,7 +28,6 @@ public abstract class ProductMapper {
             @Mapping(target = "sellerId", source = "product.seller.id"),
             @Mapping(target = "sellerName", expression = "java(getFullName(product.getSeller()))"),
             @Mapping(target = "cropName", source = "product.crop.name"),
-            @Mapping(target = "unitName", source = "product.unit.name"),
             @Mapping(target = "shopName", source = "product.seller.shop.name"),
             @Mapping(target = "totalPrice", expression = "java(productService.calculateTotalPrice(product.getPricePerUnit(), product.getQuantityPerUnit(), product.getAvailableQuantity()))"),
             @Mapping(target = "listingDate", expression = "java(product.getListingDate().toLocalDate())")
@@ -43,7 +42,6 @@ public abstract class ProductMapper {
             @Mapping(target = "state", expression = "java(State.PENDING)"),
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
             @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
-            @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
             @Mapping(target = "seller", expression = "java(seller)"),
 
             @Mapping(target = "addedToCarts", expression = "java(new java.util.ArrayList<>())"),
@@ -63,7 +61,7 @@ public abstract class ProductMapper {
             @Mapping(target = "privateChatRooms", ignore = true),
 
             @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
-            @Mapping(target = "unit", expression = "java(unitService.getByName(productDTO.getUnitName()))"),
+
     })
     public abstract Product toUpdate(@MappingTarget Product product, ProductDTO productDTO);
 

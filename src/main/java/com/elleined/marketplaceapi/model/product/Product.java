@@ -18,16 +18,25 @@ import java.util.List;
         name = "tbl_product",
         indexes = @Index(name = "keyword_idx", columnList = "keyword")
 )
-@Builder
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
-public class Product {
+public abstract class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.TABLE,
+            generator = "productAutoIncrement"
+    )
+    @SequenceGenerator(
+            allocationSize = 1,
+            name = "productAutoIncrement",
+            sequenceName = "productAutoIncrement"
+    )
     @Column(
             name = "product_id",
+            unique = true,
             nullable = false,
             updatable = false
     )
@@ -52,20 +61,11 @@ public class Product {
     )
     private LocalDateTime listingDate;
 
-    @Column(name = "price_per_unit", nullable = false)
-    private double pricePerUnit;
-
-    @Column(name = "quantity_per_unit", nullable = false)
-    private int quantityPerUnit;
-
     @Column(
             name = "picture",
             nullable = false
     )
     private String picture;
-
-    @Column(name = "keyword", length = 40, nullable = false)
-    private String keyword;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
@@ -90,15 +90,6 @@ public class Product {
             nullable = false
     )
     private Crop crop;
-
-
-    @ManyToOne(optional = false)
-    @JoinColumn(
-            name = "unit_id",
-            referencedColumnName = "id",
-            nullable = false
-    )
-    private Unit unit;
 
     // product id is in order item table
     @OneToMany(mappedBy = "product")
