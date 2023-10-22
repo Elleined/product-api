@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.scheduler;
 
 
 import com.elleined.marketplaceapi.service.product.ProductService;
+import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,10 +13,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProductScheduler {
 
-    private final ProductService productService;
+    private final RetailProductService retailProductService;
 
     @Scheduled(fixedRate = 2000L)
     public void run() {
-        productService.deleteExpiredProducts();
+        retailProductService.deleteExpiredProducts();
     }
 }
