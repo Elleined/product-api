@@ -13,6 +13,8 @@ import com.elleined.marketplaceapi.model.item.CartItem;
 import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import jakarta.persistence.*;
@@ -106,10 +108,13 @@ public class User {
     @Setter(AccessLevel.NONE)
     private Premium premium;
 
-    // user id reference is in products table
+    // user id reference is in retail products table
     @OneToMany(mappedBy = "seller")
-    @Setter(AccessLevel.NONE)
-    private List<Product> products;
+    private List<RetailProduct> retailProducts;
+
+    // user id reference is in whole sale products table
+    @OneToMany(mappedBy = "seller")
+    private List<WholeSaleProduct> wholeSaleProducts;
 
     // sender id reference is in peer to peer transaction table
     @OneToMany(mappedBy = "sender")
