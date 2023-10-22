@@ -106,7 +106,11 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
-    public double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity) {
+    public double calculateTotalPrice(RetailProduct retailProduct) {
+        int availableQuantity = retailProduct.getAvailableQuantity();
+        int quantityPerUnit = retailProduct.getQuantityPerUnit();
+        double pricePerUnit = retailProduct.getPricePerUnit();
+
         int counter = 0;
         while (availableQuantity > 0) {
             if (availableQuantity <= quantityPerUnit) counter++;
