@@ -175,11 +175,14 @@ public class User {
         return this.getBalance().compareTo(new BigDecimal(FeeService.PREMIUM_USER_FEE)) <= 0;
     }
 
-    public boolean hasProduct(Product product) {
-        return this.getProducts().stream().anyMatch(product::equals);
+    public boolean hasProduct(WholeSaleProduct wholeSaleProduct) {
+        return this.getWholeSaleProducts().stream().anyMatch(wholeSaleProduct::equals);
     }
 
-
+    public boolean hasProduct(RetailProduct retailProduct) {
+        return this.getRetailProducts().stream().anyMatch(retailProduct::equals);
+    }
+    
     public boolean hasOrder(OrderItem orderItem) {
         return this.getOrderedItems().stream().anyMatch(orderItem::equals);
     }
