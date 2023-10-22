@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.unit;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.unit.Unit;
+import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.repository.unit.WholeSaleUnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +23,12 @@ public class WholeSaleUnitService implements UnitService {
     private final WholeSaleUnitRepository wholeSaleUnitRepository;
 
     @Override
-    public Unit save(String name) {
+    public WholeSaleUnit save(String name) {
         return null;
     }
 
     @Override
-    public Unit getById(int id) throws ResourceNotFoundException {
+    public WholeSaleUnit getById(int id) throws ResourceNotFoundException {
         return null;
     }
 
