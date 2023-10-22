@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.dto;
+package com.elleined.marketplaceapi.dto.product;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +22,8 @@ public class ProductDTO {
     @NotBlank(message = "Crop name cannot be null, blank, or empty")
     private String cropName;
 
-    @NotBlank(message = "Unit name cannot be null, blank, or empty")
+    @Positive(message = "Unit id cannot be negative or less than 0")
+    private int unitId;
     private String unitName;
 
     @NotBlank(message = "Description cannot be null, blank, or empty")
@@ -30,8 +31,6 @@ public class ProductDTO {
 
     private String picture;
 
-    @NotBlank(message = "Keyword cannot be null, blank, or empty")
-    private String keyword;
     private String state;
 
     private int sellerId;
@@ -39,10 +38,6 @@ public class ProductDTO {
 
     @Positive(message = "Available quantity cannot be negative or less than 0")
     private int availableQuantity;
-    @Positive(message = "Price per unit cannot be negative or less than 0")
-    private double pricePerUnit;
-    @Positive(message = "Quantity per unit cannot be negative or less than 0")
-    private int quantityPerUnit;
 
     @NotNull(message = "Harvest date cannot null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

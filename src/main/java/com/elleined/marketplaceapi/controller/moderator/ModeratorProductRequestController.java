@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.controller.moderator;
 
-import com.elleined.marketplaceapi.dto.ProductDTO;
+import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.Moderator;
