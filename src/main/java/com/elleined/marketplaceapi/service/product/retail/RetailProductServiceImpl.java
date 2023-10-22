@@ -7,7 +7,6 @@ import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
-import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class RetailProductServiceImpl implements RetailProductService {
-    private final ProductRepository productRepository;
     private final RetailProductRepository retailProductRepository;
 
     private final UserRepository userRepository;
