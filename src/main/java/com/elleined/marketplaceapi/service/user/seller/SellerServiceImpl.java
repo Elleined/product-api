@@ -22,7 +22,6 @@ import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
-import com.elleined.marketplaceapi.service.product.UnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;

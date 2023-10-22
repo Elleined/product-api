@@ -6,7 +6,6 @@ import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.product.CropService;
-import com.elleined.marketplaceapi.service.product.UnitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

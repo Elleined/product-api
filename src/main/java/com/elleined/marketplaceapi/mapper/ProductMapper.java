@@ -6,7 +6,6 @@ import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
-import com.elleined.marketplaceapi.service.product.UnitService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

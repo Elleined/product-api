@@ -9,10 +9,10 @@ public interface BaseEntityService<T> {
     T save(String name);
 
     T getById(int id) throws ResourceNotFoundException;
+    List<String> getAll();
 
     boolean existsByName(String name) throws ResourceNotFoundException;
 
-    List<String> getAll();
 
     T getByName(String name) throws ResourceNotFoundException;
 }
