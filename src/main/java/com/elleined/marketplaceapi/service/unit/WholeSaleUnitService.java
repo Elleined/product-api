@@ -26,16 +26,22 @@ public class WholeSaleUnitService implements UnitService {
 
     @Override
     public WholeSaleUnit save(String name) {
-        return null;
+        WholeSaleUnit wholeSaleUnit = wholeSaleUnitMapper.toEntity(name);
+        wholeSaleUnitRepository.save(wholeSaleUnit);
+        log.debug("Whole sale unit with name of {} saved successfully", name);
+        return wholeSaleUnit;
     }
 
     @Override
     public WholeSaleUnit getById(int id) throws ResourceNotFoundException {
-        return null;
+        return wholeSaleUnitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Whole sale unit with id of " + id + " doesn't exists!"));
     }
 
     @Override
     public List<String> getAll() {
-        return null;
+        return wholeSaleUnitRepository.findAll().stream()
+                .map(WholeSaleUnit::getName)
+                .sorted()
+                .toList();
     }
 }
