@@ -14,16 +14,6 @@ public interface ProductService {
 
     // Use this to get all the product listing available
     List<Product> getAllExcept(User currentUser);
-    double calculateOrderPrice(Product product, int userOrderQuantity);
-
-    /**
-     * Sample:
-     * 50(Price per unit)
-     * 5(Quantity per unit)
-     * 100(Available quantity)
-     * Meaning 5 pesos per 50 pieces and has available quantity of 100
-     */
-    double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
 
     Set<Product> getAllById(Set<Integer> productsToBeListedId);
 

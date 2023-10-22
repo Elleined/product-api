@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.dto.ProductDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.product.CropService;
+import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;

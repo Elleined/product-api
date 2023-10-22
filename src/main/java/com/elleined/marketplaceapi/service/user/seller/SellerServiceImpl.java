@@ -20,7 +20,7 @@ import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
-import com.elleined.marketplaceapi.service.product.CropService;
+import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;

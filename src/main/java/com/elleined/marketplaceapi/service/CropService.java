@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service.product;
+package com.elleined.marketplaceapi.service;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.CropMapper;
