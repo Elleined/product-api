@@ -17,11 +17,17 @@ import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.product.ProductRepository;
+import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
+import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
 import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.product.ProductService;
+import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
+import com.elleined.marketplaceapi.service.unit.RetailUnitService;
+import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
@@ -52,14 +58,17 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
 
     private final PrivateChatRoomService privateChatRoomService;
 
-    private final ProductRepository productRepository;
-    private final ProductService productService;
+    private final RetailProductRepository retailProductRepository;
+    private final WholeSaleProductRepository wholeSaleProductRepository;
+    private final RetailProductService retailProductService;
+    private final WholeSaleProductService wholeSaleProductService;
     private final ProductMapper productMapper;
 
     private final ImageUploader imageUploader;
 
     private final CropService cropService;
-    private final UnitService unitService;
+    private final RetailUnitService retailUnitService;
+    private final WholeSaleUnitService wholeSaleUnitService;
 
     private final OrderItemRepository orderItemRepository;
 
