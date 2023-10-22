@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.unit;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.mapper.unit.RetailUnitMapper;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.unit.Unit;
 import com.elleined.marketplaceapi.repository.unit.RetailUnitRepository;
@@ -19,19 +20,26 @@ import java.util.List;
 @Primary
 public class RetailUnitService implements UnitService {
     private final RetailUnitRepository retailUnitRepository;
+    private final RetailUnitMapper retailUnitMapper;
 
     @Override
     public RetailUnit save(String name) {
-        return null;
+        RetailUnit retailUnit = retailUnitMapper.toEntity(name);
+        retailUnitRepository.save(retailUnit);
+        log.debug("Retail unit with name of {} saved successfully", name);
+        return retailUnit;
     }
 
     @Override
     public RetailUnit getById(int id) throws ResourceNotFoundException {
-        return null;
+        return retailUnitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Retail unit with id of " + id + " doesn't exists!"));
     }
 
     @Override
     public List<String> getAll() {
-        return null;
+        return retailUnitRepository.findAll().stream()
+                .map(RetailUnit::getName)
+                .sorted()
+                .toList();
     }
 }

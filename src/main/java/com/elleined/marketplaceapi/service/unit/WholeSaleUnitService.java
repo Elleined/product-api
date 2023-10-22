@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.unit;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.mapper.unit.WholeSaleUnitMapper;
 import com.elleined.marketplaceapi.model.unit.Unit;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.repository.unit.WholeSaleUnitRepository;
@@ -21,6 +22,7 @@ import java.util.List;
 @Qualifier("wholeSaleUnitService")
 public class WholeSaleUnitService implements UnitService {
     private final WholeSaleUnitRepository wholeSaleUnitRepository;
+    private final WholeSaleUnitMapper wholeSaleUnitMapper;
 
     @Override
     public WholeSaleUnit save(String name) {
