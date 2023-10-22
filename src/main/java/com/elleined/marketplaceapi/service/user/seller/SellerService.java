@@ -1,6 +1,8 @@
 package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.product.ProductDTO;
+import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
@@ -11,6 +13,8 @@ import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,19 +22,31 @@ import java.io.IOException;
 
 public interface SellerService extends SellerTransactionFeeService {
 
-    Product saleProduct(User seller, Product product, int salePercentage)
+    RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage)
             throws NotOwnedException,
             ProductSaleException,
             FieldException,
             ProductNotListedException;
 
-    Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
+    WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage)
+            throws NotOwnedException,
+            ProductSaleException,
+            FieldException,
+            ProductNotListedException;
+
+    RetailProduct saveProduct(User seller, RetailProductDTO retailProductDTO, MultipartFile productPicture)
             throws NotVerifiedException,
             InsufficientFundException,
             ProductExpirationLimitException,
             IOException;
 
-    void updateProduct(User seller, Product product, ProductDTO productDTO, MultipartFile productPicture)
+    WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture)
+            throws NotVerifiedException,
+            InsufficientFundException,
+            ProductExpirationLimitException,
+            IOException;
+
+    void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
@@ -38,7 +54,22 @@ public interface SellerService extends SellerTransactionFeeService {
             ProductHasAcceptedOrderException,
             ProductHasPendingOrderException, IOException;
 
-    void deleteProduct(User seller, Product product)
+    void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture)
+            throws NotOwnedException,
+            NotVerifiedException,
+            ProductAlreadySoldException,
+            ResourceNotFoundException,
+            ProductHasAcceptedOrderException,
+            ProductHasPendingOrderException, IOException;
+
+    void deleteProduct(User seller, RetailProduct retailProduct)
+            throws NotOwnedException,
+            NotVerifiedException,
+            ProductAlreadySoldException,
+            ProductHasPendingOrderException,
+            ProductHasAcceptedOrderException;
+
+    void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,

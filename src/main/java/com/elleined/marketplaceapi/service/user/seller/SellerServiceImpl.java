@@ -183,7 +183,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
 
         if (orderItem.getProduct().isRejected())
             throw new ProductRejectedException("Cannot accept order! because with this product is rejected by the moderator!");
-        if (!isSellerHasOrder(seller, orderItem))
+        if (isSellerOwnedOrder(seller, orderItem))
             throw new NotOwnedException("Cannot accept order! because you don't own this order!");
         if (StringUtil.isNotValid(messageToBuyer))
             throw new NotValidBodyException("Cannot accept order! please provide a message for buyer.");
@@ -203,7 +203,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
             throws NotOwnedException,
             NotValidBodyException {
 
-        if (!isSellerHasOrder(seller, orderItem))
+        if (isSellerOwnedOrder(seller, orderItem))
             throw new NotOwnedException("Cannot reject order! because you don't own this order!");
         if (StringUtil.isNotValid(messageToBuyer))
             throw new NotValidBodyException("Cannot reject order! please provide a message for the buyer");
@@ -221,7 +221,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
-        if (!isSellerHasOrder(seller, orderItem))
+        if (isSellerOwnedOrder(seller, orderItem))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
         Product product = orderItem.getProduct();
@@ -296,7 +296,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     }
 
     @Override
-    public boolean isSellerHasOrder(User seller, OrderItem orderItem) {
+    public boolean isSellerOwnedOrder(User seller, OrderItem orderItem) {
         return seller.getProducts().stream()
                 .map(Product::getOrders)
                 .flatMap(Collection::stream)

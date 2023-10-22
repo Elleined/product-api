@@ -182,7 +182,7 @@ public class User {
     public boolean hasProduct(RetailProduct retailProduct) {
         return this.getRetailProducts().stream().anyMatch(retailProduct::equals);
     }
-    
+
     public boolean hasOrder(OrderItem orderItem) {
         return this.getOrderedItems().stream().anyMatch(orderItem::equals);
     }
