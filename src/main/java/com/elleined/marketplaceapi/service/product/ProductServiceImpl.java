@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getById(int id) throws ResourceNotFoundException {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product with id of " + id + " does not exists!"));
-        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + id + " does not exists or might already been deleted!");
+        if (product.isDeleted()) throw new ResourceNotFoundException("Product with id of " + id + " already been deleted!");
         return product;
     }
 
@@ -127,25 +127,4 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
-    private void updatePendingAndAcceptedOrderStatus(List<OrderItem> orderItems) {
-        List<OrderItem> pendingOrders = orderItems.stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
-                .toList();
-
-        List<OrderItem> acceptedOrders = orderItems.stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .toList();
-
-        pendingOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
-            orderItem.setUpdatedAt(LocalDateTime.now());
-        });
-        acceptedOrders.forEach(orderItem -> {
-            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
-            orderItem.setUpdatedAt(LocalDateTime.now());
-        });
-
-        log.debug("Pending order items with ids {} are set to {}", pendingOrders.stream().map(OrderItem::getId).toList(), OrderItem.OrderItemStatus.CANCELLED);
-        log.debug("Accepted order items with ids {} are set to {}", acceptedOrders.stream().map(OrderItem::getId).toList(), OrderItem.OrderItemStatus.CANCELLED);
-    }
 }

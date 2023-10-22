@@ -1,10 +1,17 @@
 package com.elleined.marketplaceapi.service.product.retail;
 
+import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.product.Product;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.ProductService;
 
-public interface RetailProductService extends ProductService {
-    double calculateOrderPrice(Product product, int userOrderQuantity);
+import java.util.List;
+import java.util.Set;
+
+public interface RetailProductService extends ProductService<RetailProduct> {
+
+    double calculateOrderPrice(RetailProduct retailProduct, int userOrderQuantity);
 
     /**
      * Sample:
