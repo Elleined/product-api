@@ -3,7 +3,7 @@ package com.elleined.marketplaceapi.service;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
-import com.elleined.marketplaceapi.repository.ProductRepository;
+import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.product.CropService;
 import com.elleined.marketplaceapi.service.product.UnitService;

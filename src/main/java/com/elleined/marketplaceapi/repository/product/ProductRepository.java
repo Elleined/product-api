@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.repository;
+package com.elleined.marketplaceapi.repository.product;
 
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;

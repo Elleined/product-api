@@ -16,7 +16,7 @@ import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
-import com.elleined.marketplaceapi.repository.ProductRepository;
+import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
