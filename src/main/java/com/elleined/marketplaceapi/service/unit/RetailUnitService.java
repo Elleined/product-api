@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.unit;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.unit.Unit;
+import com.elleined.marketplaceapi.repository.unit.RetailUnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -16,6 +17,7 @@ import java.util.List;
 @Service
 @Primary
 public class RetailUnitService implements UnitService {
+    private final RetailUnitRepository retailUnitRepository;
     @Override
     public Unit save(String name) {
         return null;

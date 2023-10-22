@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.unit;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.unit.Unit;
+import com.elleined.marketplaceapi.repository.unit.WholeSaleUnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,6 +19,8 @@ import java.util.List;
 @Service
 @Qualifier("wholeSaleUnitService")
 public class WholeSaleUnitService implements UnitService {
+    private final WholeSaleUnitRepository wholeSaleUnitRepository;
+    
     @Override
     public Unit save(String name) {
         return null;
