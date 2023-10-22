@@ -4,6 +4,7 @@ import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.service.product.ProductService;
 
 public interface RetailProductService extends ProductService<RetailProduct> {
+    void deleteExpiredProducts();
 
     double calculateOrderPrice(RetailProduct retailProduct, int userOrderQuantity);
 

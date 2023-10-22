@@ -19,8 +19,6 @@ public interface ProductService<T extends Product> {
 
     Set<T> getAllById(Set<Integer> productsToBeListedId);
 
-    void deleteExpiredProducts();
-
     List<T> searchProductByCropName(String cropName);
 
     default void updatePendingAndAcceptedOrderStatus(List<OrderItem> orderItems) {
