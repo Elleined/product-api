@@ -25,9 +25,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                                        @Param("seller") User seller);
 
     @Query("SELECT p FROM Product p WHERE p.crop.name LIKE CONCAT('%', :cropName, '%')")
-    Page<Product> searchProductByCropName(@Param("cropName") String cropName,
-                                          Pageable pageable);
-
-    @Query("SELECT p FROM Product p WHERE p.crop.name LIKE CONCAT('%', :cropName, '%')")
     List<Product> searchProductByCropName(@Param("cropName") String cropName);
 }
