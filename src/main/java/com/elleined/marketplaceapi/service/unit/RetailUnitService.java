@@ -18,6 +18,7 @@ import java.util.List;
 @Primary
 public class RetailUnitService implements UnitService {
     private final RetailUnitRepository retailUnitRepository;
+
     @Override
     public Unit save(String name) {
         return null;

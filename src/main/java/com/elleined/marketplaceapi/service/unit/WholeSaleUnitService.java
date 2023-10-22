@@ -20,7 +20,7 @@ import java.util.List;
 @Qualifier("wholeSaleUnitService")
 public class WholeSaleUnitService implements UnitService {
     private final WholeSaleUnitRepository wholeSaleUnitRepository;
-    
+
     @Override
     public Unit save(String name) {
         return null;
