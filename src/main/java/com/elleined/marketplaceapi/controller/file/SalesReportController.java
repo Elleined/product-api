@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.controller.file;
 
-import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.file.Exporter;
 import com.elleined.marketplaceapi.service.user.UserService;

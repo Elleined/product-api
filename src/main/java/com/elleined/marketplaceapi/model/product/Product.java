@@ -1,9 +1,7 @@
 package com.elleined.marketplaceapi.model.product;
 
 import com.elleined.marketplaceapi.model.Crop;
-import com.elleined.marketplaceapi.model.unit.Unit;
-import com.elleined.marketplaceapi.model.item.CartItem;
-import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.model.item.cart.CartItem;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
@@ -24,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class Product {
+    
     @Id
     @GeneratedValue(
             strategy = GenerationType.TABLE,
@@ -50,9 +49,6 @@ public abstract class Product {
 
     @Column(name = "date_of_harvest", nullable = false)
     private LocalDate harvestDate;
-
-    @Column(name = "date_of_expiration", nullable = false)
-    private LocalDate expirationDate;
 
     @Column(
             name = "date_of_listing",
@@ -91,16 +87,6 @@ public abstract class Product {
     )
     private Crop crop;
 
-    // product id is in order item table
-    @OneToMany(mappedBy = "product")
-    @Setter(AccessLevel.NONE)
-    private List<OrderItem> orders;
-
-    // product id is in cart item table
-    @OneToMany(mappedBy = "product")
-    @Setter(AccessLevel.NONE)
-    private List<CartItem> addedToCarts;
-
     // product id is in chat room table
     @OneToMany(mappedBy = "productToSettle")
     private List<PrivateChatRoom> privateChatRooms;
@@ -123,13 +109,12 @@ public abstract class Product {
         INACTIVE
     }
 
-    public boolean hasSoldOrder() {
-        return this.getOrders().stream().anyMatch(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.SOLD);
-    }
+    public abstract boolean hasSoldOrder();
 
-    public boolean isExpired() {
-        return LocalDate.now().isAfter(expirationDate) || this.state == State.EXPIRED;
-    }
+    public abstract boolean hasPendingOrder();
+
+    public abstract boolean hasAcceptedOrder();
+
 
     public boolean isListed() {
         return this.getState() == State.LISTING;
@@ -137,14 +122,6 @@ public abstract class Product {
 
     public boolean isRejected() {
         return this.getState() == State.REJECTED;
-    }
-
-    public boolean hasPendingOrder() {
-        return this.getOrders().stream().anyMatch(order -> order.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING);
-    }
-
-    public boolean hasAcceptedOrder() {
-        return this.getOrders().stream().anyMatch(order -> order.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED);
     }
 
     public boolean isDeleted() {

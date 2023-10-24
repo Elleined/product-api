@@ -1,34 +1,27 @@
-package com.elleined.marketplaceapi.model.item;
+package com.elleined.marketplaceapi.model.item.cart;
 
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-@MappedSuperclass
-@Getter
-@Setter
-@AllArgsConstructor
+
+@Entity
+@Table(name = "tbl_cart_item")
 @NoArgsConstructor
-public abstract class Item {
+@Setter
+@Getter
+public class CartItem extends Item {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(
-            name = "id",
-            nullable = false,
-            updatable = false,
-            unique = true
-    )
-    private int id;
-
-    @Column(name = "item_quantity", nullable = false)
-    private int orderQuantity;
+    @Builder
+    public CartItem(int id, int orderQuantity, double price, LocalDateTime orderDate, Product product, User purchaser, DeliveryAddress deliveryAddress) {
+        super(id, orderQuantity, price, orderDate, product, purchaser, deliveryAddress);
+    }
 
     @Column(name = "item_price", nullable = false)
     private double price;
@@ -39,15 +32,6 @@ public abstract class Item {
             updatable = false
     )
     private LocalDateTime orderDate;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(
-            name = "product_id",
-            referencedColumnName = "product_id",
-            nullable = false,
-            updatable = false
-    )
-    private Product product;
 
     @ManyToOne(optional = false)
     @JoinColumn(

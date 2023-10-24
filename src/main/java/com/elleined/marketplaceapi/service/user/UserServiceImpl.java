@@ -19,7 +19,6 @@ import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Shop;
-import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;

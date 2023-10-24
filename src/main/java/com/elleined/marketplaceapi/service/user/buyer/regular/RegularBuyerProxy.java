@@ -11,7 +11,6 @@ import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerMaxOrderPerDayException;
-import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.service.user.buyer.BuyerService;

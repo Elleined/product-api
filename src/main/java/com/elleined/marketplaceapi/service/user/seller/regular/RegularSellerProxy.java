@@ -14,7 +14,6 @@ import com.elleined.marketplaceapi.exception.user.seller.SellerMaxAcceptedOrderE
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxListingException;
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxPendingOrderException;
 import com.elleined.marketplaceapi.model.product.Product;
-import com.elleined.marketplaceapi.model.item.OrderItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.OrderItemRepository;
 import com.elleined.marketplaceapi.repository.product.ProductRepository;

@@ -1,11 +1,10 @@
 package com.elleined.marketplaceapi.model.product;
 
 import com.elleined.marketplaceapi.model.Crop;
-import com.elleined.marketplaceapi.model.item.CartItem;
-import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.model.item.order.Order;
+import com.elleined.marketplaceapi.model.item.order.RetailOrder;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
-import com.elleined.marketplaceapi.model.unit.Unit;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -23,11 +22,15 @@ import java.util.List;
 @Getter
 @Setter
 public class RetailProduct extends Product {
+
     @Column(name = "price_per_unit", nullable = false)
     private double pricePerUnit;
 
     @Column(name = "quantity_per_unit", nullable = false)
     private int quantityPerUnit;
+
+    @Column(name = "date_of_expiration", nullable = false)
+    private LocalDate expirationDate;
 
     @ManyToOne(optional = false)
     @JoinColumn(
@@ -37,11 +40,42 @@ public class RetailProduct extends Product {
     )
     private RetailUnit retailUnit;
 
+    // retail product id reference is in tbl order retail
+    @OneToMany(mappedBy = "retailProduct")
+    private List<RetailOrder> retailOrders;
 
     @Builder(builderMethodName = "retailProductBuilder")
-    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDate expirationDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<OrderItem> orders, List<CartItem> addedToCarts, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit) {
-        super(id, description, availableQuantity, harvestDate, expirationDate, listingDate, picture, state, status, seller, crop, orders, addedToCarts, privateChatRooms);
+    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit, List<RetailOrder> retailOrders, LocalDate expirationDate, RetailUnit retailUnit) {
+        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, privateChatRooms);
         this.pricePerUnit = pricePerUnit;
         this.quantityPerUnit = quantityPerUnit;
+        this.retailOrders = retailOrders;
+        this.expirationDate = expirationDate;
+        this.retailUnit = retailUnit;
+    }
+
+    @Override
+    public boolean hasSoldOrder() {
+        return this.retailOrders.stream()
+                .map(RetailOrder::getOrderStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.SOLD));
+    }
+
+    @Override
+    public boolean hasPendingOrder() {
+        return this.retailOrders.stream()
+                .map(RetailOrder::getOrderStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.PENDING));
+    }
+
+    @Override
+    public boolean hasAcceptedOrder() {
+        return this.retailOrders.stream()
+                .map(RetailOrder::getOrderStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.ACCEPTED));
+    }
+
+    public boolean isExpired() {
+        return LocalDate.now().isAfter(expirationDate) || this.getState() == Product.State.EXPIRED;
     }
 }

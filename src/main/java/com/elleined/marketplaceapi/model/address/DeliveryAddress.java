@@ -1,8 +1,7 @@
 package com.elleined.marketplaceapi.model.address;
 
 
-import com.elleined.marketplaceapi.model.item.CartItem;
-import com.elleined.marketplaceapi.model.item.OrderItem;
+import com.elleined.marketplaceapi.model.item.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;

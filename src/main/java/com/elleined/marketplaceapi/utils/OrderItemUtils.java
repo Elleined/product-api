@@ -1,7 +1,5 @@
 package com.elleined.marketplaceapi.utils;
 
-import com.elleined.marketplaceapi.model.item.OrderItem;
-
 import java.time.LocalDate;
 import java.util.List;
 
