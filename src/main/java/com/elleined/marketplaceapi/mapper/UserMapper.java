@@ -1,13 +1,14 @@
 package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.mapper.address.AddressMapper;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper(componentModel = "spring", uses = {AddressMapper.class, CredentialMapper.class})
+@Mapper(componentModel = "spring", uses = {AddressMapper.AddressMapper.class, CredentialMapper.class})
 public interface UserMapper {
 
     @Mappings({

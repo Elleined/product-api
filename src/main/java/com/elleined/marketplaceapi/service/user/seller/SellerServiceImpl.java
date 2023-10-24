@@ -10,7 +10,7 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
-import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.mapper.product.ProductMapper;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;

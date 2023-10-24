@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.dto.address.AddressDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.DeliveryAddressLimitException;
-import com.elleined.marketplaceapi.mapper.AddressMapper;
+import com.elleined.marketplaceapi.mapper.address.AddressMapper;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
@@ -23,7 +23,7 @@ import java.util.List;
 public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
-    private final AddressMapper addressMapper;
+    private final AddressMapper.AddressMapper addressMapper;
 
     @Override
     public void saveUserAddress(User registeringUser, AddressDTO addressDTO) {

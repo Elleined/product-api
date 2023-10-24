@@ -5,7 +5,7 @@ import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
-import com.elleined.marketplaceapi.mapper.ProductMapper;
+import com.elleined.marketplaceapi.mapper.product.ProductMapper;
 import com.elleined.marketplaceapi.mapper.ShopMapper;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;

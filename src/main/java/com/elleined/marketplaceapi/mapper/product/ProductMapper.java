@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.mapper;
+package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;

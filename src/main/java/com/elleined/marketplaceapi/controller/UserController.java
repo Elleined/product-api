@@ -5,8 +5,8 @@ import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
-import com.elleined.marketplaceapi.mapper.AddressMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
+import com.elleined.marketplaceapi.mapper.address.AddressMapper;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
@@ -41,7 +41,7 @@ public class UserController {
     private final UserMapper userMapper;
 
     private final AddressService addressService;
-    private final AddressMapper addressMapper;
+    private final AddressMapper.AddressMapper addressMapper;
 
     private final GetAllUtilityService getAllUtilityService;
 
