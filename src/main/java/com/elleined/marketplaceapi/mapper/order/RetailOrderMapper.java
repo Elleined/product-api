@@ -18,10 +18,10 @@ public abstract class RetailOrderMapper implements OrderMapper<RetailOrderDTO, R
 
     @Autowired
     @Lazy
-    private RetailProductService retailProductService;
+    protected RetailProductService retailProductService;
     @Autowired
     @Lazy
-    private AddressService addressService;
+    protected AddressService addressService;
     @Override
     @Mappings({
             @Mapping(target = "id", ignore = true),

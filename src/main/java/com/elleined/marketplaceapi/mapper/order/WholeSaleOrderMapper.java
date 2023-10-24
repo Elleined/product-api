@@ -19,11 +19,11 @@ public abstract class WholeSaleOrderMapper implements OrderMapper<WholeSaleOrder
 
     @Autowired
     @Lazy
-    private WholeSaleProductService wholeSaleProductService;
+    protected WholeSaleProductService wholeSaleProductService;
 
     @Autowired
     @Lazy
-    private AddressService addressService;
+    protected AddressService addressService;
 
     @Override
     @Mappings({
