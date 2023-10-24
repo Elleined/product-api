@@ -3,7 +3,7 @@ package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.product.ProductMapper;
 import com.elleined.marketplaceapi.mapper.ShopMapper;
@@ -113,8 +113,8 @@ public class SellerController {
     }
 
     @GetMapping("/getAllSellerProductOrderByStatus")
-    public List<OrderItemDTO> getAllSellerProductOrderByStatus(@PathVariable("currentUserId") int sellerId,
-                                                               @RequestParam("orderItemStatus") String orderItemStatus) {
+    public List<OrderDTO> getAllSellerProductOrderByStatus(@PathVariable("currentUserId") int sellerId,
+                                                           @RequestParam("orderItemStatus") String orderItemStatus) {
 
         User seller = userService.getById(sellerId);
         return sellerGetAllService.getAllSellerProductOrderByStatus(seller, OrderItem.OrderItemStatus.valueOf(orderItemStatus)).stream()

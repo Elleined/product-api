@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.user.buyer.regular;
 
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
@@ -39,7 +39,7 @@ public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction 
 
 
     @Override
-    public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO)
+    public OrderItem orderProduct(User buyer, OrderDTO orderDTO)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,
@@ -55,7 +55,7 @@ public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction 
         if (isBuyerExceedsToMaxOrderPerDay(buyer))
             throw new BuyerMaxOrderPerDayException("Cannot order product! because you already reached the max order per day which is " + MAX_ORDER_PER_DAY + " consider buying premium account to remove this restriction.");
         // Add more validation for regular buyer here for future
-        return buyerService.orderProduct(buyer, orderItemDTO);
+        return buyerService.orderProduct(buyer, orderDTO);
     }
 
     @Override

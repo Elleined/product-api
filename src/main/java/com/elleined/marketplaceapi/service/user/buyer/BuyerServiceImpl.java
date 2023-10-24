@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
@@ -37,7 +37,7 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
     private final ItemMapper itemMapper;
 
     @Override
-    public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO)
+    public OrderItem orderProduct(User buyer, OrderDTO orderDTO)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,
@@ -49,7 +49,7 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
             BuyerAlreadyRejectedException,
             ProductExpiredException {
 
-        Product product = productService.getById(orderItemDTO.getProductId());
+        Product product = productService.getById(orderDTO.getProductId());
         if (product.isExpired())
             throw new ProductExpiredException("Cannot order this product! because this product is already expired!");
         if (product.isRejected())
@@ -66,13 +66,13 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
             throw new ProductNotListedException("Cannot order this product! because this product are not yet listed!");
         if (buyer.hasProduct(product))
             throw new ResourceOwnedException("You cannot order your own product listing!");
-        if (product.isExceedingToAvailableQuantity(orderItemDTO.getOrderQuantity()))
+        if (product.isExceedingToAvailableQuantity(orderDTO.getOrderQuantity()))
             throw new OrderQuantiantyExceedsException("Cannot order this product! because you are trying to order that exceeds to available amount!");
         if (isBuyerAlreadyBeenRejected(buyer, product))
             throw new BuyerAlreadyRejectedException("Cannot order this product! because seller of this product is rejected you order request before!. Please wait after 1 day to re-oder this product");
 
-        OrderItem orderItem = itemMapper.toOrderItemEntity(orderItemDTO, buyer);
-        double price = productService.calculateOrderPrice(orderItem.getProduct(), orderItemDTO.getOrderQuantity());
+        OrderItem orderItem = itemMapper.toOrderItemEntity(orderDTO, buyer);
+        double price = productService.calculateOrderPrice(orderItem.getProduct(), orderDTO.getOrderQuantity());
         orderItem.setUpdatedAt(LocalDateTime.now());
         orderItem.setPrice(price);
 

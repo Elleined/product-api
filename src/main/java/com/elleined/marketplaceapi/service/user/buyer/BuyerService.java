@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public interface BuyerService {
 
-    OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO)
+    OrderItem orderProduct(User buyer, OrderDTO orderDTO)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,

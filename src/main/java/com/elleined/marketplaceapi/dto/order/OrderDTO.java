@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderItemDTO {
+public class OrderDTO {
 
     private Long id;
 

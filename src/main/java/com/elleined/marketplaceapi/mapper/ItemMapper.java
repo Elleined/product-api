@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.cart.CartItemDTO;
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -38,7 +38,7 @@ public abstract class ItemMapper {
             @Mapping(target = "purchaser", expression = "java(buyer)"),
             @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     })
-    public abstract OrderItem toOrderItemEntity(OrderItemDTO orderItemDTO, @Context User buyer) throws ResourceNotFoundException;
+    public abstract OrderItem toOrderItemEntity(OrderDTO orderDTO, @Context User buyer) throws ResourceNotFoundException;
 
     @Mappings({
             @Mapping(target = "deliveryAddressId", source = "deliveryAddress.id"),
@@ -46,7 +46,7 @@ public abstract class ItemMapper {
             @Mapping(target = "purchaserId", source = "purchaser.id"),
             @Mapping(target = "sellerId", source = "product.seller.id")
     })
-    public abstract OrderItemDTO toOrderItemDTO(OrderItem orderItem);
+    public abstract OrderDTO toOrderItemDTO(OrderItem orderItem);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),

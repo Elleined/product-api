@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +34,9 @@ public class WholeSaleProduct extends Product {
     )
     private WholeSaleUnit wholeSaleUnit;
 
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;
+
     // whole sale product id reference is on tbl order whole sale
     @OneToMany(mappedBy = "wholeSaleProduct")
     private List<WholeSaleOrder> wholeSaleOrders;
@@ -42,13 +46,13 @@ public class WholeSaleProduct extends Product {
     private List<WholeSaleCartItem> wholeSaleCartItems;
 
     @Builder(builderMethodName = "wholeSaleProductBuilder")
-    public WholeSaleProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, WholeSaleUnit wholeSaleUnit, List<WholeSaleOrder> wholeSaleOrders, List<WholeSaleCartItem> wholeSaleCartItems) {
+    public WholeSaleProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, WholeSaleUnit wholeSaleUnit, BigDecimal price, List<WholeSaleOrder> wholeSaleOrders, List<WholeSaleCartItem> wholeSaleCartItems) {
         super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, privateChatRooms);
         this.wholeSaleUnit = wholeSaleUnit;
+        this.price = price;
         this.wholeSaleOrders = wholeSaleOrders;
         this.wholeSaleCartItems = wholeSaleCartItems;
     }
-
 
     @Override
     public boolean hasSoldOrder() {

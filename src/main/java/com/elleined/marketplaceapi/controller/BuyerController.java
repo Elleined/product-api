@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.controller;
 
 
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.user.UserService;
@@ -33,21 +33,21 @@ public class BuyerController {
     }
 
     @PostMapping("/orderProduct")
-    public OrderItemDTO orderProduct(@PathVariable("currentUserId") int buyerId,
-                                     @Valid @RequestBody OrderItemDTO orderItemDTO) {
+    public OrderDTO orderProduct(@PathVariable("currentUserId") int buyerId,
+                                 @Valid @RequestBody OrderDTO orderDTO) {
 
         User buyer = userService.getById(buyerId);
         if (buyer.isPremiumAndNotExpired()) {
-            OrderItem orderItem = premiumBuyer.orderProduct(buyer, orderItemDTO);
+            OrderItem orderItem = premiumBuyer.orderProduct(buyer, orderDTO);
             return itemMapper.toOrderItemDTO(orderItem);
         }
-        OrderItem orderItem = regularBuyer.orderProduct(buyer, orderItemDTO);
+        OrderItem orderItem = regularBuyer.orderProduct(buyer, orderDTO);
         return itemMapper.toOrderItemDTO(orderItem);
     }
 
     @GetMapping("/getAllOrderedProductsByStatus")
-    public List<OrderItemDTO> getAllOrderedProductsByStatus(@PathVariable("currentUserId") int buyerId,
-                                                            @RequestParam("orderItemStatus") String orderItemStatus) {
+    public List<OrderDTO> getAllOrderedProductsByStatus(@PathVariable("currentUserId") int buyerId,
+                                                        @RequestParam("orderItemStatus") String orderItemStatus) {
 
         User buyer = userService.getById(buyerId);
         if (buyer.isPremiumAndNotExpired()) {
@@ -63,8 +63,8 @@ public class BuyerController {
     }
 
     @DeleteMapping("/cancelOrderItem/{orderItemId}")
-    public ResponseEntity<OrderItemDTO> cancelOrderItem(@PathVariable("currentUserId") int buyerId,
-                                                        @PathVariable("orderItemId") int orderItemId) {
+    public ResponseEntity<OrderDTO> cancelOrderItem(@PathVariable("currentUserId") int buyerId,
+                                                    @PathVariable("orderItemId") int orderItemId) {
 
         User buyer = userService.getById(buyerId);
         OrderItem orderItem = userService.getOrderItemById(orderItemId);

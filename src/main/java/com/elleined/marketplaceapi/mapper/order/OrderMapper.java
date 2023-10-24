@@ -1,7 +1,10 @@
 package com.elleined.marketplaceapi.mapper.order;
 
-import org.mapstruct.Mapper;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.user.User;
 
-@Mapper(componentModel = "spring")
-public interface OrderMapper {
+public interface OrderMapper<DTO extends OrderDTO, ENTITY extends Order> {
+    ENTITY toEntity(DTO dto, User buyer);
+    DTO toDTO(ENTITY entity);
 }

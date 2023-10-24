@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.controller;
 
 
 import com.elleined.marketplaceapi.dto.cart.CartItemDTO;
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -52,8 +52,8 @@ public class CartItemController {
 
 
     @PostMapping("/{cartItemId}/order")
-    public OrderItemDTO moveToOrderItem(@PathVariable("currentUserId") int currentUserId,
-                                        @PathVariable("cartItemId") int cartItemId) {
+    public OrderDTO moveToOrderItem(@PathVariable("currentUserId") int currentUserId,
+                                    @PathVariable("cartItemId") int cartItemId) {
 
         User currentUser = userService.getById(currentUserId);
         CartItem cartItem = cartItemService.getCartItemById(cartItemId);
@@ -64,8 +64,8 @@ public class CartItemController {
 
 
     @PostMapping("/order")
-    public List<OrderItemDTO> moveAllToOrderItem(@PathVariable("currentUserId") int currentUserId,
-                                                 @RequestBody List<Integer> cartItemIds) {
+    public List<OrderDTO> moveAllToOrderItem(@PathVariable("currentUserId") int currentUserId,
+                                             @RequestBody List<Integer> cartItemIds) {
         User currentUser = userService.getById(currentUserId);
         List<CartItem> cartItems = cartItemService.getAllById(cartItemIds);
         List<OrderItem> orderItems = cartItemService.moveAllToOrderItem(currentUser, cartItems);

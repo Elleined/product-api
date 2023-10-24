@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.user.buyer.premium;
 
-import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
@@ -30,7 +30,7 @@ public class PremiumBuyerProxy implements BuyerService {
     }
 
     @Override
-    public OrderItem orderProduct(User buyer, OrderItemDTO orderItemDTO)
+    public OrderItem orderProduct(User buyer, OrderDTO orderDTO)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,
@@ -43,7 +43,7 @@ public class PremiumBuyerProxy implements BuyerService {
             ProductExpiredException {
 
         // add validation here for premium user for future
-        return buyerService.orderProduct(buyer, orderItemDTO);
+        return buyerService.orderProduct(buyer, orderDTO);
     }
 
     @Override
