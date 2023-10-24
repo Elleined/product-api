@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.dto.item;
 
+import com.elleined.marketplaceapi.model.product.Product;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

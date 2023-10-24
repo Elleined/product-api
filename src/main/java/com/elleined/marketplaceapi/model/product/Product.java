@@ -105,6 +105,11 @@ public abstract class Product {
     @OneToMany(mappedBy = "productToSettle")
     private List<PrivateChatRoom> privateChatRooms;
 
+    public enum SaleStatus {
+        SALE,
+        NOT_ON_SALE
+    }
+
     public enum State {
         PENDING,
         LISTING,
