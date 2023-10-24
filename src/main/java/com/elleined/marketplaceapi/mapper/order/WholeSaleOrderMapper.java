@@ -33,12 +33,12 @@ public abstract class WholeSaleOrderMapper implements OrderMapper<WholeSaleOrder
             @Mapping(target = "price", source = "price"),
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "orderStatus", expression = "java(OrderStatus.PENDING)"),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, wholeSaleOrder.getDeliveryAddressId()))"),
-            @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProductService.getById(wholeSaleOrder.getProductId()))"),
+            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, wholeSaleOrderDTO.getDeliveryAddressId()))"),
+            @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProductService.getById(wholeSaleOrderDTO.getProductId()))"),
             @Mapping(target = "purchaser", expression = "java(buyer)"),
             @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     })
-    public abstract WholeSaleOrder toEntity(WholeSaleOrderDTO wholeSaleOrder, @Context User buyer);
+    public abstract WholeSaleOrder toEntity(WholeSaleOrderDTO wholeSaleOrderDTO, @Context User buyer);
 
     @Override
     @Mappings({

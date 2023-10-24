@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper.order;
 
 import com.elleined.marketplaceapi.dto.order.OrderDTO;
+import com.elleined.marketplaceapi.dto.order.RetailOrderDTO;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.user.User;
@@ -13,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring", imports = Order.OrderStatus.class)
-public abstract class RetailOrderMapper implements OrderMapper<OrderDTO, RetailOrder> {
+public abstract class RetailOrderMapper implements OrderMapper<RetailOrderDTO, RetailOrder> {
 
     @Autowired
     @Lazy
@@ -29,12 +30,12 @@ public abstract class RetailOrderMapper implements OrderMapper<OrderDTO, RetailO
 
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "orderStatus", expression = "java(OrderStatus.PENDING)"),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, orderItemDTO.getDeliveryAddressId()))"),
-            @Mapping(target = "retailProduct", expression = "java(retailProductService.getById(orderItemDTO.getProductId()))"),
+            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, retailOrderDTO.getDeliveryAddressId()))"),
+            @Mapping(target = "retailProduct", expression = "java(retailProductService.getById(retailOrderDTO.getProductId()))"),
             @Mapping(target = "purchaser", expression = "java(buyer)"),
             @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     })
-    public abstract RetailOrder toEntity(OrderDTO dto, User buyer);
+    public abstract RetailOrder toEntity(RetailOrderDTO retailOrderDTO, User buyer);
 
     @Override
     @Mappings({
@@ -43,5 +44,5 @@ public abstract class RetailOrderMapper implements OrderMapper<OrderDTO, RetailO
             @Mapping(target = "purchaserId", source = "purchaser.id"),
             @Mapping(target = "sellerId", source = "retailProduct.seller.id")
     })
-    public abstract OrderDTO toDTO(RetailOrder retailOrder);
+    public abstract RetailOrderDTO toDTO(RetailOrder retailOrder);
 }
