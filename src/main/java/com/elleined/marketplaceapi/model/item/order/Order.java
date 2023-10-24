@@ -38,7 +38,7 @@ public abstract class Order {
     )
     private int id;
 
-    @Column(name = "item_price", nullable = false)
+    @Column(name = "order_price", nullable = false)
     private double price;
 
     @Column(

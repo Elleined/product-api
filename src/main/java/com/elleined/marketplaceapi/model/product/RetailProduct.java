@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.model.product;
 
 import com.elleined.marketplaceapi.model.Crop;
+import com.elleined.marketplaceapi.model.item.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.item.order.Order;
 import com.elleined.marketplaceapi.model.item.order.RetailOrder;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
@@ -44,14 +45,19 @@ public class RetailProduct extends Product {
     @OneToMany(mappedBy = "retailProduct")
     private List<RetailOrder> retailOrders;
 
+    // retail product id reference is in tbl cart retail
+    @OneToMany(mappedBy = "retailProduct")
+    private List<RetailCartItem> retailCartItems;
+
     @Builder(builderMethodName = "retailProductBuilder")
-    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit, List<RetailOrder> retailOrders, LocalDate expirationDate, RetailUnit retailUnit) {
+    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit, LocalDate expirationDate, RetailUnit retailUnit, List<RetailOrder> retailOrders, List<RetailCartItem> retailCartItems) {
         super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, privateChatRooms);
         this.pricePerUnit = pricePerUnit;
         this.quantityPerUnit = quantityPerUnit;
-        this.retailOrders = retailOrders;
         this.expirationDate = expirationDate;
         this.retailUnit = retailUnit;
+        this.retailOrders = retailOrders;
+        this.retailCartItems = retailCartItems;
     }
 
     @Override

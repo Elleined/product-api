@@ -1,15 +1,16 @@
 package com.elleined.marketplaceapi.model.user;
 
 import com.elleined.marketplaceapi.model.Credential;
-import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
-import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
-import com.elleined.marketplaceapi.model.item.cart.CartItem;
+import com.elleined.marketplaceapi.model.item.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.item.cart.WholeSaleCartItem;
+import com.elleined.marketplaceapi.model.item.order.RetailOrder;
+import com.elleined.marketplaceapi.model.item.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
@@ -85,15 +86,21 @@ public class User {
     @Setter(AccessLevel.NONE)
     private List<DeliveryAddress> deliveryAddresses;
 
-    // user id reference is in order item table
+    // user id reference is in tbl order whole sale
     @OneToMany(mappedBy = "purchaser")
-    @Setter(AccessLevel.NONE)
-    private List<OrderItem> orderedItems;
+    private List<WholeSaleOrder> wholeSaleOrders;
 
-    // user id reference is in cart item table
+    // user id reference is in tbl order retail
     @OneToMany(mappedBy = "purchaser")
-    @Setter(AccessLevel.NONE)
-    private List<CartItem> cartItems;
+    private List<RetailOrder> retailOrders;
+
+    // user id reference is in tbl cart whole sale
+    @OneToMany(mappedBy = "purchaser")
+    private List<WholeSaleCartItem> wholeSaleCartItems;
+
+    // user id reference is in tbl cart retail
+    @OneToMany(mappedBy = "purchaser")
+    private List<RetailCartItem> retailCartItems;
 
     // user id reference is in shop table
     @OneToOne(mappedBy = "owner")
@@ -160,10 +167,16 @@ public class User {
         return this.getShop() != null;
     }
 
-    public boolean isProductAlreadyInCart(Product product) {
-        return this.getCartItems().stream()
-                .map(CartItem::getProduct)
-                .anyMatch(product::equals);
+    public boolean isProductAlreadyInCart(WholeSaleProduct wholeSaleProduct) {
+        return this.getWholeSaleCartItems().stream()
+                .map(WholeSaleCartItem::getWholeSaleProduct)
+                .anyMatch(wholeSaleProduct::equals);
+    }
+
+    public boolean isProductAlreadyInCart(RetailProduct retailProduct) {
+        return this.getRetailCartItems().stream()
+                .map(RetailCartItem::getRetailProduct)
+                .anyMatch(retailProduct::equals);
     }
 
     public boolean hasReachedDeliveryAddressLimit() {
@@ -182,8 +195,12 @@ public class User {
         return this.getRetailProducts().stream().anyMatch(retailProduct::equals);
     }
 
-    public boolean hasOrder(OrderItem orderItem) {
-        return this.getOrderedItems().stream().anyMatch(orderItem::equals);
+    public boolean hasOrder(RetailOrder retailOrder) {
+        return this.getRetailOrders().stream().anyMatch(retailOrder::equals);
+    }
+
+    public boolean hasOrder(WholeSaleOrder wholeSaleOrder) {
+        return this.getWholeSaleOrders().stream().anyMatch(wholeSaleOrder::equals);
     }
 
     public boolean isPremiumSubscriptionExpired() {
@@ -201,9 +218,6 @@ public class User {
 
     public boolean hasNotBeenRejected() {
         return this.getUserVerification().getValidId() != null;
-    }
-    public boolean hasWithdrawTransaction(Transaction transaction) {
-        return this.getWithdrawTransactions().stream().anyMatch(transaction::equals);
     }
 
     public String getFullName() {

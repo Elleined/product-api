@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.model.item.order;
+package com.elleined.marketplaceapi.model.item.cart;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
@@ -12,11 +12,11 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tbl_order_retail")
+@Table(name = "tbl_cart_retail")
 @NoArgsConstructor
 @Getter
 @Setter
-public class RetailOrder extends Order {
+public class RetailCartItem extends CartItem {
 
     @ManyToOne(optional = false)
     @JoinColumn(
@@ -29,9 +29,9 @@ public class RetailOrder extends Order {
     @Column(name = "order_quantity", nullable = false)
     private int orderQuantity;
 
-    @Builder(builderMethodName = "retailOrderBuilder")
-    public RetailOrder(int id, double price, LocalDateTime orderDate, User purchaser, DeliveryAddress deliveryAddress, OrderStatus orderStatus, String sellerMessage, LocalDateTime updatedAt, RetailProduct retailProduct, int orderQuantity) {
-        super(id, price, orderDate, purchaser, deliveryAddress, orderStatus, sellerMessage, updatedAt);
+    @Builder(builderMethodName = "retailCartItemBuilder")
+    public RetailCartItem(int id, double price, LocalDateTime createdAt, User purchaser, DeliveryAddress deliveryAddress, RetailProduct retailProduct, int orderQuantity) {
+        super(id, price, createdAt, purchaser, deliveryAddress);
         this.retailProduct = retailProduct;
         this.orderQuantity = orderQuantity;
     }
