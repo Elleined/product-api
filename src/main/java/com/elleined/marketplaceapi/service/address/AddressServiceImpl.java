@@ -4,7 +4,8 @@ import com.elleined.marketplaceapi.dto.address.AddressDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.DeliveryAddressLimitException;
-import com.elleined.marketplaceapi.mapper.address.AddressMapper;
+import com.elleined.marketplaceapi.mapper.address.DeliveryAddressMapper;
+import com.elleined.marketplaceapi.mapper.address.UserAddressMapper;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
@@ -23,11 +24,12 @@ import java.util.List;
 public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
-    private final AddressMapper.AddressMapper addressMapper;
+    private final UserAddressMapper userAddressMapper;
+    private final DeliveryAddressMapper deliveryAddressMapper;
 
     @Override
     public void saveUserAddress(User registeringUser, AddressDTO addressDTO) {
-        UserAddress userAddress = addressMapper.toUserAddressEntity(addressDTO, registeringUser);
+        UserAddress userAddress = userAddressMapper.toEntity(addressDTO, registeringUser);
         registeringUser.setAddress(userAddress);
         addressRepository.save(userAddress);
         log.debug("User with id of {} successfully registered with address id of {}", registeringUser.getId(), userAddress.getId());
@@ -36,7 +38,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public DeliveryAddress saveDeliveryAddress(User orderingUser, DeliveryAddressDTO deliveryAddressDTO) throws DeliveryAddressLimitException {
         if (orderingUser.hasReachedDeliveryAddressLimit()) throw new DeliveryAddressLimitException("Cannot save another delivery address! Because you already reached the limit which is 5");
-        DeliveryAddress deliveryAddress = addressMapper.toDeliveryAddressEntity(deliveryAddressDTO, orderingUser);
+        DeliveryAddress deliveryAddress = deliveryAddressMapper.toEntity(deliveryAddressDTO, orderingUser);
         orderingUser.getDeliveryAddresses().add(deliveryAddress);
         addressRepository.save(deliveryAddress);
         log.debug("User with id of {} successfully saved delivery address with id of {}", orderingUser.getId(), deliveryAddress.getId());

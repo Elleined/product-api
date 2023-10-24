@@ -1,22 +1,17 @@
 package com.elleined.marketplaceapi.dto.cart;
 
-import com.elleined.marketplaceapi.dto.item.ItemDTO;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartItemDTO {
+public abstract class CartItemDTO {
 
     private Long id;
-
-    @Positive(message = "Order quantity cannot be 0 or less than zero!")
-    private int orderQuantity;
 
     private double price;
 

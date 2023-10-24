@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper.order;
 
 import com.elleined.marketplaceapi.dto.order.OrderDTO;
+import com.elleined.marketplaceapi.dto.order.WholeSaleOrderDTO;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.user.User;
@@ -14,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring", imports = Order.OrderStatus.class)
-public abstract class WholeSaleOrderMapper implements OrderMapper<OrderDTO, WholeSaleOrder> {
+public abstract class WholeSaleOrderMapper implements OrderMapper<WholeSaleOrderDTO, WholeSaleOrder> {
 
     @Autowired
     @Lazy
@@ -32,19 +33,19 @@ public abstract class WholeSaleOrderMapper implements OrderMapper<OrderDTO, Whol
             @Mapping(target = "price", source = "price"),
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "orderStatus", expression = "java(OrderStatus.PENDING)"),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, orderDTO.getDeliveryAddressId()))"),
-            @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProductService.getById(orderDTO.getProductId()))"),
+            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, wholeSaleOrder.getDeliveryAddressId()))"),
+            @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProductService.getById(wholeSaleOrder.getProductId()))"),
             @Mapping(target = "purchaser", expression = "java(buyer)"),
             @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     })
-    public abstract WholeSaleOrder toEntity(OrderDTO orderDTO, @Context User buyer);
+    public abstract WholeSaleOrder toEntity(WholeSaleOrderDTO wholeSaleOrder, @Context User buyer);
 
     @Override
     @Mappings({
             @Mapping(target = "deliveryAddressId", source = "deliveryAddress.id"),
             @Mapping(target = "productId", source = "wholeSaleProduct.id"),
             @Mapping(target = "purchaserId", source = "purchaser.id"),
-            @Mapping(target = "sellerId", source = "wholeSaleProduct.seller.id")
+            @Mapping(target = "sellerId", source = "wholeSaleProduct.seller.id"),
     })
-    public abstract OrderDTO toDTO(WholeSaleOrder wholeSaleOrder);
+    public abstract WholeSaleOrderDTO toDTO(WholeSaleOrder wholeSaleOrder);
 }

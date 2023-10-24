@@ -1,25 +1,19 @@
 package com.elleined.marketplaceapi.dto.order;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDTO {
+public abstract class OrderDTO {
 
     private Long id;
-
-    @Positive(message = "Order quantity cannot be 0 or less than zero!")
-    private int orderQuantity;
 
     private double price;
 
@@ -36,7 +30,8 @@ public class OrderDTO {
     @Positive(message = "Delivery address id cannot be 0 or less than zero!")
     private int deliveryAddressId;
 
-    private String orderItemStatus;
+    @JsonProperty("orderItemStatus")
+    private String orderStatus;
 
     private String sellerMessage;
 
