@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.model.item.order;
+package com.elleined.marketplaceapi.model.order;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;

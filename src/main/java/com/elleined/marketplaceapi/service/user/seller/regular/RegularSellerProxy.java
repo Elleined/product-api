@@ -15,7 +15,7 @@ import com.elleined.marketplaceapi.exception.user.seller.SellerMaxListingExcepti
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxPendingOrderException;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -43,7 +43,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     public final static float SUCCESSFUL_TRANSACTION_FEE = 2;
     private final SellerService sellerService;
 
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
     private final ProductRepository productRepository;
     private final ProductService productService;
@@ -51,12 +51,12 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     private final FeeService feeService;
 
     public RegularSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
-                              OrderItemRepository orderItemRepository,
+                              OrderRepository orderRepository,
                               ProductRepository productRepository,
                               ProductService productService,
                               FeeService feeService) {
         this.sellerService = sellerService;
-        this.orderItemRepository = orderItemRepository;
+        this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.productService = productService;
         this.feeService = feeService;
@@ -87,7 +87,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     public boolean isExceedsToMaxRejectionPerDay(User seller) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
-        return orderItemRepository.fetchSellerRejectedOrderCount(
+        return orderRepository.fetchSellerRejectedOrderCount(
                 currentDateTimeMidnight,
                 tomorrowMidnight,
                 seller,

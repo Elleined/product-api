@@ -2,9 +2,9 @@ package com.elleined.marketplaceapi.model.product;
 
 
 import com.elleined.marketplaceapi.model.Crop;
-import com.elleined.marketplaceapi.model.item.cart.WholeSaleCartItem;
-import com.elleined.marketplaceapi.model.item.order.Order;
-import com.elleined.marketplaceapi.model.item.order.WholeSaleOrder;
+import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;

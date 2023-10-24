@@ -20,7 +20,7 @@ import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.GetAllUtilityService;
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
     private final ShopRepository shopRepository;
 
@@ -236,7 +236,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException {
-        return orderItemRepository.findById((long) orderItemId).orElseThrow(() -> new ResourceNotFoundException("Order item does not exists!"));
+        return orderRepository.findById((long) orderItemId).orElseThrow(() -> new ResourceNotFoundException("Order item does not exists!"));
     }
 
     @Override

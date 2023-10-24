@@ -5,10 +5,10 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.product.Product;
-import com.elleined.marketplaceapi.model.item.cart.CartItem;
+import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.CartItemRepository;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.cart.CartItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,7 +25,7 @@ import java.util.List;
 @Qualifier("cartItemServiceImpl")
 public class CartItemServiceImpl implements CartItemService {
     private final CartItemRepository cartItemRepository;
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
     private final ItemMapper itemMapper;
 
@@ -66,7 +66,7 @@ public class CartItemServiceImpl implements CartItemService {
 
         int cartItemId = cartItem.getId();
         cartItemRepository.delete(cartItem);
-        orderItemRepository.save(orderItem);
+        orderRepository.save(orderItem);
         log.debug("Cart item with id of {} are now moved to order item with id of {}", cartItemId, orderItem.getId());
         return orderItem;
     }
@@ -76,7 +76,7 @@ public class CartItemServiceImpl implements CartItemService {
         List<OrderItem> orderItems = cartItems.stream()
                 .map(itemMapper::cartItemToOrderItem)
                 .toList();
-        return orderItemRepository.saveAll(orderItems);
+        return orderRepository.saveAll(orderItems);
     }
 
     @Override

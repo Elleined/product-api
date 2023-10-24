@@ -1,7 +1,10 @@
 package com.elleined.marketplaceapi.model.address;
 
 
-import com.elleined.marketplaceapi.model.item.cart.CartItem;
+import com.elleined.marketplaceapi.model.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,22 +28,30 @@ public class DeliveryAddress extends Address {
     )
     private User user;
 
-    // address id reference is in order item
-    @OneToMany(mappedBy = "deliveryAddress")
-    @Setter(AccessLevel.NONE)
-    private List<OrderItem> orderItemAddresses;
+    // delivery address id reference is in tbl order whole sale
+    @OneToMany(mappedBy = "purchaser")
+    private List<WholeSaleOrder> wholeSaleOrders;
 
-    // address id reference is in cart item table
-    @OneToMany(mappedBy = "deliveryAddress")
-    @Setter(AccessLevel.NONE)
-    private List<CartItem> cartItemDeliveryAddresses;
+    // delivery address id reference is in tbl order retail
+    @OneToMany(mappedBy = "purchaser")
+    private List<RetailOrder> retailOrders;
+
+    // delivery address id reference is in tbl cart whole sale
+    @OneToMany(mappedBy = "purchaser")
+    private List<WholeSaleCartItem> wholeSaleCartItems;
+
+    // delivery address id reference is in tbl cart retail
+    @OneToMany(mappedBy = "purchaser")
+    private List<RetailCartItem> retailCartItems;
 
     @Builder(builderMethodName = "deliveryAddressBuilder")
-    public DeliveryAddress(int id, String details, String regionName, String provinceName, String cityName, String baranggayName, String title, User user, List<OrderItem> orderItemAddresses, List<CartItem> cartItemDeliveryAddresses) {
+    public DeliveryAddress(int id, String details, String regionName, String provinceName, String cityName, String baranggayName, String title, User user, List<WholeSaleOrder> wholeSaleOrders, List<RetailOrder> retailOrders, List<WholeSaleCartItem> wholeSaleCartItems, List<RetailCartItem> retailCartItems) {
         super(id, details, regionName, provinceName, cityName, baranggayName);
         this.title = title;
         this.user = user;
-        this.orderItemAddresses = orderItemAddresses;
-        this.cartItemDeliveryAddresses = cartItemDeliveryAddresses;
+        this.wholeSaleOrders = wholeSaleOrders;
+        this.retailOrders = retailOrders;
+        this.wholeSaleCartItems = wholeSaleCartItems;
+        this.retailCartItems = retailCartItems;
     }
 }

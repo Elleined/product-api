@@ -14,7 +14,7 @@ import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.CropService;
@@ -56,7 +56,7 @@ public class newj implements SellerService {
     private final RetailUnitService retailUnitService;
     private final WholeSaleUnitService wholeSaleUnitService;
 
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
     private final ATMValidator atmValidator;
 

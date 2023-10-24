@@ -13,7 +13,7 @@ import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedExce
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ import java.util.List;
 public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
     private final ProductService productService;
 
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
     private final ItemMapper itemMapper;
 
     @Override
@@ -77,7 +77,7 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
         orderItem.setPrice(price);
 
         buyer.getOrderedItems().add(orderItem);
-        orderItemRepository.save(orderItem);
+        orderRepository.save(orderItem);
         log.debug("User with id of {} successfully ordered product with id of {}", buyer.getId(), orderItem.getProduct().getId());
         return orderItem;
     }
@@ -104,7 +104,7 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
 
         orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.CANCELLED);
         orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItemRepository.save(orderItem);
+        orderRepository.save(orderItem);
         log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
     }
 

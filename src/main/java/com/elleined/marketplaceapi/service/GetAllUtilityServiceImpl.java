@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.service;
 
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.UserDetails;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetAllUtilityServiceImpl implements GetAllUtilityService {
     private final UserRepository userRepository;
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
     private final CropService cropService;
@@ -55,7 +55,7 @@ public class GetAllUtilityServiceImpl implements GetAllUtilityService {
 
     @Override
     public int getAllUsersTransactionsCount() {
-        return orderItemRepository.findAll().size();
+        return orderRepository.findAll().size();
     }
 
     @Override

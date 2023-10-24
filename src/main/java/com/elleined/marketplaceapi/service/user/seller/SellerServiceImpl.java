@@ -14,7 +14,7 @@ import com.elleined.marketplaceapi.mapper.ProductMapper;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
@@ -67,7 +67,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     private final RetailUnitService retailUnitService;
     private final WholeSaleUnitService wholeSaleUnitService;
 
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
     private final ATMValidator atmValidator;
 
@@ -173,7 +173,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
 
         productRepository.save(product);
-        orderItemRepository.saveAll(product.getOrders());
+        orderRepository.saveAll(product.getOrders());
         log.debug("Product with id of {} are now inactive", product.getId());
     }
 
@@ -199,7 +199,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         orderItem.setUpdatedAt(LocalDateTime.now());
         orderItem.setSellerMessage(messageToBuyer);
 
-        orderItemRepository.save(orderItem);
+        orderRepository.save(orderItem);
         log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.ACCEPTED.name());
     }
 
@@ -219,7 +219,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         orderItem.setUpdatedAt(LocalDateTime.now());
         orderItem.setSellerMessage(messageToBuyer);
 
-        orderItemRepository.save(orderItem);
+        orderRepository.save(orderItem);
         log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.REJECTED.name());
     }
 
@@ -241,8 +241,8 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
             privateChatRoomService.deleteAllMessages(privateChatRoom);
 
             productRepository.save(product);
-            orderItemRepository.save(orderItem);
-            orderItemRepository.saveAll(product.getOrders());
+            orderRepository.save(orderItem);
+            orderRepository.saveAll(product.getOrders());
             return;
         }
 
@@ -254,8 +254,8 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         privateChatRoomService.deleteAllMessages(privateChatRoom);
 
         productRepository.save(product);
-        orderItemRepository.save(orderItem);
-        orderItemRepository.saveAll(product.getOrders());
+        orderRepository.save(orderItem);
+        orderRepository.saveAll(product.getOrders());
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.model.product;
 
 import com.elleined.marketplaceapi.model.Crop;
-import com.elleined.marketplaceapi.model.item.cart.CartItem;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
@@ -22,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class Product {
-    
+
     @Id
     @GeneratedValue(
             strategy = GenerationType.TABLE,

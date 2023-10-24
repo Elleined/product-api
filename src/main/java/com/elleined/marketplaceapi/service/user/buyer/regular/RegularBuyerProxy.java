@@ -12,7 +12,7 @@ import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerMaxOrderPerDayException;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.OrderItemRepository;
+import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.service.user.buyer.BuyerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,11 +30,11 @@ import java.util.List;
 public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction {
     private final BuyerService buyerService;
 
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
     public RegularBuyerProxy(@Qualifier("buyerServiceImpl") BuyerService buyerService,
-                             OrderItemRepository orderItemRepository) {
+                             OrderRepository orderRepository) {
         this.buyerService = buyerService;
-        this.orderItemRepository = orderItemRepository;
+        this.orderRepository = orderRepository;
     }
 
 
@@ -75,7 +75,7 @@ public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction 
     public boolean isBuyerExceedsToMaxOrderPerDay(User buyer) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
-        return orderItemRepository.fetchBuyerOrderCount(
+        return orderRepository.fetchBuyerOrderCount(
                 currentDateTimeMidnight,
                 tomorrowMidnight,
                 buyer,

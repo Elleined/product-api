@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.model.item.cart;
+package com.elleined.marketplaceapi.model.cart;
 
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
