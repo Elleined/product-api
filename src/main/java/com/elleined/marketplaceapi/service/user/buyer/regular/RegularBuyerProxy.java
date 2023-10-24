@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.user.buyer.regular;
 
-import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;

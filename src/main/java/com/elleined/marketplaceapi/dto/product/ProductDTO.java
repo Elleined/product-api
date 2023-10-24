@@ -46,11 +46,6 @@ public class ProductDTO {
     @PastOrPresent(message = "Cannot sell an product that are not have been harvested yet")
     private LocalDate harvestDate;
 
-    @NotNull(message = "Expiration date cannot null")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-
-    private LocalDate expirationDate;
-
     private LocalDate listingDate;
 
     private String shopName;

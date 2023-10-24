@@ -3,7 +3,7 @@ package com.elleined.marketplaceapi.controller;
 
 import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
-import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.product.ProductMapper;
 import com.elleined.marketplaceapi.mapper.ShopMapper;

@@ -1,8 +1,8 @@
 package com.elleined.marketplaceapi.controller;
 
 
-import com.elleined.marketplaceapi.dto.item.CartItemDTO;
-import com.elleined.marketplaceapi.dto.item.OrderItemDTO;
+import com.elleined.marketplaceapi.dto.cart.CartItemDTO;
+import com.elleined.marketplaceapi.dto.order.OrderItemDTO;
 import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;

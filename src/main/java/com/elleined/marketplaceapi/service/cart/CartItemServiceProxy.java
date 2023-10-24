@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.service.cart;
 
-import com.elleined.marketplaceapi.dto.item.CartItemDTO;
+import com.elleined.marketplaceapi.dto.cart.CartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
