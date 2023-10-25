@@ -2,13 +2,15 @@ package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.mapper.address.AddressMapper;
+import com.elleined.marketplaceapi.mapper.address.DeliveryAddressMapper;
+import com.elleined.marketplaceapi.mapper.address.UserAddressMapper;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper(componentModel = "spring", uses = {AddressMapper.AddressMapper.class, CredentialMapper.class})
+@Mapper(componentModel = "spring", uses = {DeliveryAddressMapper.class, UserAddressMapper.class, CredentialMapper.class})
 public interface UserMapper {
 
     @Mappings({
@@ -20,10 +22,7 @@ public interface UserMapper {
 
             @Mapping(target = "referralCode", expression = "java(java.util.UUID.randomUUID().toString())"),
 
-            @Mapping(target = "cartItems", expression = "java(new java.util.ArrayList<>())"),
-            @Mapping(target = "orderedItems", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "deliveryAddresses", expression = "java(new java.util.ArrayList<>())"),
-            @Mapping(target = "products", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "referredUsers", expression = "java(new java.util.HashSet<>())"),
             @Mapping(target = "balance", expression = "java(new java.math.BigDecimal(0))"),
 
@@ -38,7 +37,16 @@ public interface UserMapper {
 
             @Mapping(target = "privateChatMessages", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "createdChatRooms", expression = "java(new java.util.ArrayList<>())"),
-            @Mapping(target = "participatingChatRooms", expression = "java(new java.util.ArrayList<>())")
+            @Mapping(target = "participatingChatRooms", expression = "java(new java.util.ArrayList<>())"),
+
+            @Mapping(target = "retailCartItems", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "wholeSaleCartItems", expression = "java(new java.util.ArrayList<>())"),
+
+            @Mapping(target = "retailOrders", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "wholeSaleOrders", expression = "java(new java.util.ArrayList<>())"),
+
+            @Mapping(target = "retailProducts", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "wholeSaleProducts", expression = "java(new java.util.ArrayList<>())")
     })
     User toEntity(UserDTO userDTO);
 

@@ -4,7 +4,6 @@ package com.elleined.marketplaceapi.controller;
 import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.dto.ShopDTO;
 import com.elleined.marketplaceapi.dto.order.OrderDTO;
-import com.elleined.marketplaceapi.mapper.ItemMapper;
 import com.elleined.marketplaceapi.mapper.product.ProductMapper;
 import com.elleined.marketplaceapi.mapper.ShopMapper;
 import com.elleined.marketplaceapi.model.product.Product;
