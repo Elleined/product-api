@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.service.file;
 
 import com.elleined.marketplaceapi.utils.Formatter;
-import com.elleined.marketplaceapi.utils.OrderItemUtils;
+import com.elleined.marketplaceapi.utils.OrderUtils;
 import com.lowagie.text.Font;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
@@ -66,7 +66,7 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        List<OrderItem> rangedOrderItems = OrderItemUtils.getOrderItemsByRange(orderItems, start, end);
+        List<OrderItem> rangedOrderItems = OrderUtils.getOrderItemsByRange(orderItems, start, end);
         writeTableData(table, rangedOrderItems);
 
         document.add(header);

@@ -1,13 +1,11 @@
 package com.elleined.marketplaceapi.utils;
 
 import com.elleined.marketplaceapi.model.order.Order;
-import com.elleined.marketplaceapi.model.order.RetailOrder;
-import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public interface OrderItemUtils {
+public interface OrderUtils {
 
     static <T extends Order> List<T> getOrdersByDateRange(List<T> retailOrders, LocalDate start, LocalDate end) {
         return retailOrders.stream()
