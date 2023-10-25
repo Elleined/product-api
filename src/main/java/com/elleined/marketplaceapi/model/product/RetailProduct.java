@@ -50,8 +50,8 @@ public class RetailProduct extends Product {
     private List<RetailCartItem> retailCartItems;
 
     @Builder(builderMethodName = "retailProductBuilder")
-    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit, LocalDate expirationDate, RetailUnit retailUnit, List<RetailOrder> retailOrders, List<RetailCartItem> retailCartItems) {
-        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, privateChatRooms);
+    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, SaleStatus saleStatus, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit, LocalDate expirationDate, RetailUnit retailUnit, List<RetailOrder> retailOrders, List<RetailCartItem> retailCartItems) {
+        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, saleStatus, privateChatRooms);
         this.pricePerUnit = pricePerUnit;
         this.quantityPerUnit = quantityPerUnit;
         this.expirationDate = expirationDate;

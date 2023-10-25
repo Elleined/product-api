@@ -46,13 +46,15 @@ public class WholeSaleProduct extends Product {
     private List<WholeSaleCartItem> wholeSaleCartItems;
 
     @Builder(builderMethodName = "wholeSaleProductBuilder")
-    public WholeSaleProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, WholeSaleUnit wholeSaleUnit, BigDecimal price, List<WholeSaleOrder> wholeSaleOrders, List<WholeSaleCartItem> wholeSaleCartItems) {
-        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, privateChatRooms);
+    public WholeSaleProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, SaleStatus saleStatus, List<PrivateChatRoom> privateChatRooms, WholeSaleUnit wholeSaleUnit, BigDecimal price, List<WholeSaleOrder> wholeSaleOrders, List<WholeSaleCartItem> wholeSaleCartItems) {
+        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, saleStatus, privateChatRooms);
         this.wholeSaleUnit = wholeSaleUnit;
         this.price = price;
         this.wholeSaleOrders = wholeSaleOrders;
         this.wholeSaleCartItems = wholeSaleCartItems;
     }
+
+
 
     @Override
     public boolean hasSoldOrder() {

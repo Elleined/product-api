@@ -30,7 +30,7 @@ public abstract class WholeSaleOrderMapper implements OrderMapper<WholeSaleOrder
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "sellerMessage", ignore = true),
 
-            @Mapping(target = "price", source = "price"),
+            @Mapping(target = "price", expression = "java(wholeSaleProductService.getById(wholeSaleOrderDTO.getProductId()).getPrice())"),
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "orderStatus", expression = "java(OrderStatus.PENDING)"),
             @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, wholeSaleOrderDTO.getDeliveryAddressId()))"),

@@ -14,4 +14,6 @@ public interface ProductMapper<DTO extends ProductDTO, ENTITY extends Product> {
 
     DTO toDTO(ENTITY entity);
     ENTITY toEntity(DTO dto, User seller);
+
+    ENTITY toUpdate(ENTITY entity, DTO dto);
 }

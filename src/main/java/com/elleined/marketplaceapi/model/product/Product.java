@@ -86,6 +86,9 @@ public abstract class Product {
     )
     private Crop crop;
 
+    @Column(name = "sale_status", nullable = false)
+    private SaleStatus saleStatus;
+
     // product id is in chat room table
     @OneToMany(mappedBy = "productToSettle")
     private List<PrivateChatRoom> privateChatRooms;
