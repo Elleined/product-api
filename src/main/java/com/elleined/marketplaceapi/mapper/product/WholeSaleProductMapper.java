@@ -75,8 +75,8 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
             @Mapping(target = "wholeSaleCartItems", ignore = true),
             @Mapping(target = "wholeSaleOrders", ignore = true),
             @Mapping(target = "picture", ignore = true),
+            @Mapping(target = "saleStatus", ignore = true),
 
-            @Mapping(target = "saleStatus", expression = "java(wholeSaleProduct.getSaleStatus())"),
             @Mapping(target = "wholeSaleUnit", expression = "java(retailUnitService.getById(dto.getUnitId()))"),
             @Mapping(target = "crop", expression = "java(cropService.getByName(dto.getCropName()))"),
             @Mapping(target = "price", source = "dto.totalPrice")
