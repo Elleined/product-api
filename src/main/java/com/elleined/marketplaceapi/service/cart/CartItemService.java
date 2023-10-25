@@ -9,22 +9,26 @@ import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.cart.CartItem;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
 
-public interface CartItemService {
+public interface CartItemService<T extends CartItem, DTO extends CartItemDTO> {
 
-    List<CartItem> getAll(User currentUser);
+    List<T> getAll(User currentUser);
 
-    void delete(User currentUser, CartItem cartItem) throws NotOwnedException;
+    void delete(User currentUser, T t) throws NotOwnedException;
 
-    void delete(CartItem cartItem);
-    CartItem save(User currentUser, CartItemDTO cartItemDTO)
+    void delete(T t);
+
+    T save(User currentUser, DTO dto)
             throws AlreadyExistException,
             ProductHasPendingOrderException,
             ProductHasAcceptedOrderException,
@@ -37,7 +41,7 @@ public interface CartItemService {
             BuyerAlreadyRejectedException;
 
     // Same validation in order product in buyerService
-    RetailOrder orderCartItem(User currentUser, RetailCartItem retailCartItem)
+    Order orderCartItem(User currentUser, T t)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,
@@ -49,26 +53,12 @@ public interface CartItemService {
             BuyerAlreadyRejectedException;
 
     // Same validation in order product in buyerService
-    List<RetailCartItem> orderAllCartItems(User currentUser, List<RetailCartItem> retailCartItems);
+    List<Order> orderAllCartItems(User currentUser, List<T> cartItems);
 
-    WholeSaleOrder orderCartItem(User currentUser, WholeSaleOrder wholeSaleOrder)
-            throws ResourceNotFoundException,
-            ResourceOwnedException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException,
-            ProductAlreadySoldException,
-            ProductNotListedException,
-            ProductExpiredException,
-            OrderQuantiantyExceedsException,
-            BuyerAlreadyRejectedException;
+    T getCartItemById(int cartItemId) throws ResourceNotFoundException;
 
-    // Same validation in order product in buyerService
-    List<WholeSaleOrder> orderAllCartItems(List<WholeSaleOrder> wholeSaleOrders, User currentUser);
+    T getByProduct(User currentUser, RetailProduct retailProduct) throws ResourceNotFoundException;
+    T getByProduct(User currentUser, WholeSaleProduct wholeSaleProduct) throws ResourceNotFoundException;
 
-
-    CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException;
-
-    CartItem getByProduct(User currentUser, Product product) throws ResourceNotFoundException;
-
-    List<CartItem> getAllById(List<Integer> cartItemIds);
+    List<T> getAllById(List<Integer> cartItemIds);
 }
