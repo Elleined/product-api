@@ -3,6 +3,8 @@ package com.elleined.marketplaceapi.service.cart;
 import com.elleined.marketplaceapi.dto.cart.CartItemDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
+import com.elleined.marketplaceapi.model.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -59,20 +61,20 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public OrderItem moveToOrderItem(User currentUser, CartItem cartItem) throws ResourceOwnedException {
-        if (currentUser.getProducts().stream().anyMatch(cartItem.getProduct()::equals)) throw new ResourceOwnedException("You cannot order your own product listing!");
-        OrderItem orderItem = itemMapper.cartItemToOrderItem(cartItem);
+    public WholeSaleOrder orderCartItem(User currentUser, WholeSaleOrder wholeSaleOrder) throws ResourceOwnedException {
+        if (currentUser.getProducts().stream().anyMatch(wholeSaleOrder.getProduct()::equals)) throw new ResourceOwnedException("You cannot order your own product listing!");
+        OrderItem orderItem = itemMapper.cartItemToOrderItem(wholeSaleOrder);
 
-        int cartItemId = cartItem.getId();
-        cartItemRepository.delete(cartItem);
+        int cartItemId = wholeSaleOrder.getId();
+        cartItemRepository.delete(wholeSaleOrder);
         orderRepository.save(orderItem);
         log.debug("Cart item with id of {} are now moved to order item with id of {}", cartItemId, orderItem.getId());
         return orderItem;
     }
 
     @Override
-    public List<OrderItem> moveAllToOrderItem(User currentUser, List<CartItem> cartItems) throws ResourceNotFoundException {
-        List<OrderItem> orderItems = cartItems.stream()
+    public List<RetailCartItem> orderAllCartItems(User currentUser, List<RetailCartItem> retailCartItems) throws ResourceNotFoundException {
+        List<OrderItem> orderItems = retailCartItems.stream()
                 .map(itemMapper::cartItemToOrderItem)
                 .toList();
         return orderRepository.saveAll(orderItems);

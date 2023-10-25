@@ -8,6 +8,9 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
+import com.elleined.marketplaceapi.model.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -34,7 +37,7 @@ public interface CartItemService {
             BuyerAlreadyRejectedException;
 
     // Same validation in order product in buyerService
-    OrderItem moveToOrderItem(User currentUser, CartItem cartItem)
+    RetailOrder orderCartItem(User currentUser, RetailCartItem retailCartItem)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,
@@ -46,7 +49,22 @@ public interface CartItemService {
             BuyerAlreadyRejectedException;
 
     // Same validation in order product in buyerService
-    List<OrderItem> moveAllToOrderItem(User currentUser, List<CartItem> cartItems);
+    List<RetailCartItem> orderAllCartItems(User currentUser, List<RetailCartItem> retailCartItems);
+
+    WholeSaleOrder orderCartItem(User currentUser, WholeSaleOrder wholeSaleOrder)
+            throws ResourceNotFoundException,
+            ResourceOwnedException,
+            ProductHasPendingOrderException,
+            ProductHasAcceptedOrderException,
+            ProductAlreadySoldException,
+            ProductNotListedException,
+            ProductExpiredException,
+            OrderQuantiantyExceedsException,
+            BuyerAlreadyRejectedException;
+
+    // Same validation in order product in buyerService
+    List<WholeSaleOrder> orderAllCartItems(List<WholeSaleOrder> wholeSaleOrders, User currentUser);
+
 
     CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException;
 

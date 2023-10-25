@@ -56,7 +56,7 @@ public class CartItemController {
 
         User currentUser = userService.getById(currentUserId);
         CartItem cartItem = cartItemService.getCartItemById(cartItemId);
-        OrderItem orderItem = cartItemService.moveToOrderItem(currentUser, cartItem);
+        OrderItem orderItem = cartItemService.orderCartItem(currentUser, cartItem);
 
         return itemMapper.toOrderItemDTO(orderItem);
     }
@@ -67,7 +67,7 @@ public class CartItemController {
                                              @RequestBody List<Integer> cartItemIds) {
         User currentUser = userService.getById(currentUserId);
         List<CartItem> cartItems = cartItemService.getAllById(cartItemIds);
-        List<OrderItem> orderItems = cartItemService.moveAllToOrderItem(currentUser, cartItems);
+        List<OrderItem> orderItems = cartItemService.orderAllCartItems(currentUser, cartItems);
         return orderItems.stream()
                 .map(itemMapper::toOrderItemDTO)
                 .toList();

@@ -8,6 +8,8 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
+import com.elleined.marketplaceapi.model.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
@@ -95,7 +97,7 @@ public class CartItemServiceProxy implements CartItemService {
     }
 
     @Override
-    public OrderItem moveToOrderItem(User currentUser, CartItem cartItem)
+    public WholeSaleOrder orderCartItem(User currentUser, WholeSaleOrder wholeSaleOrder)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,
@@ -106,7 +108,7 @@ public class CartItemServiceProxy implements CartItemService {
             ProductExpiredException,
             BuyerAlreadyRejectedException {
 
-        Product product = cartItem.getProduct();
+        Product product = wholeSaleOrder.getProduct();
 
         if (product.isExpired())
             throw new ProductExpiredException("Cannot order! because this product is already expired!");
@@ -120,17 +122,17 @@ public class CartItemServiceProxy implements CartItemService {
             throw new ProductAlreadySoldException("Cannot order! because this product has already been sold");
         if (!product.isListed())
             throw new ProductNotListedException("Cannot order! because this product is not yet been listed");
-        if (product.isExceedingToAvailableQuantity(cartItem.getOrderQuantity()))
+        if (product.isExceedingToAvailableQuantity(wholeSaleOrder.getOrderQuantity()))
             throw new OrderQuantiantyExceedsException("Cannot order! because you are trying to order that exceeds to available amount!");
         if (buyerOrderChecker.isBuyerAlreadyBeenRejected(currentUser, product))
             throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
-        return cartItemService.moveToOrderItem(currentUser, cartItem);
+        return cartItemService.orderCartItem(currentUser, wholeSaleOrder);
     }
 
     @Override
-    public List<OrderItem> moveAllToOrderItem(User currentUser, List<CartItem> cartItems) throws ResourceNotFoundException {
-        return cartItems.stream()
-                .map(cartItem -> this.moveToOrderItem(currentUser, cartItem))
+    public List<RetailCartItem> orderAllCartItems(User currentUser, List<RetailCartItem> retailCartItems) throws ResourceNotFoundException {
+        return retailCartItems.stream()
+                .map(cartItem -> this.orderCartItem(currentUser, cartItem))
                 .toList();
     }
 
