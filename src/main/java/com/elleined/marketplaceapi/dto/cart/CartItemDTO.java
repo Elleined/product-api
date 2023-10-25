@@ -18,7 +18,7 @@ public abstract class CartItemDTO {
     private int sellerId;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime orderDate;
+    private LocalDateTime createdAt;
 
     @Positive(message = "Product id cannot be 0 or less than zero!")
     private int productId;
