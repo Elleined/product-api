@@ -7,9 +7,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -40,21 +38,48 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
             @Mapping(target = "cropName", source = "wholeSaleProduct.crop.name"),
             @Mapping(target = "shopName", source = "wholeSaleProduct.seller.shop.name"),
             @Mapping(target = "listingDate", expression = "java(wholeSaleProduct.getListingDate().toLocalDate())"),
-            @Mapping(target = "unitId", source = "wholeSaleProduct.id"),
-            @Mapping(target = "unitName", source = "wholeSaleProduct.name"),
+            @Mapping(target = "unitId", source = "wholeSaleProduct.wholeSaleUnit.id"),
+            @Mapping(target = "unitName", source = "wholeSaleProduct.wholeSaleUnit.name"),
             @Mapping(target = "totalPrice", source = "price")
     })
     public abstract WholeSaleProductDTO toDTO(WholeSaleProduct wholeSaleProduct);
 
     @Override
     @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "picture", ignore = true),
 
+            @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
+            @Mapping(target = "state", expression = "java(State.PENDING)"),
+            @Mapping(target = "saleStatus", expression = "java(SaleStatus.NOT_ON_SALE)"),
+            @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
+            @Mapping(target = "crop", expression = "java(cropService.getByName(dto.getCropName()))"),
+            @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnitService.getById(dto.getUnitId()))"),
+            @Mapping(target = "seller", expression = "java(seller)"),
+            @Mapping(target = "price", source = "totalPrice"),
+
+            @Mapping(target = "privateChatRooms", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "wholeSaleCartItems", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "wholeSaleOrders", expression = "java(new java.util.ArrayList<>())"),
     })
-    public abstract WholeSaleProduct toEntity(WholeSaleProductDTO dto, User seller);
+    public abstract WholeSaleProduct toEntity(WholeSaleProductDTO dto, @Context User seller);
 
     @Override
     @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "status", ignore = true),
+            @Mapping(target = "listingDate", ignore = true),
+            @Mapping(target = "state", ignore = true),
+            @Mapping(target = "seller", ignore = true),
+            @Mapping(target = "privateChatRooms", ignore = true),
+            @Mapping(target = "wholeSaleCartItems", ignore = true),
+            @Mapping(target = "wholeSaleOrders", ignore = true),
+            @Mapping(target = "picture", ignore = true),
 
+            @Mapping(target = "saleStatus", expression = "java(wholeSaleProduct.getSaleStatus())"),
+            @Mapping(target = "wholeSaleUnit", expression = "java(retailUnitService.getById(dto.getUnitId()))"),
+            @Mapping(target = "crop", expression = "java(cropService.getByName(dto.getCropName()))"),
+            @Mapping(target = "price", source = "dto.totalPrice")
     })
-    public abstract WholeSaleProduct toUpdate(WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto);
+    public abstract WholeSaleProduct toUpdate(@MappingTarget WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto);
 }

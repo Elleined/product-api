@@ -16,4 +16,8 @@ public interface ProductMapper<DTO extends ProductDTO, ENTITY extends Product> {
     ENTITY toEntity(DTO dto, User seller);
 
     ENTITY toUpdate(ENTITY entity, DTO dto);
+
+    default String getFullName(User user) {
+        return user.getUserDetails().getFirstName() + " " + user.getUserDetails().getMiddleName() + " " + user.getUserDetails().getLastName();
+    }
 }

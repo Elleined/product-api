@@ -78,12 +78,8 @@ public abstract class RetailProductMapper implements ProductMapper<RetailProduct
             @Mapping(target = "picture", ignore = true),
 
             @Mapping(target = "saleStatus", expression = "java(retailProduct.getSaleStatus())"),
-            @Mapping(target = "retailUnit", expression = "java(retailUnitService.getById(retailProductDTO.getUnitId()))"),
-            @Mapping(target = "crop", expression = "java(cropService.getByName(productDTO.getCropName()))"),
+            @Mapping(target = "retailUnit", expression = "java(retailUnitService.getById(dto.getUnitId()))"),
+            @Mapping(target = "crop", expression = "java(cropService.getByName(dto.getCropName()))"),
     })
     public abstract RetailProduct toUpdate(@MappingTarget RetailProduct retailProduct, RetailProductDTO dto);
-
-    final protected String getFullName(User user) {
-        return user.getUserDetails().getFirstName() + " " + user.getUserDetails().getMiddleName() + " " + user.getUserDetails().getLastName();
-    }
 }
