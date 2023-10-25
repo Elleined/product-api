@@ -5,6 +5,8 @@ import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.product.ProductRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.service.unit.RetailUnitService;
+import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,8 @@ public class GetAllUtilityServiceImpl implements GetAllUtilityService {
     private final ProductRepository productRepository;
 
     private final CropService cropService;
-    private final UnitService unitService;
+    private final WholeSaleUnitService wholeSaleUnitService;
+    private final RetailUnitService retailUnitService;
 
 
     @Override
@@ -64,8 +67,13 @@ public class GetAllUtilityServiceImpl implements GetAllUtilityService {
     }
 
     @Override
-    public List<String> getAllUnit() {
-        return unitService.getAll();
+    public List<String> getAllRetailUnit() {
+        return retailUnitService.getAll();
+    }
+
+    @Override
+    public List<String> getAllWholeSaleUnit() {
+        return wholeSaleUnitService.getAll();
     }
 
     @Override

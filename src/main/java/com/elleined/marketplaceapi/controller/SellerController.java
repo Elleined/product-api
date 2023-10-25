@@ -75,7 +75,7 @@ public class SellerController {
                             @RequestParam("messageToBuyer") String messageToBuyer) {
 
         User seller = userService.getById(sellerId);
-        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+        OrderItem orderItem = userService.getOrderById(orderItemId);
 
         if (seller.isPremiumAndNotExpired()) {
             premiumSeller.acceptOrder(seller, orderItem, messageToBuyer);
@@ -90,7 +90,7 @@ public class SellerController {
                             @RequestParam("messageToBuyer") String messageToBuyer) {
 
         User seller = userService.getById(sellerId);
-        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+        OrderItem orderItem = userService.getOrderById(orderItemId);
         if (seller.isPremiumAndNotExpired()) {
             premiumSeller.rejectOrder(seller, orderItem, messageToBuyer);
             return;
@@ -103,7 +103,7 @@ public class SellerController {
                           @PathVariable("orderItemId") int orderItemId) {
 
         User seller = userService.getById(sellerId);
-        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+        OrderItem orderItem = userService.getOrderById(orderItemId);
         if (seller.isPremiumAndNotExpired()) {
             premiumSeller.soldOrder(seller, orderItem);
             return;

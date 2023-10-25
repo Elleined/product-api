@@ -66,7 +66,7 @@ public class BuyerController {
                                                     @PathVariable("orderItemId") int orderItemId) {
 
         User buyer = userService.getById(buyerId);
-        OrderItem orderItem = userService.getOrderItemById(orderItemId);
+        OrderItem orderItem = userService.getOrderById(orderItemId);
         if (buyer.isPremiumAndNotExpired()) {
             premiumBuyer.cancelOrderItem(buyer, orderItem);
             return ResponseEntity.noContent().build();

@@ -10,6 +10,8 @@ import com.elleined.marketplaceapi.exception.field.password.WeakPasswordExceptio
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,8 +53,9 @@ public interface UserService extends PasswordService {
 
     User getByEmail(String email) throws ResourceNotFoundException;
 
+    RetailOrder getOrderById(int orderId) throws ResourceNotFoundException;
 
-    OrderItem getOrderItemById(int orderItemId) throws ResourceNotFoundException;
+    WholeSaleOrder getOrderById(Integer orderId) throws ResourceNotFoundException;
 
     User getByReferralCode(String referralCode) throws ResourceNotFoundException;
 
