@@ -30,7 +30,8 @@ public abstract class RetailCartItemMapper implements CartMapper<RetailCartItemD
     @Override
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(currentUser, cartItemDTO.getDeliveryAddressId()))"),
+            @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
+            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(currentUser, dto.getDeliveryAddressId()))"),
             @Mapping(target = "retailProduct", expression = "java(retailProductService.getById(dto.getProductId()))"),
             @Mapping(target = "purchaser", expression = "java(currentUser)")
     })
