@@ -223,4 +223,8 @@ public class User {
     public String getFullName() {
         return this.getUserDetails().getFirstName() + " " + this.getUserDetails().getMiddleName() + " " + this.getUserDetails().getLastName();
     }
+
+    public boolean notHave(RetailCartItem retailCartItem) {
+        return this.getRetailCartItems().stream().noneMatch(retailCartItem::equals);
+    }
 }

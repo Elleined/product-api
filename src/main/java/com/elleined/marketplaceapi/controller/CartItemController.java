@@ -45,7 +45,7 @@ public class CartItemController {
                        @PathVariable("cartItemId") int cartItemId) {
 
         User currentUser = userService.getById(currentUserId);
-        CartItem cartItem = cartItemService.getCartItemById(cartItemId);
+        CartItem cartItem = cartItemService.getById(cartItemId);
         cartItemService.delete(currentUser, cartItem);
     }
 
@@ -55,7 +55,7 @@ public class CartItemController {
                                     @PathVariable("cartItemId") int cartItemId) {
 
         User currentUser = userService.getById(currentUserId);
-        CartItem cartItem = cartItemService.getCartItemById(cartItemId);
+        CartItem cartItem = cartItemService.getById(cartItemId);
         OrderItem orderItem = cartItemService.orderCartItem(currentUser, cartItem);
 
         return itemMapper.toOrderItemDTO(orderItem);

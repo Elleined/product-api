@@ -137,8 +137,8 @@ public class CartItemServiceProxy implements CartItemService {
     }
 
     @Override
-    public CartItem getCartItemById(int cartItemId) throws ResourceNotFoundException {
-        return cartItemService.getCartItemById(cartItemId);
+    public CartItem getById(int cartItemId) throws ResourceNotFoundException {
+        return cartItemService.getById(cartItemId);
     }
 
     @Override

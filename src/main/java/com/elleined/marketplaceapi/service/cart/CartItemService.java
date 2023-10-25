@@ -8,27 +8,22 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
-import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.order.Order;
-import com.elleined.marketplaceapi.model.order.RetailOrder;
-import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
-import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.cart.CartItem;
-import com.elleined.marketplaceapi.model.product.RetailProduct;
-import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.util.List;
 
-public interface CartItemService<T extends CartItem, DTO extends CartItemDTO> {
+public interface CartItemService<ENTITY extends CartItem, DTO extends CartItemDTO> {
 
-    List<T> getAll(User currentUser);
+    List<ENTITY> getAll(User currentUser);
 
-    void delete(User currentUser, T t) throws NotOwnedException;
+    void delete(User currentUser, ENTITY entity) throws NotOwnedException;
 
-    void delete(T t);
+    void delete(ENTITY entity);
 
-    T save(User currentUser, DTO dto)
+    ENTITY save(User currentUser, DTO dto)
             throws AlreadyExistException,
             ProductHasPendingOrderException,
             ProductHasAcceptedOrderException,
@@ -41,7 +36,7 @@ public interface CartItemService<T extends CartItem, DTO extends CartItemDTO> {
             BuyerAlreadyRejectedException;
 
     // Same validation in order product in buyerService
-    Order orderCartItem(User currentUser, T t)
+    Order orderCartItem(User currentUser, ENTITY entity)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,
@@ -52,13 +47,9 @@ public interface CartItemService<T extends CartItem, DTO extends CartItemDTO> {
             OrderQuantiantyExceedsException,
             BuyerAlreadyRejectedException;
 
-    // Same validation in order product in buyerService
-    List<Order> orderAllCartItems(User currentUser, List<T> cartItems);
+    ENTITY getById(int cartItemId) throws ResourceNotFoundException;
 
-    T getCartItemById(int cartItemId) throws ResourceNotFoundException;
+    ENTITY getByProduct(User currentUser, Product product) throws ResourceNotFoundException;
 
-    T getByProduct(User currentUser, RetailProduct retailProduct) throws ResourceNotFoundException;
-    T getByProduct(User currentUser, WholeSaleProduct wholeSaleProduct) throws ResourceNotFoundException;
-
-    List<T> getAllById(List<Integer> cartItemIds);
+    List<ENTITY> getAllById(List<Integer> cartItemIds);
 }
