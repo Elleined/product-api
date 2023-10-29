@@ -69,8 +69,8 @@ public class DepositService {
             MinimumAmountException,
             DepositLimitException, IOException {
 
-        if (Validator.notValidMultipartFile(proofOfTransaction)) throw new ResourceException("Cannot deposit! To complete your request, we need proof of the transaction. Please upload a valid proof of payment.");
-        if (isBelowMinimumDepositAmount(depositedAmount)) throw new MinimumAmountException("Cannot deposit! because you are trying to deposit an amount that is below minimum which is " + MINIMUM_DEPOSIT_AMOUNT);
+        if (Validator.notValidMultipartFile(proofOfTransaction)) throw new ResourceException("Cannot deposit! To complete your request, we need proof of the transaction. Please upload a valid proof of payment .");
+        if (isBelowMinimumDepositAmount(depositedAmount)) throw new MinimumAmountException("Cannot deposit! Because the deposit amount you entered is below the required minimum deposit " + MINIMUM_DEPOSIT_AMOUNT + ". Please ensure that your deposit meets the minimum requirement.");
         if (atmValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (isDepositAmountAboveLimit(depositedAmount)) throw new DepositLimitException("You cannot deposit an amount that is greater than to deposit limit which is " + DEPOSIT_LIMIT_PER_DAY);
         if (isUserReachedDepositLimitPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! Because you already reached the deposit limit per day which is " + DEPOSIT_LIMIT_PER_DAY);
