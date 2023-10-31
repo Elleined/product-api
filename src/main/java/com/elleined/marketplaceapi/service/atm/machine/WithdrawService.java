@@ -14,6 +14,7 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.validator.NumberValidator;
@@ -33,7 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class WithdrawService implements ATMLimitValidator {
+public class WithdrawService implements ATMLimitValidator, ATMLimitPerDayValidator {
     public static final int WITHDRAWAL_LIMIT_PER_DAY = 10_000;
     public static final int MAXIMUM_WITHDRAW_AMOUNT = 10_000;
     public static final int MINIMUM_WITHDRAW_AMOUNT = 500;
