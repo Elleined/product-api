@@ -52,7 +52,7 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
 
         Product product = productService.getById(orderItemDTO.getProductId());
         if (product.isExpired())
-            throw new ProductExpiredException("Cannot order this product! because this product is already expired!");
+            throw new ProductExpiredException("Cannot order this product! Because it has expired and is no longer available for purchase!");
         if (product.isRejected())
             throw new ProductRejectedException("Cannot order this product! because this product is rejected by moderator!");
         if (isBuyerHasPendingOrderToProduct(buyer, product))
