@@ -11,6 +11,9 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
@@ -32,7 +35,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class DepositService {
+public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidator {
     public static final int DEPOSIT_LIMIT_PER_DAY = 10_000;
 
     public static final int MAXIMUM_DEPOSIT_AMOUNT = 10_000;
@@ -72,9 +75,9 @@ public class DepositService {
 
         if (Validator.notValidMultipartFile(proofOfTransaction)) throw new ResourceException("Cannot deposit! To complete your request, we need proof of the transaction. Please upload a valid proof of payment.");
         if (atmValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Cannot deposit! Because the amount you provided " + depositedAmount + " for the deposit is invalid. Please ensure that the deposit amount is a positive value greater than zero.");
-        if (isBelowMinimumDepositAmount(depositedAmount)) throw new DepositLimitException("Cannot deposit! Because the deposit amount you entered is below the required minimum deposit " + MINIMUM_DEPOSIT_AMOUNT + ". Please ensure that your deposit meets the minimum requirement.");
-        if (isAboveMaximumDepositAmount(depositedAmount)) throw new DepositLimitException("Cannot deposit! You cannot make a deposit because the amount you entered exceeds the maximum deposit limit which is " + MAXIMUM_DEPOSIT_AMOUNT);
-        if (isUserReachedDepositLimitPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! You cannot make another deposit today because you've already reached your daily deposit limit " + DEPOSIT_LIMIT_PER_DAY);
+        if (isBelowMinimum(depositedAmount)) throw new DepositLimitException("Cannot deposit! Because the deposit amount you entered is below the required minimum deposit " + MINIMUM_DEPOSIT_AMOUNT + ". Please ensure that your deposit meets the minimum requirement.");
+        if (isAboveMaximum(depositedAmount)) throw new DepositLimitException("Cannot deposit! You cannot make a deposit because the amount you entered exceeds the maximum deposit limit which is " + MAXIMUM_DEPOSIT_AMOUNT);
+        if (reachedLimitAmountPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! You cannot make another deposit today because you've already reached your daily deposit limit " + DEPOSIT_LIMIT_PER_DAY);
 
         String trn = UUID.randomUUID().toString();
 
@@ -93,15 +96,18 @@ public class DepositService {
         return depositTransaction;
     }
 
-    private boolean isBelowMinimumDepositAmount(BigDecimal depositedAmount) {
+    @Override
+    public boolean isBelowMinimum(BigDecimal depositedAmount) {
         return depositedAmount.compareTo(new BigDecimal(MINIMUM_DEPOSIT_AMOUNT)) < 0;
     }
 
-    private boolean isAboveMaximumDepositAmount(BigDecimal depositedAmount) {
+    @Override
+    public boolean isAboveMaximum(BigDecimal depositedAmount) {
         return depositedAmount.compareTo(new BigDecimal(MAXIMUM_DEPOSIT_AMOUNT)) > 0;
     }
 
-    private boolean isUserReachedDepositLimitPerDay(User currentUser) {
+    @Override
+    public boolean reachedLimitAmountPerDay(User currentUser) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         List<DepositTransaction> userDepositTransactions = currentUser.getDepositTransactions();

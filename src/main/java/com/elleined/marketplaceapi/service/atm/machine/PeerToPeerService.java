@@ -12,6 +12,8 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class PeerToPeerService {
+public class PeerToPeerService implements ATMLimitPerDayValidator {
     public static final int PEER_TO_PEER_LIMIT_PER_DAY = 10_000;
     public static final int MAXIMUM_AMOUNT = 10_000;
     public static final int MINIMUM_AMOUNT = 500;
@@ -45,10 +47,10 @@ public class PeerToPeerService {
             NotValidAmountException,
             LimitException {
 
-        if (atmValidator.isSenderSendingToHimself(sender, receiver)) throw new SendingToHimselfException("You cannot send to yourself");
         if (atmValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Cannot send money! because amount should be positive and cannot be zero!");
         if (atmValidator.isBalanceEnough(sender, sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
-        if (isSenderReachedSentLimitPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
+        if (isSenderSendingToHimself(sender, receiver)) throw new SendingToHimselfException("You cannot send to yourself");
+        if (reachedLimitAmountPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
 
         float p2pFee = feeService.getP2pFee(sentAmount);
         BigDecimal finalSentAmount = sentAmount.subtract(new BigDecimal(p2pFee));
@@ -68,8 +70,8 @@ public class PeerToPeerService {
         return peerToPeerTransaction;
     }
 
-    private boolean isSentAmountBelowMinimum(BigDecimal sentAmount) {
-        return sentAmount.compareTo(new BigDecimal(MINIMUM_AMOUNT)) < 0;
+    private boolean isSenderSendingToHimself(User sender, User receiver) {
+        return sender.getId() == receiver.getId();
     }
 
     private void updateSenderBalance(User sender, BigDecimal amountToBeDeducted) {
@@ -101,10 +103,8 @@ public class PeerToPeerService {
         return peerToPeerTransaction;
     }
 
-    public boolean isSentAmountAboveLimit(BigDecimal sentAmount) {
-        return sentAmount.compareTo(new BigDecimal(MAXIMUM_AMOUNT)) > 0;
-    }
-    public boolean isSenderReachedSentLimitPerDay(User currentUser) {
+    @Override
+    public boolean reachedLimitAmountPerDay(User currentUser) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         List<PeerToPeerTransaction> userSentMoneyTransactions = currentUser.getSentMoneyTransactions();
