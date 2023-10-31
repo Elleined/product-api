@@ -68,12 +68,18 @@ public class WithdrawService implements ATMLimitValidator, ATMLimitPerDayValidat
             MobileNumberException {
 
         numberValidator.validate(gcashNumber);
-        if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
-        if (atmValidator.isBalanceEnough(user, withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
-        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(user)) throw new InsufficientFundException("Cannot withdraw! because you're total pending withdraw requests exceeds to your current balance!");
-        if (isBelowMinimum(withdrawalAmount)) throw new MinimumAmountException("Cannot withdraw! because you are trying to withdraw an amount that below to minimum amount which is " + MINIMUM_WITHDRAW_AMOUNT);
-        if (isAboveMaximum(withdrawalAmount)) throw new WithdrawLimitException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + MAXIMUM_WITHDRAW_AMOUNT);
-        if (reachedLimitAmountPerDay(user)) throw new WithdrawLimitPerDayException("Cannot withdraw! You already reached withdrawal limit per day which is " + WITHDRAWAL_LIMIT_PER_DAY);
+        if (atmValidator.isNotValidAmount(withdrawalAmount))
+            throw new NotValidAmountException("Cannot withdraw! Because the amount you provided " + withdrawalAmount + " for the withdraw is invalid. Please ensure that the withdraw amount is a positive value greater than zero.");
+        if (atmValidator.isBalanceEnough(user, withdrawalAmount))
+            throw new InsufficientFundException("Cannot withdraw! Because you do not have a sufficient balance to complete the transaction. Please ensure that your account has enough funds for this transfer.");
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(user))
+            throw new InsufficientFundException("Cannot withdraw! Because your account balance cannot be less than the total of your pending withdrawal requests. Please cancel some of your withdrawal requests or wait for our team to settle your withdrawal requests.");
+        if (isBelowMinimum(withdrawalAmount))
+            throw new MinimumAmountException("Cannot withdraw! Because the withdraw amount you entered is below the required minimum withdraw " + MINIMUM_WITHDRAW_AMOUNT + ". Please ensure that your withdraw meets the minimum requirement.");
+        if (isAboveMaximum(withdrawalAmount))
+            throw new WithdrawLimitException("Cannot withdraw! You cannot make a withdraw because the amount you entered exceeds the maximum withdraw limit which is " + MAXIMUM_WITHDRAW_AMOUNT);
+        if (reachedLimitAmountPerDay(user))
+            throw new WithdrawLimitPerDayException("Cannot withdraw! Because you have already reached the daily sending limit, which is " + WITHDRAWAL_LIMIT_PER_DAY);
 
         String trn = UUID.randomUUID().toString();
 

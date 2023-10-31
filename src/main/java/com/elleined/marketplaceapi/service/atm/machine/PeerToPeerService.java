@@ -47,10 +47,14 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
             NotValidAmountException,
             LimitException {
 
-        if (atmValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Cannot send money! because amount should be positive and cannot be zero!");
-        if (atmValidator.isBalanceEnough(sender, sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
-        if (isSenderSendingToHimself(sender, receiver)) throw new SendingToHimselfException("You cannot send to yourself");
-        if (reachedLimitAmountPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
+        if (atmValidator.isNotValidAmount(sentAmount))
+            throw new NotValidAmountException("Can't send money! Because the amount you provided " + sentAmount + " for the peer to peer is invalid. Please ensure that the peer to peer amount is a positive value greater than zero.");
+        if (atmValidator.isBalanceEnough(sender, sentAmount))
+            throw new InsufficientFundException("Can't send money! Because you do not have a sufficient balance to complete the transaction. Please ensure that your account has enough funds for this transfer.");
+        if (isSenderSendingToHimself(sender, receiver))
+            throw new SendingToHimselfException("Can't send money! Because you cannot send funds to yourself. Please enter a valid recipient's account or payment details.");
+        if (reachedLimitAmountPerDay(sender))
+            throw new PeerToPeerLimitPerDayException("Can't send money! Because you have already reached the daily sending limit, which is " + PEER_TO_PEER_LIMIT_PER_DAY);
 
         float p2pFee = feeService.getP2pFee(sentAmount);
         BigDecimal finalSentAmount = sentAmount.subtract(new BigDecimal(p2pFee));
@@ -62,7 +66,8 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
         appWalletService.addAndSaveBalance(p2pFee);
         PeerToPeerTransaction peerToPeerTransaction = savePeerToPeerTransaction(sender, receiver, sentAmount);
 
-        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(sender)) throw new InsufficientFundException("Cannot send money! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(sender))
+            throw new InsufficientFundException("Can't send money! Because your account balance cannot be less than the total of your pending withdrawal requests. Please cancel some of your withdrawal requests or wait for our team to settle your withdrawal requests.");
 
         log.debug("Sender with id of {} sent money amounting {} from {} because of p2p fee of {} which is the {}% of sent amount.", sender.getId(), finalSentAmount, sentAmount, p2pFee, ATMFeeService.P2P_FEE_PERCENTAGE);
         log.debug("Sender with id of {} has now new balance of {} from {}.", sender.getId(), sender.getBalance(), senderOldBalance);
