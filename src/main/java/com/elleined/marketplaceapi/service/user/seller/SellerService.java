@@ -10,6 +10,9 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
@@ -73,16 +76,30 @@ public interface SellerService extends SellerTransactionFeeService {
             ProductHasPendingOrderException,
             ProductHasAcceptedOrderException;
 
-    void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer)
+    void acceptOrder(User seller, RetailOrder retailOrder, String messageToBuyer)
             throws NotOwnedException,
             NotValidBodyException,
             ProductRejectedException;
 
-    void rejectOrder(User seller, OrderItem orderItem, String messageToBuyer)
+    void acceptOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer)
+            throws NotOwnedException,
+            NotValidBodyException,
+            ProductRejectedException;
+
+    void rejectOrder(User seller, RetailOrder retailOrder, String messageToBuyer)
             throws NotOwnedException,
             NotValidBodyException;
 
-    void soldOrder(User seller, OrderItem orderItem)
+    void rejectOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer)
+            throws NotOwnedException,
+            NotValidBodyException;
+
+    void soldOrder(User seller, RetailOrder retailOrder)
+            throws NotOwnedException,
+            InsufficientFundException,
+            InsufficientBalanceException;
+
+    void soldOrder(User seller, WholeSaleOrder wholeSaleOrder)
             throws NotOwnedException,
             InsufficientFundException,
             InsufficientBalanceException;

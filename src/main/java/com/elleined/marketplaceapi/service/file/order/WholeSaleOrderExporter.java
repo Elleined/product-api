@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
-    
+
     @Override
     public void export(HttpServletResponse response, WholeSaleProduct wholeSaleProduct) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
