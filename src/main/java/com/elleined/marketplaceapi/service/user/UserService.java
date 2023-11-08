@@ -24,7 +24,6 @@ public interface UserService extends PasswordService {
 
     // Info will also be saved in forum api
     // first 500 registrant will receive a token as a reward
-    // After this method will automatically sends welcome email
     User saveByDTO(UserDTO dto)
             throws ResourceNotFoundException,
             HasDigitException,
@@ -48,15 +47,9 @@ public interface UserService extends PasswordService {
     Set<User> getAllSeller();
     Set<User> searchAllSellerByName(String username);
 
-    // After this principal will be set to be use in web socket
     User login(CredentialDTO userCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException;
 
     User getByEmail(String email) throws ResourceNotFoundException;
 
-    RetailOrder getOrderById(int orderId) throws ResourceNotFoundException;
-
-    WholeSaleOrder getOrderById(Integer orderId) throws ResourceNotFoundException;
-
     User getByReferralCode(String referralCode) throws ResourceNotFoundException;
-
 }

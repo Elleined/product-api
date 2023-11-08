@@ -41,6 +41,7 @@ import java.util.Collection;
 public class RegularSellerProxy implements SellerService, RegularSellerRestriction {
     public final static float LISTING_FEE_PERCENTAGE = 2;
     public final static float SUCCESSFUL_TRANSACTION_FEE = 2;
+
     private final SellerService sellerService;
 
     private final OrderRepository orderRepository;
