@@ -1,28 +1,26 @@
-package com.elleined.marketplaceapi.service.file;
+package com.elleined.marketplaceapi.service.file.order;
 
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.utils.Formatter;
 import com.elleined.marketplaceapi.utils.OrderUtils;
-import com.lowagie.text.Font;
 import com.lowagie.text.*;
-import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-
 @Service
 @Slf4j
-public class OrderItemExporter implements Exporter<List<OrderItem>> {
-
+public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
+    
     @Override
-    public void export(HttpServletResponse response, List<OrderItem> orderItems) throws DocumentException, IOException {
+    public void export(HttpServletResponse response, WholeSaleProduct wholeSaleProduct) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.addTitle("Sales Report");
@@ -39,7 +37,7 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        writeTableData(table, orderItems);
+        writeTableData(table, wholeSaleProduct.getWholeSaleOrders());
 
         document.add(header);
         document.add(table);
@@ -49,7 +47,7 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
     }
 
     @Override
-    public void export(HttpServletResponse response, List<OrderItem> orderItems, LocalDate start, LocalDate end) throws DocumentException, IOException {
+    public void export(HttpServletResponse response, WholeSaleProduct wholeSaleProduct, LocalDate start, LocalDate end) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.addTitle("Sales report");
@@ -66,8 +64,8 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        List<OrderItem> rangedOrderItems = OrderUtils.getOrderItemsByRange(orderItems, start, end);
-        writeTableData(table, rangedOrderItems);
+        List<WholeSaleOrder> rangedWholeSaleOrders = OrderUtils.getOrdersByDateRange(wholeSaleProduct.getWholeSaleOrders(), start, end);
+        writeTableData(table, rangedWholeSaleOrders);
 
         document.add(header);
         document.add(table);
@@ -76,27 +74,14 @@ public class OrderItemExporter implements Exporter<List<OrderItem>> {
         log.debug("Pdf generation success!");
     }
 
-    private void writeTableData(PdfPTable table, List<OrderItem> orders) {
-        for (OrderItem orderItem : orders) {
-            table.addCell(String.valueOf(orderItem.getProduct().getSeller().getId()));
-            table.addCell(String.valueOf(orderItem.getProduct().getId()));
-            table.addCell(orderItem.getProduct().getCrop().getName());
-            table.addCell(String.valueOf(orderItem.getPrice()));
-            table.addCell(String.valueOf(orderItem.getOrderQuantity()));
-            table.addCell(Formatter.formatDate(orderItem.getUpdatedAt()));
-        }
-    }
-
-    private void writeColumnNames(PdfPTable pdfPTable, List<String> columnNames) {
-        PdfPCell cell = new PdfPCell();
-        cell.setBackgroundColor(Color.LIGHT_GRAY);
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-        Font columnHeaderFont = FontFactory.getFont(FontFactory.HELVETICA, 13);
-        columnHeaderFont.setStyle(Font.BOLD);
-        columnNames.forEach(columnName -> {
-            cell.setPhrase(new Phrase(columnName, columnHeaderFont));
-            pdfPTable.addCell(cell);
+    private void writeTableData(PdfPTable table, List<WholeSaleOrder> wholeSaleOrders) {
+        wholeSaleOrders.forEach(wholeSaleOrder -> {
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getSeller().getId()));
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getId()));
+            table.addCell(wholeSaleOrder.getWholeSaleProduct().getCrop().getName());
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getPrice()));
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getAvailableQuantity()));
+            table.addCell(Formatter.formatDate(wholeSaleOrder.getUpdatedAt()));
         });
     }
 }
