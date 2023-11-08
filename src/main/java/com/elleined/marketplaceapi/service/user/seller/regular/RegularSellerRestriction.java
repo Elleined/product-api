@@ -9,15 +9,10 @@ public interface RegularSellerRestriction {
     int MAX_ACCEPTED_ORDER = 25;
     int MAX_PENDING_ORDER = 25;
 
-
-    boolean isBalanceNotEnoughToPayListingFee(User seller, double listingFee);
-
     boolean isExceedsToMaxListingPerDay(User seller);
 
     boolean isExceedsToMaxRejectionPerDay(User seller);
     boolean isExceedsToMaxAcceptedOrder(User seller);
 
     boolean isExceedsToMaxPendingOrder(User seller);
-
-
 }

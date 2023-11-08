@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.service.address.AddressService;
@@ -22,6 +23,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -199,6 +201,20 @@ public class User {
         return this.getRetailOrders().stream().anyMatch(retailOrder::equals);
     }
 
+    public boolean hasSellableProductOrder(WholeSaleOrder wholeSaleOrder) {
+        return this.getWholeSaleProducts().stream()
+                .map(WholeSaleProduct::getWholeSaleOrders)
+                .flatMap(Collection::stream)
+                .anyMatch(wholeSaleOrder::equals);
+    }
+
+    public boolean hasSellableProductOrder(RetailOrder retailOrder) {
+        return this.getRetailProducts().stream()
+                .map(RetailProduct::getRetailOrders)
+                .flatMap(Collection::stream)
+                .anyMatch(retailOrder::equals);
+    }
+
     public boolean hasOrder(WholeSaleOrder wholeSaleOrder) {
         return this.getWholeSaleOrders().stream().anyMatch(wholeSaleOrder::equals);
     }
@@ -226,5 +242,9 @@ public class User {
 
     public boolean notHave(RetailCartItem retailCartItem) {
         return this.getRetailCartItems().stream().noneMatch(retailCartItem::equals);
+    }
+
+    public boolean isBalanceEnough(BigDecimal amount) {
+        return this.getBalance().compareTo(amount) <= 0;
     }
 }

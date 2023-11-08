@@ -308,13 +308,6 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         return orders;
     }
 
-    @Override
-    public boolean isSellerOwnedOrder(User seller, OrderItem orderItem) {
-        return seller.getProducts().stream()
-                .map(Product::getOrders)
-                .flatMap(Collection::stream)
-                .anyMatch(orderItem::equals);
-    }
 
     private void updatePendingAndAcceptedOrderStatus(Product product, OrderItem.OrderItemStatus orderItemStatus) {
         List<OrderItem> pendingOrders = product.getOrders().stream()

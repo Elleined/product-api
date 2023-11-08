@@ -63,16 +63,6 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public boolean isBalanceNotEnoughToPayListingFee(User seller, double listingFee) {
-        return seller.getBalance().compareTo(new BigDecimal(listingFee)) <= 0;
-    }
-
-    @Override
-    public boolean isBalanceNotEnoughToPaySuccessfulTransactionFee(User seller, double successfulTransactionFee) {
-        return sellerService.isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee);
-    }
-
-    @Override
     public boolean isExceedsToMaxListingPerDay(User seller) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
@@ -233,8 +223,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         return (productTotalPrice * (LISTING_FEE_PERCENTAGE / 100f));
     }
 
-    @Override
-    public double getSuccessfulTransactionFee(double orderPrice) {
+    private double getSuccessfulTransactionFee(double orderPrice) {
         return (orderPrice * (SUCCESSFUL_TRANSACTION_FEE / 100f));
     }
 }

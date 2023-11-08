@@ -10,7 +10,6 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
-import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
@@ -19,9 +18,8 @@ import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
-public interface SellerService extends SellerTransactionFeeService {
+public interface SellerService {
 
     RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage)
             throws NotOwnedException,
@@ -104,7 +102,4 @@ public interface SellerService extends SellerTransactionFeeService {
             throws NotOwnedException,
             InsufficientFundException,
             InsufficientBalanceException;
-
-    List<OrderItem> getAllProductOrderByStatus(User seller, Order.Status orderStatus);
-    List<OrderItem> getAllProductOrderByStatus(User seller, Order.Status orderStatus);
 }
