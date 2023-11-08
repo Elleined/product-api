@@ -67,7 +67,7 @@ public abstract class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
-    private Order.OrderStatus orderStatus;
+    private Status status;
 
     @Column(name = "seller_message_to_purchaser")
     private String sellerMessage;
@@ -75,7 +75,7 @@ public abstract class Order {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public enum OrderStatus {
+    public enum Status {
         CANCELLED,
         PENDING,
         ACCEPTED,
@@ -89,6 +89,6 @@ public abstract class Order {
     }
 
     public boolean isAccepted() {
-        return this.getOrderStatus() == OrderStatus.ACCEPTED;
+        return this.getStatus() == Status.ACCEPTED;
     }
 }

@@ -16,12 +16,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             WHERE oi.updatedAt
             BETWEEN :currentDateTimeMidnight AND :tomorrowMidnight
             AND oi.product.seller = :seller
-            AND oi.orderStatus = :orderStatus
+            AND oi.status = :status
             """)
     int fetchSellerRejectedOrderCount(@Param("currentDateTimeMidnight") LocalDateTime currentDateTimeMidnight,
                                  @Param("tomorrowMidnight") LocalDateTime tomorrowMidnight,
                                  @Param("seller") User seller,
-                                 @Param("orderStatus") Order.OrderStatus orderStatus);
+                                 @Param("status") Order.Status status);
 
     @Query("""
             SELECT COUNT(oi)
@@ -29,10 +29,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             WHERE oi.orderDate
             BETWEEN :currentDateTimeMidnight AND :tomorrowMidnight
             AND oi.purchaser = :buyer
-            AND oi.orderStatus = :orderStatus
+            AND oi.status = :status
             """)
     int fetchBuyerOrderCount(@Param("currentDateTimeMidnight") LocalDateTime currentDateTimeMidnight,
                              @Param("tomorrowMidnight") LocalDateTime tomorrowMidnight,
                              @Param("buyer") User buyer,
-                             @Param("orderStatus") Order.OrderStatus orderStatus);
+                             @Param("status") Order.Status status);
 }

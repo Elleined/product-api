@@ -3,7 +3,6 @@ package com.elleined.marketplaceapi.controller.file;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.file.Exporter;
 import com.elleined.marketplaceapi.service.user.UserService;
-import com.elleined.marketplaceapi.service.user.seller.SellerGetAllService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

@@ -19,6 +19,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface SellerService extends SellerTransactionFeeService {
 
@@ -103,4 +104,7 @@ public interface SellerService extends SellerTransactionFeeService {
             throws NotOwnedException,
             InsufficientFundException,
             InsufficientBalanceException;
+
+    List<OrderItem> getAllProductOrderByStatus(User seller, Order.Status orderStatus);
+    List<OrderItem> getAllProductOrderByStatus(User seller, Order.Status orderStatus);
 }

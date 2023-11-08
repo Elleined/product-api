@@ -63,22 +63,22 @@ public class RetailProduct extends Product {
     @Override
     public boolean hasSoldOrder() {
         return this.retailOrders.stream()
-                .map(RetailOrder::getOrderStatus)
-                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.SOLD));
+                .map(RetailOrder::getStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.Status.SOLD));
     }
 
     @Override
     public boolean hasPendingOrder() {
         return this.retailOrders.stream()
-                .map(RetailOrder::getOrderStatus)
-                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.PENDING));
+                .map(RetailOrder::getStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.Status.PENDING));
     }
 
     @Override
     public boolean hasAcceptedOrder() {
         return this.retailOrders.stream()
-                .map(RetailOrder::getOrderStatus)
-                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.ACCEPTED));
+                .map(RetailOrder::getStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.Status.ACCEPTED));
     }
 
     public boolean isExpired() {

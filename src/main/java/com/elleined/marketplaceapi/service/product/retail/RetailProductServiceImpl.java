@@ -1,6 +1,8 @@
 package com.elleined.marketplaceapi.service.product.retail;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.Premium;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -67,27 +70,36 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
+    public List<RetailProduct> getAllByState(User seller, Product.State state) {
+        return seller.getRetailProducts().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(product -> product.getState() == state)
+                .sorted(Comparator.comparing(Product::getListingDate).reversed())
+                .toList();
+    }
+
+    @Override
     public void deleteExpiredProducts() {
         List<RetailProduct> expiredProducts = retailProductRepository.findAll().stream()
-                .filter(Product::isExpired)
+                .filter(RetailProduct::isExpired)
                 .toList();
 
         // Pending products
         expiredProducts.stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.PENDING)
-                .forEach(product -> {
-                    product.setState(Product.State.EXPIRED);
-                    updatePendingAndAcceptedOrderStatus(product.getOrders());
+                .filter(retailProduct -> retailProduct.getStatus() == Product.Status.ACTIVE)
+                .filter(retailProduct -> retailProduct.getState() == Product.State.PENDING)
+                .forEach(retailProduct -> {
+                    retailProduct.setState(Product.State.EXPIRED);
+                    updatePendingAndAcceptedOrderStatus(retailProduct);
                 });
 
-        // Listing products
+        // Listing retailProducts
         expiredProducts.stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
-                .forEach(product -> {
-                    product.setState(Product.State.EXPIRED);
-                    updatePendingAndAcceptedOrderStatus(product.getOrders());
+                .filter(retailProduct -> retailProduct.getStatus() == Product.Status.ACTIVE)
+                .filter(retailProduct -> retailProduct.getState() == Product.State.LISTING)
+                .forEach(retailProduct -> {
+                    retailProduct.setState(Product.State.EXPIRED);
+                    updatePendingAndAcceptedOrderStatus(retailProduct);
                 });
         retailProductRepository.saveAll(expiredProducts);
     }
@@ -121,5 +133,25 @@ public class RetailProductServiceImpl implements RetailProductService {
         double totalPrice = counter * pricePerUnit;
         log.trace("Total price {}", totalPrice);
         return totalPrice;
+    }
+
+    @Override
+    public void updatePendingAndAcceptedOrderStatus(RetailProduct retailProduct) {
+        List<RetailOrder> pendingOrders = retailProduct.getRetailOrders().stream()
+                .filter(orderItem -> orderItem.getStatus() == Order.Status.PENDING)
+                .toList();
+
+        List<RetailOrder> acceptedOrders = retailProduct.getRetailOrders().stream()
+                .filter(orderItem -> orderItem.getStatus() == Order.Status.ACCEPTED)
+                .toList();
+
+        pendingOrders.forEach(orderItem -> {
+            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
+        acceptedOrders.forEach(orderItem -> {
+            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
     }
 }

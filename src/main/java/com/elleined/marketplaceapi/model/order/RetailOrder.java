@@ -30,8 +30,8 @@ public class RetailOrder extends Order {
     private int orderQuantity;
 
     @Builder(builderMethodName = "retailOrderBuilder")
-    public RetailOrder(int id, double price, LocalDateTime orderDate, User purchaser, DeliveryAddress deliveryAddress, OrderStatus orderStatus, String sellerMessage, LocalDateTime updatedAt, RetailProduct retailProduct, int orderQuantity) {
-        super(id, price, orderDate, purchaser, deliveryAddress, orderStatus, sellerMessage, updatedAt);
+    public RetailOrder(int id, double price, LocalDateTime orderDate, User purchaser, DeliveryAddress deliveryAddress, Status status, String sellerMessage, LocalDateTime updatedAt, RetailProduct retailProduct, int orderQuantity) {
+        super(id, price, orderDate, purchaser, deliveryAddress, status, sellerMessage, updatedAt);
         this.retailProduct = retailProduct;
         this.orderQuantity = orderQuantity;
     }

@@ -59,21 +59,21 @@ public class WholeSaleProduct extends Product {
     @Override
     public boolean hasSoldOrder() {
         return this.wholeSaleOrders.stream()
-                .map(WholeSaleOrder::getOrderStatus)
-                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.SOLD));
+                .map(WholeSaleOrder::getStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.Status.SOLD));
     }
 
     @Override
     public boolean hasPendingOrder() {
         return this.wholeSaleOrders.stream()
-                .map(WholeSaleOrder::getOrderStatus)
-                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.PENDING));
+                .map(WholeSaleOrder::getStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.Status.PENDING));
     }
 
     @Override
     public boolean hasAcceptedOrder() {
         return this.wholeSaleOrders.stream()
-                .map(WholeSaleOrder::getOrderStatus)
-                .anyMatch(orderStatus -> orderStatus.equals(Order.OrderStatus.ACCEPTED));
+                .map(WholeSaleOrder::getStatus)
+                .anyMatch(orderStatus -> orderStatus.equals(Order.Status.ACCEPTED));
     }
 }

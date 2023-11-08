@@ -14,7 +14,7 @@ import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-@Mapper(componentModel = "spring", imports = Order.OrderStatus.class)
+@Mapper(componentModel = "spring", imports = Order.Status.class)
 public abstract class WholeSaleOrderMapper implements OrderMapper<WholeSaleOrderDTO, WholeSaleOrder> {
 
     @Autowired

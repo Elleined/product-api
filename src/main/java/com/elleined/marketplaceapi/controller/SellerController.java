@@ -10,7 +10,6 @@ import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.UserService;
-import com.elleined.marketplaceapi.service.user.seller.SellerGetAllService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;

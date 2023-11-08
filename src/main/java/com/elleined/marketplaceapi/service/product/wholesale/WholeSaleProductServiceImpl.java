@@ -66,10 +66,24 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
     }
 
     @Override
+    public List<WholeSaleProduct> getAllByState(User seller, Product.State state) {
+        return seller.getWholeSaleProducts().stream()
+                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(product -> product.getState() == state)
+                .sorted(Comparator.comparing(Product::getListingDate).reversed())
+                .toList();
+    }
+
+    @Override
     public List<WholeSaleProduct> searchProductByCropName(String cropName) {
         return wholeSaleProductRepository.searchProductByCropName(cropName).stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)
                 .filter(product -> product.getState() == Product.State.LISTING)
                 .toList();
+    }
+
+    @Override
+    public void updatePendingAndAcceptedOrderStatus(WholeSaleProduct wholeSaleProduct) {
+
     }
 }

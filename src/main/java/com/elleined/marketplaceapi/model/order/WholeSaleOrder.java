@@ -28,8 +28,8 @@ public class WholeSaleOrder extends Order {
     private WholeSaleProduct wholeSaleProduct;
 
     @Builder(builderMethodName = "wholeSaleOrderBuilder")
-    public WholeSaleOrder(int id, double price, LocalDateTime orderDate, User purchaser, DeliveryAddress deliveryAddress, OrderStatus orderStatus, String sellerMessage, LocalDateTime updatedAt, WholeSaleProduct wholeSaleProduct) {
-        super(id, price, orderDate, purchaser, deliveryAddress, orderStatus, sellerMessage, updatedAt);
+    public WholeSaleOrder(int id, double price, LocalDateTime orderDate, User purchaser, DeliveryAddress deliveryAddress, Status status, String sellerMessage, LocalDateTime updatedAt, WholeSaleProduct wholeSaleProduct) {
+        super(id, price, orderDate, purchaser, deliveryAddress, status, sellerMessage, updatedAt);
         this.wholeSaleProduct = wholeSaleProduct;
     }
 }
