@@ -14,6 +14,4 @@ public interface OrderService<ENTITY extends Order> {
     List<ENTITY> getAllProductOrderByStatus(User seller, Order.Status orderStatus);
 
     ENTITY getById(int id) throws ResourceNotFoundException;
-
-    boolean isSellerOwnedOrder(User seller, ENTITY entity);
 }

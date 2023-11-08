@@ -24,5 +24,4 @@ public interface ProductService<T extends Product> {
 
     List<T> searchProductByCropName(String cropName);
 
-    void updatePendingAndAcceptedOrderStatus(T t);
 }

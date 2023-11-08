@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.user.seller;
 
-import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
@@ -13,20 +12,21 @@ import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.mapper.product.ProductMapper;
-import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
+import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
-import com.elleined.marketplaceapi.service.CropService;
-import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
-import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
+import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.unit.RetailUnitService;
 import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
@@ -41,28 +41,24 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 @Qualifier("sellerServiceImpl")
-public class SellerServiceImpl implements SellerService, SellerOrderChecker, SellerGetAllService {
+public class SellerServiceImpl implements SellerService {
     public static final int DAY_RANGE = 14;
 
     private final PrivateChatRoomService privateChatRoomService;
 
     private final RetailProductRepository retailProductRepository;
     private final WholeSaleProductRepository wholeSaleProductRepository;
-    private final RetailProductService retailProductService;
-    private final WholeSaleProductService wholeSaleProductService;
+
+    private final ProductService<RetailProduct> retailProductService;
+    private final ProductService<WholeSaleProduct> wholeSaleProductService;
 
     private final ProductMapper<WholeSaleProductDTO, WholeSaleProduct> wholeSaleProductMapper;
     private final ProductMapper<RetailProductDTO, RetailProduct> retailProductMapper;
@@ -80,7 +76,7 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     @Value("${cropTrade.img.directory}")
     private String cropTradeImgDirectory;
 
-//    @Override
+    //    @Override
 //    public Product saleProduct(User seller, Product product, int salePercentage)
 //            throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
 //
@@ -96,9 +92,17 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
 //    }
 
     @Override
-    public Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
-            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
+    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        return null;
+    }
 
+    @Override
+    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        return null;
+    }
+
+    @Override
+    public RetailProduct saveProduct(User seller, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
@@ -121,14 +125,12 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     }
 
     @Override
-    public void updateProduct(User seller, Product product, ProductDTO productDTO, MultipartFile productPicture)
-            throws NotOwnedException,
-            NotVerifiedException,
-            ProductAlreadySoldException,
-            ResourceNotFoundException,
-            ProductHasAcceptedOrderException,
-            ProductHasPendingOrderException, IOException {
+    public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
+        return null;
+    }
 
+    @Override
+    public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
         if (Validator.notValidMultipartFile(productPicture)) throw new ResourceException("Cannot save product! please provide product picture!");
         if (product.hasAcceptedOrder())
             throw new ProductHasAcceptedOrderException("Cannot update product! because theres an accepted order for this product.");
@@ -158,12 +160,12 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     }
 
     @Override
-    public void deleteProduct(User seller, Product product)
-            throws NotOwnedException,
-            NotVerifiedException,
-            ProductAlreadySoldException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException {
+    public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+
+    }
+
+    @Override
+    public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
 
         if (!seller.isVerified())
             throw new NotVerifiedException("Cannot delete product! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
@@ -185,10 +187,12 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     }
 
     @Override
-    public void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer)
-            throws NotOwnedException,
-            NotValidBodyException,
-            ProductRejectedException {
+    public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
+
+    }
+
+    @Override
+    public void acceptOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
 
         Product product = orderItem.getProduct();
         int newAvailableQuantity = product.getAvailableQuantity() - orderItem.getOrderQuantity();
@@ -210,11 +214,13 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
         log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.ACCEPTED.name());
     }
 
+    @Override
+    public void acceptOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
+
+    }
 
     @Override
-    public void rejectOrder(User seller, OrderItem orderItem, String messageToBuyer)
-            throws NotOwnedException,
-            NotValidBodyException {
+    public void rejectOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
 
         if (isSellerOwnedOrder(seller, orderItem))
             throw new NotOwnedException("Cannot reject order! because you don't own this order!");
@@ -231,7 +237,12 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     }
 
     @Override
-    public void soldOrder(User seller, OrderItem orderItem) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
+    public void rejectOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
+
+    }
+
+    @Override
+    public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (isSellerOwnedOrder(seller, orderItem))
@@ -266,72 +277,11 @@ public class SellerServiceImpl implements SellerService, SellerOrderChecker, Sel
     }
 
     @Override
-    public boolean isBalanceNotEnoughToPaySuccessfulTransactionFee(User seller, double successfulTransactionFee) {
-        return seller.getBalance().compareTo(new BigDecimal(successfulTransactionFee)) <= 0;
+    public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
+
     }
 
-    @Override
-    public double getSuccessfulTransactionFee(double orderItemPrice) {
-        return 1000; // HAHAHA don't use this implementation
-    }
-
-    @Override
-    public List<Product> getAllProductByState(User seller, Product.State state) {
-        return seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == state)
-                .sorted(Comparator.comparing(Product::getListingDate).reversed())
-                .toList();
-    }
-
-    @Override
-    public List<OrderItem> getAllSellerProductOrderByStatus(User seller, OrderItem.OrderItemStatus orderItemStatus) {
-        List<OrderItem> premiumUserOrders = seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .flatMap(product -> product.getOrders().stream()
-                        .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
-                        .filter(productOrder -> productOrder.getPurchaser().isPremium())
-                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
-                .toList();
-
-        List<OrderItem> regularUserOrders = seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .flatMap(product -> product.getOrders().stream()
-                        .filter(productOrder -> productOrder.getOrderItemStatus() == orderItemStatus)
-                        .filter(productOrder -> !productOrder.getPurchaser().isPremium())
-                        .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed()))
-                .toList();
-
-        List<OrderItem> orders = new ArrayList<>();
-        orders.addAll(premiumUserOrders);
-        orders.addAll(regularUserOrders);
-        return orders;
-    }
-
-
-    private void updatePendingAndAcceptedOrderStatus(Product product, OrderItem.OrderItemStatus orderItemStatus) {
-        List<OrderItem> pendingOrders = product.getOrders().stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
-                .toList();
-
-        List<OrderItem> acceptedOrders = product.getOrders().stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .toList();
-
-        pendingOrders.forEach(pendingOrder -> {
-            pendingOrder.setOrderItemStatus(orderItemStatus);
-            pendingOrder.setUpdatedAt(LocalDateTime.now());
-        });
-        acceptedOrders.forEach(acceptedOrder -> {
-            acceptedOrder.setOrderItemStatus(orderItemStatus);
-            acceptedOrder.setUpdatedAt(LocalDateTime.now());
-        });
-
-        log.debug("Pending order items with ids {} are set to {}", pendingOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
-        log.debug("Accepted order items with ids {} are set to {}", acceptedOrders.stream().map(OrderItem::getId).toList(), orderItemStatus);
-    }
-
-    public boolean isHarvestAndExpirationDateNotInRange(LocalDate harvestDate, LocalDate expirationDate, int rangeInDays) {
+    private boolean isHarvestAndExpirationDateNotInRange(LocalDate harvestDate, LocalDate expirationDate, int rangeInDays) {
         LocalDate dateRange = harvestDate.plusDays(rangeInDays);
 
         return expirationDate.isAfter(dateRange) || expirationDate.isBefore(harvestDate);
