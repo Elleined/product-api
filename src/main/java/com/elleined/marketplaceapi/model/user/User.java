@@ -244,7 +244,7 @@ public class User {
         return this.getRetailCartItems().stream().noneMatch(retailCartItem::equals);
     }
 
-    public boolean isBalanceNotEnough(BigDecimal amount) {
-        return this.getBalance().compareTo(amount) <= 0;
+    public <T> boolean isBalanceNotEnough(T t) {
+        return this.getBalance().compareTo(new BigDecimal(String.valueOf(t))) <= 0;
     }
 }

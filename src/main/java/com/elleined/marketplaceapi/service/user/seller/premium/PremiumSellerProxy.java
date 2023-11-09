@@ -17,6 +17,7 @@ import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
+import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ import java.io.IOException;
 public class PremiumSellerProxy implements SellerService {
 
     public static final float SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE = 1;
-    
+
     private final SellerService sellerService;
     private final FeeService feeService;
 
@@ -44,77 +45,87 @@ public class PremiumSellerProxy implements SellerService {
 
     @Override
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        return sellerService.saleProduct(seller, product, salePercentage);
+        return sellerService.saleProduct(seller, retailProduct, salePercentage);
     }
 
     @Override
     public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        return null;
+        return sellerService.saleProduct(seller, wholeSaleProduct, salePercentage);
     }
 
     @Override
     public RetailProduct saveProduct(User seller, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
-        return sellerService.saveProduct(seller, productDTO, productPicture);
+        return sellerService.saveProduct(seller, retailProductDTO, productPicture);
     }
 
     @Override
     public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
-        return null;
+        return sellerService.saveProduct(seller, wholeSaleProductDTO, productPicture);
     }
 
     @Override
     public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
-        sellerService.updateProduct(seller, product, productDTO, productPicture);
+        sellerService.updateProduct(seller, retailProduct, retailProductDTO, productPicture);
     }
 
     @Override
     public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
-
+        sellerService.updateProduct(seller, wholeSaleProduct, wholeSaleProductDTO, productPicture);
     }
 
     @Override
     public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
-        sellerService.deleteProduct(seller, product);
+        sellerService.deleteProduct(seller, retailProduct);
     }
 
     @Override
     public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
-
+        sellerService.deleteProduct(seller, wholeSaleProduct);
     }
 
     @Override
     public void acceptOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
-        sellerService.acceptOrder(seller, orderItem, messageToBuyer);
+        sellerService.acceptOrder(seller, retailOrder, messageToBuyer);
     }
 
     @Override
     public void acceptOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
-
+        sellerService.acceptOrder(seller, wholeSaleOrder, messageToBuyer);
     }
 
     @Override
     public void rejectOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
-        sellerService.rejectOrder(seller, orderItem, messageToBuyer);
+        sellerService.rejectOrder(seller, retailOrder, messageToBuyer);
     }
 
     @Override
     public void rejectOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
-
+        sellerService.rejectOrder(seller, wholeSaleOrder, messageToBuyer);
     }
 
     @Override
     public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
-        double orderPrice = orderItem.getPrice();
+        double orderPrice = retailOrder.getPrice();
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
-        if (isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee))
-            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + successfulTransactionFee + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + orderPrice);
+        if (seller.isBalanceNotEnough(successfulTransactionFee))
+            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
-        sellerService.soldOrder(seller, orderItem);
+        sellerService.soldOrder(seller, retailOrder);
     }
 
     @Override
     public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
+        double orderPrice = wholeSaleOrder.getPrice();
+        double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
+        if (seller.isBalanceNotEnough(successfulTransactionFee))
+            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
+        feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
+        sellerService.soldOrder(seller, wholeSaleOrder);
+    }
+
+    private double getSuccessfulTransactionFee(double orderPrice) {
+        return (orderPrice * (SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE / 100f));
     }
 }
