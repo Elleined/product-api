@@ -9,6 +9,7 @@ import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import java.util.*;
 @Transactional
 public class RetailProductServiceImpl implements RetailProductService {
     private final RetailProductRepository retailProductRepository;
+    private final RetailOrderRepository retailOrderRepository;
 
     private final UserRepository userRepository;
     private final PremiumRepository premiumRepository;
@@ -139,6 +141,8 @@ public class RetailProductServiceImpl implements RetailProductService {
             orderItem.setStatus(Order.Status.CANCELLED);
             orderItem.setUpdatedAt(LocalDateTime.now());
         });
+        retailOrderRepository.saveAll(pendingOrders);
+        retailOrderRepository.saveAll(acceptedOrders);
     }
 
     @Override

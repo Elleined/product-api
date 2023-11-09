@@ -205,29 +205,42 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
-
         if (!seller.isVerified())
             throw new NotVerifiedException("Cannot delete product! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
-        if (!seller.hasProduct(product))
-            throw new NotOwnedException("Cannot delete product! because you don't owned this product!");
-        if (product.isSold())
-            throw new ProductAlreadySoldException("Cannot delete product! because this product is already sold");
-        if (product.hasPendingOrder())
-            throw new ProductHasPendingOrderException("Cannot delete product! because this product has pending orders. Please settle first the pending order to delete this");
-        if (product.hasAcceptedOrder())
-            throw new ProductHasAcceptedOrderException("Cannot delete product! because this product has accepted orders. Please settle first the accepted order to delete this");
+        if (!seller.hasProduct(retailProduct))
+            throw new NotOwnedException("Cannot delete retail product! because you don't owned this retail product!");
+        if (retailProduct.isSold())
+            throw new ProductAlreadySoldException("Cannot delete retail product! because this retail product is already sold");
+        if (retailProduct.hasPendingOrder())
+            throw new ProductHasPendingOrderException("Cannot delete retail product! because this retail product has pending orders. Please settle first the pending order to delete this");
+        if (retailProduct.hasAcceptedOrder())
+            throw new ProductHasAcceptedOrderException("Cannot delete retail product! because this retail product has accepted orders. Please settle first the accepted order to delete this");
 
-        product.setStatus(Product.Status.INACTIVE);
-        updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
+        retailProduct.setStatus(Product.Status.INACTIVE);
+        retailProductService.cancelAllPendingAndAcceptedOrders(retailProduct);
+        retailProductRepository.save(retailProduct);
 
-        productRepository.save(product);
-        orderRepository.saveAll(product.getOrders());
-        log.debug("Product with id of {} are now inactive", product.getId());
+        log.debug("Retail product with id of {} are now inactive", retailProduct.getId());
     }
 
     @Override
     public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
+        if (!seller.isVerified())
+            throw new NotVerifiedException("Cannot delete product! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
+        if (!seller.hasProduct(wholeSaleProduct))
+            throw new NotOwnedException("Cannot delete whole sale product! because you don't owned this whole sale product!");
+        if (wholeSaleProduct.isSold())
+            throw new ProductAlreadySoldException("Cannot delete whole sale product! because this whole sale product is already sold");
+        if (wholeSaleProduct.hasPendingOrder())
+            throw new ProductHasPendingOrderException("Cannot delete whole sale product! because this whole sale product has pending orders. Please settle first the pending order to delete this");
+        if (wholeSaleProduct.hasAcceptedOrder())
+            throw new ProductHasAcceptedOrderException("Cannot delete whole sale product! because this whole sale product has accepted orders. Please settle first the accepted order to delete this");
 
+        wholeSaleProduct.setStatus(Product.Status.INACTIVE);
+        wholeSaleProductService.cancelAllPendingAndAcceptedOrders(wholeSaleProduct);
+        wholeSaleProductRepository.save(wholeSaleProduct);
+
+        log.debug("Retail product with id of {} are now inactive", wholeSaleProduct.getId());
     }
 
     @Override
