@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.mapper.product.ProductMapper;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
@@ -41,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -107,61 +107,100 @@ public class SellerServiceImpl implements SellerService {
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
-        if (isHarvestAndExpirationDateNotInRange(productDTO.getHarvestDate(), productDTO.getExpirationDate(), DAY_RANGE))
-            throw new ProductExpirationLimitException("Cannot save product! because expiration date should be within " + DAY_RANGE + " after the harvest date");
-        if (!seller.isVerified())
+        if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
 
-        if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
-        if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
+        if (cropService.notExist(retailProductDTO.getCropName())) cropService.save(retailProductDTO.getCropName());
 
-        Product product = productMapper.toEntity(productDTO, seller);
-        product.setPicture(productPicture.getOriginalFilename());
-        productRepository.save(product);
+        RetailProduct retailProduct = retailProductMapper.toEntity(retailProductDTO, seller);
+        retailProduct.setPicture(productPicture.getOriginalFilename());
+        retailProductRepository.save(retailProduct);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
-        log.debug("Product saved successfully with id of {}", product.getId());
-        return product;
+        log.debug("Retail product saved successfully with id of {}", retailProduct.getId());
+        return retailProduct;
     }
 
     @Override
     public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
-        return null;
+        if (Validator.notValidMultipartFile(productPicture))
+            throw new ResourceException("Cannot save product! please provide product picture!");
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
+        if (seller.isNotVerified())
+            throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
+
+        if (cropService.notExist(wholeSaleProductDTO.getCropName())) cropService.save(wholeSaleProductDTO.getCropName());
+
+        WholeSaleProduct wholeSaleProduct = wholeSaleProductMapper.toEntity(wholeSaleProductDTO, seller);
+        wholeSaleProduct.setPicture(productPicture.getOriginalFilename());
+        wholeSaleProductRepository.save(wholeSaleProduct);
+
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
+        log.debug("Whole sale product saved successfully with id of {}", wholeSaleProduct.getId());
+        return wholeSaleProduct;
     }
 
     @Override
     public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
-        if (Validator.notValidMultipartFile(productPicture)) throw new ResourceException("Cannot save product! please provide product picture!");
-        if (product.hasAcceptedOrder())
-            throw new ProductHasAcceptedOrderException("Cannot update product! because theres an accepted order for this product.");
-        if (product.hasPendingOrder())
-            throw new ProductHasPendingOrderException("Cannot update product! because theres an pending order for this product");
-        if (product.hasSoldOrder())
-            throw new ProductAlreadySoldException("Cannot update product! because this product is already been sold!");
+        if (Validator.notValidMultipartFile(productPicture))
+            throw new ResourceException("Cannot save product! please provide product picture!");
+        if (retailProduct.hasAcceptedOrder())
+            throw new ProductHasAcceptedOrderException("Cannot update retail product! because theres an accepted order for this retail product.");
+        if (retailProduct.hasPendingOrder())
+            throw new ProductHasPendingOrderException("Cannot update retail product! because theres an pending order for this retail product");
+        if (retailProduct.hasSoldOrder())
+            throw new ProductAlreadySoldException("Cannot update retail product! because this retail product is already been sold!");
         if (!seller.isVerified())
-            throw new NotVerifiedException("Cannot update product! because you are not yet been verified! Consider register shop first then get verified afterwards to update this product!");
-        if (!seller.hasProduct(product))
-            throw new NotOwnedException("Cannot update product! because you don't owned this product!");
-        if (product.isSold())
-            throw new ProductAlreadySoldException("Cannot update product! because this product is already sold!");
-        if (product.isDeleted())
-            throw new ResourceNotFoundException("Cannot update product! because this product does not exists or might already been deleted!");
+            throw new NotVerifiedException("Cannot update retail product! because you are not yet been verified! Consider register shop first then get verified afterwards to update this retail product!");
+        if (!seller.hasProduct(retailProduct))
+            throw new NotOwnedException("Cannot update retail product! because you don't owned this retail product!");
+        if (retailProduct.isSold())
+            throw new ProductAlreadySoldException("Cannot update retail product! because this retail product is already sold!");
+        if (retailProduct.isDeleted())
+            throw new ResourceNotFoundException("Cannot update retail product! because this retail product does not exists or might already been deleted!");
 
-        product.setState(Product.State.PENDING);
-        updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
-        if (!cropService.existsByName(productDTO.getCropName())) cropService.save(productDTO.getCropName());
-        if (!unitService.existsByName(productDTO.getUnitName())) unitService.save(productDTO.getUnitName());
-        Product updatedProduct = productMapper.toUpdate(product, productDTO);
-        updatedProduct.setPicture(productPicture.getOriginalFilename());
-        productRepository.save(updatedProduct);
+        retailProduct.setState(Product.State.PENDING);
+        retailProductService.cancelAllPendingAndAcceptedOrders(retailProduct);
+
+        if (cropService.notExist(retailProductDTO.getCropName())) cropService.save(retailProductDTO.getCropName());
+        RetailProduct updatedRetailProduct = retailProductMapper.toUpdate(retailProduct, retailProductDTO);
+        updatedRetailProduct.setPicture(productPicture.getOriginalFilename());
+        retailProductRepository.save(updatedRetailProduct);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
-        log.debug("Product with id of {} updated successfully!", updatedProduct.getId());
+        log.debug("Retail product with id of {} updated successfully!", updatedRetailProduct.getId());
     }
 
     @Override
     public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+        if (Validator.notValidMultipartFile(productPicture))
+            throw new ResourceException("Cannot save product! please provide product picture!");
+        if (wholeSaleProduct.hasAcceptedOrder())
+            throw new ProductHasAcceptedOrderException("Cannot update whole sale product! because theres an accepted order for this whole sale product.");
+        if (wholeSaleProduct.hasPendingOrder())
+            throw new ProductHasPendingOrderException("Cannot update whole sale product! because theres an pending order for this whole sale product");
+        if (wholeSaleProduct.hasSoldOrder())
+            throw new ProductAlreadySoldException("Cannot update whole sale product! because this whole sale product is already been sold!");
+        if (!seller.isVerified())
+            throw new NotVerifiedException("Cannot update whole sale product! because you are not yet been verified! Consider register shop first then get verified afterwards to update this whole sale product!");
+        if (!seller.hasProduct(wholeSaleProduct))
+            throw new NotOwnedException("Cannot update whole sale product! because you don't owned this whole sale product!");
+        if (wholeSaleProduct.isSold())
+            throw new ProductAlreadySoldException("Cannot update whole sale product! because this whole sale product is already sold!");
+        if (wholeSaleProduct.isDeleted())
+            throw new ResourceNotFoundException("Cannot update whole sale product! because this whole sale product does not exists or might already been deleted!");
 
+        wholeSaleProduct.setState(Product.State.PENDING);
+        wholeSaleProductService.cancelAllPendingAndAcceptedOrders(wholeSaleProduct);
+
+        if (cropService.notExist(wholeSaleProductDTO.getCropName())) cropService.save(wholeSaleProductDTO.getCropName());
+        WholeSaleProduct updatedWholeSaleProduct = wholeSaleProductMapper.toUpdate(wholeSaleProduct, wholeSaleProductDTO);
+        updatedWholeSaleProduct.setPicture(productPicture.getOriginalFilename());
+        wholeSaleProductRepository.save(wholeSaleProduct);
+
+        imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
+        log.debug("Whole sale product with id of {} updated successfully!", wholeSaleProduct.getId());
     }
 
     @Override
@@ -279,11 +318,5 @@ public class SellerServiceImpl implements SellerService {
     @Override
     public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
 
-    }
-
-    private boolean isHarvestAndExpirationDateNotInRange(LocalDate harvestDate, LocalDate expirationDate, int rangeInDays) {
-        LocalDate dateRange = harvestDate.plusDays(rangeInDays);
-
-        return expirationDate.isAfter(dateRange) || expirationDate.isBefore(harvestDate);
     }
 }

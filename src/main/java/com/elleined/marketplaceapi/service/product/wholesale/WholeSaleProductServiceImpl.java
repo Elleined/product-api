@@ -1,6 +1,9 @@
 package com.elleined.marketplaceapi.service.product.wholesale;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.Premium;
@@ -90,5 +93,25 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
                         || (product.getListingDate().isAfter(start) && product.getListingDate().isBefore(end))
                         || product.getListingDate().equals(end))
                 .toList();
+    }
+
+    @Override
+    public void cancelAllPendingAndAcceptedOrders(WholeSaleProduct wholeSaleProduct) {
+        List<WholeSaleOrder> pendingOrders = wholeSaleProduct.getWholeSaleOrders().stream()
+                .filter(Order::isPending)
+                .toList();
+
+        List<WholeSaleOrder> acceptedOrders = wholeSaleProduct.getWholeSaleOrders().stream()
+                .filter(Order::isAccepted)
+                .toList();
+
+        pendingOrders.forEach(orderItem -> {
+            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
+        acceptedOrders.forEach(orderItem -> {
+            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
     }
 }

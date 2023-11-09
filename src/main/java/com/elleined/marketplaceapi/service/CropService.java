@@ -25,10 +25,10 @@ public class CropService {
     }
 
 
-    public boolean existsByName(String name) {
+    public boolean notExist(String name) {
         return cropRepository.findAll().stream()
                 .map(Crop::getName)
-                .anyMatch(name::equalsIgnoreCase);
+                .noneMatch(name::equalsIgnoreCase);
     }
 
     public List<String> getAll() {

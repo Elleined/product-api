@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -27,7 +28,7 @@ public class PremiumService {
 
         if (user.isPremium() && !user.isPremiumSubscriptionExpired())
             throw new AlreadyExistException("Cannot buy premium! because you already purchased our premium account please wait for your premium account to expired which is " + user.getPremium().getRegistrationDate().plusMonths(1) + " before purchasing again");
-        if (user.isBalanceNotEnoughForPremium())
+        if (user.isBalanceNotEnough(new BigDecimal(FeeService.PREMIUM_USER_FEE)))
             throw new InsufficientBalanceException("Cannot buy premium because! you doesn't have enough balance to pay for the premium user fee amounting " + FeeService.PREMIUM_USER_FEE);
         Premium premium = Premium.builder()
                 .registrationDate(LocalDateTime.now())

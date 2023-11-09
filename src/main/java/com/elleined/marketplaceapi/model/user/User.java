@@ -13,7 +13,6 @@ import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
-import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.service.address.AddressService;
@@ -165,6 +164,10 @@ public class User {
         return this.getUserVerification().getStatus() == UserVerification.Status.VERIFIED;
     }
 
+    public boolean isNotVerified() {
+        return this.getUserVerification().getStatus() != UserVerification.Status.VERIFIED;
+    }
+
     public boolean hasShopRegistration() {
         return this.getShop() != null;
     }
@@ -185,9 +188,6 @@ public class User {
         return this.getDeliveryAddresses().size() == AddressService.DELIVERY_ADDRESS_LIMIT;
     }
 
-    public boolean isBalanceNotEnoughForPremium() {
-        return this.getBalance().compareTo(new BigDecimal(FeeService.PREMIUM_USER_FEE)) <= 0;
-    }
 
     public boolean hasProduct(WholeSaleProduct wholeSaleProduct) {
         return this.getWholeSaleProducts().stream().anyMatch(wholeSaleProduct::equals);
@@ -199,6 +199,10 @@ public class User {
 
     public boolean hasOrder(RetailOrder retailOrder) {
         return this.getRetailOrders().stream().anyMatch(retailOrder::equals);
+    }
+
+    public boolean hasOrder(WholeSaleOrder wholeSaleOrder) {
+        return this.getWholeSaleOrders().stream().anyMatch(wholeSaleOrder::equals);
     }
 
     public boolean hasSellableProductOrder(WholeSaleOrder wholeSaleOrder) {
@@ -213,10 +217,6 @@ public class User {
                 .map(RetailProduct::getRetailOrders)
                 .flatMap(Collection::stream)
                 .anyMatch(retailOrder::equals);
-    }
-
-    public boolean hasOrder(WholeSaleOrder wholeSaleOrder) {
-        return this.getWholeSaleOrders().stream().anyMatch(wholeSaleOrder::equals);
     }
 
     public boolean isPremiumSubscriptionExpired() {
@@ -244,7 +244,7 @@ public class User {
         return this.getRetailCartItems().stream().noneMatch(retailCartItem::equals);
     }
 
-    public boolean isBalanceEnough(BigDecimal amount) {
+    public boolean isBalanceNotEnough(BigDecimal amount) {
         return this.getBalance().compareTo(amount) <= 0;
     }
 }

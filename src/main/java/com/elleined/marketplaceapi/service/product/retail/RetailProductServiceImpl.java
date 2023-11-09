@@ -90,7 +90,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(Product::isPending)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
-                    updatePendingAndAcceptedOrderStatus(retailProduct);
+                    cancelAllPendingAndAcceptedOrders(retailProduct);
                 });
 
         // Listing retailProducts
@@ -99,7 +99,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(Product::isListed)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
-                    updatePendingAndAcceptedOrderStatus(retailProduct);
+                    cancelAllPendingAndAcceptedOrders(retailProduct);
                 });
         retailProductRepository.saveAll(expiredProducts);
     }
@@ -119,6 +119,26 @@ public class RetailProductServiceImpl implements RetailProductService {
                         || (product.getListingDate().isAfter(start) && product.getListingDate().isBefore(end))
                         || product.getListingDate().equals(end))
                 .toList();
+    }
+
+    @Override
+    public void cancelAllPendingAndAcceptedOrders(RetailProduct retailProduct) {
+        List<RetailOrder> pendingOrders = retailProduct.getRetailOrders().stream()
+                .filter(Order::isPending)
+                .toList();
+
+        List<RetailOrder> acceptedOrders = retailProduct.getRetailOrders().stream()
+                .filter(Order::isAccepted)
+                .toList();
+
+        pendingOrders.forEach(orderItem -> {
+            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
+        acceptedOrders.forEach(orderItem -> {
+            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setUpdatedAt(LocalDateTime.now());
+        });
     }
 
     @Override
@@ -142,24 +162,5 @@ public class RetailProductServiceImpl implements RetailProductService {
         double totalPrice = counter * pricePerUnit;
         log.trace("Total price {}", totalPrice);
         return totalPrice;
-    }
-
-    private void updatePendingAndAcceptedOrderStatus(RetailProduct retailProduct) {
-        List<RetailOrder> pendingOrders = retailProduct.getRetailOrders().stream()
-                .filter(Order::isPending)
-                .toList();
-
-        List<RetailOrder> acceptedOrders = retailProduct.getRetailOrders().stream()
-                .filter(Order::isAccepted)
-                .toList();
-
-        pendingOrders.forEach(orderItem -> {
-            orderItem.setStatus(Order.Status.CANCELLED);
-            orderItem.setUpdatedAt(LocalDateTime.now());
-        });
-        acceptedOrders.forEach(orderItem -> {
-            orderItem.setStatus(Order.Status.CANCELLED);
-            orderItem.setUpdatedAt(LocalDateTime.now());
-        });
     }
 }
