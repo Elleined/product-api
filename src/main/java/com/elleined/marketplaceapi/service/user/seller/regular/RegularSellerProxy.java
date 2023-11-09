@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.user.seller.regular;
 
-import com.elleined.marketplaceapi.dto.product.ProductDTO;
+import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
@@ -13,11 +14,18 @@ import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxAcceptedOrderException;
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxListingException;
 import com.elleined.marketplaceapi.exception.user.seller.SellerMaxPendingOrderException;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.OrderRepository;
-import com.elleined.marketplaceapi.repository.product.ProductRepository;
+import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
+import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.fee.FeeService;
+import com.elleined.marketplaceapi.service.order.OrderService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import com.elleined.marketplaceapi.service.user.seller.premium.PremiumSellerProxy;
@@ -32,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -45,75 +54,44 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
 
     private final OrderRepository orderRepository;
 
-    private final ProductRepository productRepository;
-    private final ProductService productService;
+    private final RetailProductRepository retailProductRepository;
+    private final WholeSaleProductRepository wholeSaleProductRepository;
+
+    private final ProductService<WholeSaleProduct> wholeSaleProductService;
+    private final ProductService<RetailProduct> retailProductService;
 
     private final FeeService feeService;
 
+
     public RegularSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
                               OrderRepository orderRepository,
-                              ProductRepository productRepository,
-                              ProductService productService,
+                              RetailProductRepository retailProductRepository,
+                              WholeSaleProductRepository wholeSaleProductRepository,
+                              ProductService<WholeSaleProduct> wholeSaleProductService,
+                              ProductService<RetailProduct> retailProductService,
                               FeeService feeService) {
+
         this.sellerService = sellerService;
         this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
-        this.productService = productService;
+        this.retailProductRepository = retailProductRepository;
+        this.wholeSaleProductRepository = wholeSaleProductRepository;
+        this.wholeSaleProductService = wholeSaleProductService;
+        this.retailProductService = retailProductService;
         this.feeService = feeService;
     }
 
     @Override
-    public boolean isExceedsToMaxListingPerDay(User seller) {
-        final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
-        return productRepository.fetchSellerProductListingCount(
-                currentDateTimeMidnight,
-                tomorrowMidnight,
-                seller
-        ) >= MAX_LISTING_PER_DAY;
+    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        return null;
     }
 
     @Override
-    public boolean isExceedsToMaxRejectionPerDay(User seller) {
-
-
-        return orderRepository.fetchSellerRejectedOrderCount(
-                currentDateTimeMidnight,
-                tomorrowMidnight,
-                seller,
-                OrderItem.OrderItemStatus.REJECTED
-        ) >= MAX_ORDER_REJECTION_PER_DAY;
+    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        return null;
     }
 
     @Override
-    public boolean isExceedsToMaxAcceptedOrder(User seller) {
-        return seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .map(Product::getOrders)
-                .flatMap(Collection::stream)
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .count() >= MAX_ACCEPTED_ORDER;
-    }
-
-    @Override
-    public boolean isExceedsToMaxPendingOrder(User seller) {
-        return seller.getProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .map(Product::getOrders)
-                .flatMap(Collection::stream)
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
-                .count() >= MAX_PENDING_ORDER;
-    }
-
-    @Override
-    public Product saleProduct(User seller, Product product, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        // Add more validation for regular seller here for future
-        return sellerService.saleProduct(seller, product, salePercentage);
-    }
-
-    @Override
-    public Product saveProduct(User seller, ProductDTO productDTO, MultipartFile productPicture)
-            throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
+    public RetailProduct saveProduct(User seller, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot save product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
@@ -133,15 +111,12 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public void updateProduct(User seller, Product product, ProductDTO productDTO, MultipartFile productPicture)
-            throws NotOwnedException,
-            NotVerifiedException,
-            ProductAlreadySoldException,
-            ResourceNotFoundException,
-            ProductHasAcceptedOrderException,
-            ProductHasPendingOrderException,
-            SellerMaxAcceptedOrderException,
-            SellerMaxPendingOrderException, IOException {
+    public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
+        return null;
+    }
+
+    @Override
+    public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot update product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
@@ -158,14 +133,12 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public void deleteProduct(User seller, Product product)
-            throws NotOwnedException,
-            NotVerifiedException,
-            ProductAlreadySoldException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException,
-            SellerMaxAcceptedOrderException,
-            SellerMaxPendingOrderException {
+    public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+
+    }
+
+    @Override
+    public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
 
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot delete product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
@@ -177,12 +150,12 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public void acceptOrder(User seller, OrderItem orderItem, String messageToBuyer)
-            throws NotOwnedException,
-            NotValidBodyException,
-            ProductRejectedException,
-            SellerMaxAcceptedOrderException {
+    public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
 
+    }
+
+    @Override
+    public void acceptOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot accept order! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
@@ -191,12 +164,12 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public void rejectOrder(User seller, OrderItem orderItem, String messageToBuyer)
-            throws NotOwnedException,
-            NotValidBodyException,
-            MaxOrderRejectionException,
-            SellerMaxPendingOrderException {
+    public void acceptOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
 
+    }
+
+    @Override
+    public void rejectOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
         if (isExceedsToMaxPendingOrder(seller))
             throw new SellerMaxPendingOrderException("Cannot reject order! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxRejectionPerDay(seller))
@@ -207,9 +180,12 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public void soldOrder(User seller, OrderItem orderItem)
-            throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
+    public void rejectOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
 
+    }
+
+    @Override
+    public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         double orderPrice = orderItem.getPrice();
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
         if (isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee))
@@ -217,6 +193,75 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
         sellerService.soldOrder(seller, orderItem);
+    }
+
+    @Override
+    public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
+
+    }
+
+    @Override
+    public boolean isExceedsToMaxListingPerDay(User seller) {
+        LocalDateTime todayMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime tomorrowMidnight = todayMidnight.plusDays(1);
+
+        List<RetailProduct> createdRetailProductToday = retailProductService.getByDateRange(seller, todayMidnight, tomorrowMidnight);
+        List<WholeSaleProduct> createdWholeSaleProductToday = wholeSaleProductService.getByDateRange(seller, todayMidnight, tomorrowMidnight);
+
+        int totalCreatedProductsToday = createdRetailProductToday.size() + createdWholeSaleProductToday.size();
+        return totalCreatedProductsToday >= MAX_LISTING_PER_DAY;
+    }
+
+    @Override
+    public boolean isExceedsToMaxRejectionPerDay(User seller) {
+        LocalDateTime todayMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime tomorrowMidnight = todayMidnight.plusDays(1);
+
+        List<RetailOrder> rejectedRetailOrderByDateRange = OrderService.getByDateRange(seller.getRetailOrders(), Order.Status.REJECTED, todayMidnight, tomorrowMidnight);
+        List<WholeSaleOrder> rejectedWholeSaleOrderByDateRange = OrderService.getByDateRange(seller.getWholeSaleOrders(), Order.Status.REJECTED, todayMidnight, tomorrowMidnight);
+
+        int totalRejectedOrdersToday = rejectedRetailOrderByDateRange.size() + rejectedWholeSaleOrderByDateRange.size();
+        return totalRejectedOrdersToday >= MAX_ORDER_REJECTION_PER_DAY;
+    }
+
+    @Override
+    public boolean isExceedsToMaxAcceptedOrder(User seller) {
+        int retailAcceptedOrderCount = (int) seller.getRetailProducts().stream()
+                .filter(Product::isNotDeleted)
+                .map(RetailProduct::getRetailOrders)
+                .flatMap(Collection::stream)
+                .filter(RetailOrder::isAccepted)
+                .count();
+
+        int wholeSaleAcceptedOrderCount = (int) seller.getWholeSaleProducts().stream()
+                .filter(Product::isNotDeleted)
+                .map(WholeSaleProduct::getWholeSaleOrders)
+                .flatMap(Collection::stream)
+                .filter(WholeSaleOrder::isAccepted)
+                .count();
+
+        int totalAcceptedOrder = retailAcceptedOrderCount + wholeSaleAcceptedOrderCount;
+        return totalAcceptedOrder >= MAX_ACCEPTED_ORDER;
+    }
+
+    @Override
+    public boolean isExceedsToMaxPendingOrder(User seller) {
+        int retailPendingOrderCount = (int) seller.getRetailProducts().stream()
+                .filter(Product::isNotDeleted)
+                .map(RetailProduct::getRetailOrders)
+                .flatMap(Collection::stream)
+                .filter(RetailOrder::isPending)
+                .count();
+
+        int wholeSalePendingOrderCount = (int) seller.getWholeSaleProducts().stream()
+                .filter(Product::isNotDeleted)
+                .map(WholeSaleProduct::getWholeSaleOrders)
+                .flatMap(Collection::stream)
+                .filter(WholeSaleOrder::isPending)
+                .count();
+
+        int totalPendingOrder = retailPendingOrderCount + wholeSalePendingOrderCount;
+        return totalPendingOrder >= MAX_PENDING_ORDER;
     }
 
     private double getListingFee(double productTotalPrice) {
