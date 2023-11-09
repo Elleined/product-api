@@ -28,7 +28,6 @@ import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.order.OrderService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
-import com.elleined.marketplaceapi.service.user.seller.premium.PremiumSellerProxy;
 import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
