@@ -117,4 +117,14 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
         wholeSaleOrderRepository.saveAll(pendingOrders);
         wholeSaleOrderRepository.saveAll(acceptedOrders);
     }
+
+    @Override
+    public boolean isRejectedBySeller(User buyer, WholeSaleProduct wholeSaleProduct) {
+        return buyer.getWholeSaleOrders().stream()
+                .filter(wholeSaleOrder -> wholeSaleOrder.getWholeSaleProduct().equals(wholeSaleProduct))
+                .anyMatch(wholeSaleOrder -> {
+                    LocalDateTime reOrderingDate = wholeSaleOrder.getUpdatedAt().plusDays(1);
+                    return wholeSaleOrder.isRejected() && LocalDateTime.now().isBefore(reOrderingDate);
+                });
+    }
 }

@@ -14,7 +14,6 @@ import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.ProductService;
-import com.elleined.marketplaceapi.service.user.buyer.BuyerOrderChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;

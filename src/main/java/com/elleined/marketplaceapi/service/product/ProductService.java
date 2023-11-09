@@ -27,4 +27,6 @@ public interface ProductService<T extends Product> {
     List<T> getByDateRange(User seller, LocalDateTime start, LocalDateTime end);
 
     void updateAllPendingAndAcceptedOrders(T t, Status status);
+
+    boolean isRejectedBySeller(User buyer, T t);
 }

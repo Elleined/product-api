@@ -106,29 +106,4 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
         orderRepository.save(orderItem);
         log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
     }
-
-    @Override
-    public boolean isBuyerHasPendingOrderToProduct(User buyer, Product product) {
-        return buyer.getOrderedItems().stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.PENDING)
-                .map(OrderItem::getProduct)
-                .anyMatch(product::equals);
-    }
-
-    @Override
-    public boolean isBuyerHasAcceptedOrderToProduct(User buyer, Product product) {
-        return buyer.getOrderedItems().stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.ACCEPTED)
-                .map(OrderItem::getProduct)
-                .anyMatch(product::equals);
-    }
-    @Override
-    public boolean isBuyerAlreadyBeenRejected(User buyer, Product product) {
-        return buyer.getOrderedItems().stream()
-                .filter(orderItem -> orderItem.getProduct().equals(product))
-                .anyMatch(orderItem -> {
-                    LocalDateTime reOrderingDate = orderItem.getUpdatedAt().plusDays(1);
-                    return orderItem.getOrderItemStatus() == OrderItem.OrderItemStatus.REJECTED && LocalDateTime.now().isBefore(reOrderingDate);
-                });
-    }
 }

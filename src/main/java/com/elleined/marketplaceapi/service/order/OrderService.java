@@ -10,7 +10,11 @@ import java.util.List;
 
 public interface OrderService<ENTITY extends Order> {
 
-    List<ENTITY> getAllProductOrderByStatus(User seller, Order.Status orderStatus);
+    // Use this to see the seller sellable product orders status
+    List<ENTITY> getAllProductOrderByStatus(User seller, Order.Status status);
+
+    // Use this to see the buyer product orders status
+    List<ENTITY> getAllOrderedProductsByStatus(User buyer, Order.Status status);
 
     ENTITY getById(int id) throws ResourceNotFoundException;
 

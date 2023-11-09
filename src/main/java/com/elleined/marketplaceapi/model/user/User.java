@@ -9,6 +9,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
@@ -246,5 +247,19 @@ public class User {
 
     public <T> boolean isBalanceNotEnough(T t) {
         return this.getBalance().compareTo(new BigDecimal(String.valueOf(t))) <= 0;
+    }
+
+    public boolean hasOrder(RetailProduct retailProduct, Order.Status status) {
+        return this.getRetailOrders().stream()
+                .filter(retailOrder -> retailOrder.getStatus() == status)
+                .map(RetailOrder::getRetailProduct)
+                .anyMatch(retailProduct::equals);
+    }
+
+    public boolean hasOrder(WholeSaleProduct wholeSaleProduct, Order.Status status) {
+        return this.getWholeSaleOrders().stream()
+                .filter(wholeSaleOrder -> wholeSaleOrder.getStatus() == status)
+                .map(WholeSaleOrder::getWholeSaleProduct)
+                .anyMatch(wholeSaleProduct::equals);
     }
 }
