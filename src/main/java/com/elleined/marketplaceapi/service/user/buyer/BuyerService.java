@@ -20,7 +20,7 @@ import java.util.List;
 
 public interface BuyerService {
 
-    RetailOrder order(User buyer, RetailOrderDTO)
+    RetailOrder order(User buyer, RetailOrderDTO retailOrderDTO)
             throws ResourceNotFoundException,
             ResourceOwnedException,
             ProductHasPendingOrderException,

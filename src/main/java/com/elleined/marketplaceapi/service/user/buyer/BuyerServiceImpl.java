@@ -1,6 +1,9 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
-import com.elleined.marketplaceapi.dto.order.OrderDTO;
+import com.elleined.marketplaceapi.dto.order.RetailOrderDTO;
+import com.elleined.marketplaceapi.dto.order.WholeSaleOrderDTO;
+import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
@@ -10,9 +13,15 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
+import com.elleined.marketplaceapi.mapper.product.ProductMapper;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.order.OrderRepository;
+import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
+import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,33 +30,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 @Qualifier("buyerServiceImpl")
-public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
-    private final ProductService productService;
+public class BuyerServiceImpl implements BuyerService {
+    private final ProductService<RetailProduct> retailProductService;
+    private final ProductService<WholeSaleProduct> wholeSaleProductService;
 
-    private final OrderRepository orderRepository;
-    private final ItemMapper itemMapper;
+    private final WholeSaleOrderRepository wholeSaleOrderRepository;
+    private final RetailOrderRepository retailOrderRepository;
+
+    private final ProductMapper<WholeSaleProductDTO, WholeSaleProduct> wholeSaleProductMapper;
+    private final ProductMapper<RetailProductDTO, RetailProduct> retailProductMapper;
 
     @Override
-    public OrderItem orderProduct(User buyer, OrderDTO orderDTO)
-            throws ResourceNotFoundException,
-            ResourceOwnedException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException,
-            ProductRejectedException,
-            ProductAlreadySoldException,
-            ProductNotListedException,
-            OrderQuantiantyExceedsException,
-            BuyerAlreadyRejectedException,
-            ProductExpiredException {
-
+    public RetailOrder order(User buyer, RetailOrderDTO retailOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
         Product product = productService.getById(orderDTO.getProductId());
         if (product.isExpired())
             throw new ProductExpiredException("Cannot order this product! because this product is already expired!");
@@ -82,17 +82,12 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
     }
 
     @Override
-    public List<OrderItem> getAllOrderedProductsByStatus(User currentUser, OrderItem.OrderItemStatus orderItemStatus) {
-        return currentUser.getOrderedItems().stream()
-                .filter(orderItem -> orderItem.getOrderItemStatus() == orderItemStatus)
-                .filter(orderItem -> orderItem.getProduct().getStatus() == Product.Status.ACTIVE)
-                .sorted(Comparator.comparing(OrderItem::getOrderDate).reversed())
-                .toList();
+    public WholeSaleOrder order(User buyer, WholeSaleOrderDTO wholeSaleOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
+        return null;
     }
 
     @Override
-    public void cancelOrderItem(User buyer, OrderItem orderItem)
-            throws NotOwnedException, OrderAlreadyAcceptedException, OrderReachedCancellingTimeLimitException, OrderAlreadyRejectedException {
+    public void cancelOrder(User buyer, RetailOrder retailOrder) throws NotOwnedException, OrderAlreadyAcceptedException, OrderReachedCancellingTimeLimitException, OrderAlreadyRejectedException {
 
         if (!buyer.hasOrder(orderItem))
             throw new NotOwnedException("Cannot cancel order! because you don't owned this order");
@@ -105,5 +100,10 @@ public class BuyerServiceImpl implements BuyerService, BuyerOrderChecker {
         orderItem.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(orderItem);
         log.debug("Buyer with id of {} cancel his order in product with id of {}", buyer.getId(), orderItem.getProduct().getId());
+    }
+
+    @Override
+    public void cancelOrder(User buyer, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, OrderAlreadyAcceptedException, OrderReachedCancellingTimeLimitException, OrderAlreadyRejectedException {
+
     }
 }
