@@ -92,7 +92,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(Product::isPending)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
-                    updateAllPendingAndAcceptedOrders(retailProduct);
+                    updateAllPendingAndAcceptedOrders(retailProduct, Order.Status.CANCELLED);
                 });
 
         // Listing retailProducts
@@ -101,7 +101,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(Product::isListed)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
-                    updateAllPendingAndAcceptedOrders(retailProduct);
+                    updateAllPendingAndAcceptedOrders(retailProduct, Order.Status.CANCELLED);
                 });
         retailProductRepository.saveAll(expiredProducts);
     }
