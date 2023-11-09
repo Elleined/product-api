@@ -92,7 +92,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(Product::isPending)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
-                    cancelAllPendingAndAcceptedOrders(retailProduct);
+                    updateAllPendingAndAcceptedOrders(retailProduct);
                 });
 
         // Listing retailProducts
@@ -101,7 +101,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(Product::isListed)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
-                    cancelAllPendingAndAcceptedOrders(retailProduct);
+                    updateAllPendingAndAcceptedOrders(retailProduct);
                 });
         retailProductRepository.saveAll(expiredProducts);
     }
@@ -124,7 +124,7 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
-    public void cancelAllPendingAndAcceptedOrders(RetailProduct retailProduct) {
+    public void updateAllPendingAndAcceptedOrders(RetailProduct retailProduct, Order.Status status) {
         List<RetailOrder> pendingOrders = retailProduct.getRetailOrders().stream()
                 .filter(Order::isPending)
                 .toList();
@@ -134,11 +134,11 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .toList();
 
         pendingOrders.forEach(orderItem -> {
-            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setStatus(status);
             orderItem.setUpdatedAt(LocalDateTime.now());
         });
         acceptedOrders.forEach(orderItem -> {
-            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setStatus(status);
             orderItem.setUpdatedAt(LocalDateTime.now());
         });
         retailOrderRepository.saveAll(pendingOrders);

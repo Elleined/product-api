@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.service.product.wholesale;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.order.Order;
-import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
@@ -10,6 +9,7 @@ import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
+import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +24,7 @@ import java.util.*;
 @Slf4j
 @Transactional
 public class WholeSaleProductServiceImpl implements WholeSaleProductService {
+    private final WholeSaleOrderRepository wholeSaleOrderRepository;
     private final WholeSaleProductRepository wholeSaleProductRepository;
 
     private final UserRepository userRepository;
@@ -96,7 +97,7 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
     }
 
     @Override
-    public void cancelAllPendingAndAcceptedOrders(WholeSaleProduct wholeSaleProduct) {
+    public void updateAllPendingAndAcceptedOrders(WholeSaleProduct wholeSaleProduct, Order.Status status) {
         List<WholeSaleOrder> pendingOrders = wholeSaleProduct.getWholeSaleOrders().stream()
                 .filter(Order::isPending)
                 .toList();
@@ -106,12 +107,14 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
                 .toList();
 
         pendingOrders.forEach(orderItem -> {
-            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setStatus(status);
             orderItem.setUpdatedAt(LocalDateTime.now());
         });
         acceptedOrders.forEach(orderItem -> {
-            orderItem.setStatus(Order.Status.CANCELLED);
+            orderItem.setStatus(status);
             orderItem.setUpdatedAt(LocalDateTime.now());
         });
+        wholeSaleOrderRepository.saveAll(pendingOrders);
+        wholeSaleOrderRepository.saveAll(acceptedOrders);
     }
 }

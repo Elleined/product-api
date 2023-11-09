@@ -13,7 +13,7 @@ import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.mapper.product.ProductMapper;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
-import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.Order.Status;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
@@ -21,6 +21,8 @@ import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.OrderRepository;
+import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
+import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.CropService;
@@ -50,6 +52,8 @@ import java.time.LocalDateTime;
 @Transactional
 @Qualifier("sellerServiceImpl")
 public class SellerServiceImpl implements SellerService {
+    private final WholeSaleOrderRepository wholeSaleOrderRepository;
+    private final RetailOrderRepository retailOrderRepository;
     public static final int DAY_RANGE = 14;
 
     private final PrivateChatRoomService privateChatRoomService;
@@ -66,8 +70,6 @@ public class SellerServiceImpl implements SellerService {
     private final ImageUploader imageUploader;
 
     private final CropService cropService;
-    private final RetailUnitService retailUnitService;
-    private final WholeSaleUnitService wholeSaleUnitService;
 
     private final OrderRepository orderRepository;
 
@@ -161,7 +163,7 @@ public class SellerServiceImpl implements SellerService {
             throw new ResourceNotFoundException("Cannot update retail product! because this retail product does not exists or might already been deleted!");
 
         retailProduct.setState(Product.State.PENDING);
-        retailProductService.cancelAllPendingAndAcceptedOrders(retailProduct);
+        retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
 
         if (cropService.notExist(retailProductDTO.getCropName())) cropService.save(retailProductDTO.getCropName());
         RetailProduct updatedRetailProduct = retailProductMapper.toUpdate(retailProduct, retailProductDTO);
@@ -192,7 +194,7 @@ public class SellerServiceImpl implements SellerService {
             throw new ResourceNotFoundException("Cannot update whole sale product! because this whole sale product does not exists or might already been deleted!");
 
         wholeSaleProduct.setState(Product.State.PENDING);
-        wholeSaleProductService.cancelAllPendingAndAcceptedOrders(wholeSaleProduct);
+        wholeSaleProductService.updateAllPendingAndAcceptedOrders(wholeSaleProduct, Status.CANCELLED);
 
         if (cropService.notExist(wholeSaleProductDTO.getCropName())) cropService.save(wholeSaleProductDTO.getCropName());
         WholeSaleProduct updatedWholeSaleProduct = wholeSaleProductMapper.toUpdate(wholeSaleProduct, wholeSaleProductDTO);
@@ -217,7 +219,7 @@ public class SellerServiceImpl implements SellerService {
             throw new ProductHasAcceptedOrderException("Cannot delete retail product! because this retail product has accepted orders. Please settle first the accepted order to delete this");
 
         retailProduct.setStatus(Product.Status.INACTIVE);
-        retailProductService.cancelAllPendingAndAcceptedOrders(retailProduct);
+        retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
         retailProductRepository.save(retailProduct);
 
         log.debug("Retail product with id of {} are now inactive", retailProduct.getId());
@@ -237,7 +239,7 @@ public class SellerServiceImpl implements SellerService {
             throw new ProductHasAcceptedOrderException("Cannot delete whole sale product! because this whole sale product has accepted orders. Please settle first the accepted order to delete this");
 
         wholeSaleProduct.setStatus(Product.Status.INACTIVE);
-        wholeSaleProductService.cancelAllPendingAndAcceptedOrders(wholeSaleProduct);
+        wholeSaleProductService.updateAllPendingAndAcceptedOrders(wholeSaleProduct, Status.CANCELLED);
         wholeSaleProductRepository.save(wholeSaleProduct);
 
         log.debug("Retail product with id of {} are now inactive", wholeSaleProduct.getId());
@@ -245,91 +247,129 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void acceptOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
-
-        Product product = orderItem.getProduct();
-        int newAvailableQuantity = product.getAvailableQuantity() - orderItem.getOrderQuantity();
+        RetailProduct retailProduct = retailOrder.getRetailProduct();
+        int newAvailableQuantity = retailProduct.getAvailableQuantity() - retailOrder.getOrderQuantity();
         if (newAvailableQuantity < 0) throw new ProductAlreadySoldException("Cannot accept order! because this product is already been sold and there are now available quantity!");
 
-        if (orderItem.getProduct().isRejected())
+        if (retailProduct.isRejected())
             throw new ProductRejectedException("Cannot accept order! because with this product is rejected by the moderator!");
-        if (isSellerOwnedOrder(seller, orderItem))
+        if (!seller.hasSellableProductOrder(retailOrder))
             throw new NotOwnedException("Cannot accept order! because you don't own this order!");
         if (StringUtil.isNotValid(messageToBuyer))
             throw new NotValidBodyException("Cannot accept order! please provide a message for buyer.");
 
-        final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
-        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.ACCEPTED);
-        orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItem.setSellerMessage(messageToBuyer);
+        Status oldStatus = retailOrder.getStatus();
 
-        orderRepository.save(orderItem);
-        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.ACCEPTED.name());
+        retailOrder.setStatus(Status.ACCEPTED);
+        retailOrder.setUpdatedAt(LocalDateTime.now());
+        retailOrder.setSellerMessage(messageToBuyer);
+
+        retailOrderRepository.save(retailOrder);
+        log.debug("Seller successfully updated retail order with id of {} status from {} to {}", retailOrder.getId(), oldStatus, retailOrder.getStatus());
     }
 
     @Override
     public void acceptOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
+        WholeSaleProduct wholeSaleProduct = wholeSaleOrder.getWholeSaleProduct();
 
+        if (wholeSaleProduct.isRejected())
+            throw new ProductRejectedException("Cannot accept order! because with this product is rejected by the moderator!");
+        if (!seller.hasSellableProductOrder(wholeSaleOrder))
+            throw new NotOwnedException("Cannot accept order! because you don't own this order!");
+        if (StringUtil.isNotValid(messageToBuyer))
+            throw new NotValidBodyException("Cannot accept order! please provide a message for buyer.");
+
+        Status oldStatus = wholeSaleOrder.getStatus();
+
+        wholeSaleOrder.setStatus(Status.ACCEPTED);
+        wholeSaleOrder.setUpdatedAt(LocalDateTime.now());
+        wholeSaleOrder.setSellerMessage(messageToBuyer);
+
+        wholeSaleOrderRepository.save(wholeSaleOrder);
+        log.debug("Seller successfully updated whole sale order with id of {} status from {} to {}", wholeSaleOrder.getId(), oldStatus, wholeSaleOrder.getStatus());
     }
 
     @Override
     public void rejectOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
-
-        if (isSellerOwnedOrder(seller, orderItem))
+        if (!seller.hasSellableProductOrder(retailOrder))
             throw new NotOwnedException("Cannot reject order! because you don't own this order!");
         if (StringUtil.isNotValid(messageToBuyer))
             throw new NotValidBodyException("Cannot reject order! please provide a message for the buyer");
 
-        final OrderItem.OrderItemStatus oldStatus = orderItem.getOrderItemStatus();
-        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.REJECTED);
-        orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItem.setSellerMessage(messageToBuyer);
+        Status oldStatus = retailOrder.getStatus();
 
-        orderRepository.save(orderItem);
-        log.debug("Seller successfully updated order item with id of {} status from {} to {}", orderItem.getId(), oldStatus, OrderItem.OrderItemStatus.REJECTED.name());
+        retailOrder.setStatus(Status.REJECTED);
+        retailOrder.setUpdatedAt(LocalDateTime.now());
+        retailOrder.setSellerMessage(messageToBuyer);
+
+        orderRepository.save(retailOrder);
+        log.debug("Seller successfully updated retail order with id of {} status from {} to {}", retailOrder.getId(), oldStatus, retailOrder.getStatus());
     }
 
     @Override
     public void rejectOrder(User seller, WholeSaleOrder wholeSaleOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException {
+        if (!seller.hasSellableProductOrder(wholeSaleOrder))
+            throw new NotOwnedException("Cannot reject order! because you don't own this order!");
+        if (StringUtil.isNotValid(messageToBuyer))
+            throw new NotValidBodyException("Cannot reject order! please provide a message for the buyer");
 
+        Status oldStatus = wholeSaleOrder.getStatus();
+
+        wholeSaleOrder.setStatus(Status.REJECTED);
+        wholeSaleOrder.setUpdatedAt(LocalDateTime.now());
+        wholeSaleOrder.setSellerMessage(messageToBuyer);
+
+        orderRepository.save(wholeSaleOrder);
+        log.debug("Seller successfully updated whole sale order with id of {} status from {} to {}", wholeSaleOrder.getId(), oldStatus, wholeSaleOrder.getStatus());
     }
 
     @Override
     public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
-        if (isSellerOwnedOrder(seller, orderItem))
+        if (!seller.hasSellableProductOrder(retailOrder))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
-        Product product = orderItem.getProduct();
-        int newAvailableQuantity = product.getAvailableQuantity() - orderItem.getOrderQuantity();
+        RetailProduct retailProduct = retailOrder.getRetailProduct();
+        int newAvailableQuantity = retailProduct.getAvailableQuantity() - retailOrder.getOrderQuantity();
         if (newAvailableQuantity <= 0) {
-            product.setState(Product.State.SOLD);
-            orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
-            updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.SOLD);
+            retailProduct.setState(Product.State.SOLD);
+            retailOrder.setStatus(Status.SOLD);
 
-            PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(seller, orderItem.getPurchaser(), product);
+            PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(seller, retailOrder.getPurchaser(), retailProduct);
             privateChatRoomService.deleteAllMessages(privateChatRoom);
 
-            productRepository.save(product);
-            orderRepository.save(orderItem);
-            orderRepository.saveAll(product.getOrders());
+            retailProductRepository.save(retailProduct);
+            retailOrderRepository.save(retailOrder);
+            retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.SOLD);
             return;
         }
 
-        product.setAvailableQuantity(newAvailableQuantity);
-        orderItem.setOrderItemStatus(OrderItem.OrderItemStatus.SOLD);
-        updatePendingAndAcceptedOrderStatus(product, OrderItem.OrderItemStatus.CANCELLED);
+        retailProduct.setAvailableQuantity(newAvailableQuantity);
+        retailOrder.setStatus(Status.SOLD);
 
-        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(seller, orderItem.getPurchaser(), product);
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(seller, retailOrder.getPurchaser(), retailProduct);
         privateChatRoomService.deleteAllMessages(privateChatRoom);
 
-        productRepository.save(product);
-        orderRepository.save(orderItem);
-        orderRepository.saveAll(product.getOrders());
+        retailProductRepository.save(retailProduct);
+        retailOrderRepository.save(retailOrder);
+        retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
     }
 
     @Override
     public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+            throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
+        if (!seller.hasSellableProductOrder(wholeSaleOrder))
+            throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
+        WholeSaleProduct wholeSaleProduct = wholeSaleOrder.getWholeSaleProduct();
+        wholeSaleOrder.setStatus(Status.SOLD);
+
+        PrivateChatRoom privateChatRoom = privateChatRoomService.getChatRoom(seller, wholeSaleOrder.getPurchaser(), wholeSaleProduct);
+        privateChatRoomService.deleteAllMessages(privateChatRoom);
+
+        wholeSaleOrderRepository.save(wholeSaleOrder);
+        wholeSaleProductService.updateAllPendingAndAcceptedOrders(wholeSaleProduct, Status.CANCELLED);
     }
 }

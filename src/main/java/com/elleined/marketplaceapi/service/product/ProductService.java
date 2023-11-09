@@ -2,9 +2,8 @@ package com.elleined.marketplaceapi.service.product;
 
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.order.Order;
-import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.Order.Status;
 import com.elleined.marketplaceapi.model.product.Product;
-import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.time.LocalDateTime;
@@ -27,5 +26,5 @@ public interface ProductService<T extends Product> {
 
     List<T> getByDateRange(User seller, LocalDateTime start, LocalDateTime end);
 
-    void cancelAllPendingAndAcceptedOrders(T t);
+    void updateAllPendingAndAcceptedOrders(T t, Status status);
 }
