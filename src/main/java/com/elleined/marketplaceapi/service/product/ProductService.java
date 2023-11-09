@@ -24,4 +24,5 @@ public interface ProductService<T extends Product> {
 
     List<T> searchProductByCropName(String cropName);
 
+    List<T> getByDateRange(User seller, LocalDateTime start, LocalDateTime end);
 }

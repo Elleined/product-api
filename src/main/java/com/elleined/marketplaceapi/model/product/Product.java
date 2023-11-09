@@ -133,6 +133,13 @@ public abstract class Product {
     public boolean isSold() {
         return this.getState() == Product.State.SOLD;
     }
+    public boolean isPending() {
+        return this.getState() == State.PENDING;
+    }
+
+    public boolean isNotDeleted() {
+        return this.getStatus() == Status.ACTIVE;
+    }
 
     public boolean isExceedingToAvailableQuantity(int userOrderQuantity) {
         return userOrderQuantity > this.getAvailableQuantity();

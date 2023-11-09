@@ -43,8 +43,8 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(User::hasShopRegistration)
                 .map(User::getRetailProducts)
                 .flatMap(Collection::stream)
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isListed)
                 .toList();
 
         List<RetailProduct> regularUserProducts = userRepository.findAll().stream()
@@ -53,8 +53,8 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(User::hasShopRegistration)
                 .map(User::getRetailProducts)
                 .flatMap(Collection::stream)
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isListed)
                 .toList();
 
         List<RetailProduct> products = new ArrayList<>();
@@ -72,7 +72,7 @@ public class RetailProductServiceImpl implements RetailProductService {
     @Override
     public List<RetailProduct> getAllByState(User seller, Product.State state) {
         return seller.getRetailProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(Product::isNotDeleted)
                 .filter(product -> product.getState() == state)
                 .sorted(Comparator.comparing(Product::getListingDate).reversed())
                 .toList();
@@ -86,8 +86,8 @@ public class RetailProductServiceImpl implements RetailProductService {
 
         // Pending products
         expiredProducts.stream()
-                .filter(retailProduct -> retailProduct.getStatus() == Product.Status.ACTIVE)
-                .filter(retailProduct -> retailProduct.getState() == Product.State.PENDING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isPending)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
                     updatePendingAndAcceptedOrderStatus(retailProduct);
@@ -95,8 +95,8 @@ public class RetailProductServiceImpl implements RetailProductService {
 
         // Listing retailProducts
         expiredProducts.stream()
-                .filter(retailProduct -> retailProduct.getStatus() == Product.Status.ACTIVE)
-                .filter(retailProduct -> retailProduct.getState() == Product.State.LISTING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isListed)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
                     updatePendingAndAcceptedOrderStatus(retailProduct);
@@ -107,8 +107,17 @@ public class RetailProductServiceImpl implements RetailProductService {
     @Override
     public List<RetailProduct> searchProductByCropName(String cropName) {
         return retailProductRepository.searchProductByCropName(cropName).stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isListed)
+                .toList();
+    }
+
+    @Override
+    public List<RetailProduct> getByDateRange(User seller, LocalDateTime start, LocalDateTime end) {
+        return seller.getRetailProducts().stream()
+                .filter(product -> product.getListingDate().equals(start)
+                        || (product.getListingDate().isAfter(start) && product.getListingDate().isBefore(end))
+                        || product.getListingDate().equals(end))
                 .toList();
     }
 
@@ -135,14 +144,13 @@ public class RetailProductServiceImpl implements RetailProductService {
         return totalPrice;
     }
 
-    @Override
-    public void updatePendingAndAcceptedOrderStatus(RetailProduct retailProduct) {
+    private void updatePendingAndAcceptedOrderStatus(RetailProduct retailProduct) {
         List<RetailOrder> pendingOrders = retailProduct.getRetailOrders().stream()
-                .filter(orderItem -> orderItem.getStatus() == Order.Status.PENDING)
+                .filter(Order::isPending)
                 .toList();
 
         List<RetailOrder> acceptedOrders = retailProduct.getRetailOrders().stream()
-                .filter(orderItem -> orderItem.getStatus() == Order.Status.ACCEPTED)
+                .filter(Order::isAccepted)
                 .toList();
 
         pendingOrders.forEach(orderItem -> {

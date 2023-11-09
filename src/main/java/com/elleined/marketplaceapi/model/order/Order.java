@@ -91,4 +91,8 @@ public abstract class Order {
     public boolean isAccepted() {
         return this.getStatus() == Status.ACCEPTED;
     }
+    public boolean isPending() {return this.getStatus() == Status.PENDING;}
+    public boolean isRejected() {
+        return this.getStatus() == Status.REJECTED;
+    }
 }

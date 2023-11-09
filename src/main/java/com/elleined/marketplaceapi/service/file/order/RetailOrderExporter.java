@@ -2,8 +2,8 @@ package com.elleined.marketplaceapi.service.file.order;
 
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.service.order.OrderService;
 import com.elleined.marketplaceapi.utils.Formatter;
-import com.elleined.marketplaceapi.utils.OrderUtils;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -65,7 +65,7 @@ public class RetailOrderExporter implements OrderExporter<RetailProduct> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        List<RetailOrder> rangedRetailOrders = OrderUtils.getOrdersByDateRange(retailProduct.getRetailOrders(), start, end);
+        List<RetailOrder> rangedRetailOrders = OrderService.getOrdersByDateRange(retailProduct.getRetailOrders(), start, end);
         writeTableData(table, rangedRetailOrders);
 
         document.add(header);

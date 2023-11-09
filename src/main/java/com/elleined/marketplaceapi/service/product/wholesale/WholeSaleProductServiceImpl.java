@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -83,7 +84,11 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
     }
 
     @Override
-    public void updatePendingAndAcceptedOrderStatus(WholeSaleProduct wholeSaleProduct) {
-
+    public List<WholeSaleProduct> getByDateRange(User seller, LocalDateTime start, LocalDateTime end) {
+        return seller.getWholeSaleProducts().stream()
+                .filter(product -> product.getListingDate().equals(start)
+                        || (product.getListingDate().isAfter(start) && product.getListingDate().isBefore(end))
+                        || product.getListingDate().equals(end))
+                .toList();
     }
 }

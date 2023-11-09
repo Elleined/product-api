@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -76,8 +75,8 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
 
     @Override
     public boolean isExceedsToMaxRejectionPerDay(User seller) {
-        final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
+
+
         return orderRepository.fetchSellerRejectedOrderCount(
                 currentDateTimeMidnight,
                 tomorrowMidnight,
