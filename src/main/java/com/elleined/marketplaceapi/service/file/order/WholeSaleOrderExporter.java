@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.file.order;
 
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.service.order.OrderService;
@@ -64,7 +65,7 @@ public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        List<WholeSaleOrder> rangedWholeSaleOrders = OrderService.getOrdersByDateRange(wholeSaleProduct.getWholeSaleOrders(), start, end);
+        List<WholeSaleOrder> rangedWholeSaleOrders = OrderService.getByDateRange(wholeSaleProduct.getWholeSaleOrders(), Order.Status.SOLD, start, end);
         writeTableData(table, rangedWholeSaleOrders);
 
         document.add(header);

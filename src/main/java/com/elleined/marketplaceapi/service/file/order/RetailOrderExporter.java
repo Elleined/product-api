@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.file.order;
 
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.service.order.OrderService;
@@ -19,6 +20,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class RetailOrderExporter implements OrderExporter<RetailProduct> {
+
 
     @Override
     public void export(HttpServletResponse response, RetailProduct retailProduct) throws DocumentException, IOException {
@@ -65,7 +67,7 @@ public class RetailOrderExporter implements OrderExporter<RetailProduct> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        List<RetailOrder> rangedRetailOrders = OrderService.getOrdersByDateRange(retailProduct.getRetailOrders(), start, end);
+        List<RetailOrder> rangedRetailOrders = OrderService.getByDateRange(retailProduct.getRetailOrders(), Order.Status.SOLD, start, end);
         writeTableData(table, rangedRetailOrders);
 
         document.add(header);

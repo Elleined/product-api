@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +26,7 @@ public class WholeSaleOrderService implements OrderService<WholeSaleOrder> {
     @Override
     public List<WholeSaleOrder> getAllProductOrderByStatus(User seller, Order.Status orderStatus) {
         List<WholeSaleOrder> premiumUserOrders = seller.getWholeSaleProducts().stream()
-                .filter(wholeSaleProduct -> wholeSaleProduct.getStatus() == Product.Status.ACTIVE)
+                .filter(Product::isNotDeleted)
                 .flatMap(wholeSaleProduct -> wholeSaleProduct.getWholeSaleOrders().stream()
                         .filter(wholeSaleOrder -> wholeSaleOrder.getStatus() == orderStatus)
                         .filter(wholeSaleOrder -> wholeSaleOrder.getPurchaser().isPremium())
@@ -32,7 +34,7 @@ public class WholeSaleOrderService implements OrderService<WholeSaleOrder> {
                 .toList();
 
         List<WholeSaleOrder> regularUserOrders = seller.getWholeSaleProducts().stream()
-                .filter(wholeSaleProduct -> wholeSaleProduct.getStatus() == Product.Status.ACTIVE)
+                .filter(Product::isNotDeleted)
                 .flatMap(wholeSaleProduct -> wholeSaleProduct.getWholeSaleOrders().stream()
                         .filter(productOrder -> productOrder.getStatus() == orderStatus)
                         .filter(productOrder -> !productOrder.getPurchaser().isPremium())

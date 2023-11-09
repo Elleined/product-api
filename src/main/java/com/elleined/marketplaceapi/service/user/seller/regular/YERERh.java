@@ -152,8 +152,8 @@ public class YERERh implements SellerService, RegularSellerRestriction {
         List<RetailProduct> createdRetailProductToday = retailProductService.getByDateRange(seller, todayMidnight, tomorrowMidnight);
         List<WholeSaleProduct> createdWholeSaleProductToday = wholeSaleProductService.getByDateRange(seller, todayMidnight, tomorrowMidnight);
 
-
-        return false;
+        int totalCreatedProductsToday = createdRetailProductToday.size() + createdWholeSaleProductToday.size();
+        return totalCreatedProductsToday >= MAX_LISTING_PER_DAY;
     }
 
     @Override
@@ -161,13 +161,8 @@ public class YERERh implements SellerService, RegularSellerRestriction {
         LocalDateTime todayMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime tomorrowMidnight = todayMidnight.plusDays(1);
 
-        List<RetailOrder> rejectedRetailOrderByDateRange = OrderService.getOrdersByDateRange(seller.getRetailOrders(), todayMidnight, tomorrowMidnight).stream()
-                .filter(Order::isRejected)
-                .toList();
-
-        List<WholeSaleOrder> rejectedWholeSaleOrderByDateRange = OrderService.getOrdersByDateRange(seller.getWholeSaleOrders(), todayMidnight, tomorrowMidnight).stream()
-                .filter(Order::isRejected)
-                .toList();
+        List<RetailOrder> rejectedRetailOrderByDateRange = OrderService.getByDateRange(seller.getRetailOrders(), Order.Status.REJECTED, todayMidnight, tomorrowMidnight);
+        List<WholeSaleOrder> rejectedWholeSaleOrderByDateRange = OrderService.getByDateRange(seller.getWholeSaleOrders(), Order.Status.REJECTED, todayMidnight, tomorrowMidnight);
 
         int totalRejectedOrdersToday = rejectedRetailOrderByDateRange.size() + rejectedWholeSaleOrderByDateRange.size();
         return totalRejectedOrdersToday >= MAX_ORDER_REJECTION_PER_DAY;
