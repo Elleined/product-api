@@ -15,6 +15,7 @@ import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +30,18 @@ import java.io.IOException;
 @Transactional
 @Qualifier("premiumSellerProxy")
 public class PremiumSellerProxy implements SellerService {
+
+    public static final float SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE = 1;
+    
+    private final SellerService sellerService;
+    private final FeeService feeService;
+
+    public PremiumSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
+                              FeeService feeService) {
+        this.sellerService = sellerService;
+        this.feeService = feeService;
+    }
+
     @Override
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
         return sellerService.saleProduct(seller, product, salePercentage);
