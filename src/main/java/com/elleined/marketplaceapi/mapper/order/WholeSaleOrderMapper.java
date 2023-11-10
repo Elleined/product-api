@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.mapper.order;
 
-import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.dto.order.WholeSaleOrderDTO;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
@@ -14,7 +13,7 @@ import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-@Mapper(componentModel = "spring", imports = Order.Status.class)
+@Mapper(componentModel = "spring", imports = Order.class)
 public abstract class WholeSaleOrderMapper implements OrderMapper<WholeSaleOrderDTO, WholeSaleOrder> {
 
     @Autowired
@@ -30,7 +29,7 @@ public abstract class WholeSaleOrderMapper implements OrderMapper<WholeSaleOrder
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "sellerMessage", ignore = true),
 
-            @Mapping(target = "price", expression = "java(wholeSaleProductService.getById(wholeSaleOrderDTO.getProductId()).getPrice())"),
+            @Mapping(target = "price", expression = "java(wholeSaleProductService.getById(wholeSaleOrderDTO.getProductId()).getPrice().toBigInteger().doubleValue())"),
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "status", expression = "java(Order.Status.PENDING)"),
             @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, wholeSaleOrderDTO.getDeliveryAddressId()))"),

@@ -7,6 +7,7 @@ import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -31,11 +32,11 @@ public abstract class RetailCartItemMapper implements CartMapper<RetailCartItemD
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(currentUser, dto.getDeliveryAddressId()))"),
+            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId()))"),
             @Mapping(target = "retailProduct", expression = "java(retailProductService.getById(dto.getProductId()))"),
-            @Mapping(target = "purchaser", expression = "java(currentUser)")
+            @Mapping(target = "purchaser", expression = "java(buyer)")
     })
-    public abstract RetailCartItem toEntity(RetailCartItemDTO dto, User buyer);
+    public abstract RetailCartItem toEntity(RetailCartItemDTO dto, @Context User buyer);
 
     @Override
     @Mappings({

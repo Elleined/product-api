@@ -7,6 +7,7 @@ import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -33,7 +34,7 @@ public abstract class WholeSaleCartItemMapper implements CartMapper<WholeSaleCar
             @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProductService.getById(dto.getProductId()))"),
             @Mapping(target = "purchaser", expression = "java(currentUser)")
     })
-    public abstract WholeSaleCartItem toEntity(WholeSaleCartItemDTO dto, User buyer);
+    public abstract WholeSaleCartItem toEntity(WholeSaleCartItemDTO dto, @Context User buyer);
 
     @Override
     @Mappings({
