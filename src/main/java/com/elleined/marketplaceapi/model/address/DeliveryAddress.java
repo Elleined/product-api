@@ -29,19 +29,19 @@ public class DeliveryAddress extends Address {
     private User user;
 
     // delivery address id reference is in tbl order whole sale
-    @OneToMany(mappedBy = "purchaser")
+    @OneToMany(mappedBy = "deliveryAddress")
     private List<WholeSaleOrder> wholeSaleOrders;
 
     // delivery address id reference is in tbl order retail
-    @OneToMany(mappedBy = "purchaser")
+    @OneToMany(mappedBy = "deliveryAddress")
     private List<RetailOrder> retailOrders;
 
     // delivery address id reference is in tbl cart whole sale
-    @OneToMany(mappedBy = "purchaser")
+    @OneToMany(mappedBy = "deliveryAddress")
     private List<WholeSaleCartItem> wholeSaleCartItems;
 
     // delivery address id reference is in tbl cart retail
-    @OneToMany(mappedBy = "purchaser")
+    @OneToMany(mappedBy = "deliveryAddress")
     private List<RetailCartItem> retailCartItems;
 
     @Builder(builderMethodName = "deliveryAddressBuilder")

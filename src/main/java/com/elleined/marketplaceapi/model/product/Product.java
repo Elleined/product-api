@@ -11,10 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(
-        name = "tbl_product",
-        indexes = @Index(name = "keyword_idx", columnList = "keyword")
-)
+@Table(name = "tbl_product")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Getter
 @Setter
