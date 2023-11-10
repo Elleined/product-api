@@ -8,11 +8,16 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
+import com.elleined.marketplaceapi.mapper.cart.WholeSaleCartItemMapper;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
 import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.repository.cart.WholeSaleCartItemRepository;
+import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.service.cart.CartItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +33,11 @@ import java.util.List;
 @Transactional
 @Qualifier("wholeSaleCartItemService")
 public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
+    private final WholeSaleCartItemRepository wholeSaleCartItemRepository;
+    private final WholeSaleCartItemMapper wholeSaleCartItemMapper;
+
+    private final WholeSaleOrderRepository wholeSaleOrderRepository;
+
     @Override
     public List<WholeSaleCartItem> getAll(User currentUser) {
         return null;
@@ -54,7 +64,7 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
     }
 
     @Override
-    public List<Order> orderAllCartItems(User currentUser, List<WholeSaleCartItem> cartItems) {
+    public List<WholeSaleOrder> orderAllCartItems(User currentUser, List<WholeSaleCartItem> cartItems) {
         return null;
     }
 
@@ -64,12 +74,7 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
     }
 
     @Override
-    public WholeSaleCartItem getByProduct(User currentUser, RetailProduct retailProduct) throws ResourceNotFoundException {
-        return null;
-    }
-
-    @Override
-    public WholeSaleCartItem getByProduct(User currentUser, WholeSaleProduct wholeSaleProduct) throws ResourceNotFoundException {
+    public WholeSaleCartItem getByProduct(User currentUser, Product product) throws ResourceNotFoundException {
         return null;
     }
 

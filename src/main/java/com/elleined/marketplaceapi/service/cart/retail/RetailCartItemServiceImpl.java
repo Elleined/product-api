@@ -14,9 +14,11 @@ import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.cart.RetailCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
+import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -26,14 +28,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.elleined.marketplaceapi.model.order.Order.Status.ACCEPTED;
+import static com.elleined.marketplaceapi.model.order.Order.Status.PENDING;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 @Primary
 public class RetailCartItemServiceImpl implements RetailCartItemService {
-    private final RetailCartItemRepository retailCartItemRepository;
+    private final RetailProductService retailProductService;
+
     private final RetailCartItemMapper retailCartItemMapper;
+    private final RetailCartItemRepository retailCartItemRepository;
 
     private final RetailOrderRepository retailOrderRepository;
 
@@ -60,6 +67,29 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
 
     @Override
     public RetailCartItem save(User currentUser, RetailCartItemDTO dto) throws AlreadyExistException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ResourceOwnedException, ResourceNotFoundException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, ProductExpiredException, BuyerAlreadyRejectedException {
+        RetailProduct retailProduct = retailProductService.getById(dto.getProductId());
+
+        if (retailProduct.isExpired())
+            throw new ProductExpiredException("Cannot add to cart! because this product is already expired!");
+        if (currentUser.isProductAlreadyInCart(retailProduct))
+            throw new AlreadyExistException("Cannot add to cart! because you already have this product in your cart.");
+        if (currentUser.hasOrder(retailProduct, PENDING))
+            throw new ProductHasPendingOrderException("Cannot add to cart! because you already has pending order for this product. Please wait until seller take action in you order request!");
+        if (currentUser.hasOrder(retailProduct, ACCEPTED))
+            throw new ProductHasAcceptedOrderException("Cannot add to cart! because you already have accepted order for this product. Please contact the seller to settle your order");
+        if (currentUser.hasProduct(retailProduct))
+            throw new ResourceOwnedException("Cannot add to cart! you cannot add to your cart your own product!");
+        if (retailProduct.isDeleted())
+            throw new ResourceNotFoundException("Cannot add to cart! because this product might already been deleted or does not exists!");
+        if (retailProduct.isSold())
+            throw new ProductAlreadySoldException("Cannot add to cart! because this product already been sold");
+        if (!retailProduct.isListed())
+            throw new ProductNotListedException("Cannot add to cart! because this product are not yet listed");
+        if (retailProduct.isExceedingToAvailableQuantity(dto.getOrderQuantity()))
+            throw new OrderQuantiantyExceedsException("Cannot add to cart! because trying to order that exceeds to available amount!");
+        if (retailProductService.isRejectedBySeller(currentUser, retailProduct))
+            throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
+
         RetailCartItem retailCartItem = retailCartItemMapper.toEntity(dto, currentUser);
         currentUser.getRetailCartItems().add(retailCartItem);
 
@@ -70,13 +100,31 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
 
     @Override
     public RetailOrder orderCartItem(User currentUser, RetailCartItem retailCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException {
-        if (currentUser.hasProduct(retailCartItem.getRetailProduct())) throw new ResourceOwnedException("You cannot order your own product listing!");
-        RetailOrder retailOrder = retailCartItemMapper.cartItemToOrder(retailCartItem);
+        RetailProduct retailProduct = retailCartItem.getRetailProduct();
 
-        int retailCartItemId = retailCartItem.getId();
+        if (retailProduct.isExpired())
+            throw new ProductExpiredException("Cannot order! because this product is already expired!");
+        if (currentUser.hasOrder(retailProduct, PENDING))
+            throw new ProductHasPendingOrderException("Cannot order! because you already pending order for this product. Please wait until seller take action in you order request!");
+        if (currentUser.hasOrder(retailProduct, ACCEPTED))
+            throw new ProductHasAcceptedOrderException("Cannot order! because you already have a accepted order for this product. Please contact the seller to settle your order!");
+        if (retailProduct.isDeleted())
+            throw new ResourceNotFoundException("Cannot order! because this product does not exist or might already been deleted");
+        if (retailProduct.isSold())
+            throw new ProductAlreadySoldException("Cannot order! because this product has already been sold");
+        if (!retailProduct.isListed())
+            throw new ProductNotListedException("Cannot order! because this product is not yet been listed");
+        if (retailProduct.isExceedingToAvailableQuantity(retailCartItem.getOrderQuantity()))
+            throw new OrderQuantiantyExceedsException("Cannot order! because you are trying to order that exceeds to available amount!");
+        if (retailProductService.isRejectedBySeller(currentUser, retailProduct))
+            throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
+        if (currentUser.hasProduct(retailCartItem.getRetailProduct()))
+            throw new ResourceOwnedException("You cannot order your own product listing!");
+
+        RetailOrder retailOrder = retailCartItemMapper.cartItemToOrder(retailCartItem);
         retailCartItemRepository.delete(retailCartItem);
         retailOrderRepository.save(retailOrder);
-        log.debug("Cart item with id of {} are now moved to order item with id of {}", retailCartItemId, retailOrder.getId());
+        log.debug("Cart item with id of {} are now moved to order item with id of {}", retailCartItem.getId(), retailOrder.getId());
         return retailOrder;
     }
 

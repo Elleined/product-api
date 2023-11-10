@@ -67,6 +67,7 @@ public class CartItemServiceProxy implements CartItemService {
             OrderQuantiantyExceedsException,
             ProductExpiredException,
             BuyerAlreadyRejectedException {
+
         Product product = productService.getById(cartItemDTO.getProductId());
 
         if (product.isExpired())

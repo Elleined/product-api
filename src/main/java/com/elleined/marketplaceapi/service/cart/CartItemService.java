@@ -35,7 +35,6 @@ public interface CartItemService<ENTITY extends CartItem, DTO extends CartItemDT
             ProductExpiredException,
             BuyerAlreadyRejectedException;
 
-    // Same validation in order product in buyerService
     Order orderCartItem(User currentUser, ENTITY entity)
             throws ResourceNotFoundException,
             ResourceOwnedException,
