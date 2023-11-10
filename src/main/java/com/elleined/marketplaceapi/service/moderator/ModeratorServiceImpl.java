@@ -19,7 +19,7 @@ import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
-import com.elleined.marketplaceapi.service.moderator.request.ProductRequest;
+import com.elleined.marketplaceapi.service.moderator.request.product.ProductRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
 import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
