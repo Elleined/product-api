@@ -30,9 +30,9 @@ public abstract class WholeSaleCartItemMapper implements CartMapper<WholeSaleCar
     @Override
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(currentUser, cartItemDTO.getDeliveryAddressId()))"),
+            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId()))"),
             @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProductService.getById(dto.getProductId()))"),
-            @Mapping(target = "purchaser", expression = "java(currentUser)")
+            @Mapping(target = "purchaser", expression = "java(buyer)")
     })
     public abstract WholeSaleCartItem toEntity(WholeSaleCartItemDTO dto, @Context User buyer);
 
