@@ -21,7 +21,7 @@ public class RetailOrder extends Order {
     @ManyToOne(optional = false)
     @JoinColumn(
             name = "retail_product_id",
-            referencedColumnName = "id",
+            referencedColumnName = "product_id",
             nullable = false
     )
     private RetailProduct retailProduct;

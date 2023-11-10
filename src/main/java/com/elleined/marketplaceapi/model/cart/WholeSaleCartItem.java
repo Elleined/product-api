@@ -24,7 +24,7 @@ public class WholeSaleCartItem extends CartItem {
     @ManyToOne(optional = false)
     @JoinColumn(
             name = "whole_sale_product",
-            referencedColumnName = "id",
+            referencedColumnName = "product_id",
             nullable = false
     )
     private WholeSaleProduct wholeSaleProduct;
