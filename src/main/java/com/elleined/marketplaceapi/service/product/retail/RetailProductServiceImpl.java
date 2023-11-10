@@ -147,6 +147,16 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
+    public boolean isRejectedBySeller(User buyer, RetailProduct retailProduct) {
+        return buyer.getRetailOrders().stream()
+                .filter(retailOrder -> retailOrder.getRetailProduct().equals(retailProduct))
+                .anyMatch(retailOrder -> {
+                    LocalDateTime reOrderingDate = retailOrder.getUpdatedAt().plusDays(1);
+                    return retailOrder.isRejected() && LocalDateTime.now().isBefore(reOrderingDate);
+                });
+    }
+
+    @Override
     public double calculateOrderPrice(RetailProduct retailProduct, int userOrderQuantity) {
         return retailProduct.getPricePerUnit() * userOrderQuantity;
     }
