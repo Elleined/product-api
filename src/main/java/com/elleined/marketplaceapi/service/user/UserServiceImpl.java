@@ -132,7 +132,7 @@ public class UserServiceImpl
         this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
-        saveForumUser(registeringUser);
+        // saveForumUser(registeringUser);
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
