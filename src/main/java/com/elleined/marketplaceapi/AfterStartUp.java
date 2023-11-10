@@ -3,13 +3,16 @@ package com.elleined.marketplaceapi;
 import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.model.AppWallet;
-import com.elleined.marketplaceapi.populator.Populator;
+import com.elleined.marketplaceapi.populator.CropPopulator;
+import com.elleined.marketplaceapi.populator.UserPopulator;
+import com.elleined.marketplaceapi.populator.unit.RetailUnitPopulator;
+import com.elleined.marketplaceapi.populator.unit.WholeSaleUnitPopulator;
 import com.elleined.marketplaceapi.repository.AppWalletRepository;
 import com.elleined.marketplaceapi.repository.CropRepository;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,32 +22,21 @@ import java.math.BigDecimal;
 @Transactional
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AfterStartUp {
 
-    private final Populator cropPopulator;
-    private final Populator unitPopulator;
-    private final Populator userPopulator;
+    private final CropPopulator cropPopulator;
+    private final RetailUnitPopulator retailUnitPopulator;
+    private final WholeSaleUnitPopulator wholeSaleUnitPopulator;
+    private final UserPopulator userPopulator;
     private final CropRepository cropRepository;
     private final AppWalletRepository appWalletRepository;
     private final ModeratorService moderatorService;
 
-    public AfterStartUp(Populator cropPopulator,
-                        @Qualifier("unitPopulator") Populator unitPopulator,
-                        @Qualifier("userPopulator") Populator userPopulator,
-                        CropRepository cropRepository,
-                        AppWalletRepository appWalletRepository,
-                        ModeratorService moderatorService) {
-        this.cropPopulator = cropPopulator;
-        this.unitPopulator = unitPopulator;
-        this.userPopulator = userPopulator;
-        this.cropRepository = cropRepository;
-        this.appWalletRepository = appWalletRepository;
-        this.moderatorService = moderatorService;
-    }
-
     private final static String CROPS_JSON = "/json/crops.json";
     private final static String USERS_JSON = "/json/users.json";
-    private final static String UNITS_JSON = "/json/units.json";
+    private final static String RETAIL_UNITS_JSON = "/json/retail_units.json";
+    private final static String WHOLE_SALE_UNITS_JSON = "/json/whole_sale_units.json";
 
     @PostConstruct
     public void init() throws IOException {
@@ -55,7 +47,8 @@ public class AfterStartUp {
         log.debug("Saving app wallet, moderator, crops and units initial values! Please wait....");
 
         cropPopulator.populate(CROPS_JSON);
-        unitPopulator.populate(UNITS_JSON);
+        retailUnitPopulator.populate(RETAIL_UNITS_JSON);
+        wholeSaleUnitPopulator.populate(WHOLE_SALE_UNITS_JSON);
         userPopulator.populate(USERS_JSON);
 
         AppWallet appWallet = AppWallet.builder()
