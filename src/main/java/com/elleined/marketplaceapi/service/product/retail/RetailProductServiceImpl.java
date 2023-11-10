@@ -162,11 +162,7 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
-    public double calculateTotalPrice(RetailProductDTO retailProductDTO) {
-        int availableQuantity = retailProductDTO.getAvailableQuantity();
-        int quantityPerUnit = retailProductDTO.getQuantityPerUnit();
-        double pricePerUnit = retailProductDTO.getPricePerUnit();
-
+    public double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity) {
         int counter = 0;
         while (availableQuantity > 0) {
             if (availableQuantity <= quantityPerUnit) counter++;

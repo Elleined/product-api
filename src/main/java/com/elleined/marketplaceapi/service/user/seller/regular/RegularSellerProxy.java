@@ -86,7 +86,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             throw new SellerMaxListingException("Cannot save product! because already reached the limit of product listing per day which is " + MAX_LISTING_PER_DAY + ". Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
 
-        double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO);
+        double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO.getPricePerUnit(), retailProductDTO.getQuantityPerUnit(), retailProductDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
             throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
@@ -115,7 +115,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
         // Add more validation for regular seller here for future
 
 
-        double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO);
+        double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO.getPricePerUnit(), retailProductDTO.getQuantityPerUnit(), retailProductDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
             throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");

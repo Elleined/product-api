@@ -1,8 +1,6 @@
 package com.elleined.marketplaceapi.mapper.product;
 
-import com.elleined.marketplaceapi.dto.product.ProductDTO;
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
@@ -39,7 +37,7 @@ public abstract class RetailProductMapper implements ProductMapper<RetailProduct
             @Mapping(target = "sellerName", expression = "java(getFullName(retailProduct.getSeller()))"),
             @Mapping(target = "cropName", source = "retailProduct.crop.name"),
             @Mapping(target = "shopName", source = "retailProduct.seller.shop.name"),
-            @Mapping(target = "totalPrice", expression = "java(retailProductService.calculateTotalPrice(retailProduct))"),
+            @Mapping(target = "totalPrice", expression = "java(retailProductService.calculateTotalPrice(retailProduct.getPricePerUnit(), retailProduct.getQuantityPerUnit(), retailProduct.getQuantityPerUnit()))"),
             @Mapping(target = "listingDate", expression = "java(retailProduct.getListingDate().toLocalDate())"),
             @Mapping(target = "unitId", source = "retailUnit.id"),
             @Mapping(target = "unitName", source = "retailUnit.name")
