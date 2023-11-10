@@ -52,7 +52,7 @@ public abstract class WholeSaleCartItemMapper implements CartMapper<WholeSaleCar
                 .orderDate(LocalDateTime.now())
                 .purchaser(wholeSaleCartItem.getPurchaser())
                 .deliveryAddress(wholeSaleCartItem.getDeliveryAddress())
-                .orderStatus(Order.Status.PENDING)
+                .status(Order.Status.PENDING)
                 .sellerMessage(null)
                 .updatedAt(LocalDateTime.now())
                 .build();

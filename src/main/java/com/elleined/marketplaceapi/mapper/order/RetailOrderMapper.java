@@ -29,7 +29,7 @@ public abstract class RetailOrderMapper implements OrderMapper<RetailOrderDTO, R
             @Mapping(target = "price", ignore = true),
 
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
-            @Mapping(target = "orderStatus", expression = "java(Order.Status.PENDING)"),
+            @Mapping(target = "status", expression = "java(Order.Status.PENDING)"),
             @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, retailOrderDTO.getDeliveryAddressId()))"),
             @Mapping(target = "retailProduct", expression = "java(retailProductService.getById(retailOrderDTO.getProductId()))"),
             @Mapping(target = "purchaser", expression = "java(buyer)"),

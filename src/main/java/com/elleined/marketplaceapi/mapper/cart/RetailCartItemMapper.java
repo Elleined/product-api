@@ -55,7 +55,7 @@ public abstract class RetailCartItemMapper implements CartMapper<RetailCartItemD
                 .orderDate(LocalDateTime.now())
                 .purchaser(retailCartItem.getPurchaser())
                 .deliveryAddress(retailCartItem.getDeliveryAddress())
-                .orderStatus(Order.Status.PENDING)
+                .status(Order.Status.PENDING)
                 .sellerMessage(null)
                 .updatedAt(LocalDateTime.now())
                 .build();

@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.controller.constants.seller;
 
 
+import com.elleined.marketplaceapi.service.user.seller.regular.RegularSellerProxy;
 import com.elleined.marketplaceapi.service.user.seller.regular.RegularSellerRestriction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

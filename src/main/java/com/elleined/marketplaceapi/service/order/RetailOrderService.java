@@ -27,8 +27,8 @@ public class RetailOrderService implements OrderService<RetailOrder> {
         List<RetailOrder> premiumUserOrders = seller.getRetailProducts().stream()
                 .filter(Product::isNotDeleted)
                 .flatMap(retailProduct -> retailProduct.getRetailOrders().stream()
-                        .filter(wholeSaleOrder -> wholeSaleOrder.getStatus() == orderStatus)
-                        .filter(wholeSaleOrder -> wholeSaleOrder.getPurchaser().isPremium())
+                        .filter(retailOrder -> retailOrder.getStatus() == orderStatus)
+                        .filter(retailOrder -> retailOrder.getPurchaser().isPremium())
                         .sorted(Comparator.comparing(Order::getOrderDate).reversed()))
                 .toList();
 
@@ -44,6 +44,15 @@ public class RetailOrderService implements OrderService<RetailOrder> {
         orders.addAll(premiumUserOrders);
         orders.addAll(regularUserOrders);
         return orders;
+    }
+
+    @Override
+    public List<RetailOrder> getAllOrderedProductsByStatus(User buyer, Order.Status status) {
+        return buyer.getRetailOrders().stream()
+                .filter(retailOrder -> retailOrder.getStatus() == status)
+                .filter(retailOrder -> retailOrder.getRetailProduct().getStatus() == Product.Status.ACTIVE)
+                .sorted(Comparator.comparing(Order::getOrderDate).reversed())
+                .toList();
     }
 
     @Override

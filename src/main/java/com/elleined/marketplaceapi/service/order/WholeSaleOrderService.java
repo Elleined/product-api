@@ -48,6 +48,15 @@ public class WholeSaleOrderService implements OrderService<WholeSaleOrder> {
     }
 
     @Override
+    public List<WholeSaleOrder> getAllOrderedProductsByStatus(User buyer, Order.Status status) {
+        return buyer.getWholeSaleOrders().stream()
+                .filter(wholeSaleOrder -> wholeSaleOrder.getStatus() == status)
+                .filter(wholeSaleOrder -> wholeSaleOrder.getWholeSaleProduct().getStatus() == Product.Status.ACTIVE)
+                .sorted(Comparator.comparing(Order::getOrderDate).reversed())
+                .toList();
+    }
+
+    @Override
     public WholeSaleOrder getById(int id) throws ResourceNotFoundException {
         return wholeSaleOrderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Whole sale order with id of " + id + " does not exists!"));
     }
