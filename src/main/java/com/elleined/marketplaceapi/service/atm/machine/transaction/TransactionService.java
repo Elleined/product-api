@@ -9,18 +9,12 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.util.List;
 import java.util.Set;
 
-public interface TransactionService {
+public interface TransactionService<T extends Transaction> {
 
-    Transaction save(Transaction transaction);
+    T save(T t);
 
-    Transaction getById(int id) throws ResourceNotFoundException;
-    WithdrawTransaction getWithdrawTransactionById(int withdrawTransactionId) throws ResourceNotFoundException;
-    DepositTransaction getDepositTransactionById(int depositTransactionId) throws ResourceNotFoundException;
-    List<DepositTransaction> getAllDepositTransactionById(Set<Integer> depositTransactionIds);
-    List<WithdrawTransaction> getAllWithdrawTransactions(Set<Integer> withdrawTransactionIds);
-    List<WithdrawTransaction> getAllWithdrawalTransactions(User currentUser);
-    List<DepositTransaction> getAllDepositTransactions(User currentUser);
-    List<PeerToPeerTransaction> getAllReceiveMoneyTransactions(User currentUser);
-    List<PeerToPeerTransaction> getAllSentMoneyTransactions(User currentUser);
+    T getById(int id) throws ResourceNotFoundException;
+    List<T> getAllById(Set<Integer> ids);
+    List<T> getAll(User currentUser);
 
 }
