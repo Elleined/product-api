@@ -1,6 +1,8 @@
 package com.elleined.marketplaceapi.mock;
 
 import com.elleined.marketplaceapi.model.Credential;
+import com.elleined.marketplaceapi.model.Shop;
+import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.model.user.UserVerification;
@@ -16,6 +18,17 @@ public interface UserMockDataFactory {
 
     static User getUser() {
         return User.builder()
+                .id(1)
+                .premium(Premium.builder()
+                        .id(1)
+                        .registrationDate(LocalDateTime.now())
+                        .build())
+                .shop(Shop.builder()
+                        .id(1)
+                        .name("ShopName")
+                        .description("Shop Description")
+                        .picture("Shop Picture")
+                        .build())
                 .userVerification(UserVerification.builder()
                         .status(UserVerification.Status.NOT_VERIFIED)
                         .build())

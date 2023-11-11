@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.AddressRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,7 +36,8 @@ class AddressServiceImplTest {
     @Mock
     private AddressRepository addressRepository;
 
-    @Spy
+
+    @Mock
     private UserAddressMapper userAddressMapper;
 
     @Mock
@@ -45,16 +47,30 @@ class AddressServiceImplTest {
     private AddressServiceImpl addressService;
 
     @Test
+    @DisplayName("Saving user address")
     void saveUserAddress() {
-        User registeringUser = UserMockDataFactory.getUser();
-        AddressDTO addressDTO = AddressMockDataFactory.getAddress();
+        User registeringUser = new User();
+        AddressDTO addressDTO = new AddressDTO();
 
-        UserAddress userAddress = userAddressMapper.toEntity(addressDTO, registeringUser);
+        UserAddress expected = UserAddress.userAddressBuilder()
+                .id(1)
+                .regionName("Region name")
+                .provinceName("Province name")
+                .cityName("City name")
+                .baranggayName("Baranggay name")
+                .build();
 
-        when(addressRepository.save(userAddress)).thenReturn(userAddress);
+        when(userAddressMapper.toEntity(addressDTO,  registeringUser)).thenReturn(expected);
+        when(addressRepository.save(expected)).thenReturn(expected);
+        addressService.saveUserAddress(registeringUser, addressDTO);
 
-        verify(addressRepository).save(userAddress);
+        verify(addressRepository).save(expected);
+        verify(addressService).saveUserAddress(registeringUser, addressDTO);
         assertNotNull(registeringUser.getAddress());
+        assertNotNull(expected.getRegionName());
+        assertNotNull(expected.getProvinceName());
+        assertNotNull(expected.getCityName());
+        assertNotNull(expected.getBaranggayName());
     }
 
     @Test
