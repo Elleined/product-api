@@ -93,7 +93,7 @@ class DepositServiceTest {
     }
 
     @Test
-    void shouldThrowAbove() {
+    void shouldThrowAboveMaximumException() {
 
     }
 

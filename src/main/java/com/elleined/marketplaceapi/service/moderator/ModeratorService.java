@@ -12,6 +12,8 @@ import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,16 +47,27 @@ public interface    ModeratorService {
 
 
     /** Product **/
-    List<Product> getAllPendingProduct();
+    List<RetailProduct> getAllPendingRetailProduct();
 
-    void listProduct(Moderator moderator, Product productToBeListed);
+    void listRetailProduct(Moderator moderator, RetailProduct productToBeListed);
 
-    void listAllProduct(Moderator moderator, Set<Product> productsToBeListed);
+    void listAllRetailProduct(Moderator moderator, Set<RetailProduct> productsToBeListed);
 
-    void rejectProduct(Moderator moderator, Product productToBeRejected)
+    void rejectRetailProduct(Moderator moderator, RetailProduct productToBeRejected)
             throws ProductAlreadyListedException;
 
-    void rejectAllProduct(Moderator moderator, Set<Product> productsToBeRejected);
+    void rejectAllRetailProduct(Moderator moderator, Set<RetailProduct> productsToBeRejected);
+
+    List<WholeSaleProduct> getAllPendingWholeSaleProduct();
+
+    void listWholeSaleProduct(Moderator moderator, WholeSaleProduct productToBeListed);
+
+    void listAllWholeSaleProduct(Moderator moderator, Set<WholeSaleProduct> productsToBeListed);
+
+    void rejectWholeSaleProduct(Moderator moderator, WholeSaleProduct productToBeRejected)
+            throws ProductAlreadyListedException;
+
+    void rejectAllWholeSaleProduct(Moderator moderator, Set<WholeSaleProduct> productsToBeRejected);
 
     /** Deposit **/
     List<DepositTransaction> getAllPendingDepositRequest();

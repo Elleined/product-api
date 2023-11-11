@@ -10,18 +10,18 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.*;
 import com.elleined.marketplaceapi.mapper.ModeratorMapper;
 import com.elleined.marketplaceapi.model.Moderator;
-import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
-import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
-import com.elleined.marketplaceapi.service.moderator.request.product.ProductRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
 import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
+import com.elleined.marketplaceapi.service.moderator.request.product.ProductRequest;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
@@ -46,11 +46,13 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     private final ModeratorRepository moderatorRepository;
     private final ModeratorMapper moderatorMapper;
 
-    private final ATMValidator atmValidator;
     private final PasswordEncoder passwordEncoder;
 
     private final UserVerificationRequest userVerificationRequest;
-    private final ProductRequest productRequest;
+
+    private final ProductRequest<RetailProduct> retailProductRequest;
+    private final ProductRequest<WholeSaleProduct> wholeSaleProductRequest;
+
     private final WithdrawRequest withdrawRequest;
     private final DepositRequest depositRequest;
 
@@ -132,34 +134,53 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public List<Product> getAllPendingProduct() {
-        return productRequest.getAllRequest();
+    public List<RetailProduct> getAllPendingRetailProduct() {
+        return retailProductRequest.getAllRequest();
     }
 
     @Override
-    public void listProduct(Moderator moderator, Product productToBeListed) {
-        // Add validation here
-        productRequest.accept(moderator, productToBeListed);
+    public void listRetailProduct(Moderator moderator, RetailProduct productToBeListed) {
+        retailProductRequest.accept(moderator, productToBeListed);
     }
 
     @Override
-    public void listAllProduct(Moderator moderator, Set<Product> productsToBeListed) {
-        // Add validation here
-        productRequest.acceptAll(moderator, productsToBeListed);
-    }
-
-
-    @Override
-    public void rejectProduct(Moderator moderator, Product productToBeRejected) throws ProductAlreadyListedException {
-        if (productToBeRejected.isListed()) throw new ProductAlreadyListedException("Rejection failed! because this product already been listed");
-        // Add validation here
-        productRequest.reject(moderator, productToBeRejected);
+    public void listAllRetailProduct(Moderator moderator, Set<RetailProduct> productsToBeListed) {
+        retailProductRequest.acceptAll(moderator, productsToBeListed);
     }
 
     @Override
-    public void rejectAllProduct(Moderator moderator, Set<Product> productsToBeRejected) {
-        // Add validation here
-        productRequest.rejectAll(moderator, productsToBeRejected);
+    public void rejectRetailProduct(Moderator moderator, RetailProduct productToBeRejected) throws ProductAlreadyListedException {
+        retailProductRequest.reject(moderator, productToBeRejected);
+    }
+
+    @Override
+    public void rejectAllRetailProduct(Moderator moderator, Set<RetailProduct> productsToBeRejected) {
+        retailProductRequest.rejectAll(moderator, productsToBeRejected);
+    }
+
+    @Override
+    public List<WholeSaleProduct> getAllPendingWholeSaleProduct() {
+        return wholeSaleProductRequest.getAllRequest();
+    }
+
+    @Override
+    public void listWholeSaleProduct(Moderator moderator, WholeSaleProduct productToBeListed) {
+        wholeSaleProductRequest.accept(moderator, productToBeListed);
+    }
+
+    @Override
+    public void listAllWholeSaleProduct(Moderator moderator, Set<WholeSaleProduct> productsToBeListed) {
+        wholeSaleProductRequest.acceptAll(moderator, productsToBeListed);
+    }
+
+    @Override
+    public void rejectWholeSaleProduct(Moderator moderator, WholeSaleProduct productToBeRejected) throws ProductAlreadyListedException {
+        wholeSaleProductRequest.reject(moderator, productToBeRejected);
+    }
+
+    @Override
+    public void rejectAllWholeSaleProduct(Moderator moderator, Set<WholeSaleProduct> productsToBeRejected) {
+        wholeSaleProductRequest.rejectAll(moderator, productsToBeRejected);
     }
 
     @Override
