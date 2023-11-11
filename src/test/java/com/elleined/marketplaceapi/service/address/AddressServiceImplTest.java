@@ -65,7 +65,6 @@ class AddressServiceImplTest {
         addressService.saveUserAddress(registeringUser, addressDTO);
 
         verify(addressRepository).save(expected);
-        verify(addressService).saveUserAddress(registeringUser, addressDTO);
         assertNotNull(registeringUser.getAddress());
         assertNotNull(expected.getRegionName());
         assertNotNull(expected.getProvinceName());
