@@ -14,6 +14,7 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
@@ -37,7 +38,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class DepositService implements ATMLimitValidator {
+public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidator {
+
+    public static final int MAXIMUM_DEPOSIT_AMOUNT = 10_000;
     public static final int DEPOSIT_LIMIT_PER_DAY = 10_000;
     public static final int MINIMUM_DEPOSIT_AMOUNT = 500;
 
@@ -75,7 +78,7 @@ public class DepositService implements ATMLimitValidator {
         if (ATMValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (isBelowMinimum(depositedAmount)) throw new DepositAmountBelowMinimumException("Cannot deposit! because you are trying to deposit an amount that is below minimum which is " + MINIMUM_DEPOSIT_AMOUNT);
         if (isAboveMaximum(depositedAmount)) throw new DepositAmountAboveMaximumException("You cannot deposit an amount that is greater than to deposit limit which is " + DEPOSIT_LIMIT_PER_DAY);
-        if (isUserReachedDepositLimitPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! Because you already reached the deposit limit per day which is " + DEPOSIT_LIMIT_PER_DAY);
+        if (reachedLimitAmountPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! Because you already reached the deposit limit per day which is " + DEPOSIT_LIMIT_PER_DAY);
 
         String trn = UUID.randomUUID().toString();
 
@@ -101,14 +104,15 @@ public class DepositService implements ATMLimitValidator {
 
     @Override
     public boolean isAboveMaximum(BigDecimal depositedAmount) {
-        return depositedAmount.compareTo(new BigDecimal(DEPOSIT_LIMIT_PER_DAY)) > 0;
+        return depositedAmount.compareTo(new BigDecimal(MAXIMUM_DEPOSIT_AMOUNT)) > 0;
     }
 
-    private boolean isUserReachedDepositLimitPerDay(User currentUser) {
+    @Override
+    public boolean reachedLimitAmountPerDay(User currentUser) {
         final LocalDateTime currentDateTimeMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         List<DepositTransaction> userDepositTransactions = currentUser.getDepositTransactions();
-        List<DepositTransaction>  depositTransactions =
+        List<DepositTransaction> depositTransactions =
                 TransactionUtils.getTransactionsByDateRange(userDepositTransactions, currentDateTimeMidnight, tomorrowMidnight);
 
         BigDecimal totalDepositAmount = depositTransactions.stream()

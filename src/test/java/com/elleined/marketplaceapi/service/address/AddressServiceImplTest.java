@@ -86,9 +86,9 @@ class AddressServiceImplTest {
 
         when(deliveryAddressMapper.toEntity(deliveryAddressDTO, orderingUser)).thenReturn(mockAddress);
         when(addressRepository.save(mockAddress)).thenReturn(mockAddress);
-        addressService.saveDeliveryAddress(orderingUser, deliveryAddressDTO);
+        DeliveryAddress savedDeliveryAddress = addressService.saveDeliveryAddress(orderingUser, deliveryAddressDTO);
 
-        verify(addressRepository).save(mockAddress);
+        verify(addressRepository).save(savedDeliveryAddress);
         assertNotNull(orderingUser.getDeliveryAddresses());
         assertNotNull(mockAddress.getRegionName());
         assertNotNull(mockAddress.getProvinceName());
