@@ -9,16 +9,8 @@ import java.math.BigDecimal;
 @Component
 public class ATMValidator {
 
-    public boolean isBalanceEnough(User user, BigDecimal amountToBeSent) {
-        return user.getBalance().compareTo(amountToBeSent) < 0;
-    }
-
     public boolean isNotValidAmount(BigDecimal amount) {
         return amount == null || amount.compareTo(BigDecimal.ZERO) <= 0;
-    }
-
-    public boolean isSenderSendingToHimself(User sender, User receiver) {
-        return sender.getId() == receiver.getId();
     }
 
     public boolean isUserTotalPendingRequestAmountAboveBalance(User currentUser) {
