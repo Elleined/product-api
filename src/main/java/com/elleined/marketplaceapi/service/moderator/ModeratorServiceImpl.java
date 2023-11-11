@@ -16,7 +16,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
-import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
 import com.elleined.marketplaceapi.service.moderator.request.product.ProductRequest;

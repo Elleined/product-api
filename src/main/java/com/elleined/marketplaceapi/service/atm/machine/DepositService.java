@@ -1,11 +1,12 @@
 package com.elleined.marketplaceapi.service.atm.machine;
 
+import com.elleined.marketplaceapi.exception.atm.amount.DepositAmountAboveMaximumException;
+import com.elleined.marketplaceapi.exception.atm.amount.DepositAmountBelowMinimumException;
 import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.DepositLimitPerDayException;
 import com.elleined.marketplaceapi.exception.resource.PictureNotValidException;
-import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.user.User;
@@ -13,6 +14,8 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
@@ -34,7 +37,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class DepositService {
+public class DepositService implements ATMLimitValidator {
     public static final int DEPOSIT_LIMIT_PER_DAY = 10_000;
     public static final int MINIMUM_DEPOSIT_AMOUNT = 500;
 
@@ -69,9 +72,9 @@ public class DepositService {
             DepositLimitException, IOException {
 
         if (Validator.notValidMultipartFile(proofOfTransaction)) throw new PictureNotValidException("Cannot deposit! Please provide proof of transaction!");
-        if (isBelowMinimumDepositAmount(depositedAmount)) throw new MinimumAmountException("Cannot deposit! because you are trying to deposit an amount that is below minimum which is " + MINIMUM_DEPOSIT_AMOUNT);
         if (ATMValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
-        if (isDepositAmountAboveLimit(depositedAmount)) throw new DepositLimitException("You cannot deposit an amount that is greater than to deposit limit which is " + DEPOSIT_LIMIT_PER_DAY);
+        if (isBelowMinimum(depositedAmount)) throw new DepositAmountBelowMinimumException("Cannot deposit! because you are trying to deposit an amount that is below minimum which is " + MINIMUM_DEPOSIT_AMOUNT);
+        if (isAboveMaximum(depositedAmount)) throw new DepositAmountAboveMaximumException("You cannot deposit an amount that is greater than to deposit limit which is " + DEPOSIT_LIMIT_PER_DAY);
         if (isUserReachedDepositLimitPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! Because you already reached the deposit limit per day which is " + DEPOSIT_LIMIT_PER_DAY);
 
         String trn = UUID.randomUUID().toString();
@@ -91,11 +94,13 @@ public class DepositService {
         return depositTransaction;
     }
 
-    private boolean isBelowMinimumDepositAmount(BigDecimal depositedAmount) {
+    @Override
+    public boolean isBelowMinimum(BigDecimal depositedAmount) {
         return depositedAmount.compareTo(new BigDecimal(MINIMUM_DEPOSIT_AMOUNT)) < 0;
     }
 
-    private boolean isDepositAmountAboveLimit(BigDecimal depositedAmount) {
+    @Override
+    public boolean isAboveMaximum(BigDecimal depositedAmount) {
         return depositedAmount.compareTo(new BigDecimal(DEPOSIT_LIMIT_PER_DAY)) > 0;
     }
 
