@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.atm.machine;
 
+import com.elleined.marketplaceapi.exception.resource.PictureNotValidException;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
@@ -27,9 +28,6 @@ class DepositServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private ATMValidator atmValidator;
 
     @Mock
     private DepositTransactionRepository depositTransactionRepository;
@@ -68,9 +66,12 @@ class DepositServiceTest {
 
     @Test
     void shouldThrowPictureNotValidException() {
-        MultipartFile picture = null;
+        User user = new User();
+        BigDecimal amount = new BigDecimal(500);
+        MultipartFile proofOfTransaction = null;
 
-
-        verifyNoInteractions();
+        verifyNoInteractions(depositTransactionRepository);
+        verifyNoInteractions(imageUploader);
+        assertThrows(PictureNotValidException.class, () -> depositService.requestDeposit(user, amount, proofOfTransaction));
     }
 }

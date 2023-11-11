@@ -38,7 +38,6 @@ public class WithdrawService {
 
     private final UserRepository userRepository;
 
-    private final ATMValidator atmValidator;
     private final NumberValidator numberValidator;
 
     private final WithdrawTransactionRepository withdrawTransactionRepository;
@@ -65,9 +64,9 @@ public class WithdrawService {
             MobileNumberException {
 
         numberValidator.validate(gcashNumber);
-        if (atmValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
+        if (ATMValidator.isNotValidAmount(withdrawalAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (user.isBalanceNotEnough(withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
-        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(user)) throw new InsufficientFundException("Cannot withdraw! because you're total pending withdraw requests exceeds to your current balance!");
+        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(user)) throw new InsufficientFundException("Cannot withdraw! because you're total pending withdraw requests exceeds to your current balance!");
         if (isBelowMinimum(withdrawalAmount)) throw new MinimumAmountException("Cannot withdraw! because you are trying to withdraw an amount that below to minimum amount which is " + MINIMUM_WITHDRAW_AMOUNT);
         if (isAboveMinimum(withdrawalAmount)) throw new WithdrawLimitException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + MAXIMUM_WITHDRAW_AMOUNT);
         if (isUserReachedWithdrawLimitPerDay(user)) throw new WithdrawLimitPerDayException("Cannot withdraw! You already reached withdrawal limit per day which is " + WITHDRAWAL_LIMIT_PER_DAY);

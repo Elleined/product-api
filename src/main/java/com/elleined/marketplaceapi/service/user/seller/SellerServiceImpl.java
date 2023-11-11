@@ -73,8 +73,6 @@ public class SellerServiceImpl implements SellerService {
 
     private final OrderRepository orderRepository;
 
-    private final ATMValidator atmValidator;
-
     @Value("${cropTrade.img.directory}")
     private String cropTradeImgDirectory;
 
@@ -107,7 +105,7 @@ public class SellerServiceImpl implements SellerService {
     public RetailProduct saveProduct(User seller, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
-        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
@@ -127,7 +125,7 @@ public class SellerServiceImpl implements SellerService {
     public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
-        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
@@ -325,7 +323,7 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
-        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (!seller.hasSellableProductOrder(retailOrder))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
@@ -358,7 +356,7 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
-        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
+        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (!seller.hasSellableProductOrder(wholeSaleOrder))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
