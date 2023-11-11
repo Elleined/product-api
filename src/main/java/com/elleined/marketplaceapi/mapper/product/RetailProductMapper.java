@@ -34,7 +34,7 @@ public abstract class RetailProductMapper implements ProductMapper<RetailProduct
     @Mappings({
             @Mapping(target = "state", source = "retailProduct.state"),
             @Mapping(target = "sellerId", source = "retailProduct.seller.id"),
-            @Mapping(target = "sellerName", expression = "java(getFullName(retailProduct.getSeller()))"),
+            @Mapping(target = "sellerName", expression = "java(retailProduct.getSeller().getFullName())"),
             @Mapping(target = "cropName", source = "retailProduct.crop.name"),
             @Mapping(target = "shopName", source = "retailProduct.seller.shop.name"),
             @Mapping(target = "totalPrice", expression = "java(retailProductService.calculateTotalPrice(retailProduct.getPricePerUnit(), retailProduct.getQuantityPerUnit(), retailProduct.getQuantityPerUnit()))"),

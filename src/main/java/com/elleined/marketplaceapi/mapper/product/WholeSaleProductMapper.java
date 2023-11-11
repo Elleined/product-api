@@ -20,10 +20,6 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
 
     @Lazy
     @Autowired
-    protected WholeSaleProductService wholeSaleProductService;
-
-    @Lazy
-    @Autowired
     protected WholeSaleUnitService wholeSaleUnitService;
 
     @Lazy
@@ -34,7 +30,7 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
     @Mappings({
             @Mapping(target = "state", source = "wholeSaleProduct.state"),
             @Mapping(target = "sellerId", source = "wholeSaleProduct.seller.id"),
-            @Mapping(target = "sellerName", expression = "java(getFullName(wholeSaleProduct.getSeller()))"),
+            @Mapping(target = "sellerName", expression = "java(wholeSaleProduct.getSeller().getFullName())"),
             @Mapping(target = "cropName", source = "wholeSaleProduct.crop.name"),
             @Mapping(target = "shopName", source = "wholeSaleProduct.seller.shop.name"),
             @Mapping(target = "listingDate", expression = "java(wholeSaleProduct.getListingDate().toLocalDate())"),
