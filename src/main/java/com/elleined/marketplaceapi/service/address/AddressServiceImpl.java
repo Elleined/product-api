@@ -55,6 +55,6 @@ public class AddressServiceImpl implements AddressService {
         return user.getDeliveryAddresses().stream()
                 .filter(deliveryAddress -> deliveryAddress.getId() == deliveryAddressId)
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot save another delivery address because you already reached the delivery address limit which is " + DELIVERY_ADDRESS_LIMIT));
+                .orElseThrow(() -> new ResourceNotFoundException("Delivery address with id of " + deliveryAddressId + " does not exists or you don't own this delivery address!"));
     }
 }

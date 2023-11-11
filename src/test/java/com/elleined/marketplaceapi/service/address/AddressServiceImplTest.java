@@ -1,11 +1,14 @@
 package com.elleined.marketplaceapi.service.address;
 
 import com.elleined.marketplaceapi.dto.address.AddressDTO;
+import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
+import com.elleined.marketplaceapi.exception.user.DeliveryAddressLimitException;
 import com.elleined.marketplaceapi.mapper.address.DeliveryAddressMapper;
 import com.elleined.marketplaceapi.mapper.address.UserAddressMapper;
 import com.elleined.marketplaceapi.mock.AddressMockDataFactory;
 import com.elleined.marketplaceapi.mock.UserMockDataFactory;
 import com.elleined.marketplaceapi.model.Credential;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
@@ -14,6 +17,7 @@ import com.elleined.marketplaceapi.repository.AddressRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.control.MappingControl;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -23,9 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -74,13 +76,66 @@ class AddressServiceImplTest {
 
     @Test
     void saveDeliveryAddress() {
+        User orderingUser = User.builder()
+                .deliveryAddresses(new ArrayList<>())
+                .build();
+
+        DeliveryAddressDTO deliveryAddressDTO = new DeliveryAddressDTO();
+
+        DeliveryAddress mockAddress = AddressMockDataFactory.getDeliveryAddress(1);
+
+        when(deliveryAddressMapper.toEntity(deliveryAddressDTO, orderingUser)).thenReturn(mockAddress);
+        when(addressRepository.save(mockAddress)).thenReturn(mockAddress);
+        addressService.saveDeliveryAddress(orderingUser, deliveryAddressDTO);
+
+        verify(addressRepository).save(mockAddress);
+        assertNotNull(orderingUser.getDeliveryAddresses());
+        assertNotNull(mockAddress.getRegionName());
+        assertNotNull(mockAddress.getProvinceName());
+        assertNotNull(mockAddress.getCityName());
+        assertNotNull(mockAddress.getBaranggayName());
+        assertFalse(orderingUser.getDeliveryAddresses().isEmpty());
+    }
+
+    @Test
+    void shouldThrowDeliveryAddressLimitException() {
+        User orderingUser = User.builder()
+                .deliveryAddresses(new ArrayList<>())
+                .build();
+
+        DeliveryAddressDTO deliveryAddressDTO = new DeliveryAddressDTO();
+
+        DeliveryAddress mockAddress = AddressMockDataFactory.getDeliveryAddress(1);
+
+        orderingUser.getDeliveryAddresses().add(mockAddress);
+        orderingUser.getDeliveryAddresses().add(mockAddress);
+        orderingUser.getDeliveryAddresses().add(mockAddress);
+        orderingUser.getDeliveryAddresses().add(mockAddress);
+        orderingUser.getDeliveryAddresses().add(mockAddress);
+
+        verifyNoInteractions(addressRepository, deliveryAddressMapper);
+        assertThrows(DeliveryAddressLimitException.class, () -> addressService.saveDeliveryAddress(orderingUser, deliveryAddressDTO));
     }
 
     @Test
     void getAllDeliveryAddress() {
+        User user = User.builder()
+                .deliveryAddresses(new ArrayList<>())
+                .build();
+
+        assertNotNull(user.getDeliveryAddresses());
+        assertDoesNotThrow(user::getDeliveryAddresses);
     }
 
     @Test
     void getDeliveryAddressById() {
+        User user = new User();
+
+        List<DeliveryAddress> deliveryAddresses = Arrays.asList(
+                AddressMockDataFactory.getDeliveryAddress(1),
+                AddressMockDataFactory.getDeliveryAddress(2)
+        );
+        user.setDeliveryAddresses(deliveryAddresses);
+        assertDoesNotThrow(() -> addressService.getDeliveryAddressById(user, 1));
     }
 }

@@ -85,7 +85,6 @@ public class User {
 
     // user id reference is in delivery address table
     @OneToMany(mappedBy = "user")
-    @Setter(AccessLevel.NONE)
     private List<DeliveryAddress> deliveryAddresses;
 
     // user id reference is in tbl order whole sale
