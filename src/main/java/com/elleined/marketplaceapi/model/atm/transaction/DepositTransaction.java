@@ -5,19 +5,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "tbl_transaction_deposit")
 @NoArgsConstructor
 @Getter
 @Setter
+
 public class DepositTransaction extends Transaction {
 
     @ManyToOne(optional = false)
@@ -34,4 +34,5 @@ public class DepositTransaction extends Transaction {
         super(id, trn, amount, transactionDate, status, proofOfTransaction);
         this.user = user;
     }
+
 }

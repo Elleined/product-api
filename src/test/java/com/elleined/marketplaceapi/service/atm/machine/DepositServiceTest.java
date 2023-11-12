@@ -27,13 +27,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
 class DepositServiceTest {
+
 
     @Mock
     private UserRepository userRepository;
@@ -171,5 +174,59 @@ class DepositServiceTest {
         assertThrows(DepositLimitPerDayException.class, () -> depositService.requestDeposit(mockUser, amount, mockMultiPartFile));
         verifyNoInteractions(depositTransactionRepository);
         verifyNoInteractions(imageUploader);
+    }
+
+    @Test
+    void isBelowMinimum() {
+        BigDecimal amount = new BigDecimal(499);
+        assertTrue(depositService.isBelowMinimum(amount));
+    }
+
+    @Test
+    void isAboveMaximum() {
+        BigDecimal amount = new BigDecimal(10_001);
+        assertTrue(depositService.isAboveMaximum(amount));
+    }
+
+    @Test
+    void reachedLimitAmountPerDay() {
+        User user = new User();
+
+        DepositTransaction depositTransaction1 = DepositTransaction.builder()
+                .amount(new BigDecimal(5000))
+                .transactionDate(LocalDateTime.now())
+                .build();
+
+        DepositTransaction depositTransaction2 = DepositTransaction.builder()
+                .amount(new BigDecimal(5000))
+                .transactionDate(LocalDateTime.now())
+                .build();
+        List<DepositTransaction> depositTransactions = Arrays.asList(depositTransaction1, depositTransaction2);
+        user.setDepositTransactions(depositTransactions);
+
+        assertTrue(depositService.reachedLimitAmountPerDay(user));
+    }
+
+    @Test
+    void save() {
+        DepositTransaction depositTransaction = new DepositTransaction();
+
+        depositService.save(depositTransaction);
+
+        assertNotNull(depositTransaction);
+        verify(depositTransactionRepository).save(depositTransaction);
+    }
+
+    @Test
+    void getById() {
+        Optional<DepositTransaction> depositTransaction = Optional.of(DepositTransaction.builder()
+                .id(1)
+                .build());
+
+        when(depositTransactionRepository.findById(1)).thenReturn(depositTransaction);
+        DepositTransaction actual = depositService.getById(1);
+
+        assertNotNull(actual);
+        verify(depositTransactionRepository).findById(1);
     }
 }
