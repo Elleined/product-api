@@ -2,8 +2,10 @@ package com.elleined.marketplaceapi.service.atm.machine.withdraw;
 
 
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
+import com.elleined.marketplaceapi.exception.atm.MaximumAmountException;
 import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
+import com.elleined.marketplaceapi.exception.atm.amount.DepositAmountAboveMaximumException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitPerDayException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
@@ -45,7 +47,7 @@ public class WithdrawService implements ATMLimitValidator, ATMLimitPerDayValidat
     private final ATMFeeService feeService;
     private final AppWalletService appWalletService;
 
-    public void withdraw(User currentUser, @NonNull BigDecimal withdrawalAmount) {
+    public void withdraw(User currentUser, BigDecimal withdrawalAmount) {
         BigDecimal oldBalance = currentUser.getBalance();
         float withdrawalFee = feeService.getWithdrawalFee(withdrawalAmount);
         BigDecimal finalWithdrawalAmount = withdrawalAmount.subtract(new BigDecimal(withdrawalFee));
@@ -68,7 +70,7 @@ public class WithdrawService implements ATMLimitValidator, ATMLimitPerDayValidat
         if (user.isBalanceNotEnough(withdrawalAmount)) throw new InsufficientFundException("Insufficient Funds!");
         if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(user, withdrawalAmount)) throw new InsufficientFundException("Cannot withdraw! because you're total pending withdraw requests exceeds to your current balance!");
         if (isBelowMinimum(withdrawalAmount)) throw new MinimumAmountException("Cannot withdraw! because you are trying to withdraw an amount that below to minimum amount which is " + MINIMUM_WITHDRAW_AMOUNT);
-        if (isAboveMaximum(withdrawalAmount)) throw new WithdrawLimitException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + MAXIMUM_WITHDRAW_AMOUNT);
+        if (isAboveMaximum(withdrawalAmount)) throw new MaximumAmountException("Cannot withdraw! You cannot withdraw an amount that is greater than withdraw limit which is " + MAXIMUM_WITHDRAW_AMOUNT);
         if (reachedLimitAmountPerDay(user)) throw new WithdrawLimitPerDayException("Cannot withdraw! You already reached withdrawal limit per day which is " + WITHDRAWAL_LIMIT_PER_DAY);
 
         WithdrawTransaction withdrawTransaction = withdrawTransactionService.save(user, withdrawalAmount, gcashNumber);

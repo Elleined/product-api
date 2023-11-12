@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-@Component
 public interface ATMValidator {
 
     static boolean isNotValidAmount(BigDecimal amount) {

@@ -11,8 +11,6 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
-import com.elleined.marketplaceapi.service.atm.machine.deposit.DepositService;
-import com.elleined.marketplaceapi.service.atm.machine.deposit.DepositTransactionService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
