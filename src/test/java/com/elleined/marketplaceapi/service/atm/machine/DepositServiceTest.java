@@ -82,6 +82,7 @@ class DepositServiceTest {
 
         DepositTransaction depositTransaction = new DepositTransaction();
         when(depositTransactionService.save(user, depositAmount, multipartFile)).thenReturn(depositTransaction);
+        doNothing().when(imageUploader).upload(any(), any());
         depositService.requestDeposit(user, depositAmount, multipartFile);
 
         verify(depositTransactionService).save(user, depositAmount, multipartFile);
@@ -100,8 +101,7 @@ class DepositServiceTest {
         assertThrows(PictureNotValidException.class, () -> depositService.requestDeposit(user, amount, nullMultiPartFile));
         assertThrows(PictureNotValidException.class, () -> depositService.requestDeposit(user, amount, emptyMultiPartFile));
 
-        verifyNoInteractions(depositTransactionService);
-        verifyNoInteractions(imageUploader);
+        verifyNoInteractions(depositTransactionService, imageUploader);
     }
 
     @Test
@@ -113,8 +113,7 @@ class DepositServiceTest {
         assertNotNull(mockMultiPartFile);
         assertNotEquals(MultiPartFileDataFactory.empty(), mockMultiPartFile);
         assertThrows(DepositAmountBelowMinimumException.class, () -> depositService.requestDeposit(mockUser, belowMinimumAmount, mockMultiPartFile), "Failed because the deposit amount " + belowMinimumAmount + " is above to " + DepositService.MINIMUM_DEPOSIT_AMOUNT);
-        verifyNoInteractions(depositTransactionService);
-        verifyNoInteractions(imageUploader);
+        verifyNoInteractions(depositTransactionService, imageUploader);
     }
 
     @Test
@@ -128,8 +127,7 @@ class DepositServiceTest {
         assertNotEquals(MultiPartFileDataFactory.empty(), mockMultiPartFile);
         assertThrows(DepositAmountAboveMaximumException.class, () -> depositService.requestDeposit(mockUser, aboveMaximumAmount, mockMultiPartFile), "Failed becuase the deposit amount " + aboveMaximumAmount + " is below the maximum amount " + DepositService.MAXIMUM_DEPOSIT_AMOUNT);
 
-        verifyNoInteractions(depositTransactionService);
-        verifyNoInteractions(imageUploader);
+        verifyNoInteractions(depositTransactionService, imageUploader);
     }
 
     @Test
@@ -146,8 +144,7 @@ class DepositServiceTest {
         assertThrows(NotValidAmountException.class, () -> depositService.requestDeposit(user, nullAmount, mockMultiPartFile));
         assertThrows(NotValidAmountException.class, () -> depositService.requestDeposit(user, negativeAmount, mockMultiPartFile));
 
-        verifyNoInteractions(depositTransactionService);
-        verifyNoInteractions(imageUploader);
+        verifyNoInteractions(depositTransactionService, imageUploader);
     }
 
     @Test
@@ -168,8 +165,7 @@ class DepositServiceTest {
         mockUser.setDepositTransactions(depositTransactions);
 
         assertThrows(DepositLimitPerDayException.class, () -> depositService.requestDeposit(mockUser, amount, mockMultiPartFile));
-        verifyNoInteractions(depositTransactionService);
-        verifyNoInteractions(imageUploader);
+        verifyNoInteractions(depositTransactionService, imageUploader);
     }
 
     @Test

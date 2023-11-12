@@ -244,7 +244,7 @@ public class User {
     }
 
     public <T> boolean isBalanceNotEnough(T t) {
-        return this.getBalance().compareTo(new BigDecimal(String.valueOf(t))) <= 0;
+        return this.getBalance().compareTo(new BigDecimal(String.valueOf(t))) < 0;
     }
 
     public boolean hasOrder(RetailProduct retailProduct, Order.Status status) {

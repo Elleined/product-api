@@ -38,7 +38,7 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
     private final P2PTransactionService p2PTransactionService;
     private final AppWalletService appWalletService;
 
-    public PeerToPeerTransaction peerToPeer(User sender, User receiver, @NonNull BigDecimal sentAmount)
+    public PeerToPeerTransaction peerToPeer(User sender, User receiver, BigDecimal sentAmount)
             throws SendingToHimselfException,
             InsufficientFundException,
             NotValidAmountException,
