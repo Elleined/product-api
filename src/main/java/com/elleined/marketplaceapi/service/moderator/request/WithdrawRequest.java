@@ -9,7 +9,7 @@ import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
-import com.elleined.marketplaceapi.service.atm.machine.WithdrawService;
+import com.elleined.marketplaceapi.service.atm.machine.withdraw.WithdrawService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

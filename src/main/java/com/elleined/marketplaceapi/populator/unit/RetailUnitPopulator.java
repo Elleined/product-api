@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.populator.unit;
 
-import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.repository.unit.UnitRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

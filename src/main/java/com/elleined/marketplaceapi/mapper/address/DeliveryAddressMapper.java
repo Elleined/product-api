@@ -1,8 +1,6 @@
 package com.elleined.marketplaceapi.mapper.address;
 
-import com.elleined.marketplaceapi.dto.address.AddressDTO;
 import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
-import com.elleined.marketplaceapi.model.address.Address;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import org.mapstruct.Context;

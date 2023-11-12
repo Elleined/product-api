@@ -5,7 +5,7 @@
 //import com.elleined.marketplaceapi.dto.atm.dto.WithdrawTransactionDTO;
 //import com.elleined.marketplaceapi.mapper.TransactionMapper;
 //import com.elleined.marketplaceapi.model.user.User;
-//import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+//import com.elleined.marketplaceapi.service.atm.machine.TransactionService;
 //import com.elleined.marketplaceapi.service.user.UserService;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.web.bind.annotation.GetMapping;

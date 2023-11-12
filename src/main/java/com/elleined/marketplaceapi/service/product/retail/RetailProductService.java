@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.product.retail;
 
-import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.service.product.ProductService;
 

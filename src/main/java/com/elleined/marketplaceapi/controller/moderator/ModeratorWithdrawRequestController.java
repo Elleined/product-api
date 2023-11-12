@@ -4,7 +4,7 @@
 //import com.elleined.marketplaceapi.mapper.TransactionMapper;
 //import com.elleined.marketplaceapi.model.Moderator;
 //import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
-//import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+//import com.elleined.marketplaceapi.service.atm.machine.TransactionService;
 //import com.elleined.marketplaceapi.service.email.EmailService;
 //import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 //import lombok.RequiredArgsConstructor;

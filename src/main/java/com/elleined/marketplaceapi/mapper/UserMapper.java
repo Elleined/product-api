@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
-import com.elleined.marketplaceapi.mapper.address.AddressMapper;
 import com.elleined.marketplaceapi.mapper.address.DeliveryAddressMapper;
 import com.elleined.marketplaceapi.mapper.address.UserAddressMapper;
 import com.elleined.marketplaceapi.model.user.User;

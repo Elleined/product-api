@@ -1,7 +1,5 @@
 package com.elleined.marketplaceapi.service.fee;
 
-import com.elleined.marketplaceapi.model.order.Order;
-import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.user.User;
 
 public interface FeeService {

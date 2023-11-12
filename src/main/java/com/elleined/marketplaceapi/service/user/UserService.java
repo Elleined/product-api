@@ -10,8 +10,6 @@ import com.elleined.marketplaceapi.exception.field.password.WeakPasswordExceptio
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
-import com.elleined.marketplaceapi.model.order.RetailOrder;
-import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 

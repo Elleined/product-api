@@ -9,9 +9,10 @@ import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
-import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.deposit.DepositService;
+import com.elleined.marketplaceapi.service.atm.machine.deposit.DepositTransactionService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +42,7 @@ class DepositServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private DepositTransactionRepository depositTransactionRepository;
+    private DepositTransactionService depositTransactionService;
 
     @Mock
     private ATMFeeService feeService;
@@ -79,9 +79,12 @@ class DepositServiceTest {
                 .build();
         BigDecimal depositAmount = new BigDecimal(501);
         MultipartFile multipartFile = MultiPartFileDataFactory.notEmpty();
-        DepositTransaction depositTransaction = depositService.requestDeposit(user, depositAmount, multipartFile);
 
-        verify(depositTransactionRepository).save(depositTransaction);
+        DepositTransaction depositTransaction = new DepositTransaction();
+        when(depositTransactionService.save(user, depositAmount, multipartFile)).thenReturn(depositTransaction);
+        depositService.requestDeposit(user, depositAmount, multipartFile);
+
+        verify(depositTransactionService).save(user, depositAmount, multipartFile);
         verify(imageUploader).upload(any(), any());
 
         assertNotNull(depositTransaction.getUser());
@@ -104,7 +107,7 @@ class DepositServiceTest {
         assertThrows(PictureNotValidException.class, () -> depositService.requestDeposit(user, amount, nullMultiPartFile));
         assertThrows(PictureNotValidException.class, () -> depositService.requestDeposit(user, amount, emptyMultiPartFile));
 
-        verifyNoInteractions(depositTransactionRepository);
+        verifyNoInteractions(depositTransactionService);
         verifyNoInteractions(imageUploader);
     }
 
@@ -117,7 +120,7 @@ class DepositServiceTest {
         assertNotNull(mockMultiPartFile);
         assertNotEquals(MultiPartFileDataFactory.empty(), mockMultiPartFile);
         assertThrows(DepositAmountBelowMinimumException.class, () -> depositService.requestDeposit(mockUser, belowMinimumAmount, mockMultiPartFile), "Failed because the deposit amount " + belowMinimumAmount + " is above to " + DepositService.MINIMUM_DEPOSIT_AMOUNT);
-        verifyNoInteractions(depositTransactionRepository);
+        verifyNoInteractions(depositTransactionService);
         verifyNoInteractions(imageUploader);
     }
 
@@ -132,7 +135,7 @@ class DepositServiceTest {
         assertNotEquals(MultiPartFileDataFactory.empty(), mockMultiPartFile);
         assertThrows(DepositAmountAboveMaximumException.class, () -> depositService.requestDeposit(mockUser, aboveMaximumAmount, mockMultiPartFile), "Failed becuase the deposit amount " + aboveMaximumAmount + " is below the maximum amount " + DepositService.MAXIMUM_DEPOSIT_AMOUNT);
 
-        verifyNoInteractions(depositTransactionRepository);
+        verifyNoInteractions(depositTransactionService);
         verifyNoInteractions(imageUploader);
     }
 
@@ -150,7 +153,7 @@ class DepositServiceTest {
         assertThrows(NotValidAmountException.class, () -> depositService.requestDeposit(user, nullAmount, mockMultiPartFile));
         assertThrows(NotValidAmountException.class, () -> depositService.requestDeposit(user, negativeAmount, mockMultiPartFile));
 
-        verifyNoInteractions(depositTransactionRepository);
+        verifyNoInteractions(depositTransactionService);
         verifyNoInteractions(imageUploader);
     }
 
@@ -172,7 +175,7 @@ class DepositServiceTest {
         mockUser.setDepositTransactions(depositTransactions);
 
         assertThrows(DepositLimitPerDayException.class, () -> depositService.requestDeposit(mockUser, amount, mockMultiPartFile));
-        verifyNoInteractions(depositTransactionRepository);
+        verifyNoInteractions(depositTransactionService);
         verifyNoInteractions(imageUploader);
     }
 
@@ -205,28 +208,5 @@ class DepositServiceTest {
         user.setDepositTransactions(depositTransactions);
 
         assertTrue(depositService.reachedLimitAmountPerDay(user));
-    }
-
-    @Test
-    void save() {
-        DepositTransaction depositTransaction = new DepositTransaction();
-
-        depositService.save(depositTransaction);
-
-        assertNotNull(depositTransaction);
-        verify(depositTransactionRepository).save(depositTransaction);
-    }
-
-    @Test
-    void getById() {
-        Optional<DepositTransaction> depositTransaction = Optional.of(DepositTransaction.builder()
-                .id(1)
-                .build());
-
-        when(depositTransactionRepository.findById(1)).thenReturn(depositTransaction);
-        DepositTransaction actual = depositService.getById(1);
-
-        assertNotNull(actual);
-        verify(depositTransactionRepository).findById(1);
     }
 }

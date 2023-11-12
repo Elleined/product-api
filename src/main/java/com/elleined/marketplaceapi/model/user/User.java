@@ -9,15 +9,14 @@ import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
+import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
+import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
-import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
-import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.service.address.AddressService;
-import com.elleined.marketplaceapi.service.fee.FeeService;
 import jakarta.persistence.*;
 import lombok.*;
 

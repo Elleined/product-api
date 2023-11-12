@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.user.buyer;
 
-import com.elleined.marketplaceapi.dto.order.OrderDTO;
 import com.elleined.marketplaceapi.dto.order.RetailOrderDTO;
 import com.elleined.marketplaceapi.dto.order.WholeSaleOrderDTO;
 import com.elleined.marketplaceapi.exception.order.OrderAlreadyAcceptedException;
@@ -15,8 +14,6 @@ import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedExce
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.user.User;
-
-import java.util.List;
 
 public interface BuyerService {
 

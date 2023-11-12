@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.controller.constants.atm;
 
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
-import com.elleined.marketplaceapi.service.atm.machine.DepositService;
+import com.elleined.marketplaceapi.service.atm.machine.deposit.DepositService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

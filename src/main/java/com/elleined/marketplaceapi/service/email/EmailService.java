@@ -1,9 +1,9 @@
 package com.elleined.marketplaceapi.service.email;
 
 import com.elleined.marketplaceapi.dto.email.OTPMessage;
-import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.user.User;
 
 public interface EmailService {

@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.model.unit;
 
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Builder;
