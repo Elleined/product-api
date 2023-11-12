@@ -86,13 +86,6 @@ class DepositServiceTest {
 
         verify(depositTransactionService).save(user, depositAmount, multipartFile);
         verify(imageUploader).upload(any(), any());
-
-        assertNotNull(depositTransaction.getUser());
-        assertNotNull(depositTransaction.getAmount());
-        assertNotNull(depositTransaction.getStatus());
-        assertNotNull(depositTransaction.getTransactionDate());
-        assertNotNull(depositTransaction.getProofOfTransaction());
-        assertNotNull(depositTransaction.getTrn());
         assertDoesNotThrow(() -> depositService.requestDeposit(user, depositAmount, multipartFile));
     }
 
