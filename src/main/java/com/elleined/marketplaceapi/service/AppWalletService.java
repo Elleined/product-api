@@ -25,4 +25,8 @@ public class AppWalletService {
         appWalletRepository.save(appWallet);
         log.debug("App wallet has new balance of {} from {}", appWallet.getAppWalletBalance(), oldAppWalletBalance);
     }
+
+    public BigDecimal getAppWalletBalance() {
+        return appWalletRepository.findById(1).orElseThrow().getAppWalletBalance();
+    }
 }

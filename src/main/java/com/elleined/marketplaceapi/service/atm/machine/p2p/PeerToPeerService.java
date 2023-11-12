@@ -59,7 +59,6 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
         appWalletService.addAndSaveBalance(p2pFee);
         PeerToPeerTransaction peerToPeerTransaction = p2PTransactionService.save(sender, receiver, sentAmount);
 
-
         log.debug("Sender with id of {} sent money amounting {} from {} because of p2p fee of {} which is the {}% of sent amount.", sender.getId(), finalSentAmount, sentAmount, p2pFee, ATMFeeService.P2P_FEE_PERCENTAGE);
         log.debug("Sender with id of {} has now new balance of {} from {}.", sender.getId(), sender.getBalance(), senderOldBalance);
         log.debug("Receiver with id of {} has now new balance of {} from {}", receiver.getId(), receiver.getBalance(), receiverOldBalance);

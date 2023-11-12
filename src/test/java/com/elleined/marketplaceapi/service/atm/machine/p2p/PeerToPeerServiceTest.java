@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PeerToPeerServiceTest {
@@ -46,6 +46,33 @@ class PeerToPeerServiceTest {
 
     @Test
     void peerToPeer() {
+        BigDecimal balance = new BigDecimal(5_000);
+        User sender = User.builder()
+                .id(1)
+                .balance(balance)
+                .sentMoneyTransactions(new ArrayList<>())
+                .withdrawTransactions(new ArrayList<>())
+                .build();
+
+        User receiver = User.builder()
+                .id(2)
+                .balance(new BigDecimal(0))
+                .build();
+        BigDecimal sentAmount = new BigDecimal(500);
+
+        float p2pFee = 5;
+        when(feeService.getP2pFee(sentAmount)).thenReturn(p2pFee);
+
+        peerToPeerService.peerToPeer(sender, receiver, sentAmount);
+        assertEquals(new BigDecimal(495), receiver.getBalance());
+        assertEquals(new BigDecimal(4_500), sender.getBalance());
+
+        verify(feeService).getP2pFee(sentAmount);
+        verify(appWalletService).addAndSaveBalance(p2pFee);
+        verify(p2PTransactionService).save(sender, receiver, sentAmount);
+        verify(userRepository).save(sender);
+        verify(userRepository).save(receiver);
+        assertDoesNotThrow(() -> peerToPeerService.peerToPeer(sender, receiver, sentAmount));
     }
 
     @Test
