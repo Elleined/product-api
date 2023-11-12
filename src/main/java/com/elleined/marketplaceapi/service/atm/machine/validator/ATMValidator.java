@@ -13,12 +13,12 @@ public interface ATMValidator {
         return amount == null || amount.compareTo(BigDecimal.ZERO) <= 0;
     }
 
-    static boolean isUserTotalPendingRequestAmountAboveBalance(User currentUser) {
+    static boolean isUserTotalPendingRequestAmountAboveBalance(User currentUser, BigDecimal sentAmount) {
         BigDecimal totalPendingAmount = currentUser.getWithdrawTransactions().stream()
                 .filter(WithdrawTransaction::isPending)
                 .map(WithdrawTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return totalPendingAmount.compareTo(currentUser.getBalance()) > 0;
+        return totalPendingAmount.add(sentAmount).compareTo(currentUser.getBalance()) > 0;
     }
 }

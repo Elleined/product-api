@@ -14,7 +14,6 @@ import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,6 +47,7 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
         if (ATMValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Cannot send money! because amount should be positive and cannot be zero!");
         if (sender.isBalanceNotEnough(sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
         if (reachedLimitAmountPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
+        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(sender, sentAmount)) throw new InsufficientFundException("Cannot send money! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
 
         float p2pFee = feeService.getP2pFee(sentAmount);
         BigDecimal finalSentAmount = sentAmount.subtract(new BigDecimal(p2pFee));
@@ -59,7 +59,6 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
         appWalletService.addAndSaveBalance(p2pFee);
         PeerToPeerTransaction peerToPeerTransaction = p2PTransactionService.save(sender, receiver, sentAmount);
 
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(sender)) throw new InsufficientFundException("Cannot send money! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
 
         log.debug("Sender with id of {} sent money amounting {} from {} because of p2p fee of {} which is the {}% of sent amount.", sender.getId(), finalSentAmount, sentAmount, p2pFee, ATMFeeService.P2P_FEE_PERCENTAGE);
         log.debug("Sender with id of {} has now new balance of {} from {}.", sender.getId(), sender.getBalance(), senderOldBalance);

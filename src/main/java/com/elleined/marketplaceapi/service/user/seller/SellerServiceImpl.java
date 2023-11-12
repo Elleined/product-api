@@ -26,7 +26,6 @@ import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.CropService;
-import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -52,7 +51,6 @@ import java.time.LocalDateTime;
 public class SellerServiceImpl implements SellerService {
     private final WholeSaleOrderRepository wholeSaleOrderRepository;
     private final RetailOrderRepository retailOrderRepository;
-    public static final int DAY_RANGE = 14;
 
     private final PrivateChatRoomService privateChatRoomService;
 
@@ -103,8 +101,6 @@ public class SellerServiceImpl implements SellerService {
     public RetailProduct saveProduct(User seller, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
-            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
 
@@ -123,8 +119,6 @@ public class SellerServiceImpl implements SellerService {
     public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
-            throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
 
@@ -321,8 +315,6 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
-            throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (!seller.hasSellableProductOrder(retailOrder))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
@@ -354,8 +346,6 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller))
-            throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         if (!seller.hasSellableProductOrder(wholeSaleOrder))
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 

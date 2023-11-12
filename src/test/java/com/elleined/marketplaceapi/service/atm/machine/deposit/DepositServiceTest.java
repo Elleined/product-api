@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service.atm.machine;
+package com.elleined.marketplaceapi.service.atm.machine.deposit;
 
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.amount.DepositAmountAboveMaximumException;
