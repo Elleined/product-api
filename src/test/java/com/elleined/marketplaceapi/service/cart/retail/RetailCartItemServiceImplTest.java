@@ -59,11 +59,13 @@ class RetailCartItemServiceImplTest {
                 .state(Product.State.PENDING)
                 .build();
 
+        RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
+                .retailProduct(activeAndListedRetailProduct)
+                .createdAt(LocalDateTime.now())
+                .build();
+
         List<RetailCartItem> rawRetailCartItems = Arrays.asList(
-                RetailCartItem.retailCartItemBuilder()
-                        .retailProduct(activeAndListedRetailProduct)
-                        .createdAt(LocalDateTime.now())
-                        .build(),
+                retailCartItem,
                 RetailCartItem.retailCartItemBuilder()
                         .retailProduct(inactiveRetailProduct)
                         .createdAt(LocalDateTime.now())
@@ -76,16 +78,9 @@ class RetailCartItemServiceImplTest {
         user.setRetailCartItems(rawRetailCartItems);
 
         List<RetailCartItem> actual = retailCartItemService.getAll(user);
-        actual.forEach(retailCartItem -> System.out.println(retailCartItem.getRetailProduct().getId()));
+        List<RetailCartItem> expected = Arrays.asList(retailCartItem);
 
-        List<RetailCartItem> expected = Arrays.asList(
-                RetailCartItem.retailCartItemBuilder()
-                        .retailProduct(activeAndListedRetailProduct)
-                        .createdAt(LocalDateTime.now())
-                        .build()
-        );
-        expected .forEach(retailCartItem -> System.out.println(retailCartItem.getRetailProduct().getId()));
-
+        assertEquals(expected.size(), actual.size());
         for (int i = 0; i < actual.size() && i < expected.size(); i++) {
             assertEquals(expected.get(i), actual.get(i));
         }
