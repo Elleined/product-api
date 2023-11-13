@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Mapper(componentModel = "spring")
 public interface WholeSaleCartItemMapper extends CartMapper<WholeSaleCartItemDTO, WholeSaleCartItem> {
 
-
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "price", expression = "java(wholeSaleProduct.getPrice())"),

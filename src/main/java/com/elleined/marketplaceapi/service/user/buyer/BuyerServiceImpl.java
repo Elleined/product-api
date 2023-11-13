@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.mapper.order.RetailOrderMapper;
 import com.elleined.marketplaceapi.mapper.order.WholeSaleOrderMapper;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
@@ -20,6 +21,7 @@ import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
+import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +49,11 @@ public class BuyerServiceImpl implements BuyerService {
     private final RetailOrderMapper retailOrderMapper;
     private final WholeSaleOrderMapper wholeSaleOrderMapper;
 
+    private final AddressService addressService;
+
     @Override
-    public RetailOrder order(User buyer, RetailOrderDTO retailOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
-        RetailProduct retailProduct = retailProductService.getById(retailOrderDTO.getProductId());
+    public RetailOrder order(User buyer, RetailOrderDTO dto) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
+        RetailProduct retailProduct = retailProductService.getById(dto.getProductId());
 
         if (retailProduct.isExpired())
             throw new ProductExpiredException("Cannot order this retail product! because this retail product is already expired!");
@@ -67,14 +71,14 @@ public class BuyerServiceImpl implements BuyerService {
             throw new ProductNotListedException("Cannot order this retail product! because this retail product are not yet listed!");
         if (buyer.hasProduct(retailProduct))
             throw new ResourceOwnedException("You cannot order your own retail product listing!");
-        if (retailProduct.isExceedingToAvailableQuantity(retailOrderDTO.getOrderQuantity()))
+        if (retailProduct.isExceedingToAvailableQuantity(dto.getOrderQuantity()))
             throw new OrderQuantiantyExceedsException("Cannot order this retail product! because you are trying to order that exceeds to available amount!");
         if (retailProductService.isRejectedBySeller(buyer, retailProduct))
             throw new BuyerAlreadyRejectedException("Cannot order this retail product! because seller of this retail product is rejected you order request before!. Please wait after 1 day to re-oder this product");
 
-        RetailOrder retailOrder = retailOrderMapper.toEntity(retailOrderDTO, buyer);
-        double price = retailProductService.calculateOrderPrice(retailProduct, retailOrderDTO.getOrderQuantity());
-        retailOrder.setPrice(price);
+        double price = retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
+        DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId());
+        RetailOrder retailOrder = retailOrderMapper.toEntity(dto, buyer, deliveryAddress, price, retailProduct);
 
         buyer.getRetailOrders().add(retailOrder);
         retailOrderRepository.save(retailOrder);
@@ -83,8 +87,8 @@ public class BuyerServiceImpl implements BuyerService {
     }
 
     @Override
-    public WholeSaleOrder order(User buyer, WholeSaleOrderDTO wholeSaleOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
-        WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(wholeSaleOrderDTO.getProductId());
+    public WholeSaleOrder order(User buyer, WholeSaleOrderDTO dto) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException{
+        WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(dto.getProductId());
 
         if (wholeSaleProduct.isRejected())
             throw new ProductRejectedException("Cannot order this whole sale product! because this whole sale product is rejected by moderator!");
@@ -103,9 +107,8 @@ public class BuyerServiceImpl implements BuyerService {
         if (wholeSaleProductService.isRejectedBySeller(buyer, wholeSaleProduct))
             throw new BuyerAlreadyRejectedException("Cannot order this whole sale product! because seller of this whole sale product is rejected you order request before!. Please wait after 1 day to re-oder this product");
 
-        WholeSaleOrder wholeSaleOrder = wholeSaleOrderMapper.toEntity(wholeSaleOrderDTO, buyer);
-        wholeSaleOrder.setUpdatedAt(LocalDateTime.now());
-        wholeSaleOrder.setPrice(wholeSaleOrder.getPrice());
+        DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId());
+        WholeSaleOrder wholeSaleOrder = wholeSaleOrderMapper.toEntity(dto, buyer, deliveryAddress, wholeSaleProduct);
 
         buyer.getWholeSaleOrders().add(wholeSaleOrder);
         wholeSaleOrderRepository.save(wholeSaleOrder);

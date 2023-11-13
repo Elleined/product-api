@@ -1,8 +1,10 @@
 package com.elleined.marketplaceapi.mapper.order;
 
 import com.elleined.marketplaceapi.dto.order.RetailOrderDTO;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
@@ -14,28 +16,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring", imports = Order.class)
-public abstract class RetailOrderMapper implements OrderMapper<RetailOrderDTO, RetailOrder> {
+public interface RetailOrderMapper extends OrderMapper<RetailOrderDTO, RetailOrder> {
 
-    @Autowired
-    @Lazy
-    protected RetailProductService retailProductService;
-    @Autowired
-    @Lazy
-    protected AddressService addressService;
-    @Override
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "sellerMessage", ignore = true),
-            @Mapping(target = "price", ignore = true),
 
+            @Mapping(target = "price", expression = "java(price)"),
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "status", expression = "java(Order.Status.PENDING)"),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, retailOrderDTO.getDeliveryAddressId()))"),
-            @Mapping(target = "retailProduct", expression = "java(retailProductService.getById(retailOrderDTO.getProductId()))"),
+            @Mapping(target = "deliveryAddress", expression = "java(deliveryAddress)"),
+            @Mapping(target = "retailProduct", expression = "java(retailProduct)"),
             @Mapping(target = "purchaser", expression = "java(buyer)"),
             @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     })
-    public abstract RetailOrder toEntity(RetailOrderDTO retailOrderDTO, @Context User buyer);
+    RetailOrder toEntity(RetailOrderDTO retailOrderDTO,
+                                         @Context User buyer,
+                                         @Context DeliveryAddress deliveryAddress,
+                                         @Context double price,
+                                         @Context RetailProduct retailProduct);
 
     @Override
     @Mappings({
@@ -45,5 +44,5 @@ public abstract class RetailOrderMapper implements OrderMapper<RetailOrderDTO, R
             @Mapping(target = "sellerId", source = "retailProduct.seller.id"),
             @Mapping(target = "orderStatus", source = "status")
     })
-    public abstract RetailOrderDTO toDTO(RetailOrder retailOrder);
+    RetailOrderDTO toDTO(RetailOrder retailOrder);
 }

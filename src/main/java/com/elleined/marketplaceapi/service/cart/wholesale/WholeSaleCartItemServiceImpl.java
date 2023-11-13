@@ -9,6 +9,7 @@ import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.mapper.cart.WholeSaleCartItemMapper;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
@@ -17,6 +18,7 @@ import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.cart.WholeSaleCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
+import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,8 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
     private final WholeSaleCartItemRepository wholeSaleCartItemRepository;
 
     private final WholeSaleOrderRepository wholeSaleOrderRepository;
+
+    private final AddressService addressService;
 
     @Override
     public List<WholeSaleCartItem> getAll(User currentUser) {
@@ -84,7 +88,8 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
         if (wholeSaleProductService.isRejectedBySeller(currentUser, wholeSaleProduct))
             throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
-        WholeSaleCartItem wholeSaleCartItem = wholeSaleCartItemMapper.toEntity(dto, currentUser);
+        DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, dto.getDeliveryAddressId());
+        WholeSaleCartItem wholeSaleCartItem = wholeSaleCartItemMapper.toEntity(dto, currentUser, deliveryAddress, wholeSaleProduct);
         currentUser.getWholeSaleCartItems().add(wholeSaleCartItem);
 
         wholeSaleCartItemRepository.save(wholeSaleCartItem);

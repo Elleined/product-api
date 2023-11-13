@@ -59,7 +59,4 @@ public class RetailOrderService implements OrderService<RetailOrder> {
     public RetailOrder getById(int id) throws ResourceNotFoundException {
         return retailOrderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Retail order with id of " + id + " does not exists!"));
     }
-
-
-
 }
