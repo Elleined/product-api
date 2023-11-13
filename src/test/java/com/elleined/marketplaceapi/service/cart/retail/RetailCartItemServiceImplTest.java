@@ -539,14 +539,33 @@ class RetailCartItemServiceImplTest {
     }
 
     @Test
-    void getById() {
-    }
-
-    @Test
     void getByProduct() {
+        User user = new User();
+
+        RetailProduct retailProduct1 = RetailProduct.retailProductBuilder()
+                .id(1)
+                .build();
+
+        RetailProduct retailProduct2 = RetailProduct.retailProductBuilder()
+                .id(2)
+                .build();
+
+        RetailCartItem expected = RetailCartItem.retailCartItemBuilder()
+                .id(1)
+                .retailProduct(retailProduct1)
+                .build();
+        List<RetailCartItem> retailCartItems = Arrays.asList(
+                expected,
+                RetailCartItem.retailCartItemBuilder()
+                        .id(2)
+                        .retailProduct(retailProduct2)
+                        .build()
+        );
+        user.setRetailCartItems(retailCartItems);
+
+        RetailCartItem actual = retailCartItemService.getByProduct(user, retailProduct1);
+
+        assertEquals(expected, actual);
     }
 
-    @Test
-    void getAllById() {
-    }
 }
