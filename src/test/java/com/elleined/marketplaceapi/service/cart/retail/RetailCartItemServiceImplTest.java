@@ -607,4 +607,5 @@ class RetailCartItemServiceImplTest {
         assertEquals(expected, actual);
         assertDoesNotThrow(() -> retailCartItemService.getByProduct(user, retailProduct1));
     }
+
 }

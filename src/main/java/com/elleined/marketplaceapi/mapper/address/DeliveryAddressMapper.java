@@ -15,8 +15,8 @@ public interface DeliveryAddressMapper extends AddressMapper<DeliveryAddressDTO,
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "user", expression = "java(registeringUser)"),
             @Mapping(target = "retailCartItems", expression = "java(new java.util.ArrayList<>())"),
-            @Mapping(target = "retailOrders", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "wholeSaleCartItems", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "retailOrders", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "wholeSaleOrders", expression = "java(new java.util.ArrayList<>())")
     })
     DeliveryAddress toEntity(DeliveryAddressDTO deliveryAddressDTO, @Context User registeringUser);
