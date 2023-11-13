@@ -4,10 +4,12 @@ import com.elleined.marketplaceapi.dto.address.DeliveryAddressDTO;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+@ExtendWith(MockitoExtension.class)
 class DeliveryAddressMapperTest {
 
     @InjectMocks
@@ -45,6 +48,8 @@ class DeliveryAddressMapperTest {
         assertNotNull(deliveryAddress.getRetailCartItems());
         assertNotNull(deliveryAddress.getWholeSaleOrders());
         assertNotNull(deliveryAddress.getRetailOrders());
+
+        assertEquals(user, deliveryAddress.getUser());
     }
 
     @Test

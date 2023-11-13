@@ -28,4 +28,6 @@ public class AddressDTO {
 
     @NotBlank(message = "Baranggay name cannot be null, empty, or blank")
     private String baranggayName;
+
+
 }
