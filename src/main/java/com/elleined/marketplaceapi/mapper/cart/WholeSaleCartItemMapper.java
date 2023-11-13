@@ -22,6 +22,7 @@ public interface WholeSaleCartItemMapper extends CartMapper<WholeSaleCartItemDTO
             @Mapping(target = "price", expression = "java(wholeSaleProduct.getPrice().doubleValue())"),
             @Mapping(target = "deliveryAddress", expression = "java(deliveryAddress)"),
             @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProduct)"),
+            @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "purchaser", expression = "java(buyer)")
     })
     WholeSaleCartItem toEntity(WholeSaleCartItemDTO dto,
