@@ -9,6 +9,7 @@ import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.mapper.cart.RetailCartItemMapper;
 import com.elleined.marketplaceapi.model.Crop;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product;
@@ -18,6 +19,8 @@ import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.cart.RetailCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
+import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,15 +45,21 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RetailCartItemServiceImplTest {
-
     @Mock
     private RetailProductServiceImpl retailProductService;
+
     @Mock
     private RetailCartItemMapper retailCartItemMapper;
     @Mock
     private RetailCartItemRepository retailCartItemRepository;
+
     @Mock
     private RetailOrderRepository retailOrderRepository;
+
+    @Mock
+    private AddressService addressService;
+
+
 
     @InjectMocks
     private RetailCartItemServiceImpl retailCartItemService;
@@ -492,6 +501,7 @@ class RetailCartItemServiceImplTest {
         user.setRetailProducts(new ArrayList<>());
         user.setRetailCartItems(new ArrayList<>());
         user.setRetailOrders(new ArrayList<>());
+        user.setDeliveryAddresses(new ArrayList<>());
 
         RetailProduct retailProduct = RetailProduct.retailProductBuilder()
                 .id(1)
@@ -513,17 +523,29 @@ class RetailCartItemServiceImplTest {
         RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
                 .productId(1)
                 .orderQuantity(20)
+                .deliveryAddressId(1)
                 .build();
 
         RetailCartItem retailCartItem = new RetailCartItem();
-        
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailCartItemMapper.toEntity(retailCartItemDTO, user)).thenReturn(retailCartItem);
+
+        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
+                .id(1)
+                .build();
+        user.getDeliveryAddresses().add(deliveryAddress);
+
+        double price = 50_000.00;
+        when(retailProductService.getById(retailCartItemDTO.getProductId())).thenReturn(retailProduct);
+        when(retailProductService.calculateOrderPrice(retailProduct, retailCartItemDTO.getOrderQuantity())).thenReturn(price);
+        when(addressService.getDeliveryAddressById(user, retailCartItemDTO.getDeliveryAddressId())).thenReturn(deliveryAddress);
+        when(retailCartItemMapper.toEntity(retailCartItemDTO, user, deliveryAddress, price, retailProduct)).thenReturn(retailCartItem);
         when(retailCartItemRepository.save(retailCartItem)).thenReturn(retailCartItem);
+
         retailCartItemService.save(user, retailCartItemDTO);
 
         verify(retailProductService).isRejectedBySeller(user, retailProduct);
-        verify(retailCartItemMapper).toEntity(retailCartItemDTO, user);
+        verify(retailProductService).calculateOrderPrice(retailProduct, retailCartItemDTO.getOrderQuantity());
+        verify(addressService).getDeliveryAddressById(user, retailCartItemDTO.getDeliveryAddressId());
+        verify(retailCartItemMapper).toEntity(retailCartItemDTO, user, deliveryAddress, price, retailProduct);
         verify(retailCartItemRepository).save(retailCartItem);
 
         // not nulls

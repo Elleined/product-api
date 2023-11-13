@@ -11,16 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class RetailCartItemMapperTest {
@@ -49,27 +46,34 @@ class RetailCartItemMapperTest {
                 .availableQuantity(5_000)
                 .build();
 
+        int expectedOrderQuantity = 200;
         RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
                 .productId(1)
                 .deliveryAddressId(1)
-                .orderQuantity(20)
+                .orderQuantity(expectedOrderQuantity)
                 .build();
+        double expectedPrice = 10_000.00;
 
-        when(addressService.getDeliveryAddressById(user, retailCartItemDTO.getDeliveryAddressId())).thenReturn(deliveryAddress);
-        when(retailProductService.getById(retailCartItemDTO.getProductId())).thenReturn(retailProduct);
+        RetailCartItem retailCartItem = retailCartItemMapper.toEntity(retailCartItemDTO, user, deliveryAddress, expectedPrice, retailProduct);
+        int actualId = retailCartItem.getId();
+        double actualPrice = retailCartItem.getPrice();
+        int actualOrderQuantity = retailCartItem.getOrderQuantity();
 
-        RetailCartItem retailCartItem = retailCartItemMapper.toEntity(retailCartItemDTO, user);
-
-        assertEquals(0, retailCartItem.getId());
+        assertEquals(0, actualId);
+        assertEquals(expectedPrice, actualPrice);
         assertNotNull(retailCartItem.getCreatedAt());
-        assertNotNull(retailCartItem.getPrice());
+        assertNotNull(retailCartItem.getPurchaser());
+        assertNotNull(retailCartItem.getDeliveryAddress());
         assertNotNull(retailCartItem.getRetailProduct());
+        assertEquals(expectedOrderQuantity, actualOrderQuantity);
 
+        assertEquals(deliveryAddress, retailCartItem.getDeliveryAddress());
         assertEquals(user, retailCartItem.getPurchaser());
     }
 
     @Test
     void toDTO() {
+        
     }
 
     @Test
