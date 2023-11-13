@@ -69,10 +69,10 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
     public RetailCartItem save(User currentUser, RetailCartItemDTO dto) throws AlreadyExistException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ResourceOwnedException, ResourceNotFoundException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, ProductExpiredException, BuyerAlreadyRejectedException {
         RetailProduct retailProduct = retailProductService.getById(dto.getProductId());
 
-        if (retailProduct.isExpired())
-            throw new ProductExpiredException("Cannot add to cart! because this product is already expired!");
         if (currentUser.isProductAlreadyInCart(retailProduct))
             throw new AlreadyExistException("Cannot add to cart! because you already have this product in your cart.");
+        if (retailProduct.isExpired())
+            throw new ProductExpiredException("Cannot add to cart! because this product is already expired!");
         if (currentUser.hasOrder(retailProduct, PENDING))
             throw new ProductHasPendingOrderException("Cannot add to cart! because you already has pending order for this product. Please wait until seller take action in you order request!");
         if (currentUser.hasOrder(retailProduct, ACCEPTED))
@@ -94,7 +94,7 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
         currentUser.getRetailCartItems().add(retailCartItem);
 
         retailCartItemRepository.save(retailCartItem);
-        log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), dto.getProductId(), retailCartItem.getId());
+//        log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), dto.getProductId(), retailCartItem.getId());
         return retailCartItem;
     }
 
@@ -108,6 +108,8 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
             throw new ProductHasPendingOrderException("Cannot order! because you already pending order for this product. Please wait until seller take action in you order request!");
         if (currentUser.hasOrder(retailProduct, ACCEPTED))
             throw new ProductHasAcceptedOrderException("Cannot order! because you already have a accepted order for this product. Please contact the seller to settle your order!");
+        if (currentUser.hasProduct(retailCartItem.getRetailProduct()))
+            throw new ResourceOwnedException("You cannot order your own product listing!");
         if (retailProduct.isDeleted())
             throw new ResourceNotFoundException("Cannot order! because this product does not exist or might already been deleted");
         if (retailProduct.isSold())
@@ -118,8 +120,6 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
             throw new OrderQuantiantyExceedsException("Cannot order! because you are trying to order that exceeds to available amount!");
         if (retailProductService.isRejectedBySeller(currentUser, retailProduct))
             throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
-        if (currentUser.hasProduct(retailCartItem.getRetailProduct()))
-            throw new ResourceOwnedException("You cannot order your own product listing!");
 
         RetailOrder retailOrder = retailCartItemMapper.cartItemToOrder(retailCartItem);
         retailCartItemRepository.delete(retailCartItem);
