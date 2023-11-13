@@ -3,30 +3,24 @@ package com.elleined.marketplaceapi.mapper.cart;
 import com.elleined.marketplaceapi.dto.cart.RetailCartItemDTO;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.address.AddressService;
-import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static com.elleined.marketplaceapi.model.order.Order.Status.PENDING;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class RetailCartItemMapperTest {
-
-    @Spy
-    protected RetailProductService retailProductService;
-
-    @Spy
-    protected AddressService addressService;
 
     @InjectMocks
     private RetailCartItemMapper retailCartItemMapper = Mappers.getMapper(RetailCartItemMapper.class);
@@ -73,10 +67,63 @@ class RetailCartItemMapperTest {
 
     @Test
     void toDTO() {
-        
+        RetailCartItem expected = RetailCartItem.retailCartItemBuilder()
+                .id(1)
+                .price(200)
+                .createdAt(LocalDateTime.now())
+                .purchaser(User.builder()
+                        .id(1)
+                        .build())
+                .deliveryAddress(DeliveryAddress.deliveryAddressBuilder()
+                        .id(1)
+                        .build())
+                .retailProduct(RetailProduct.retailProductBuilder()
+                        .id(1)
+                        .build())
+                .orderQuantity(5)
+                .build();
+
+        RetailCartItemDTO actual = retailCartItemMapper.toDTO(expected);
+
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getPrice(), actual.getPrice());
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
+        assertEquals(expected.getPurchaser().getId(), actual.getPurchaserId());
+        assertEquals(expected.getDeliveryAddress().getId(), actual.getDeliveryAddressId());
+        assertEquals(expected.getRetailProduct().getId(), actual.getProductId());
+        assertEquals(expected.getOrderQuantity(), actual.getOrderQuantity());
     }
 
     @Test
     void cartItemToOrder() {
+        RetailCartItem actual = RetailCartItem.retailCartItemBuilder()
+                .id(1)
+                .price(200)
+                .createdAt(LocalDateTime.now())
+                .purchaser(User.builder()
+                        .id(1)
+                        .build())
+                .deliveryAddress(DeliveryAddress.deliveryAddressBuilder()
+                        .id(1)
+                        .build())
+                .retailProduct(RetailProduct.retailProductBuilder()
+                        .id(1)
+                        .build())
+                .orderQuantity(5)
+                .build();
+
+        RetailOrder expected = retailCartItemMapper.cartItemToOrder(actual);
+
+        assertEquals(0, expected.getId());
+        assertEquals(expected.getPrice(), actual.getPrice());
+        assertEquals(expected.getPurchaser(), actual.getPurchaser());
+        assertEquals(expected.getRetailProduct(), actual.getRetailProduct());
+        assertEquals(expected.getDeliveryAddress(), actual.getDeliveryAddress());
+
+        assertNotNull(expected.getOrderDate());
+        assertNotNull(expected.getUpdatedAt());
+        assertNull(expected.getSellerMessage());
+        assertEquals(PENDING, expected.getStatus());
+
     }
 }
