@@ -12,8 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class WholeSaleCartItemMapperTest {
 
@@ -59,6 +61,45 @@ class WholeSaleCartItemMapperTest {
 
     @Test
     void toDTO() {
+        User purchaser = User.builder()
+                .id(1)
+                .build();
+        User seller = User.builder()
+                .id(2)
+                .build();
+
+        double expectedPrice = 2000.0;
+
+        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
+                .id(1)
+                .build();
+
+        WholeSaleProduct wholeSaleProduct = WholeSaleProduct.wholeSaleProductBuilder()
+                .id(1)
+                .seller(seller)
+                .price(new BigDecimal(expectedPrice))
+                .build();
+
+        WholeSaleCartItem wholeSaleCartItem = WholeSaleCartItem.wholeSaleCartItemBuilder()
+                .id(1)
+                .price(expectedPrice)
+                .createdAt(LocalDateTime.now())
+                .purchaser(purchaser)
+                .deliveryAddress(deliveryAddress)
+                .wholeSaleProduct(wholeSaleProduct)
+                .build();
+
+        WholeSaleCartItemDTO dto = wholeSaleCartItemMapper.toDTO(wholeSaleCartItem);
+
+
+        assertNotNull(dto.getId());
+        assertEquals(expectedPrice, dto.getPrice());
+        assertEquals(wholeSaleCartItem.getWholeSaleProduct().getSeller().getId(), dto.getSellerId());
+        assertNotNull(dto.getCreatedAt());
+        assertEquals(wholeSaleCartItem.getWholeSaleProduct().getId(), dto.getProductId());
+        assertEquals(wholeSaleCartItem.getPurchaser().getId(), dto.getPurchaserId());
+        assertEquals(wholeSaleCartItem.getDeliveryAddress().getId(), dto.getDeliveryAddressId());
+
     }
 
     @Test
