@@ -3,6 +3,8 @@ package com.elleined.marketplaceapi.mapper.cart;
 import com.elleined.marketplaceapi.dto.cart.WholeSaleCartItemDTO;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import org.junit.jupiter.api.Test;
@@ -14,8 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static com.elleined.marketplaceapi.model.order.Order.Status.PENDING;
+import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(MockitoExtension.class)
 class WholeSaleCartItemMapperTest {
 
@@ -104,5 +107,53 @@ class WholeSaleCartItemMapperTest {
 
     @Test
     void cartItemToOrder() {
+        User purchaser = User.builder()
+                .id(1)
+                .build();
+        User seller = User.builder()
+                .id(2)
+                .build();
+
+        double expectedPrice = 2000.0;
+
+        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
+                .id(1)
+                .build();
+
+        WholeSaleProduct wholeSaleProduct = WholeSaleProduct.wholeSaleProductBuilder()
+                .id(1)
+                .seller(seller)
+                .price(new BigDecimal(expectedPrice))
+                .build();
+
+        WholeSaleCartItem wholeSaleCartItem = WholeSaleCartItem.wholeSaleCartItemBuilder()
+                .id(1)
+                .price(expectedPrice)
+                .createdAt(LocalDateTime.now())
+                .purchaser(purchaser)
+                .deliveryAddress(deliveryAddress)
+                .wholeSaleProduct(wholeSaleProduct)
+                .build();
+
+        WholeSaleOrder wholeSaleOrder = wholeSaleCartItemMapper.cartItemToOrder(wholeSaleCartItem);
+
+        assertEquals(0, wholeSaleOrder.getId());
+        assertEquals(expectedPrice, wholeSaleOrder.getPrice());
+        assertNotNull(wholeSaleOrder.getOrderDate());
+
+        assertEquals(wholeSaleCartItem.getPurchaser(), wholeSaleOrder.getPurchaser());
+        assertNotNull(wholeSaleOrder.getPurchaser());
+
+        assertEquals(wholeSaleCartItem.getDeliveryAddress(), wholeSaleOrder.getDeliveryAddress());
+        assertNotNull(wholeSaleOrder.getDeliveryAddress());
+
+        assertEquals(PENDING, wholeSaleOrder.getStatus());
+        assertNotNull(wholeSaleOrder.getStatus());
+
+        assertNull(wholeSaleOrder.getSellerMessage());
+        assertNotNull(wholeSaleOrder.getUpdatedAt());
+
+        assertEquals(wholeSaleCartItem.getWholeSaleProduct(), wholeSaleOrder.getWholeSaleProduct());
+        assertNotNull(wholeSaleOrder.getWholeSaleProduct());
     }
 }
