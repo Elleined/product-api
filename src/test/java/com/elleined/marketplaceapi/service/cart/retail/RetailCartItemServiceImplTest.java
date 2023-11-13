@@ -96,7 +96,7 @@ class RetailCartItemServiceImplTest {
         user.setRetailCartItems(rawRetailCartItems);
 
         List<RetailCartItem> actual = retailCartItemService.getAll(user);
-        List<RetailCartItem> expected = Arrays.asList(retailCartItem);
+        List<RetailCartItem> expected = Collections.singletonList(retailCartItem);
 
         assertEquals(expected.size(), actual.size());
         assertIterableEquals(expected, actual);
@@ -143,7 +143,7 @@ class RetailCartItemServiceImplTest {
         when(retailProductService.getById(1)).thenReturn(retailProduct);
 
         assertThrows(AlreadyExistException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -171,7 +171,7 @@ class RetailCartItemServiceImplTest {
 
         assertThrows(ProductExpiredException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrows(ProductExpiredException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -216,7 +216,7 @@ class RetailCartItemServiceImplTest {
 
         assertThrowsExactly(ProductHasPendingOrderException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrows(ProductHasPendingOrderException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -262,7 +262,7 @@ class RetailCartItemServiceImplTest {
 
         assertThrowsExactly(ProductHasAcceptedOrderException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrowsExactly(ProductHasAcceptedOrderException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -294,7 +294,7 @@ class RetailCartItemServiceImplTest {
 
         assertThrowsExactly(ResourceOwnedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrowsExactly(ResourceOwnedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -326,7 +326,7 @@ class RetailCartItemServiceImplTest {
 
         assertThrowsExactly(ResourceNotFoundException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrowsExactly(ResourceNotFoundException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -359,7 +359,7 @@ class RetailCartItemServiceImplTest {
 
         assertThrowsExactly(ProductAlreadySoldException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrowsExactly(ProductAlreadySoldException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @ParameterizedTest
@@ -395,7 +395,7 @@ class RetailCartItemServiceImplTest {
         assertThrowsExactly(ProductNotListedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrowsExactly(ProductNotListedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -434,7 +434,7 @@ class RetailCartItemServiceImplTest {
         assertThrowsExactly(OrderQuantiantyExceedsException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrowsExactly(OrderQuantiantyExceedsException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
@@ -482,7 +482,7 @@ class RetailCartItemServiceImplTest {
         assertThrowsExactly(BuyerAlreadyRejectedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
         verify(retailProductService, atMost(2)).isRejectedBySeller(user, retailProduct);
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository);
+        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
 
@@ -532,10 +532,49 @@ class RetailCartItemServiceImplTest {
 
     @Test
     void orderCartItem() {
-    }
+        User user = new User();
+        user.setRetailProducts(new ArrayList<>());
+        user.setRetailCartItems(new ArrayList<>());
+        user.setRetailOrders(new ArrayList<>());
 
-    @Test
-    void orderAllCartItems() {
+        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
+                .id(1)
+                .expirationDate(LocalDate.now().plusDays(20))
+                .status(ACTIVE)
+                .state(State.LISTING)
+                .availableQuantity(100)
+                .pricePerUnit(20)
+                .quantityPerUnit(5)
+                .crop(Crop.builder()
+                        .name("Crop")
+                        .build())
+                .retailUnit(RetailUnit.retailUnitBuilder()
+                        .name("Retail unit")
+                        .build())
+                .picture("Picture")
+                .build();
+
+        RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
+                .id(1)
+                .retailProduct(retailProduct)
+                .build();
+        user.getRetailCartItems().add(retailCartItem);
+
+        RetailOrder retailOrder = new RetailOrder();
+
+        when(retailCartItemMapper.cartItemToOrder(retailCartItem)).thenReturn(retailOrder);
+        doAnswer(i -> user.getRetailCartItems().remove(retailCartItem))
+                .when(retailCartItemRepository)
+                .delete(retailCartItem);
+        when(retailOrderRepository.save(retailOrder)).thenReturn(retailOrder);
+
+        retailCartItemService.orderCartItem(user, retailCartItem);
+
+        assertFalse(user.getRetailCartItems().contains(retailCartItem));
+        verify(retailCartItemMapper).cartItemToOrder(retailCartItem);
+        verify(retailCartItemRepository).delete(retailCartItem);
+        verify(retailOrderRepository).save(retailOrder);
+        assertDoesNotThrow(() -> retailCartItemService.orderCartItem(user, retailCartItem));
     }
 
     @Test
@@ -566,6 +605,6 @@ class RetailCartItemServiceImplTest {
         RetailCartItem actual = retailCartItemService.getByProduct(user, retailProduct1);
 
         assertEquals(expected, actual);
+        assertDoesNotThrow(() -> retailCartItemService.getByProduct(user, retailProduct1));
     }
-
 }
