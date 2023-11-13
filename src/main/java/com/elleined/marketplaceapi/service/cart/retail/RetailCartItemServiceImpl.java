@@ -94,7 +94,7 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
         currentUser.getRetailCartItems().add(retailCartItem);
 
         retailCartItemRepository.save(retailCartItem);
-//        log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), dto.getProductId(), retailCartItem.getId());
+        log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), dto.getProductId(), retailCartItem.getId());
         return retailCartItem;
     }
 

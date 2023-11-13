@@ -8,16 +8,16 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.mapper.cart.RetailCartItemMapper;
+import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
-import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.Product.State;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.cart.RetailCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
-import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -36,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.elleined.marketplaceapi.model.order.Order.Status.*;
+import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
 import static com.elleined.marketplaceapi.model.product.Product.Status.INACTIVE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -488,6 +488,46 @@ class RetailCartItemServiceImplTest {
 
     @Test
     void save() {
+        User user = new User();
+        user.setRetailProducts(new ArrayList<>());
+        user.setRetailCartItems(new ArrayList<>());
+        user.setRetailOrders(new ArrayList<>());
+
+        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
+                .id(1)
+                .expirationDate(LocalDate.now().plusDays(20))
+                .status(ACTIVE)
+                .state(State.LISTING)
+                .availableQuantity(100)
+                .pricePerUnit(20)
+                .quantityPerUnit(5)
+                .crop(Crop.builder()
+                        .name("Crop")
+                        .build())
+                .retailUnit(RetailUnit.retailUnitBuilder()
+                        .name("Retail unit")
+                        .build())
+                .picture("Picture")
+                .build();
+
+        RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
+                .productId(1)
+                .orderQuantity(20)
+                .build();
+
+        RetailCartItem retailCartItem = new RetailCartItem();
+        
+        when(retailProductService.getById(1)).thenReturn(retailProduct);
+        when(retailCartItemMapper.toEntity(retailCartItemDTO, user)).thenReturn(retailCartItem);
+        when(retailCartItemRepository.save(retailCartItem)).thenReturn(retailCartItem);
+        retailCartItemService.save(user, retailCartItemDTO);
+
+        verify(retailProductService).isRejectedBySeller(user, retailProduct);
+        verify(retailCartItemMapper).toEntity(retailCartItemDTO, user);
+        verify(retailCartItemRepository).save(retailCartItem);
+
+        // not nulls
+        assertDoesNotThrow(() -> retailCartItemService.save(user, retailCartItemDTO));
     }
 
     @Test
