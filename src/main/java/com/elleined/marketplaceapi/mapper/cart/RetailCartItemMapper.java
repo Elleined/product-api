@@ -1,42 +1,37 @@
 package com.elleined.marketplaceapi.mapper.cart;
 
 import com.elleined.marketplaceapi.dto.cart.RetailCartItemDTO;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.address.AddressService;
-import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 import java.time.LocalDateTime;
 
 
 @Mapper(componentModel = "spring")
-public abstract class RetailCartItemMapper implements CartMapper<RetailCartItemDTO, RetailCartItem> {
+public interface RetailCartItemMapper extends CartMapper<RetailCartItemDTO, RetailCartItem> {
 
-    @Lazy
-    @Autowired
-    protected RetailProductService retailProductService;
-
-    @Lazy
-    @Autowired
-    protected AddressService addressService;
-
-    @Override
     @Mappings({
             @Mapping(target = "id", ignore = true),
+
+            @Mapping(target = "price", expression = "java(price)"),
             @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
-            @Mapping(target = "deliveryAddress", expression = "java(addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId()))"),
-            @Mapping(target = "retailProduct", expression = "java(retailProductService.getById(dto.getProductId()))"),
+            @Mapping(target = "deliveryAddress", expression = "java(deliveryAddress)"),
+            @Mapping(target = "retailProduct", expression = "java(retailProduct)"),
             @Mapping(target = "purchaser", expression = "java(buyer)")
     })
-    public abstract RetailCartItem toEntity(RetailCartItemDTO dto, @Context User buyer);
+    RetailCartItem toEntity(RetailCartItemDTO dto,
+                            @Context User buyer,
+                            @Context DeliveryAddress deliveryAddress,
+                            @Context double price,
+                            @Context RetailProduct retailProduct);
 
     @Override
     @Mappings({
@@ -48,7 +43,7 @@ public abstract class RetailCartItemMapper implements CartMapper<RetailCartItemD
     public abstract RetailCartItemDTO toDTO(RetailCartItem retailCartItem);
 
     @Override
-    public RetailOrder cartItemToOrder(RetailCartItem retailCartItem) {
+    default RetailOrder cartItemToOrder(RetailCartItem retailCartItem) {
         return RetailOrder.retailOrderBuilder()
                 .orderQuantity(retailCartItem.getOrderQuantity())
                 .retailProduct(retailCartItem.getRetailProduct())

@@ -10,6 +10,7 @@ import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.mapper.cart.RetailCartItemMapper;
+import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.CartItem;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
@@ -18,6 +19,7 @@ import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.cart.RetailCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
+import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -43,6 +46,8 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
     private final RetailCartItemRepository retailCartItemRepository;
 
     private final RetailOrderRepository retailOrderRepository;
+
+    private final AddressService addressService;
 
     @Override
     public List<RetailCartItem> getAll(User currentUser) {
@@ -90,7 +95,9 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
         if (retailProductService.isRejectedBySeller(currentUser, retailProduct))
             throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
-        RetailCartItem retailCartItem = retailCartItemMapper.toEntity(dto, currentUser);
+        double price = retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
+        DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, dto.getDeliveryAddressId());
+        RetailCartItem retailCartItem = retailCartItemMapper.toEntity(dto, currentUser, deliveryAddress, price, retailProduct);
         currentUser.getRetailCartItems().add(retailCartItem);
 
         retailCartItemRepository.save(retailCartItem);

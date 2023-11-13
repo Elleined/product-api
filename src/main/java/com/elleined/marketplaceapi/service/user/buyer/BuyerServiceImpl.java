@@ -74,7 +74,6 @@ public class BuyerServiceImpl implements BuyerService {
 
         RetailOrder retailOrder = retailOrderMapper.toEntity(retailOrderDTO, buyer);
         double price = retailProductService.calculateOrderPrice(retailProduct, retailOrderDTO.getOrderQuantity());
-        retailOrder.setUpdatedAt(LocalDateTime.now());
         retailOrder.setPrice(price);
 
         buyer.getRetailOrders().add(retailOrder);
