@@ -20,8 +20,8 @@ public interface RetailOrderMapper extends OrderMapper<RetailOrderDTO, RetailOrd
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "sellerMessage", ignore = true),
 
+            @Mapping(target = "sellerMessage", expression = "java(null)"),
             @Mapping(target = "price", expression = "java(price)"),
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "status", expression = "java(Order.Status.PENDING)"),
