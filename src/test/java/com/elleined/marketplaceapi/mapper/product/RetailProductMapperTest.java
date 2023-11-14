@@ -55,7 +55,8 @@ class RetailProductMapperTest {
                 .privateChatRooms(new ArrayList<>())
                 .build();
 
-        RetailProductDTO actual = retailProductMapper.toDTO(expected);
+        double expectedTotalPrice = 5_000;
+        RetailProductDTO actual = retailProductMapper.toDTO(expected, expectedTotalPrice);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getCrop().getName(), actual.getCropName());
@@ -72,7 +73,7 @@ class RetailProductMapperTest {
         assertNotNull(actual.getListingDate());
         assertNotNull(actual.getExpirationDate());
         assertEquals(expected.getSeller().getShop().getName(), actual.getShopName());
-        // assertEquals();// total price
+        assertEquals(expectedTotalPrice, actual.getTotalPrice());// total price
         assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
         assertEquals(expected.getQuantityPerUnit(), actual.getQuantityPerUnit());
     }

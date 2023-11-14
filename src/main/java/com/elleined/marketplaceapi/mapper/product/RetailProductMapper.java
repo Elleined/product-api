@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Lazy;
                 Product.Status.class,
                 Product.SaleStatus.class}
 )
-public interface RetailProductMapper extends ProductMapper<RetailProductDTO, RetailProduct> {
+public interface RetailProductMapper {
 
     @Mappings({
             @Mapping(target = "state", source = "retailProduct.state"),
@@ -36,8 +36,8 @@ public interface RetailProductMapper extends ProductMapper<RetailProductDTO, Ret
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "picture", ignore = true),
 
+            @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "state", expression = "java(State.PENDING)"),
             @Mapping(target = "saleStatus", expression = "java(SaleStatus.NOT_ON_SALE)"),
@@ -51,9 +51,10 @@ public interface RetailProductMapper extends ProductMapper<RetailProductDTO, Ret
             @Mapping(target = "retailOrders", expression = "java(new java.util.ArrayList<>())"),
     })
     RetailProduct toEntity(RetailProductDTO retailProductDTO,
-                                           @Context User seller,
-                                           @Context Crop crop,
-                                           @Context RetailUnit retailUnit);
+                           @Context User seller,
+                           @Context Crop crop,
+                           @Context RetailUnit retailUnit,
+                           @Context String picture);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -64,14 +65,15 @@ public interface RetailProductMapper extends ProductMapper<RetailProductDTO, Ret
             @Mapping(target = "privateChatRooms", ignore = true),
             @Mapping(target = "retailCartItems", ignore = true),
             @Mapping(target = "retailOrders", ignore = true),
-            @Mapping(target = "picture", ignore = true),
 
+            @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "saleStatus", expression = "java(retailProduct.getSaleStatus())"),
             @Mapping(target = "retailUnit", expression = "java(retailUnit)"),
             @Mapping(target = "crop", expression = "java(crop)"),
     })
     RetailProduct toUpdate(@MappingTarget RetailProduct retailProduct,
-                                           RetailProductDTO dto,
-                                           @Context RetailUnit retailUnit,
-                                           @Context Crop crop);
+                           RetailProductDTO dto,
+                           @Context RetailUnit retailUnit,
+                           @Context Crop crop,
+                           @Context String picture);
 }

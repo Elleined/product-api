@@ -11,7 +11,9 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
-import com.elleined.marketplaceapi.mapper.product.ProductMapper;
+import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
+import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
+import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.order.Order.Status;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
@@ -19,6 +21,8 @@ import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.unit.RetailUnit;
+import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
@@ -29,6 +33,8 @@ import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
 import com.elleined.marketplaceapi.service.product.ProductService;
+import com.elleined.marketplaceapi.service.unit.RetailUnitService;
+import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
@@ -60,14 +66,17 @@ public class SellerServiceImpl implements SellerService {
     private final ProductService<RetailProduct> retailProductService;
     private final ProductService<WholeSaleProduct> wholeSaleProductService;
 
-    private final ProductMapper<WholeSaleProductDTO, WholeSaleProduct> wholeSaleProductMapper;
-    private final ProductMapper<RetailProductDTO, RetailProduct> retailProductMapper;
+    private final WholeSaleProductMapper wholeSaleProductMapper;
+    private final RetailProductMapper retailProductMapper;
 
     private final ImageUploader imageUploader;
 
     private final CropService cropService;
 
     private final OrderRepository orderRepository;
+
+    private final RetailUnitService retailUnitService;
+    private final WholeSaleUnitService wholeSaleUnitService;
 
     @Value("${cropTrade.img.directory}")
     private String cropTradeImgDirectory;
@@ -98,16 +107,16 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public RetailProduct saveProduct(User seller, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
+    public RetailProduct saveProduct(User seller, RetailProductDTO dto, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
 
-        if (cropService.notExist(retailProductDTO.getCropName())) cropService.save(retailProductDTO.getCropName());
-
-        RetailProduct retailProduct = retailProductMapper.toEntity(retailProductDTO, seller);
-        retailProduct.setPicture(productPicture.getOriginalFilename());
+        if (cropService.notExist(dto.getCropName())) cropService.save(dto.getCropName());
+        Crop crop = cropService.getByName(dto.getCropName());
+        RetailUnit retailUnit = retailUnitService.getById(dto.getUnitId());
+        RetailProduct retailProduct = retailProductMapper.toEntity(dto, seller, crop, retailUnit, productPicture.getOriginalFilename());
         retailProductRepository.save(retailProduct);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
@@ -116,16 +125,16 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
+    public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO dto, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot save product! because you are not yet been verified! Consider sending verification form first then get verified afterwards to list a product!");
 
-        if (cropService.notExist(wholeSaleProductDTO.getCropName())) cropService.save(wholeSaleProductDTO.getCropName());
-
-        WholeSaleProduct wholeSaleProduct = wholeSaleProductMapper.toEntity(wholeSaleProductDTO, seller);
-        wholeSaleProduct.setPicture(productPicture.getOriginalFilename());
+        if (cropService.notExist(dto.getCropName())) cropService.save(dto.getCropName());
+        Crop crop = cropService.getByName(dto.getCropName());
+        WholeSaleUnit wholeSaleUnit = wholeSaleUnitService.getById(dto.getUnitId());
+        WholeSaleProduct wholeSaleProduct = wholeSaleProductMapper.toEntity(dto, seller, crop, wholeSaleUnit, productPicture.getOriginalFilename());
         wholeSaleProductRepository.save(wholeSaleProduct);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
@@ -134,7 +143,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (retailProduct.hasAcceptedOrder())
@@ -155,9 +164,10 @@ public class SellerServiceImpl implements SellerService {
         retailProduct.setState(Product.State.PENDING);
         retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
 
-        if (cropService.notExist(retailProductDTO.getCropName())) cropService.save(retailProductDTO.getCropName());
-        RetailProduct updatedRetailProduct = retailProductMapper.toUpdate(retailProduct, retailProductDTO);
-        updatedRetailProduct.setPicture(productPicture.getOriginalFilename());
+        if (cropService.notExist(dto.getCropName())) cropService.save(dto.getCropName());
+        Crop crop = cropService.getByName(dto.getCropName());
+        RetailUnit retailUnit = retailUnitService.getById(dto.getUnitId());
+        RetailProduct updatedRetailProduct = retailProductMapper.toUpdate(retailProduct, dto, retailUnit, crop, productPicture.getOriginalFilename());
         retailProductRepository.save(updatedRetailProduct);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
@@ -165,7 +175,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (wholeSaleProduct.hasAcceptedOrder())
@@ -186,10 +196,11 @@ public class SellerServiceImpl implements SellerService {
         wholeSaleProduct.setState(Product.State.PENDING);
         wholeSaleProductService.updateAllPendingAndAcceptedOrders(wholeSaleProduct, Status.CANCELLED);
 
-        if (cropService.notExist(wholeSaleProductDTO.getCropName())) cropService.save(wholeSaleProductDTO.getCropName());
-        WholeSaleProduct updatedWholeSaleProduct = wholeSaleProductMapper.toUpdate(wholeSaleProduct, wholeSaleProductDTO);
-        updatedWholeSaleProduct.setPicture(productPicture.getOriginalFilename());
-        wholeSaleProductRepository.save(wholeSaleProduct);
+        if (cropService.notExist(dto.getCropName())) cropService.save(dto.getCropName());
+        Crop crop = cropService.getByName(dto.getCropName());
+        WholeSaleUnit wholeSaleUnit = wholeSaleUnitService.getById(dto.getUnitId());
+        WholeSaleProduct updatedWholeSaleProduct = wholeSaleProductMapper.toUpdate(wholeSaleProduct, dto, crop, wholeSaleUnit, productPicture.getOriginalFilename());
+        wholeSaleProductRepository.save(updatedWholeSaleProduct);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
         log.debug("Whole sale product with id of {} updated successfully!", wholeSaleProduct.getId());

@@ -6,20 +6,15 @@ import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.CropService;
-import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring",
         imports = {Product.State.class,
                 Product.Status.class,
                 Product.SaleStatus.class}
 )
-public interface WholeSaleProductMapper extends ProductMapper<WholeSaleProductDTO, WholeSaleProduct> {
+public interface WholeSaleProductMapper {
 
-    @Override
     @Mappings({
             @Mapping(target = "state", source = "wholeSaleProduct.state"),
             @Mapping(target = "sellerId", source = "wholeSaleProduct.seller.id"),
@@ -35,8 +30,8 @@ public interface WholeSaleProductMapper extends ProductMapper<WholeSaleProductDT
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "picture", ignore = true),
 
+            @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "state", expression = "java(State.PENDING)"),
             @Mapping(target = "saleStatus", expression = "java(SaleStatus.NOT_ON_SALE)"),
@@ -53,7 +48,8 @@ public interface WholeSaleProductMapper extends ProductMapper<WholeSaleProductDT
     WholeSaleProduct toEntity(WholeSaleProductDTO dto,
                               @Context User seller,
                               @Context Crop crop,
-                              @Context WholeSaleUnit wholeSaleUnit);
+                              @Context WholeSaleUnit wholeSaleUnit,
+                              @Context String picture);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -64,9 +60,9 @@ public interface WholeSaleProductMapper extends ProductMapper<WholeSaleProductDT
             @Mapping(target = "privateChatRooms", ignore = true),
             @Mapping(target = "wholeSaleCartItems", ignore = true),
             @Mapping(target = "wholeSaleOrders", ignore = true),
-            @Mapping(target = "picture", ignore = true),
             @Mapping(target = "saleStatus", ignore = true),
 
+            @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnit)"),
             @Mapping(target = "crop", expression = "java(crop)"),
             @Mapping(target = "price", source = "dto.totalPrice")
@@ -74,5 +70,6 @@ public interface WholeSaleProductMapper extends ProductMapper<WholeSaleProductDT
     WholeSaleProduct toUpdate(@MappingTarget WholeSaleProduct wholeSaleProduct,
                               WholeSaleProductDTO dto,
                               @Context Crop crop,
-                              @Context WholeSaleUnit wholeSaleUnit);
+                              @Context WholeSaleUnit wholeSaleUnit,
+                              @Context String picture);
 }
