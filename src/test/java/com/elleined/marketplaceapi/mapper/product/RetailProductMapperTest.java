@@ -1,12 +1,12 @@
 package com.elleined.marketplaceapi.mapper.product;
 
-import com.elleined.marketplaceapi.dto.order.RetailOrderDTO;
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.model.Crop;
-import com.elleined.marketplaceapi.model.product.Product;
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.UserDetails;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -17,7 +17,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_ON_SALE;
+import static com.elleined.marketplaceapi.model.product.Product.State.PENDING;
+import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class RetailProductMapperTest {
 
@@ -26,10 +30,6 @@ class RetailProductMapperTest {
 
     @Test
     void toDTO() {
-        User seller = User.builder()
-                .id(1)
-                .build();
-
         RetailProduct expected = RetailProduct.retailProductBuilder()
                 .id(1)
                 .description("Description")
@@ -37,17 +37,29 @@ class RetailProductMapperTest {
                 .harvestDate(LocalDate.now())
                 .listingDate(LocalDateTime.now())
                 .picture("Picture.jpg")
-                .state(Product.State.PENDING)
-                .status(Product.Status.ACTIVE)
-                .seller(seller)
+                .state(PENDING)
+                .status(ACTIVE)
+                .seller(User.builder()
+                        .id(1)
+                        .userDetails(UserDetails.builder()
+                                .firstName("First name")
+                                .middleName("Middle name")
+                                .lastName("Last name")
+                                .build())
+                        .shop(Shop.builder()
+                                .id(1)
+                                .name("Shop name")
+                                .build())
+                        .build())
                 .crop(Crop.builder()
                         .name("Crop")
                         .build())
-                .saleStatus(Product.SaleStatus.NOT_ON_SALE)
+                .saleStatus(NOT_ON_SALE)
                 .pricePerUnit(50)
                 .quantityPerUnit(100)
                 .expirationDate(LocalDate.now())
                 .retailUnit(RetailUnit.retailUnitBuilder()
+                        .id(1)
                         .name("Retail unit")
                         .build())
                 .retailOrders(new ArrayList<>())
@@ -80,6 +92,50 @@ class RetailProductMapperTest {
 
     @Test
     void toEntity() {
+        User seller = User.builder()
+                .id(1)
+                .build();
+
+        Crop crop = Crop.builder()
+                .id(1)
+                .name("Crop")
+                .build();
+
+        RetailUnit retailUnit = RetailUnit.retailUnitBuilder()
+                .id(1)
+                .name("Retail unit")
+                .build();
+
+        RetailProductDTO expected = RetailProductDTO.retailProductDTOBuilder()
+                .cropName("Crop name")
+                .unitId(1)
+                .description("Description")
+                .availableQuantity(100)
+                .pricePerUnit(500)
+                .quantityPerUnit(50)
+                .harvestDate(LocalDate.now())
+                .expirationDate(LocalDate.now())
+                .build();
+
+        RetailProduct actual = retailProductMapper.toEntity(expected, seller, crop, retailUnit, "Prodict PIcture");
+
+        assertEquals(0, actual.getId());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
+        assertNotNull(actual.getHarvestDate());
+        assertNotNull(actual.getListingDate());
+        assertNotNull(actual.getPicture());
+        assertEquals(PENDING, actual.getState());
+        assertEquals(ACTIVE, actual.getStatus());
+        assertNotNull(actual.getCrop());
+        assertEquals(NOT_ON_SALE, actual.getSaleStatus());
+        assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
+        assertEquals(expected.getQuantityPerUnit(), actual.getQuantityPerUnit());
+        assertNotNull(actual.getExpirationDate());
+        assertNotNull(actual.getRetailUnit());
+        assertNotNull(actual.getRetailOrders());
+        assertNotNull(actual.getRetailCartItems());
+        assertNotNull(actual.getPrivateChatRooms());
     }
 
     @Test
