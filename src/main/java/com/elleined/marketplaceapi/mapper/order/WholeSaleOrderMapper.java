@@ -16,8 +16,8 @@ public interface WholeSaleOrderMapper extends OrderMapper<WholeSaleOrderDTO, Who
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "sellerMessage", ignore = true),
 
+            @Mapping(target = "sellerMessage", expression = "java(null)"),
             @Mapping(target = "price", expression = "java(wholeSaleProduct.getPrice().doubleValue())"),
             @Mapping(target = "orderDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "status", expression = "java(Order.Status.PENDING)"),
