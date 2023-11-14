@@ -16,6 +16,15 @@ public class WholeSaleOrderDTO extends OrderDTO {
 
     @Builder(builderMethodName = "wholeSaleOrderDTOBuilder")
     public WholeSaleOrderDTO(Long id, double price, int sellerId, LocalDateTime orderDate, @Positive(message = "Product id cannot be 0 or less than zero!") int productId, int purchaserId, @Positive(message = "Delivery address id cannot be 0 or less than zero!") int deliveryAddressId, String orderStatus, String sellerMessage, LocalDateTime updatedAt) {
-        super(id, price, sellerId, orderDate, productId, purchaserId, deliveryAddressId, orderStatus, sellerMessage, updatedAt);
+        super(id,
+                price,
+                sellerId,
+                orderDate,
+                productId,
+                purchaserId,
+                deliveryAddressId,
+                orderStatus,
+                sellerMessage,
+                updatedAt);
     }
 }

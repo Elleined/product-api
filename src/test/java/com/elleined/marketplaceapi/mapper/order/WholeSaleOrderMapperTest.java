@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static com.elleined.marketplaceapi.model.order.Order.Status.PENDING;
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,5 +69,44 @@ class WholeSaleOrderMapperTest {
 
     @Test
     void toDTO() {
+        User purchaser = User.builder()
+                .id(1)
+                .build();
+
+        User seller = User.builder()
+                .id(2)
+                .build();
+
+        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
+                .id(1)
+                .build();
+
+        double expectedPrice = 5_000.00;
+        WholeSaleOrder wholeSaleOrder = WholeSaleOrder.wholeSaleOrderBuilder()
+                .id(1)
+                .price(expectedPrice)
+                .orderDate(LocalDateTime.now())
+                .purchaser(purchaser)
+                .deliveryAddress(deliveryAddress)
+                .status(PENDING)
+                .sellerMessage(null)
+                .updatedAt(LocalDateTime.now())
+                .wholeSaleProduct(WholeSaleProduct.wholeSaleProductBuilder()
+                        .id(1)
+                        .seller(seller)
+                        .build())
+                .build();
+
+        WholeSaleOrderDTO wholeSaleOrderDTO = wholeSaleOrderMapper.toDTO(wholeSaleOrder);
+
+        assertEquals(wholeSaleOrder.getId(), wholeSaleOrderDTO.getId());
+        assertEquals(expectedPrice, wholeSaleOrderDTO.getPrice());
+        assertEquals(wholeSaleOrder.getWholeSaleProduct().getSeller().getId(), wholeSaleOrderDTO.getSellerId());
+        assertNotNull(wholeSaleOrderDTO.getOrderDate());
+        assertEquals(wholeSaleOrder.getWholeSaleProduct().getId(), wholeSaleOrderDTO.getProductId());
+        assertEquals(wholeSaleOrder.getDeliveryAddress().getId(), wholeSaleOrderDTO.getDeliveryAddressId());
+        assertEquals(wholeSaleOrder.getStatus().name(), wholeSaleOrderDTO.getOrderStatus());
+        assertNull(wholeSaleOrderDTO.getSellerMessage());
+        assertNotNull(wholeSaleOrderDTO.getUpdatedAt());
     }
 }
