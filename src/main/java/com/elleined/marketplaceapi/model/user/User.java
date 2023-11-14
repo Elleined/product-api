@@ -105,7 +105,6 @@ public class User {
     // user id reference is in shop table
     @OneToOne(mappedBy = "owner")
     @PrimaryKeyJoinColumn
-    @Setter(AccessLevel.NONE)
     private Shop shop;
 
     // user id reference is in premium user table

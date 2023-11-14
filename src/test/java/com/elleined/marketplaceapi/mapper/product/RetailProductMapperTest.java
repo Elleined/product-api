@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_ON_SALE;
 import static com.elleined.marketplaceapi.model.product.Product.State.PENDING;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(MockitoExtension.class)
 class RetailProductMapperTest {
 
@@ -118,7 +118,6 @@ class RetailProductMapperTest {
                 .build();
 
         RetailProduct actual = retailProductMapper.toEntity(expected, seller, crop, retailUnit, "Prodict PIcture");
-
         assertEquals(0, actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
@@ -140,5 +139,87 @@ class RetailProductMapperTest {
 
     @Test
     void toUpdate() {
+        Crop crop = Crop.builder()
+                .id(1)
+                .name("Crop")
+                .build();
+
+        RetailUnit retailUnit = RetailUnit.retailUnitBuilder()
+                .id(1)
+                .name("Retail unit")
+                .build();
+
+        RetailProduct expected = RetailProduct.retailProductBuilder()
+                .id(1)
+                .description("Description")
+                .availableQuantity(1_000)
+                .harvestDate(LocalDate.now())
+                .listingDate(LocalDateTime.now())
+                .picture("Picture.jpg")
+                .state(PENDING)
+                .status(ACTIVE)
+                .seller(User.builder()
+                        .id(1)
+                        .userDetails(UserDetails.builder()
+                                .firstName("First name")
+                                .middleName("Middle name")
+                                .lastName("Last name")
+                                .build())
+                        .shop(Shop.builder()
+                                .id(1)
+                                .name("Shop name")
+                                .build())
+                        .build())
+                .crop(Crop.builder()
+                        .name("Crop")
+                        .build())
+                .saleStatus(NOT_ON_SALE)
+                .pricePerUnit(50)
+                .quantityPerUnit(100)
+                .expirationDate(LocalDate.now())
+                .retailUnit(RetailUnit.retailUnitBuilder()
+                        .id(1)
+                        .name("Retail unit")
+                        .build())
+                .retailOrders(new ArrayList<>())
+                .retailCartItems(new ArrayList<>())
+                .privateChatRooms(new ArrayList<>())
+                .build();
+
+        RetailProductDTO retailProductDTO = RetailProductDTO.retailProductDTOBuilder()
+                .cropName("Crop name")
+                .unitId(1)
+                .description("Description")
+                .availableQuantity(100)
+                .pricePerUnit(500)
+                .quantityPerUnit(50)
+                .harvestDate(LocalDate.now())
+                .expirationDate(LocalDate.now())
+                .build();
+
+        String expectedPicture = "Change PIcutre";
+        RetailProduct actual = retailProductMapper.toUpdate(expected, retailProductDTO, retailUnit, crop, expectedPicture);
+
+        // Changed field should be notEquals
+        assertEquals(expectedPicture, actual.getPicture());
+        assertEquals(expectedPicture, expected.getPicture());
+
+        // All field must be the same after updating
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
+        assertEquals(expected.getHarvestDate(), actual.getHarvestDate());
+        assertEquals(expected.getListingDate(), actual.getListingDate());
+        assertEquals(expected.getState(), actual.getState());
+        assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(expected.getCrop(), actual.getCrop());
+        assertEquals(expected.getSaleStatus(), actual.getSaleStatus());
+        assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
+        assertEquals(expected.getQuantityPerUnit(), actual.getQuantityPerUnit());
+        assertEquals(expected.getExpirationDate(), actual.getExpirationDate());
+        assertEquals(expected.getRetailUnit(), actual.getRetailUnit());
+        assertIterableEquals(expected.getRetailOrders(), actual.getRetailOrders());
+        assertIterableEquals(expected.getRetailCartItems(), actual.getRetailCartItems());
+        assertIterableEquals(expected.getPrivateChatRooms(), actual.getPrivateChatRooms());
     }
 }
