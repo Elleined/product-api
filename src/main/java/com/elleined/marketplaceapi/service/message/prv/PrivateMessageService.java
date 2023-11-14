@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.message.MessageAgreementNotAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
-import com.elleined.marketplaceapi.mapper.ChatMessageMapper;
+import com.elleined.marketplaceapi.mapper.PrivateChatMessageMapper;
 import com.elleined.marketplaceapi.model.message.ChatMessage;
 import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
@@ -39,7 +39,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
     private final WSMessageService wsMessageService;
 
-    private final ChatMessageMapper chatMessageMapper;
+    private final PrivateChatMessageMapper privateChatMessageMapper;
 
     private final ImageUploader imageUploader;
 
@@ -53,7 +53,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
 
         String pictureImage = Validator.validMultipartFile(picture) ? picture.getOriginalFilename() : null;
-        PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, pictureImage, message);
+        PrivateChatMessage privateChatMessage = privateChatMessageMapper.toEntity(privateChatRoom, currentUser, pictureImage, message);
         privateChatMessageRepository.save(privateChatMessage);
         wsMessageService.broadCastPrivateMessage(privateChatMessage);
 

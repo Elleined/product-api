@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring", imports = {ChatMessage.Status.class})
-public interface ChatMessageMapper {
+public interface PrivateChatMessageMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -22,15 +22,15 @@ public interface ChatMessageMapper {
             @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "picture", expression = "java(picture)")
     })
-    PrivateChatMessage toPrivateChatMessageEntity(PrivateChatRoom privateChatRoom,
-                                                  @Context User currentUser,
-                                                  String picture,
-                                                  @Context String message);
+    PrivateChatMessage toEntity(PrivateChatRoom privateChatRoom,
+                                @Context User currentUser,
+                                String picture,
+                                @Context String message);
 
     @Mappings({
             @Mapping(target = "privateRoomId", source = "privateChatRoom.id"),
             @Mapping(target = "productToSettleId", source = "privateChatRoom.productToSettle.id"),
             @Mapping(target = "senderId", source = "sender.id")
     })
-    PrivateChatMessageDTO toPrivateChatMessageDTO(PrivateChatMessage privateChatMessage);
+    PrivateChatMessageDTO toDTO(PrivateChatMessage privateChatMessage);
 }
