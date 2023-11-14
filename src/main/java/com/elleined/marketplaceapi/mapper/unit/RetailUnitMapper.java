@@ -10,7 +10,7 @@ public interface RetailUnitMapper extends UnitMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "retailProducts", ignore = true),
+            @Mapping(target = "retailProducts", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "name", source = "name")
     })
     RetailUnit toEntity(String name);

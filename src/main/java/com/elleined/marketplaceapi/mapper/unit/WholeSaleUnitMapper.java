@@ -10,7 +10,7 @@ public interface WholeSaleUnitMapper extends UnitMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "wholeSaleProducts", ignore = true),
+            @Mapping(target = "wholeSaleProducts", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "name", source = "name")
     })
     WholeSaleUnit toEntity(String name);
