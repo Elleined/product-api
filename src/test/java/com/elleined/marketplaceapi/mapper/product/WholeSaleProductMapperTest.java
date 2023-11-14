@@ -22,6 +22,7 @@ import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_O
 import static com.elleined.marketplaceapi.model.product.Product.State.PENDING;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @ExtendWith(MockitoExtension.class)
 class WholeSaleProductMapperTest {
@@ -86,9 +87,130 @@ class WholeSaleProductMapperTest {
 
     @Test
     void toEntity() {
+        User seller = User.builder()
+                .id(1)
+                .build();
+
+        Crop crop = Crop.builder()
+                .id(1)
+                .name("Crop")
+                .build();
+
+        WholeSaleUnit wholeSaleUnit = WholeSaleUnit.wholeSaleUnitBuilder()
+                .id(1)
+                .name("whole sale unit")
+                .build();
+
+        WholeSaleProductDTO expected = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
+                .cropName("Crop name")
+                .unitId(1)
+                .description("Description")
+                .availableQuantity(100)
+                .totalPrice(10_000)
+                .harvestDate(LocalDate.now())
+                .build();
+
+        WholeSaleProduct actual = wholeSaleProductMapper.toEntity(expected, seller, crop, wholeSaleUnit, "Picture");
+
+        assertEquals(0, actual.getId());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
+        assertNotNull(actual.getHarvestDate());
+        assertNotNull(actual.getListingDate());
+        assertNotNull(actual.getPicture());
+        assertEquals(PENDING, actual.getState());
+        assertEquals(ACTIVE, actual.getStatus());
+        assertNotNull(actual.getCrop());
+        assertEquals(NOT_ON_SALE, actual.getSaleStatus());
+        assertNotNull(actual.getWholeSaleUnit());
+        assertEquals(expected.getTotalPrice(), actual.getPrice().doubleValue());
+        assertNotNull(actual.getWholeSaleOrders());
+        assertNotNull(actual.getWholeSaleCartItems());
+        assertNotNull(actual.getPrivateChatRooms());
     }
 
     @Test
     void toUpdate() {
+        User seller = User.builder()
+                .id(1)
+                .build();
+
+        Crop crop = Crop.builder()
+                .id(1)
+                .name("Crop")
+                .build();
+
+        WholeSaleUnit wholeSaleUnit = WholeSaleUnit.wholeSaleUnitBuilder()
+                .id(1)
+                .name("whole sale unit")
+                .build();
+
+        double expectedTotalPrice = 1_000;
+        WholeSaleProduct expected = WholeSaleProduct.wholeSaleProductBuilder()
+                .id(1)
+                .description("Description")
+                .availableQuantity(1_000)
+                .harvestDate(LocalDate.now())
+                .listingDate(LocalDateTime.now())
+                .picture("Picture.jpg")
+                .state(PENDING)
+                .status(ACTIVE)
+                .seller(User.builder()
+                        .id(1)
+                        .userDetails(UserDetails.builder()
+                                .firstName("First name")
+                                .middleName("Middle name")
+                                .lastName("Last name")
+                                .build())
+                        .shop(Shop.builder()
+                                .id(1)
+                                .name("Shop name")
+                                .build())
+                        .build())
+                .crop(Crop.builder()
+                        .name("Crop")
+                        .build())
+                .saleStatus(NOT_ON_SALE)
+                .wholeSaleUnit(WholeSaleUnit.wholeSaleUnitBuilder()
+                        .id(1)
+                        .name("Whole sale unit")
+                        .build())
+                .price(new BigDecimal(expectedTotalPrice))
+                .privateChatRooms(new ArrayList<>())
+                .wholeSaleOrders(new ArrayList<>())
+                .wholeSaleCartItems(new ArrayList<>())
+                .build();
+
+        WholeSaleProductDTO dto = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
+                .cropName("Crop name")
+                .unitId(1)
+                .description("Description")
+                .availableQuantity(100)
+                .totalPrice(10_000)
+                .harvestDate(LocalDate.now())
+                .build();
+
+        String expectedPicture = "Changed";
+        WholeSaleProduct actual = wholeSaleProductMapper.toUpdate(expected, dto, crop, wholeSaleUnit, expectedPicture);
+
+        // Changed field should be
+        assertEquals(expectedPicture, actual.getPicture());
+        assertEquals(expectedPicture, expected.getPicture());
+
+
+        // All field must be the same after updating
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
+        assertEquals(expected.getHarvestDate(), actual.getHarvestDate());
+        assertEquals(expected.getListingDate(), actual.getListingDate());
+        assertEquals(expected.getState(), actual.getState());
+        assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(expected.getCrop(), actual.getCrop());
+        assertEquals(expected.getSaleStatus(), actual.getSaleStatus());
+        assertEquals(expected.getWholeSaleUnit(), actual.getWholeSaleUnit());
+        assertIterableEquals(expected.getWholeSaleOrders(), actual.getWholeSaleOrders());
+        assertIterableEquals(expected.getWholeSaleCartItems(), actual.getWholeSaleCartItems());
+        assertIterableEquals(expected.getPrivateChatRooms(), actual.getPrivateChatRooms());
     }
 }
