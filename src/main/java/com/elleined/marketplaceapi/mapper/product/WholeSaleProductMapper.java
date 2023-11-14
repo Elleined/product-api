@@ -1,8 +1,10 @@
 package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
@@ -15,15 +17,7 @@ import org.springframework.context.annotation.Lazy;
                 Product.Status.class,
                 Product.SaleStatus.class}
 )
-public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleProductDTO, WholeSaleProduct> {
-
-    @Lazy
-    @Autowired
-    protected WholeSaleUnitService wholeSaleUnitService;
-
-    @Lazy
-    @Autowired
-    protected CropService cropService;
+public interface WholeSaleProductMapper extends ProductMapper<WholeSaleProductDTO, WholeSaleProduct> {
 
     @Override
     @Mappings({
@@ -37,9 +31,8 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
             @Mapping(target = "unitName", source = "wholeSaleProduct.wholeSaleUnit.name"),
             @Mapping(target = "totalPrice", source = "price")
     })
-    public abstract WholeSaleProductDTO toDTO(WholeSaleProduct wholeSaleProduct);
+    WholeSaleProductDTO toDTO(WholeSaleProduct wholeSaleProduct);
 
-    @Override
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "picture", ignore = true),
@@ -48,8 +41,8 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
             @Mapping(target = "state", expression = "java(State.PENDING)"),
             @Mapping(target = "saleStatus", expression = "java(SaleStatus.NOT_ON_SALE)"),
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
-            @Mapping(target = "crop", expression = "java(cropService.getByName(dto.getCropName()))"),
-            @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnitService.getById(dto.getUnitId()))"),
+            @Mapping(target = "crop", expression = "java(crop)"),
+            @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnit)"),
             @Mapping(target = "seller", expression = "java(seller)"),
             @Mapping(target = "price", source = "totalPrice"),
 
@@ -57,9 +50,11 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
             @Mapping(target = "wholeSaleCartItems", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "wholeSaleOrders", expression = "java(new java.util.ArrayList<>())"),
     })
-    public abstract WholeSaleProduct toEntity(WholeSaleProductDTO dto, @Context User seller);
+    WholeSaleProduct toEntity(WholeSaleProductDTO dto,
+                              @Context User seller,
+                              @Context Crop crop,
+                              @Context WholeSaleUnit wholeSaleUnit);
 
-    @Override
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "status", ignore = true),
@@ -72,9 +67,12 @@ public abstract class WholeSaleProductMapper implements ProductMapper<WholeSaleP
             @Mapping(target = "picture", ignore = true),
             @Mapping(target = "saleStatus", ignore = true),
 
-            @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnitService.getById(dto.getUnitId()))"),
-            @Mapping(target = "crop", expression = "java(cropService.getByName(dto.getCropName()))"),
+            @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnit)"),
+            @Mapping(target = "crop", expression = "java(crop)"),
             @Mapping(target = "price", source = "dto.totalPrice")
     })
-    public abstract WholeSaleProduct toUpdate(@MappingTarget WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto);
+    WholeSaleProduct toUpdate(@MappingTarget WholeSaleProduct wholeSaleProduct,
+                              WholeSaleProductDTO dto,
+                              @Context Crop crop,
+                              @Context WholeSaleUnit wholeSaleUnit);
 }
