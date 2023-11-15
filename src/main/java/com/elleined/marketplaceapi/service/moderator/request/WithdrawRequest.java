@@ -41,7 +41,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
                 .toList();
 
         List<WithdrawTransaction> regularUsersWithdrawRequest = userRepository.findAll().stream()
-                .filter(user -> !user.isPremium())
+                .filter(user -> !user.isPremiumAndNotExpired())
                 .map(User::getWithdrawTransactions)
                 .flatMap(Collection::stream)
                 .filter(withdrawTransaction -> withdrawTransaction.getStatus() == Transaction.Status.PENDING)

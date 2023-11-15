@@ -50,7 +50,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .toList();
 
         List<RetailProduct> regularUserProducts = userRepository.findAll().stream()
-                .filter(user -> !user.isPremium())
+                .filter(user -> !user.isPremiumAndNotExpired())
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
                 .map(User::getRetailProducts)

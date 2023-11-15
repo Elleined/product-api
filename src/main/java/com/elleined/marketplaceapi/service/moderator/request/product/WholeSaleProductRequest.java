@@ -47,7 +47,7 @@ public class WholeSaleProductRequest implements ProductRequest<WholeSaleProduct>
                 .toList();
 
         List<WholeSaleProduct> regularUserWholeSaleProducts = userRepository.findAll().stream()
-                .filter(user -> !user.isPremium())
+                .filter(user -> !user.isPremiumAndNotExpired())
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
                 .map(User::getWholeSaleProducts)

@@ -47,7 +47,7 @@ public class RetailProductRequest implements ProductRequest<RetailProduct> {
                 .toList();
 
         List<RetailProduct> regularUserRetailProducts = userRepository.findAll().stream()
-                .filter(user -> !user.isPremium())
+                .filter(user -> !user.isPremiumAndNotExpired())
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
                 .map(User::getRetailProducts)

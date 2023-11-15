@@ -27,7 +27,7 @@ public class WholeSaleOrderService implements OrderService<WholeSaleOrder> {
                 .filter(Product::isNotDeleted)
                 .flatMap(wholeSaleProduct -> wholeSaleProduct.getWholeSaleOrders().stream()
                         .filter(wholeSaleOrder -> wholeSaleOrder.getStatus() == orderStatus)
-                        .filter(wholeSaleOrder -> wholeSaleOrder.getPurchaser().isPremium())
+                        .filter(wholeSaleOrder -> wholeSaleOrder.getPurchaser().isPremiumAndNotExpired())
                         .sorted(Comparator.comparing(Order::getOrderDate).reversed()))
                 .toList();
 
@@ -35,7 +35,7 @@ public class WholeSaleOrderService implements OrderService<WholeSaleOrder> {
                 .filter(Product::isNotDeleted)
                 .flatMap(wholeSaleProduct -> wholeSaleProduct.getWholeSaleOrders().stream()
                         .filter(productOrder -> productOrder.getStatus() == orderStatus)
-                        .filter(productOrder -> !productOrder.getPurchaser().isPremium())
+                        .filter(productOrder -> !productOrder.getPurchaser().isPremiumAndNotExpired())
                         .sorted(Comparator.comparing(Order::getOrderDate).reversed()))
                 .toList();
 

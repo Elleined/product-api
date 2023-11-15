@@ -152,9 +152,10 @@ public class User {
         this.getReferredUsers().add(invitedUser);
     }
 
-
-    public boolean isPremium() {
-        return this.getPremium() != null;
+    public boolean isPremiumAndNotExpired() {
+        if (this.getPremium() == null) return false;
+        LocalDateTime premiumExpiration = this.getPremium().getRegistrationDate().plusMonths(1);
+        return LocalDateTime.now().equals(premiumExpiration) || LocalDateTime.now().isBefore(premiumExpiration);
     }
 
     public boolean isVerified() {
@@ -214,15 +215,6 @@ public class User {
                 .map(RetailProduct::getRetailOrders)
                 .flatMap(Collection::stream)
                 .anyMatch(retailOrder::equals);
-    }
-
-    public boolean isPremiumSubscriptionExpired() {
-        LocalDateTime premiumExpiration = this.getPremium().getRegistrationDate().plusMonths(1);
-        return LocalDateTime.now().isAfter(premiumExpiration);
-    }
-
-    public boolean isPremiumAndNotExpired() {
-        return isPremium() && !isPremiumSubscriptionExpired();
     }
 
     public boolean isRejected() {

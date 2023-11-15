@@ -28,7 +28,7 @@ public class RetailOrderService implements OrderService<RetailOrder> {
                 .filter(Product::isNotDeleted)
                 .flatMap(retailProduct -> retailProduct.getRetailOrders().stream()
                         .filter(retailOrder -> retailOrder.getStatus() == orderStatus)
-                        .filter(retailOrder -> retailOrder.getPurchaser().isPremium())
+                        .filter(retailOrder -> retailOrder.getPurchaser().isPremiumAndNotExpired())
                         .sorted(Comparator.comparing(Order::getOrderDate).reversed()))
                 .toList();
 
@@ -36,7 +36,7 @@ public class RetailOrderService implements OrderService<RetailOrder> {
                 .filter(Product::isNotDeleted)
                 .flatMap(retailProduct -> retailProduct.getRetailOrders().stream()
                         .filter(productOrder -> productOrder.getStatus() == orderStatus)
-                        .filter(productOrder -> !productOrder.getPurchaser().isPremium())
+                        .filter(productOrder -> !productOrder.getPurchaser().isPremiumAndNotExpired())
                         .sorted(Comparator.comparing(Order::getOrderDate).reversed()))
                 .toList();
 

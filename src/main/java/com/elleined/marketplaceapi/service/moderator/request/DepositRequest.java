@@ -41,7 +41,7 @@ public class DepositRequest implements Request<DepositTransaction> {
                 .toList();
 
         List<DepositTransaction> regularUserDepositRequests = userRepository.findAll().stream()
-                .filter(user -> !user.isPremium())
+                .filter(user -> !user.isPremiumAndNotExpired())
                 .map(User::getDepositTransactions)
                 .flatMap(Collection::stream)
                 .filter(depositTransaction -> depositTransaction.getStatus() == Transaction.Status.PENDING)

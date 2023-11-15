@@ -49,7 +49,7 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
                 .toList();
 
         List<WholeSaleProduct> regularUserProducts = userRepository.findAll().stream()
-                .filter(user -> !user.isPremium())
+                .filter(user -> !user.isPremiumAndNotExpired())
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
                 .map(User::getWholeSaleProducts)
