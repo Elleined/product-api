@@ -76,7 +76,9 @@ class ModeratorMapperTest {
                 .build();
 
         Moderator moderator = moderatorMapper.toEntity(moderatorDTO);
+        verify(credentialMapper).toEntity(credentialDTO);
 
+        
         assertEquals(0, moderator.getId());
         assertNotNull(moderator.getName());
 
@@ -106,6 +108,5 @@ class ModeratorMapperTest {
 
         assertEquals(credentialDTO.getPassword(), moderatorDTO.moderatorCredentialDTO().getPassword());
         assertNotNull(moderatorDTO.moderatorCredentialDTO().getPassword());
-        verify(credentialMapper.toEntity(credentialDTO));
     }
 }
