@@ -104,7 +104,11 @@ class RetailCartItemServiceImplTest {
         User user = User.builder()
                 .retailCartItems(new ArrayList<>())
                 .build();
-        RetailCartItem retailCartItem = new RetailCartItem();
+        RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
+                .retailProduct(RetailProduct.retailProductBuilder()
+                        .id(1)
+                        .build())
+                .build();
         user.getRetailCartItems().add(retailCartItem);
 
         doAnswer(i -> user.getRetailCartItems().remove(retailCartItem))

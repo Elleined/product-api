@@ -221,7 +221,7 @@ public class User {
         return this.getUserVerification().getValidId() == null;
     }
 
-    public boolean hasNotBeenRejected() {
+    public boolean isNotRejected() {
         return this.getUserVerification().getValidId() != null;
     }
 
@@ -229,9 +229,6 @@ public class User {
         return this.getUserDetails().getFirstName() + " " + this.getUserDetails().getMiddleName() + " " + this.getUserDetails().getLastName();
     }
 
-    public boolean notHave(RetailCartItem retailCartItem) {
-        return this.getRetailCartItems().stream().noneMatch(retailCartItem::equals);
-    }
 
     public <T> boolean isBalanceNotEnough(T t) {
         return this.getBalance().compareTo(new BigDecimal(String.valueOf(t))) < 0;

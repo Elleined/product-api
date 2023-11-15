@@ -41,13 +41,13 @@ public class UserVerificationRequest implements Request<User> {
                 .map(Premium::getUser)
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
                 .filter(User::hasShopRegistration)
-                .filter(User::hasNotBeenRejected) // Checking for rejected user
+                .filter(User::isNotRejected) // Checking for rejected user
                 .toList();
 
         List<User> regularUsers = userRepository.findAll().stream()
                 .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
                 .filter(User::hasShopRegistration)
-                .filter(User::hasNotBeenRejected) // Checking for rejected user
+                .filter(User::isNotRejected) // Checking for rejected user
                 .toList();
 
         List<User> users = new ArrayList<>();

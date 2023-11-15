@@ -95,7 +95,7 @@ public class UserServiceImpl
         return userRepository.findAll().stream()
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
-                .filter(User::hasNotBeenRejected) // Checking for rejected user
+                .filter(User::isNotRejected) // Checking for rejected user
                 .collect(Collectors.toSet());
     }
 
@@ -104,7 +104,7 @@ public class UserServiceImpl
         return userRepository.searchByUserName(username).stream()
                 .filter(User::isVerified)
                 .filter(User::hasShopRegistration)
-                .filter(User::hasNotBeenRejected) // Checking for rejected user
+                .filter(User::isNotRejected) // Checking for rejected user
                 .collect(Collectors.toSet());
     }
 

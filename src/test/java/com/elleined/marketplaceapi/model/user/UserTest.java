@@ -3,15 +3,22 @@ package com.elleined.marketplaceapi.model.user;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import static com.elleined.marketplaceapi.model.order.Order.Status.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserTest {
@@ -138,29 +145,92 @@ class UserTest {
 
     @Test
     void isRejected() {
+        User user = User.builder()
+                .userVerification(UserVerification.builder()
+                        .validId(null)
+                        .build())
+                .build();
+
+        assertTrue(user.isRejected());
     }
 
     @Test
     void hasNotBeenRejected() {
+        User user = User.builder()
+                .userVerification(UserVerification.builder()
+                        .validId("valid id")
+                        .build())
+                .build();
+
+        assertTrue(user.isNotRejected());
     }
 
     @Test
     void getFullName() {
+        User user = User.builder()
+                .userDetails(UserDetails.builder()
+                        .firstName("first name")
+                        .middleName("middle name")
+                        .lastName("last name")
+                        .build())
+                .build();
+
+        String expectedFullName = "first name middle name last name";
+        assertEquals(expectedFullName, user.getFullName());
     }
 
-    @Test
-    void notHave() {
-    }
 
     @Test
     void isBalanceNotEnough() {
+        User user = User.builder()
+                .balance(new BigDecimal(0))
+                .build();
+
+        BigDecimal liability = new BigDecimal(6_000);
+        assertTrue(user.isBalanceNotEnough(liability));
     }
 
-    @Test
-    void testHasOrder1() {
+    @ParameterizedTest
+    @ValueSource(strings = {"CANCELLED", "PENDING", "ACCEPTED", "REJECTED", "SOLD"})
+    void isRetailProductHasRetailOrderWithStatusOf(String orderStatus) {
+        User user = User.builder()
+                .retailOrders(new ArrayList<>())
+                .build();
+
+        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
+                .retailOrders(new ArrayList<>())
+                .build();
+
+        Order.Status status = Order.Status.valueOf(orderStatus);
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+                .status(Order.Status.valueOf(orderStatus))
+                .retailProduct(retailProduct)
+                .build();
+
+        user.getRetailOrders().add(retailOrder);
+
+        assertTrue(user.hasOrder(retailProduct, status));
     }
 
-    @Test
-    void testHasOrder2() {
+    @ParameterizedTest
+    @ValueSource(strings = {"CANCELLED", "PENDING", "ACCEPTED", "REJECTED", "SOLD"})
+    void isWholeSaleProductHasWholeSaleOrderWithStatusOf(String orderStatus) {
+        User user = User.builder()
+                .wholeSaleOrders(new ArrayList<>())
+                .build();
+
+        WholeSaleProduct wholeSaleProduct = WholeSaleProduct.wholeSaleProductBuilder()
+                .wholeSaleOrders(new ArrayList<>())
+                .build();
+
+        Order.Status status = Order.Status.valueOf(orderStatus);
+        WholeSaleOrder wholeSaleOrder = WholeSaleOrder.wholeSaleOrderBuilder()
+                .status(status)
+                .wholeSaleProduct(wholeSaleProduct)
+                .build();
+
+        user.getWholeSaleOrders().add(wholeSaleOrder);
+
+        assertTrue(user.hasOrder(wholeSaleProduct, status));
     }
 }

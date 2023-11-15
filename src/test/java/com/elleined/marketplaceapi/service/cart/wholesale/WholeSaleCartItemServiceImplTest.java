@@ -131,7 +131,7 @@ class WholeSaleCartItemServiceImplTest {
                 .harvestDate(LocalDate.now())
                 .listingDate(LocalDateTime.now())
                 .picture("Picture.jpg")
-                .state(EXPIRED)
+                .state(LISTING)
                 .status(ACTIVE)
                 .seller(User.builder()
                         .id(1)
