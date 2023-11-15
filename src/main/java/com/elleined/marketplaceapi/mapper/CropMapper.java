@@ -10,7 +10,7 @@ public interface CropMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "product", ignore = true),
+            @Mapping(target = "products", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "name", source = "name")
     })
     Crop toEntity(String name);

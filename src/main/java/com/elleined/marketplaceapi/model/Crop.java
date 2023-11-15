@@ -23,11 +23,11 @@ import java.util.List;
 public class Crop extends BaseEntity {
     // crop id reference is in product table
     @OneToMany(mappedBy = "crop")
-    private List<Product> product;
+    private List<Product> products;
 
     @Builder
-    public Crop(int id, String name, List<Product> product) {
+    public Crop(int id, String name, List<Product> products) {
         super(id, name);
-        this.product = product;
+        this.products = products;
     }
 }
