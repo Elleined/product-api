@@ -5,6 +5,10 @@ import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.dto.address.AddressDTO;
 import com.elleined.marketplaceapi.mapper.address.DeliveryAddressMapper;
 import com.elleined.marketplaceapi.mapper.address.UserAddressMapper;
+import com.elleined.marketplaceapi.model.Credential;
+import com.elleined.marketplaceapi.model.Shop;
+import com.elleined.marketplaceapi.model.address.UserAddress;
+import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.model.user.UserDetails.Suffix;
@@ -16,11 +20,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import static com.elleined.marketplaceapi.model.user.UserDetails.Gender.MALE;
-import static com.elleined.marketplaceapi.model.user.UserVerification.*;
+import static com.elleined.marketplaceapi.model.user.UserVerification.Status;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +49,6 @@ class UserMapperTest {
 
     @Test
     void toEntity() {
-
         UserDTO expected = UserDTO.builder()
                 .userDetailsDTO(UserDTO.UserDetailsDTO.builder()
                         .firstName("First name")
@@ -111,6 +117,81 @@ class UserMapperTest {
 
     @Test
     void toDTO() {
+        User expected = User.builder()
+                .id(1)
+                .referralCode("Referral Code")
+                .balance(new BigDecimal(5_000))
+                .userVerification(UserVerification.builder()
+                        .validId("Valid id")
+                        .status(Status.NOT_VERIFIED)
+                        .build())
+                .userCredential(Credential.builder()
+                        .email("email")
+                        .password("password")
+                        .build())
+                .userDetails(UserDetails.builder()
+                        .firstName("First name")
+                        .middleName("MIddle name")
+                        .lastName("Last name")
+                        .gender(MALE)
+                        .birthDate(LocalDate.now())
+                        .mobileNumber("09999999999")
+                        .picture("picutre")
+                        .suffix(Suffix.NONE)
+                        .registrationDate(LocalDateTime.now())
+                        .build())
+                .address(UserAddress.userAddressBuilder()
+                        .id(1)
+                        .regionName("Region name")
+                        .provinceName("Province name")
+                        .cityName("City name")
+                        .baranggayName("Baranggay name")
+                        .build())
+                .shop(Shop.builder()
+                        .id(1)
+                        .name("Name")
+                        .description("Description")
+                        .picture("PIcture")
+                        .build())
+                .premium(Premium.builder()
+                        .registrationDate(LocalDateTime.now())
+                        .build())
+                .referredUsers(new HashSet<>())
+                .deliveryAddresses(new ArrayList<>())
+                .retailOrders(new ArrayList<>())
+                .wholeSaleOrders(new ArrayList<>())
+                .retailCartItems(new ArrayList<>())
+                .wholeSaleCartItems(new ArrayList<>())
+                .retailProducts(new ArrayList<>())
+                .wholeSaleProducts(new ArrayList<>())
+                .sentMoneyTransactions(new ArrayList<>())
+                .receiveMoneyTransactions(new ArrayList<>())
+                .withdrawTransactions(new ArrayList<>())
+                .depositTransactions(new ArrayList<>())
+                .privateChatMessages(new ArrayList<>())
+                .createdChatRooms(new ArrayList<>())
+                .participatingChatRooms(new ArrayList<>())
+                .build();
+        
+        UserDTO actual = userMapper.toDTO(expected);
+        
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getReferralCode(), actual.getReferralCode());
+
+        assertEquals(expected.getUserVerification().getStatus().name(), actual.getStatus());
+        assertEquals(expected.getUserVerification().getValidId(), actual.getValidId());
+
+        // premium
+        assertTrue(actual.isPremium());
+
+        assertNull(actual.getInvitationReferralCode());
+
+        assertNotNull(actual.getBalance());
+        assertEquals(expected.getBalance(), actual.getBalance());
+
+        assertNotNull(actual.getUserDetailsDTO());
+        assertNotNull(actual.getAddressDTO());
+        assertNotNull(actual.getUserCredentialDTO());
     }
 
     @Test
