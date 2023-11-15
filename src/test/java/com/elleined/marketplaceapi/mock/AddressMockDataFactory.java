@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.mock;
 
-import com.elleined.marketplaceapi.dto.address.AddressDTO;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 
 public interface AddressMockDataFactory {

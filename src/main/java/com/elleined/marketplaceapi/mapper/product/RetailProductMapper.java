@@ -6,12 +6,7 @@ import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.CropService;
-import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
-import com.elleined.marketplaceapi.service.unit.RetailUnitService;
 import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring",
         imports = {Product.State.class,

@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.mapper;
 
+import com.elleined.marketplaceapi.dto.CredentialDTO;
 import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.model.Credential;
 import com.elleined.marketplaceapi.model.Moderator;
@@ -7,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -16,9 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ModeratorMapperTest {
@@ -68,5 +65,47 @@ class ModeratorMapperTest {
 
     @Test
     void toEntity() {
+        CredentialDTO credentialDTO = CredentialDTO.builder()
+                .email("Email")
+                .password("Password")
+                .build();
+
+        ModeratorDTO moderatorDTO = ModeratorDTO.builder()
+                .name("Name")
+                .moderatorCredentialDTO(credentialDTO)
+                .build();
+
+        Moderator moderator = moderatorMapper.toEntity(moderatorDTO);
+
+        assertEquals(0, moderator.getId());
+        assertNotNull(moderator.getName());
+
+        assertNotNull(moderator.getListedProducts());
+        assertTrue(moderator.getListedProducts().isEmpty());
+
+        assertNotNull(moderator.getRejectedProducts());
+        assertTrue(moderator.getRejectedProducts().isEmpty());
+
+        assertNotNull(moderator.getVerifiedUsers());
+        assertTrue(moderator.getVerifiedUsers().isEmpty());
+
+        assertNotNull(moderator.getReleaseDepositRequest());
+        assertTrue(moderator.getReleaseDepositRequest().isEmpty());
+
+        assertNotNull(moderator.getRejectedDepositRequest());
+        assertTrue(moderator.getRejectedDepositRequest().isEmpty());
+
+        assertNotNull(moderator.getReleaseWithdrawRequests());
+        assertTrue(moderator.getReleaseWithdrawRequests().isEmpty());
+
+        assertNotNull(moderator.getRejectedWithdrawRequests());
+        assertTrue(moderator.getRejectedWithdrawRequests().isEmpty());
+
+        assertEquals(credentialDTO.getEmail(), moderatorDTO.moderatorCredentialDTO().getEmail());
+        assertNotNull(moderatorDTO.moderatorCredentialDTO().getEmail());
+
+        assertEquals(credentialDTO.getPassword(), moderatorDTO.moderatorCredentialDTO().getPassword());
+        assertNotNull(moderatorDTO.moderatorCredentialDTO().getPassword());
+        verify(credentialMapper.toEntity(credentialDTO));
     }
 }

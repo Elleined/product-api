@@ -22,7 +22,6 @@ import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_O
 import static com.elleined.marketplaceapi.model.product.Product.State.PENDING;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @ExtendWith(MockitoExtension.class)
 class WholeSaleProductMapperTest {

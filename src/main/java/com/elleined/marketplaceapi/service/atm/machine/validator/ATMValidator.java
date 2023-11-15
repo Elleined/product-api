@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.service.atm.machine.validator;
 
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 

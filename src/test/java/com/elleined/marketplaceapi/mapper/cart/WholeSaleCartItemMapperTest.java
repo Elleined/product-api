@@ -3,7 +3,6 @@ package com.elleined.marketplaceapi.mapper.cart;
 import com.elleined.marketplaceapi.dto.cart.WholeSaleCartItemDTO;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
-import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;

@@ -5,7 +5,6 @@ import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.atm.MaximumAmountException;
 import com.elleined.marketplaceapi.exception.atm.MinimumAmountException;
 import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
-import com.elleined.marketplaceapi.exception.atm.amount.DepositAmountAboveMaximumException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitException;
 import com.elleined.marketplaceapi.exception.atm.limit.WithdrawLimitPerDayException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
@@ -22,7 +21,6 @@ import com.elleined.marketplaceapi.service.validator.NumberValidator;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

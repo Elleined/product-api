@@ -6,14 +6,10 @@ import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.address.AddressService;
-import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 @Mapper(componentModel = "spring", imports = Order.class)
 public interface RetailOrderMapper extends OrderMapper<RetailOrderDTO, RetailOrder> {
