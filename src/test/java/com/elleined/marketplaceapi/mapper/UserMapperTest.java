@@ -7,6 +7,7 @@ import com.elleined.marketplaceapi.mapper.address.DeliveryAddressMapper;
 import com.elleined.marketplaceapi.mapper.address.UserAddressMapper;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
+import com.elleined.marketplaceapi.model.user.UserDetails.Suffix;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -15,8 +16,9 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import static com.elleined.marketplaceapi.model.user.UserDetails.Gender.*;
+import static com.elleined.marketplaceapi.model.user.UserDetails.Gender.MALE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -123,17 +125,56 @@ class UserMapperTest {
         assertEquals(expected.getFirstName(), actual.getFirstName());
         assertEquals(expected.getMiddleName(), actual.getMiddleName());
         assertEquals(expected.getLastName(), actual.getLastName());
-        assertNotNull(actual.getRegistrationDate());
         assertEquals(expected.getGender(), actual.getGender().name());
         assertEquals(expected.getBirthDate(), actual.getBirthDate());
         assertEquals(expected.getMobileNumber(), actual.getMobileNumber());
         assertEquals(expected.getPicture(), actual.getPicture());
         assertEquals(expected.getSuffix(), actual.getSuffix().name());
 
-        // equals and not null
+        assertNotNull(actual.getFirstName());
+        assertNotNull(actual.getMiddleName());
+        assertNotNull(actual.getLastName());
+        assertNotNull(actual.getRegistrationDate());
+        assertNotNull(actual.getGender().name());
+        assertNotNull(actual.getBirthDate());
+        assertNotNull(actual.getMobileNumber());
+        assertNotNull(actual.getPicture());
+        assertNotNull(actual.getSuffix().name());
     }
 
     @Test
     void toUserDetailsDTO() {
+        UserDetails expected = UserDetails.builder()
+                .firstName("First name")
+                .middleName("MIddle name")
+                .lastName("Last name")
+                .gender(MALE)
+                .birthDate(LocalDate.now())
+                .mobileNumber("09999999999")
+                .picture("picutre")
+                .suffix(Suffix.NONE)
+                .registrationDate(LocalDateTime.now())
+                .build();
+
+        UserDTO.UserDetailsDTO actual = userMapper.toUserDetailsDTO(expected);
+
+        assertEquals(expected.getFirstName(), actual.getFirstName());
+        assertEquals(expected.getMiddleName(), actual.getMiddleName());
+        assertEquals(expected.getLastName(), actual.getLastName());
+        assertEquals(expected.getGender().name(), actual.getGender());
+        assertEquals(expected.getBirthDate(), actual.getBirthDate());
+        assertEquals(expected.getMobileNumber(), actual.getMobileNumber());
+        assertEquals(expected.getPicture(), actual.getPicture());
+        assertEquals(expected.getSuffix().name(), actual.getSuffix());
+
+        assertNotNull(actual.getFirstName());
+        assertNotNull(actual.getMiddleName());
+        assertNotNull(actual.getLastName());
+        assertNotNull(actual.getRegistrationDate());
+        assertNotNull(actual.getGender());
+        assertNotNull(actual.getBirthDate());
+        assertNotNull(actual.getMobileNumber());
+        assertNotNull(actual.getPicture());
+        assertNotNull(actual.getSuffix());
     }
 }
