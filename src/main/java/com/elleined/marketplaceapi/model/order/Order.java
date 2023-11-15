@@ -85,7 +85,7 @@ public abstract class Order {
 
     public boolean reachedCancellingTimeLimit() {
         LocalDateTime maxCancelDateTime = this.getUpdatedAt().plusDays(1);
-        return LocalDateTime.now().isAfter(maxCancelDateTime);
+        return LocalDateTime.now().equals(maxCancelDateTime) || LocalDateTime.now().isAfter(maxCancelDateTime);
     }
 
     public boolean isAccepted() {

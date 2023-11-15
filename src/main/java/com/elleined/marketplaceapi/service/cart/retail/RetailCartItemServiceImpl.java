@@ -58,12 +58,6 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
     }
 
     @Override
-    public void delete(User currentUser, RetailCartItem retailCartItem) throws NotOwnedException {
-        retailCartItemRepository.delete(retailCartItem);
-        log.debug("User with id of {} successfully deleted cart item with id of {}", currentUser.getId(), retailCartItem.getId());
-    }
-
-    @Override
     public void delete(RetailCartItem retailCartItem) {
         retailCartItemRepository.delete(retailCartItem);
         log.debug("Cart item with id of {} are deleted because user ordered this product with id of {}", retailCartItem.getId(), retailCartItem.getRetailProduct().getId());

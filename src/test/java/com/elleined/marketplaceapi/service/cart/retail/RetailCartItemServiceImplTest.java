@@ -58,53 +58,42 @@ class RetailCartItemServiceImplTest {
     @Mock
     private AddressService addressService;
 
-
-
     @InjectMocks
     private RetailCartItemServiceImpl retailCartItemService;
 
-    @Test
-    void getAll() {
+    @ParameterizedTest
+    @ValueSource(strings = {"PENDING", "SOLD", "REJECTED", "EXPIRED"})
+    void getAll(String productStatus) {
         User user = new User();
 
-        RetailProduct activeAndListedRetailProduct = RetailProduct.retailProductBuilder()
-                .id(1)
-                .status(Product.Status.ACTIVE)
-                .state(State.LISTING)
+        RetailCartItem activeAndListed = RetailCartItem.retailCartItemBuilder()
+                .retailProduct(RetailProduct.retailProductBuilder()
+                        .id(1)
+                        .status(Product.Status.ACTIVE)
+                        .state(State.LISTING)
+                        .build())
                 .build();
 
-        RetailProduct inactiveRetailProduct = RetailProduct.retailProductBuilder()
-                .id(2)
-                .status(INACTIVE)
-                .state(State.LISTING)
+        RetailCartItem activeAndNotListed = RetailCartItem.retailCartItemBuilder()
+                .retailProduct(RetailProduct.retailProductBuilder()
+                        .id(1)
+                        .state(State.valueOf(productStatus))
+                        .status(Product.Status.ACTIVE)
+                        .build())
                 .build();
 
-        RetailProduct unListedRetailProduct = RetailProduct.retailProductBuilder()
-                .id(3)
-                .status(Product.Status.ACTIVE)
-                .state(State.PENDING)
+        RetailCartItem inActiveAndNotListed = RetailCartItem.retailCartItemBuilder()
+                .retailProduct(RetailProduct.retailProductBuilder()
+                        .id(1)
+                        .state(State.valueOf(productStatus))
+                        .status(INACTIVE)
+                        .build())
                 .build();
-
-        RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
-                .retailProduct(activeAndListedRetailProduct)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        List<RetailCartItem> rawRetailCartItems = Arrays.asList(
-                retailCartItem,
-                RetailCartItem.retailCartItemBuilder()
-                        .retailProduct(inactiveRetailProduct)
-                        .createdAt(LocalDateTime.now())
-                        .build(),
-                RetailCartItem.retailCartItemBuilder()
-                        .retailProduct(unListedRetailProduct)
-                        .createdAt(LocalDateTime.now())
-                        .build()
-        );
+        List<RetailCartItem> rawRetailCartItems = Arrays.asList(activeAndListed, activeAndNotListed, inActiveAndNotListed);
         user.setRetailCartItems(rawRetailCartItems);
 
         List<RetailCartItem> actual = retailCartItemService.getAll(user);
-        List<RetailCartItem> expected = Collections.singletonList(retailCartItem);
+        List<RetailCartItem> expected = Collections.singletonList(activeAndListed);
 
         assertEquals(expected.size(), actual.size());
         assertIterableEquals(expected, actual);
@@ -122,7 +111,7 @@ class RetailCartItemServiceImplTest {
                 .when(retailCartItemRepository)
                 .delete(retailCartItem);
 
-        retailCartItemService.delete(user, retailCartItem);
+        retailCartItemService.delete(retailCartItem);
         List<RetailCartItem> actual = user.getRetailCartItems();
         List<RetailCartItem> expected = Collections.emptyList();
 
@@ -519,7 +508,7 @@ class RetailCartItemServiceImplTest {
                 .picture("Picture")
                 .build();
 
-        RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
+        RetailCartItemDTO dto = RetailCartItemDTO.retailCartItemDTOBuilder()
                 .productId(1)
                 .orderQuantity(20)
                 .deliveryAddressId(1)
@@ -533,22 +522,20 @@ class RetailCartItemServiceImplTest {
         user.getDeliveryAddresses().add(deliveryAddress);
 
         double price = 50_000.00;
-        when(retailProductService.getById(retailCartItemDTO.getProductId())).thenReturn(retailProduct);
-        when(retailProductService.calculateOrderPrice(retailProduct, retailCartItemDTO.getOrderQuantity())).thenReturn(price);
-        when(addressService.getDeliveryAddressById(user, retailCartItemDTO.getDeliveryAddressId())).thenReturn(deliveryAddress);
-        when(retailCartItemMapper.toEntity(retailCartItemDTO, user, deliveryAddress, price, retailProduct)).thenReturn(retailCartItem);
+        when(retailProductService.getById(dto.getProductId())).thenReturn(retailProduct);
+        when(retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity())).thenReturn(price);
+        when(addressService.getDeliveryAddressById(user, dto.getDeliveryAddressId())).thenReturn(deliveryAddress);
+        when(retailCartItemMapper.toEntity(dto, user, deliveryAddress, price, retailProduct)).thenReturn(retailCartItem);
         when(retailCartItemRepository.save(retailCartItem)).thenReturn(retailCartItem);
 
-        retailCartItemService.save(user, retailCartItemDTO);
+        retailCartItemService.save(user, dto);
 
         verify(retailProductService).isRejectedBySeller(user, retailProduct);
-        verify(retailProductService).calculateOrderPrice(retailProduct, retailCartItemDTO.getOrderQuantity());
-        verify(addressService).getDeliveryAddressById(user, retailCartItemDTO.getDeliveryAddressId());
-        verify(retailCartItemMapper).toEntity(retailCartItemDTO, user, deliveryAddress, price, retailProduct);
+        verify(retailProductService).calculateOrderPrice(retailProduct, dto.getOrderQuantity());
+        verify(addressService).getDeliveryAddressById(user, dto.getDeliveryAddressId());
+        verify(retailCartItemMapper).toEntity(dto, user, deliveryAddress, price, retailProduct);
         verify(retailCartItemRepository).save(retailCartItem);
-
-        // not nulls
-        assertDoesNotThrow(() -> retailCartItemService.save(user, retailCartItemDTO));
+        assertDoesNotThrow(() -> retailCartItemService.save(user, dto));
     }
 
     @Test

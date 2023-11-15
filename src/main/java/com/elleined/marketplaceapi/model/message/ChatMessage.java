@@ -73,9 +73,6 @@ public abstract class ChatMessage {
 
     public enum Status {ACTIVE, INACTIVE}
 
-    public boolean isDeleted() {
-        return this.status == Status.INACTIVE;
-    }
     public boolean isNotDeleted() {
         return this.status == Status.ACTIVE;
     }

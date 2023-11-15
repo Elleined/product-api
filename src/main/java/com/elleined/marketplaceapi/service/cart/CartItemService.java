@@ -19,8 +19,6 @@ public interface CartItemService<ENTITY extends CartItem, DTO extends CartItemDT
 
     List<ENTITY> getAll(User currentUser);
 
-    void delete(User currentUser, ENTITY entity) throws NotOwnedException;
-
     void delete(ENTITY entity);
 
     ENTITY save(User currentUser, DTO dto)

@@ -57,12 +57,6 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
     }
 
     @Override
-    public void delete(User currentUser, WholeSaleCartItem wholeSaleCartItem) throws NotOwnedException {
-        wholeSaleCartItemRepository.delete(wholeSaleCartItem);
-        log.debug("User with id of {} successfully deleted cart item with id of {}", currentUser.getId(), wholeSaleCartItem.getId());
-    }
-
-    @Override
     public void delete(WholeSaleCartItem wholeSaleCartItem) {
         wholeSaleCartItemRepository.delete(wholeSaleCartItem);
         log.debug("Cart item with id of {} are deleted because user ordered this product with id of {}", wholeSaleCartItem.getId(), wholeSaleCartItem.getWholeSaleProduct().getId());
