@@ -126,15 +126,16 @@ public abstract class Product {
         return this.getState() == State.REJECTED;
     }
 
-    public boolean isDeleted() {
-        return this.getStatus() == Product.Status.INACTIVE;
-    }
 
     public boolean isSold() {
         return this.getState() == Product.State.SOLD;
     }
     public boolean isPending() {
         return this.getState() == State.PENDING;
+    }
+
+    public boolean isDeleted() {
+        return this.getStatus() == Product.Status.INACTIVE;
     }
 
     public boolean isNotDeleted() {

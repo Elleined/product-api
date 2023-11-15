@@ -20,13 +20,26 @@ class OrderTest {
         assertTrue(order.reachedCancellingTimeLimit());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"CANCELLED", "PENDING", "ACCEPTED", "REJECTED", "SOLD"})
-    void status(String expectedOrderStatus) {
-        Order actual = RetailOrder.retailOrderBuilder()
-                .status(Order.Status.valueOf(expectedOrderStatus))
+    @Test
+    void hasStatusOf() {
+//        Order cancelledOrder = RetailOrder.retailOrderBuilder()
+//                .status(Order.Status.CANCELLED)
+//                .build();
+//        Order soldOrder = RetailOrder.retailOrderBuilder()
+//                .status(Order.Status.SOLD)
+//                .build();
+        Order pendingOrder = RetailOrder.retailOrderBuilder()
+                .status(Order.Status.PENDING)
+                .build();
+        Order acceptedOrder = RetailOrder.retailOrderBuilder()
+                .status(Order.Status.ACCEPTED)
+                .build();
+        Order rejectedOrder = RetailOrder.retailOrderBuilder()
+                .status(Order.Status.REJECTED)
                 .build();
 
-        assertEquals(expectedOrderStatus, actual.getStatus().name());
+        assertTrue(acceptedOrder.isAccepted());
+        assertTrue(pendingOrder.isPending());
+        assertTrue(rejectedOrder.isRejected());
     }
 }

@@ -54,8 +54,6 @@ public class WholeSaleProduct extends Product {
         this.wholeSaleCartItems = wholeSaleCartItems;
     }
 
-
-
     @Override
     public boolean hasSoldOrder() {
         return this.wholeSaleOrders.stream()
