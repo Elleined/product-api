@@ -30,9 +30,9 @@ public interface UserMapper {
             @Mapping(target = "userCredential", source = "userCredentialDTO"),
 
             @Mapping(target = "depositTransactions", expression = "java(new java.util.ArrayList<>())"),
+            @Mapping(target = "withdrawTransactions", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "receiveMoneyTransactions", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "sentMoneyTransactions", expression = "java(new java.util.ArrayList<>())"),
-            @Mapping(target = "withdrawTransactions", expression = "java(new java.util.ArrayList<>())"),
 
             @Mapping(target = "privateChatMessages", expression = "java(new java.util.ArrayList<>())"),
             @Mapping(target = "createdChatRooms", expression = "java(new java.util.ArrayList<>())"),
@@ -62,9 +62,7 @@ public interface UserMapper {
     })
     UserDTO toDTO(User user);
 
-    @Mappings({
-            @Mapping(target = "registrationDate", expression = "java(java.time.LocalDateTime.now())"),
-    })
+    @Mapping(target = "registrationDate", expression = "java(java.time.LocalDateTime.now())")
     UserDetails toUserDetailsEntity(UserDTO.UserDetailsDTO userDetailsDTO);
 
     @Mappings({

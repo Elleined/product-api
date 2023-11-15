@@ -64,10 +64,20 @@ public class User {
     @Embedded
     private UserDetails userDetails;
 
-
     // user id reference is in user address table
     @OneToOne(mappedBy = "user")
     private UserAddress address;
+
+    // user id reference is in shop table
+    @OneToOne(mappedBy = "owner")
+    @PrimaryKeyJoinColumn
+    private Shop shop;
+
+    // user id reference is in premium user table
+    @OneToOne(mappedBy = "user")
+    @PrimaryKeyJoinColumn
+    @Setter(AccessLevel.NONE)
+    private Premium premium;
 
     @ManyToMany
     @JoinTable(
@@ -101,17 +111,6 @@ public class User {
     // user id reference is in tbl cart retail
     @OneToMany(mappedBy = "purchaser")
     private List<RetailCartItem> retailCartItems;
-
-    // user id reference is in shop table
-    @OneToOne(mappedBy = "owner")
-    @PrimaryKeyJoinColumn
-    private Shop shop;
-
-    // user id reference is in premium user table
-    @OneToOne(mappedBy = "user")
-    @PrimaryKeyJoinColumn
-    @Setter(AccessLevel.NONE)
-    private Premium premium;
 
     // user id reference is in retail products table
     @OneToMany(mappedBy = "seller")
