@@ -14,8 +14,9 @@ public interface UserMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "shop", ignore = true),
             @Mapping(target = "userVerification.validId", ignore = true),
+
+            @Mapping(target = "shop", ignore = true),
             @Mapping(target = "address", ignore = true), // will be saved after saving user
             @Mapping(target = "premium", ignore = true),
 

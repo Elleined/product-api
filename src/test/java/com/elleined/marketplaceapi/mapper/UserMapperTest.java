@@ -8,6 +8,7 @@ import com.elleined.marketplaceapi.mapper.address.UserAddressMapper;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.model.user.UserDetails.Suffix;
+import com.elleined.marketplaceapi.model.user.UserVerification;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.elleined.marketplaceapi.model.user.UserDetails.Gender.MALE;
+import static com.elleined.marketplaceapi.model.user.UserVerification.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,7 +75,11 @@ class UserMapperTest {
         assertNotNull(actual.getBalance());
 
         assertNotNull(actual.getUserVerification());
+        assertEquals(Status.NOT_VERIFIED, actual.getUserVerification().getStatus());
+        assertNull(actual.getUserVerification().getValidId());
+
         assertNotNull(actual.getUserCredential());
+
         assertNotNull(actual.getUserDetails());
 
         assertNull(actual.getAddress());
