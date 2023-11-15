@@ -14,6 +14,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static com.elleined.marketplaceapi.model.message.ChatMessage.Status.*;
@@ -34,6 +35,7 @@ class PrivateChatMessageMapperTest {
         User currentUser = User.builder()
                 .id(1)
                 .build();
+
         PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
                 .id(1)
                 .isSenderAcceptedAgreement(ChatRoom.Status.NOT_ACCEPTED)
@@ -67,5 +69,54 @@ class PrivateChatMessageMapperTest {
 
     @Test
     void toDTO() {
+        PrivateChatRoom privateChatRoom = PrivateChatRoom.privateChatRoomBuilder()
+                .id(1)
+                .isSenderAcceptedAgreement(ChatRoom.Status.NOT_ACCEPTED)
+                .isReceiverAcceptedAgreement(ChatRoom.Status.NOT_ACCEPTED)
+                .productToSettle(RetailProduct.retailProductBuilder()
+                        .id(1)
+                        .build())
+                .sender(User.builder()
+                        .id(1)
+                        .build())
+                .receiver(User.builder()
+                        .id(2)
+                        .build())
+                .privateChatMessages(new ArrayList<>())
+                .build();
+
+        PrivateChatMessage expected = PrivateChatMessage.privateMessageBuilder()
+                .id(1)
+                .message("Message")
+                .picture("Picture")
+                .sender(User.builder()
+                        .id(1)
+                        .build())
+                .createdAt(LocalDateTime.now())
+                .status(ACTIVE)
+                .privateChatRoom(privateChatRoom)
+                .build();
+
+        PrivateChatMessageDTO actual = privateChatMessageMapper.toDTO(expected);
+
+        assertNotNull(actual.getMessage());
+        assertEquals(expected.getMessage(), actual.getMessage());
+
+        assertEquals(expected.getSender().getId(), actual.getSenderId());
+
+        assertNotNull(actual.getStatus());
+        assertEquals(expected.getStatus().name(), actual.getStatus());
+
+        assertNotNull(actual.getCreatedAt());
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
+
+        assertNotNull(actual.getPicture());
+        assertEquals(expected.getPicture(), actual.getPicture());
+
+        assertEquals(expected.getId(), actual.getId());
+
+        assertEquals(expected.getPrivateChatRoom().getId(), actual.getPrivateRoomId());
+
+        assertEquals(expected.getPrivateChatRoom().getProductToSettle().getId(), actual.getProductToSettleId());
     }
 }
