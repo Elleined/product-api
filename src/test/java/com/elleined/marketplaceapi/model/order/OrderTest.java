@@ -1,6 +1,8 @@
 package com.elleined.marketplaceapi.model.order;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,15 +20,13 @@ class OrderTest {
         assertTrue(order.reachedCancellingTimeLimit());
     }
 
-    @Test
-    void isAccepted() {
-    }
+    @ParameterizedTest
+    @ValueSource(strings = {"CANCELLED", "PENDING", "ACCEPTED", "REJECTED", "SOLD"})
+    void status(String expectedOrderStatus) {
+        Order actual = RetailOrder.retailOrderBuilder()
+                .status(Order.Status.valueOf(expectedOrderStatus))
+                .build();
 
-    @Test
-    void isPending() {
-    }
-
-    @Test
-    void isRejected() {
+        assertEquals(expectedOrderStatus, actual.getStatus().name());
     }
 }
