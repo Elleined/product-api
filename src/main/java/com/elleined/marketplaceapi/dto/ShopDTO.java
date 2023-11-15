@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ShopDTO {
 
+    private int id;
+
     private String shopName;
 
     private String description;

@@ -17,6 +17,7 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
+import com.elleined.marketplaceapi.mapper.ShopMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.user.User;
@@ -53,6 +54,8 @@ public class UserServiceImpl
         ReferralService,
         RegistrationPromoService,
         VerificationService {
+
+    private final ShopMapper shopMapper;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -219,12 +222,7 @@ public class UserServiceImpl
         if (owner.hasShopRegistration()) throw new AlreadyExistException("Cannot send shop registration! because you already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
         if (isShopNameAlreadyExists(shopName)) throw new AlreadyExistException("Cannot send shop registration! because the shop name you provided " + shopName + " already been taken by another seller!");
 
-        Shop shop = Shop.builder()
-                .picture(shopPicture.getOriginalFilename())
-                .name(shopName)
-                .description(description)
-                .owner(owner)
-                .build();
+        Shop shop = shopMapper.toEntity(owner, shopName, description, shopPicture);
         owner.getUserVerification().setValidId(validId.getOriginalFilename());
 
         userRepository.save(owner);
