@@ -21,28 +21,28 @@ public class PasswordValidator implements Validator<String> {
         if (isNLettersLong(password, 8)) throw new WeakPasswordException("Password must be 8 character long!");
     }
 
-    public boolean containsWhiteSpace(String password) {
+    public final boolean containsWhiteSpace(String password) {
         return password.contains(" ");
     }
 
-    public boolean containsAtLeastOneUpperCase(List<Character> letters) {
+    public final boolean containsAtLeastOneUpperCase(List<Character> letters) {
         return letters.stream().noneMatch(Character::isUpperCase);
     }
 
-    public boolean containsAtLeastOneLowerCase(List<Character> letters) {
+    public final boolean containsAtLeastOneLowerCase(List<Character> letters) {
         return letters.stream().noneMatch(Character::isLowerCase);
     }
 
-    public boolean containsAtLeastOneDigit(List<Character> letters) {
+    public final boolean containsAtLeastOneDigit(List<Character> letters) {
         return letters.stream().noneMatch(Character::isDigit);
     }
 
-    public boolean containsAtLeastOneSpecialChar(String password) {
+    public final boolean containsAtLeastOneSpecialChar(String password) {
         List<Character> specialChars = Arrays.asList('@', '#', '$', '_', '/');
         return specialChars.stream().noneMatch(c -> password.contains(c.toString()));
     }
 
-    public boolean isNLettersLong(String password, int preferredPasswordLength) {
+    public final boolean isNLettersLong(String password, int preferredPasswordLength) {
         return password.length() < preferredPasswordLength;
     }
 }
