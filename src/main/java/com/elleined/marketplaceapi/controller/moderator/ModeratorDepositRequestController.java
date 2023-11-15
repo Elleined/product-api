@@ -1,7 +1,7 @@
 //package com.elleined.marketplaceapi.controller.moderator;
 //
 //import com.elleined.marketplaceapi.dto.atm.dto.DepositTransactionDTO;
-//import com.elleined.marketplaceapi.mapper.TransactionMapper;
+//import com.elleined.marketplaceapi.mapper.transaction.TransactionMapper;
 //import com.elleined.marketplaceapi.model.Moderator;
 //import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 //import com.elleined.marketplaceapi.service.atm.machine.TransactionService;

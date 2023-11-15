@@ -3,7 +3,7 @@
 //import com.elleined.marketplaceapi.dto.atm.dto.DepositTransactionDTO;
 //import com.elleined.marketplaceapi.dto.atm.dto.PeerToPeerTransactionDTO;
 //import com.elleined.marketplaceapi.dto.atm.dto.WithdrawTransactionDTO;
-//import com.elleined.marketplaceapi.mapper.TransactionMapper;
+//import com.elleined.marketplaceapi.mapper.transaction.TransactionMapper;
 //import com.elleined.marketplaceapi.model.user.User;
 //import com.elleined.marketplaceapi.service.atm.machine.TransactionService;
 //import com.elleined.marketplaceapi.service.user.UserService;
