@@ -62,21 +62,6 @@ public class GetAllUtilityServiceImpl implements GetAllUtilityService {
     }
 
     @Override
-    public List<String> getAllCrops() {
-        return cropService.getAll();
-    }
-
-    @Override
-    public List<String> getAllRetailUnit() {
-        return retailUnitService.getAll();
-    }
-
-    @Override
-    public List<String> getAllWholeSaleUnit() {
-        return wholeSaleUnitService.getAll();
-    }
-
-    @Override
     public int getAllProductCount() {
         return (int) productRepository.findAll().stream()
                 .filter(product -> product.getStatus() == Product.Status.ACTIVE)

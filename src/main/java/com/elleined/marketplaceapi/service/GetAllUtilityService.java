@@ -17,11 +17,6 @@ public interface GetAllUtilityService {
 
     int getAllUsersTransactionsCount();
 
-    List<String> getAllCrops();
-
-    List<String> getAllRetailUnit();
-    List<String> getAllWholeSaleUnit();
-
     // only the sold and listed products are included to the count
     int getAllProductCount();
 }
