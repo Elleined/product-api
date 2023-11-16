@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.mapper;
 
 import com.elleined.marketplaceapi.dto.message.PrivateChatMessageDTO;
-import com.elleined.marketplaceapi.model.message.ChatMessage;
 import com.elleined.marketplaceapi.model.message.ChatRoom;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatMessage;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
@@ -17,8 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static com.elleined.marketplaceapi.model.message.ChatMessage.Status.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.elleined.marketplaceapi.model.message.ChatMessage.Status.ACTIVE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class PrivateChatMessageMapperTest {

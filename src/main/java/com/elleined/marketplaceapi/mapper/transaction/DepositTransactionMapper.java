@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.mapper.transaction;
 
 import com.elleined.marketplaceapi.dto.atm.dto.DepositTransactionDTO;
-import com.elleined.marketplaceapi.dto.atm.dto.TransactionDTO;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;

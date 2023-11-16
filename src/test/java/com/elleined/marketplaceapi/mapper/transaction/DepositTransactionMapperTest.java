@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.mapper.transaction;
 
 import com.elleined.marketplaceapi.dto.atm.dto.DepositTransactionDTO;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
-import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static com.elleined.marketplaceapi.model.atm.transaction.Transaction.Status.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.elleined.marketplaceapi.model.atm.transaction.Transaction.Status.PENDING;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class DepositTransactionMapperTest {

@@ -7,7 +7,6 @@ import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
-import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.cart.CartItemService;

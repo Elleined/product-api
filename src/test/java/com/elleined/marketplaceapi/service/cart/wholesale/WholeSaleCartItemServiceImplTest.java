@@ -6,26 +6,20 @@ import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
-import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
-import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.repository.cart.WholeSaleCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
-import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -36,13 +30,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.elleined.marketplaceapi.model.product.Product.*;
 import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_ON_SALE;
-import static com.elleined.marketplaceapi.model.product.Product.State.*;
+import static com.elleined.marketplaceapi.model.product.Product.State;
+import static com.elleined.marketplaceapi.model.product.Product.State.LISTING;
+import static com.elleined.marketplaceapi.model.product.Product.Status;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
-import static com.elleined.marketplaceapi.model.product.Product.Status.INACTIVE;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WholeSaleCartItemServiceImplTest {
@@ -187,5 +183,4 @@ class WholeSaleCartItemServiceImplTest {
     @Test
     void getByProduct() {
     }
-
 }

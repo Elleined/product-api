@@ -8,7 +8,6 @@ import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.repository.atm.TransactionRepository;
 import com.elleined.marketplaceapi.service.atm.machine.deposit.DepositService;
 import com.elleined.marketplaceapi.service.atm.machine.p2p.PeerToPeerService;
 import com.elleined.marketplaceapi.service.atm.machine.withdraw.WithdrawService;

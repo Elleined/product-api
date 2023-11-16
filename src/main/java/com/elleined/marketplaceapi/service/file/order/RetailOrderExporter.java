@@ -1,8 +1,6 @@
 package com.elleined.marketplaceapi.service.file.order;
 
-import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
-import com.elleined.marketplaceapi.service.file.Exporter;
 import com.elleined.marketplaceapi.service.order.OrderService;
 import com.elleined.marketplaceapi.utils.Formatter;
 import com.lowagie.text.*;
