@@ -17,17 +17,17 @@ public class CountController {
 
     private final CountService countService;
 
-    @GetMapping("/usersCount")
+    @GetMapping("/users-count")
     public int usersCount() {
         return countService.getAllUsersCount();
     }
 
-    @GetMapping("/productsCount")
+    @GetMapping("/products-count")
     public int productsCount() {
         return countService.getAllProductCount();
     }
 
-    @GetMapping("/transactionsCount")
+    @GetMapping("/transactions-count")
     public int transactionsCount() {
         return countService.getAllUsersTransactionsCount();
     }
