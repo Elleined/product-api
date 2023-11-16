@@ -28,8 +28,6 @@ import java.math.BigDecimal;
 @Transactional
 @Primary
 public class WebATMService implements ATMService {
-    private final TransactionRepository transactionRepository;
-
     private final DepositService depositService;
     private final WithdrawService withdrawService;
     private final PeerToPeerService peerToPeerService;
