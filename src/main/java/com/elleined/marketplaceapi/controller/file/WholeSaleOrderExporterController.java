@@ -18,12 +18,12 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/export/pdf/whole-sale-orders")
-public class WholeSaleSaleReportController {
+public class WholeSaleOrderExporterController {
     private final UserService userService;
 
     private final OrderService<WholeSaleOrder> wholeSaleOrderService;
     private final WholeSaleOrderExporter wholeSaleOrderExporter;
-    
+
     @GetMapping("/sales-report")
     public void export(HttpServletResponse response,
                        @PathVariable("userId") int userId) throws IOException {

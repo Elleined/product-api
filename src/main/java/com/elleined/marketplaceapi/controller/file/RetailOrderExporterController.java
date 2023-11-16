@@ -18,7 +18,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/export/pdf/retail-orders")
-public class RetailSalesReportController {
+public class RetailOrderExporterController {
     private final UserService userService;
     private final OrderService<RetailOrder> retailOrderService;
     private final RetailOrderExporter retailOrderExporter;
