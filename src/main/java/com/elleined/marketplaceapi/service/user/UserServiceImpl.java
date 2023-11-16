@@ -23,7 +23,6 @@ import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
-import com.elleined.marketplaceapi.service.GetAllUtilityService;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
@@ -69,8 +68,6 @@ public class UserServiceImpl
     private final AddressService addressService;
 
     private final ForumClient forumClient;
-
-    private final GetAllUtilityService getAllUtilityService;
 
     private final EmailValidator emailValidator;
     private final PasswordValidator passwordValidator;
@@ -128,8 +125,8 @@ public class UserServiceImpl
         emailValidator.validate(email);
         passwordValidator.validate(password);
         if (isTwoPasswordNotMatch(password, confirmPassword)) throw new PasswordNotMatchException("Password and confirm password not match!");
-        if (getAllUtilityService.getAllEmail().contains(email)) throw new AlreadyExistException("This email " + email + " is already associated with an account!");
-        if (getAllUtilityService.getAllMobileNumber().contains(mobileNumber)) throw new AlreadyExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
+        if (userRepository.fetchAllEmail().contains(email)) throw new AlreadyExistException("This email " + email + " is already associated with an account!");
+        if (userRepository.fetchAllMobileNumber().contains(mobileNumber)) throw new AlreadyExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
 
         User registeringUser = userMapper.toEntity(userDTO);
         this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
