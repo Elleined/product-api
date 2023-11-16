@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/retail/seller/{currentUserId}/products")
+@RequestMapping("/retail/sellers/{currentUserId}/products")
 public class RetailSellerController {
     private final UserService userService;
     private final SellerService regularSeller;
@@ -67,12 +67,12 @@ public class RetailSellerController {
                             @RequestParam("messageToBuyer") String messageToBuyer) {
 
         User seller = userService.getById(sellerId);
-        RetailOrder orderItem = retailOrderService.getById(orderId);
+        RetailOrder retailOrder = retailOrderService.getById(orderId);
         if (seller.isPremiumAndNotExpired()) {
-            premiumSeller.acceptOrder(seller, orderItem, messageToBuyer);
+            premiumSeller.acceptOrder(seller, retailOrder, messageToBuyer);
             return;
         }
-        regularSeller.acceptOrder(seller, orderItem, messageToBuyer);
+        regularSeller.acceptOrder(seller, retailOrder, messageToBuyer);
     }
 
     @PatchMapping("/orders/{orderId}/reject")
