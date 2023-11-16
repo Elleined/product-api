@@ -47,7 +47,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     private String cropTradeImgDirectory;
 
     @Override
-    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, MultipartFile picture, String message) throws NotValidBodyException, MessageAgreementNotAcceptedException, IOException {
+    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, MultipartFile picture, String message) throws NotValidBodyException, MessageAgreementNotAcceptedException, IOException {
         if (privateChatRoom.getSender().equals(currentUser) && privateChatRoom.getIsSenderAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
         if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");

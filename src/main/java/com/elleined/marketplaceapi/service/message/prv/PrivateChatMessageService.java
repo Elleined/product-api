@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface PrivateChatMessageService {
-    PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, Product productToSettle, MultipartFile picture, String message)
+    PrivateChatMessage save(PrivateChatRoom privateChatRoom, User sender, MultipartFile picture, String message)
             throws NotValidBodyException,
             MessageAgreementNotAcceptedException, IOException;
 
