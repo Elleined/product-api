@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.service.file.order;
 
-import com.elleined.marketplaceapi.model.product.Product;
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.service.file.Exporter;
 
-public interface OrderExporter<T extends Product> extends Exporter<T> {
+public interface OrderExporter<T extends Order> extends Exporter<T> {
 }

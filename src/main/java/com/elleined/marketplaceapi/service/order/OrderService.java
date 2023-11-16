@@ -18,6 +18,13 @@ public interface OrderService<ENTITY extends Order> {
 
     ENTITY getById(int id) throws ResourceNotFoundException;
 
+    static <T extends Order> List<T> getByDateRange(List<T> orders, LocalDate start, LocalDate end) {
+        return orders.stream()
+                .filter(orderItem -> orderItem.getUpdatedAt().toLocalDate().isEqual(start)
+                        || (orderItem.getUpdatedAt().toLocalDate().isAfter(start) && orderItem.getUpdatedAt().toLocalDate().isBefore(end))
+                        || orderItem.getUpdatedAt().toLocalDate().equals(end))
+                .toList();
+    }
 
     static <T extends Order> List<T> getByDateRange(List<T> orders, Order.Status status, LocalDate start, LocalDate end) {
         return orders.stream()

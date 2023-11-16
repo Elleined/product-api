@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.service.file.order;
 
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
-import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.service.order.OrderService;
 import com.elleined.marketplaceapi.utils.Formatter;
 import com.lowagie.text.*;
@@ -18,10 +17,21 @@ import java.util.Arrays;
 import java.util.List;
 @Service
 @Slf4j
-public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
+public class WholeSaleOrderExporter implements OrderExporter<WholeSaleOrder> {
+
+    private void writeTableData(PdfPTable table, List<WholeSaleOrder> wholeSaleOrders) {
+        wholeSaleOrders.forEach(wholeSaleOrder -> {
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getSeller().getId()));
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getId()));
+            table.addCell(wholeSaleOrder.getWholeSaleProduct().getCrop().getName());
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getPrice()));
+            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getAvailableQuantity()));
+            table.addCell(Formatter.formatDate(wholeSaleOrder.getUpdatedAt()));
+        });
+    }
 
     @Override
-    public void export(HttpServletResponse response, WholeSaleProduct wholeSaleProduct) throws DocumentException, IOException {
+    public void export(HttpServletResponse response, List<WholeSaleOrder> orders) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.addTitle("Sales Report");
@@ -38,7 +48,7 @@ public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        writeTableData(table, wholeSaleProduct.getWholeSaleOrders());
+        writeTableData(table, orders);
 
         document.add(header);
         document.add(table);
@@ -48,7 +58,7 @@ public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
     }
 
     @Override
-    public void export(HttpServletResponse response, WholeSaleProduct wholeSaleProduct, LocalDate start, LocalDate end) throws DocumentException, IOException {
+    public void export(HttpServletResponse response, List<WholeSaleOrder> orders, LocalDate start, LocalDate end) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.addTitle("Sales report");
@@ -65,7 +75,7 @@ public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        List<WholeSaleOrder> rangedWholeSaleOrders = OrderService.getByDateRange(wholeSaleProduct.getWholeSaleOrders(), Order.Status.SOLD, start, end);
+        List<WholeSaleOrder> rangedWholeSaleOrders = OrderService.getByDateRange(orders, start, end);
         writeTableData(table, rangedWholeSaleOrders);
 
         document.add(header);
@@ -73,16 +83,5 @@ public class WholeSaleOrderExporter implements OrderExporter<WholeSaleProduct> {
 
         document.close();
         log.debug("Pdf generation success!");
-    }
-
-    private void writeTableData(PdfPTable table, List<WholeSaleOrder> wholeSaleOrders) {
-        wholeSaleOrders.forEach(wholeSaleOrder -> {
-            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getSeller().getId()));
-            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getId()));
-            table.addCell(wholeSaleOrder.getWholeSaleProduct().getCrop().getName());
-            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getPrice()));
-            table.addCell(String.valueOf(wholeSaleOrder.getWholeSaleProduct().getAvailableQuantity()));
-            table.addCell(Formatter.formatDate(wholeSaleOrder.getUpdatedAt()));
-        });
     }
 }

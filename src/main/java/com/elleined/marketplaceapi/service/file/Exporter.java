@@ -12,10 +12,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface Exporter<T> {
-    void export(HttpServletResponse httpServletResponse, T t)
+    void export(HttpServletResponse httpServletResponse, List<T> t)
             throws DocumentException, IOException;
 
-    void export(HttpServletResponse httpServletResponse, T t, LocalDate start, LocalDate end)
+    void export(HttpServletResponse httpServletResponse, List<T> t, LocalDate start, LocalDate end)
             throws DocumentException, IOException;
 
     default void writeColumnNames(PdfPTable pdfPTable, List<String> columnNames) {

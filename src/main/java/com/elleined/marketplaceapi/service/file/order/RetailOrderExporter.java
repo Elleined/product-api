@@ -2,7 +2,7 @@ package com.elleined.marketplaceapi.service.file.order;
 
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
-import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.service.file.Exporter;
 import com.elleined.marketplaceapi.service.order.OrderService;
 import com.elleined.marketplaceapi.utils.Formatter;
 import com.lowagie.text.*;
@@ -19,11 +19,21 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class RetailOrderExporter implements OrderExporter<RetailProduct> {
+public class RetailOrderExporter implements OrderExporter<RetailOrder> {
 
+    private void writeTableData(PdfPTable table, List<RetailOrder> retailOrders) {
+        retailOrders.forEach(retailOrder -> {
+            table.addCell(String.valueOf(retailOrder.getRetailProduct().getSeller().getId()));
+            table.addCell(String.valueOf(retailOrder.getRetailProduct().getId()));
+            table.addCell(retailOrder.getRetailProduct().getCrop().getName());
+            table.addCell(String.valueOf(retailOrder.getPrice()));
+            table.addCell(String.valueOf(retailOrder.getOrderQuantity()));
+            table.addCell(Formatter.formatDate(retailOrder.getUpdatedAt()));
+        });
+    }
 
     @Override
-    public void export(HttpServletResponse response, RetailProduct retailProduct) throws DocumentException, IOException {
+    public void export(HttpServletResponse response, List<RetailOrder> retailOrders) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.addTitle("Sales Report");
@@ -40,7 +50,7 @@ public class RetailOrderExporter implements OrderExporter<RetailProduct> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        writeTableData(table, retailProduct.getRetailOrders());
+        writeTableData(table, retailOrders);
 
         document.add(header);
         document.add(table);
@@ -50,7 +60,7 @@ public class RetailOrderExporter implements OrderExporter<RetailProduct> {
     }
 
     @Override
-    public void export(HttpServletResponse response, RetailProduct retailProduct, LocalDate start, LocalDate end) throws DocumentException, IOException {
+    public void export(HttpServletResponse response, List<RetailOrder> retailOrders, LocalDate start, LocalDate end) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 2, 2, 2, 2);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.addTitle("Sales report");
@@ -67,7 +77,7 @@ public class RetailOrderExporter implements OrderExporter<RetailProduct> {
         table.setSpacingBefore(10);
 
         writeColumnNames(table, Arrays.asList("Seller id", "Product id", "Product name", "Total price", "Order quantity", "Date sold"));
-        List<RetailOrder> rangedRetailOrders = OrderService.getByDateRange(retailProduct.getRetailOrders(), Order.Status.SOLD, start, end);
+        List<RetailOrder> rangedRetailOrders = OrderService.getByDateRange(retailOrders, start, end);
         writeTableData(table, rangedRetailOrders);
 
         document.add(header);
@@ -75,17 +85,5 @@ public class RetailOrderExporter implements OrderExporter<RetailProduct> {
 
         document.close();
         log.debug("Pdf generation success!");
-    }
-
-
-    private void writeTableData(PdfPTable table, List<RetailOrder> retailOrders) {
-        retailOrders.forEach(retailOrder -> {
-            table.addCell(String.valueOf(retailOrder.getRetailProduct().getSeller().getId()));
-            table.addCell(String.valueOf(retailOrder.getRetailProduct().getId()));
-            table.addCell(retailOrder.getRetailProduct().getCrop().getName());
-            table.addCell(String.valueOf(retailOrder.getPrice()));
-            table.addCell(String.valueOf(retailOrder.getOrderQuantity()));
-            table.addCell(Formatter.formatDate(retailOrder.getUpdatedAt()));
-        });
     }
 }
