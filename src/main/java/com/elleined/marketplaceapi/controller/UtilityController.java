@@ -27,4 +27,16 @@
 //    public int transactionsCount() {
 //        return getAllUtilityService.getAllUsersTransactionsCount();
 //    }
+
+
+
+//@GetMapping("/genders")
+//public List<String> getAllGender() {
+//        return getAllUtilityService.getAllGender();
+//        }
+//
+//@GetMapping("/getAllSuffix")
+//public List<String> getAllSuffix() {
+//        return getAllUtilityService.getAllSuffix();
+//        }
 //}
