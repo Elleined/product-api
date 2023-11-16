@@ -45,7 +45,7 @@ public interface SellerService {
             ProductExpirationLimitException,
             IOException;
 
-    void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture)
+    RetailProduct updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
@@ -53,7 +53,7 @@ public interface SellerService {
             ProductHasAcceptedOrderException,
             ProductHasPendingOrderException, IOException;
 
-    void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture)
+    WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,

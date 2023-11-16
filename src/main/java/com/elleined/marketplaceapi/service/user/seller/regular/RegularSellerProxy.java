@@ -113,7 +113,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
     }
 
     @Override
-    public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public RetailProduct updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot update product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxPendingOrder(seller))
@@ -127,11 +127,11 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
         feeService.deductListingFee(seller, listingFee);
 
-        sellerService.updateProduct(seller, retailProduct, retailProductDTO, productPicture);
+        return sellerService.updateProduct(seller, retailProduct, retailProductDTO, productPicture);
     }
 
     @Override
-    public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
         if (isExceedsToMaxAcceptedOrder(seller))
             throw new SellerMaxAcceptedOrderException("Cannot update product! because you already exceeds to max accepted order which is " + MAX_ACCEPTED_ORDER + " please either reject the accepted order or set the accepted orders to sold to proceed. Consider buying premium account to remove this restriction.");
         if (isExceedsToMaxPendingOrder(seller))
@@ -144,7 +144,7 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
             throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
         feeService.deductListingFee(seller, listingFee);
 
-        sellerService.updateProduct(seller, wholeSaleProduct, wholeSaleProductDTO, productPicture);
+        return sellerService.updateProduct(seller, wholeSaleProduct, wholeSaleProductDTO, productPicture);
     }
 
     @Override

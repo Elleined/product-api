@@ -143,7 +143,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public void updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public RetailProduct updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (retailProduct.hasAcceptedOrder())
@@ -172,10 +172,11 @@ public class SellerServiceImpl implements SellerService {
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
         log.debug("Retail product with id of {} updated successfully!", updatedRetailProduct.getId());
+        return updatedRetailProduct;
     }
 
     @Override
-    public void updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (wholeSaleProduct.hasAcceptedOrder())
@@ -204,6 +205,7 @@ public class SellerServiceImpl implements SellerService {
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PRODUCT_PICTURES_FOLDER, productPicture);
         log.debug("Whole sale product with id of {} updated successfully!", wholeSaleProduct.getId());
+        return updatedWholeSaleProduct;
     }
 
     @Override

@@ -52,6 +52,14 @@
 //        emailService.sendWelcomeEmail(registeringUser);
 //        return userMapper.toDTO(registeringUser);
 //    }
+
+
+//@GetMapping("/shop")
+//public ShopDTO getShop(@PathVariable("currentUserId") int currentUserId) {
+//        User seller = userService.getById(currentUserId);
+//        return shopMapper.toDTO(seller.getShop());
+//        }
+
 //
 //    @PostMapping("/save")
 //    public UserDTO save(@Valid @RequestPart("userDTO") UserDTO userDTO,
