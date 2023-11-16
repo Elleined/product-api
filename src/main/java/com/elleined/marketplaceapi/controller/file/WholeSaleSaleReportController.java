@@ -1,4 +1,90 @@
 package com.elleined.marketplaceapi.controller.file;
 
-public class WholeSaleProductSaleReportController {
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
+import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.service.file.order.WholeSaleOrderExporter;
+import com.elleined.marketplaceapi.service.order.OrderService;
+import com.elleined.marketplaceapi.service.user.UserService;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/users/{userId}/export/pdf/whole-sale-orders")
+public class WholeSaleSaleReportController {
+    private final UserService userService;
+
+    private final OrderService<WholeSaleOrder> wholeSaleOrderService;
+    private final WholeSaleOrderExporter wholeSaleOrderExporter;
+    
+    @GetMapping("/sales-report")
+    public void export(HttpServletResponse response,
+                       @PathVariable("userId") int userId) throws IOException {
+        response.setContentType("application/pdf");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=sales-report.pdf";
+        response.setHeader(headerKey, headerValue);
+
+        User user = userService.getById(userId);
+        List<WholeSaleOrder> soldOrders = wholeSaleOrderService.getAllProductOrderByStatus(user, Order.Status.SOLD);
+
+        wholeSaleOrderExporter.export(response, soldOrders);
+    }
+
+    @GetMapping("/sellers-sales-report")
+    public void exportAll(HttpServletResponse response) throws IOException {
+        Set<User> sellers = userService.getAllSeller();
+
+        response.setContentType("application/pdf");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=sales-report.pdf";
+        response.setHeader(headerKey, headerValue);
+
+        List<WholeSaleOrder> sellersAllSoldOrder = sellers.stream()
+                .flatMap(seller -> wholeSaleOrderService.getAllProductOrderByStatus(seller, Order.Status.SOLD).stream())
+                .toList();
+
+        wholeSaleOrderExporter.export(response, sellersAllSoldOrder);
+    }
+
+    @GetMapping("/sales-report-by-date-range")
+    public void export(HttpServletResponse response,
+                       @PathVariable("userId") int userId,
+                       @RequestParam("startDate") LocalDate start,
+                       @RequestParam("endDate") LocalDate end) throws IOException {
+        response.setContentType("application/pdf");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=sales-report.pdf";
+        response.setHeader(headerKey, headerValue);
+
+        User user = userService.getById(userId);
+        List<WholeSaleOrder> soldOrders = wholeSaleOrderService.getAllProductOrderByStatus(user, Order.Status.SOLD);
+
+        wholeSaleOrderExporter.export(response, soldOrders, start, end);
+    }
+
+    @GetMapping("/sellers-sales-report-by-range")
+    public void exportAll(HttpServletResponse response,
+                          @RequestParam("startDate") LocalDate start,
+                          @RequestParam("endDate") LocalDate end) throws IOException {
+        Set<User> sellers = userService.getAllSeller();
+
+        response.setContentType("application/pdf");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=sales-report.pdf";
+        response.setHeader(headerKey, headerValue);
+
+        List<WholeSaleOrder> sellersAllSoldOrder = sellers.stream()
+                .flatMap(seller -> wholeSaleOrderService.getAllProductOrderByStatus(seller, Order.Status.SOLD).stream())
+                .toList();
+
+        wholeSaleOrderExporter.export(response, sellersAllSoldOrder, start, end);
+    }
 }
