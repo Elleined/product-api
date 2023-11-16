@@ -51,7 +51,7 @@ public class WholeSaleSellerController {
         this.wholeSaleProductService = wholeSaleProductService;
         this.wholeSaleProductMapper = wholeSaleProductMapper;
     }
-    
+
     @GetMapping("/orders")
     public List<WholeSaleOrderDTO> getAllSellerProductOrderByStatus(@PathVariable("currentUserId") int sellerId,
                                                                     @RequestParam("orderStatus") String orderStatus) {

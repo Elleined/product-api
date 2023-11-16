@@ -108,6 +108,7 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
             throw new ProductNotListedException("Cannot order! because this product is not yet been listed");
         if (wholeSaleProductService.isRejectedBySeller(currentUser, wholeSaleProduct))
             throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
+
         WholeSaleOrder wholeSaleOrder = wholeSaleCartItemMapper.cartItemToOrder(wholeSaleCartItem);
 
         wholeSaleCartItemRepository.delete(wholeSaleCartItem);

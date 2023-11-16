@@ -40,7 +40,7 @@ public interface RetailCartItemMapper extends CartMapper<RetailCartItemDTO, Reta
             @Mapping(target = "purchaserId", source = "purchaser.id"),
             @Mapping(target = "sellerId", source = "retailProduct.seller.id")
     })
-    public abstract RetailCartItemDTO toDTO(RetailCartItem retailCartItem);
+    RetailCartItemDTO toDTO(RetailCartItem retailCartItem);
 
     @Override
     default RetailOrder cartItemToOrder(RetailCartItem retailCartItem) {
