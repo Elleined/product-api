@@ -45,7 +45,7 @@ public interface    ModeratorService {
     void rejectAllUser(Moderator moderator, Set<User> usersToBeRejected);
 
 
-    /** Product **/
+    /** Retail Product **/
     List<RetailProduct> getAllPendingRetailProduct();
 
     void listRetailProduct(Moderator moderator, RetailProduct productToBeListed);
@@ -57,6 +57,7 @@ public interface    ModeratorService {
 
     void rejectAllRetailProduct(Moderator moderator, Set<RetailProduct> productsToBeRejected);
 
+    /** Whole Sale Product **/
     List<WholeSaleProduct> getAllPendingWholeSaleProduct();
 
     void listWholeSaleProduct(Moderator moderator, WholeSaleProduct productToBeListed);

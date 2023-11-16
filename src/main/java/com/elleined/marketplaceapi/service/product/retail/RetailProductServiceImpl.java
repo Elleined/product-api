@@ -173,4 +173,11 @@ public class RetailProductServiceImpl implements RetailProductService {
         log.trace("Total price {}", totalPrice);
         return totalPrice;
     }
+
+    @Override
+    public double calculateTotalPrice(RetailProduct retailProduct) {
+        return calculateTotalPrice(retailProduct.getPricePerUnit(),
+                retailProduct.getQuantityPerUnit(),
+                retailProduct.getAvailableQuantity());
+    }
 }

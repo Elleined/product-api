@@ -16,4 +16,5 @@ public interface RetailProductService extends ProductService<RetailProduct> {
      * Meaning 5 pesos per 50 pieces and has available quantity of 100
      */
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
+    double calculateTotalPrice(RetailProduct retailProduct);
 }
