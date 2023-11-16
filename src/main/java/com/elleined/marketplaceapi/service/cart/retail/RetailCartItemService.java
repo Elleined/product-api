@@ -20,23 +20,5 @@ public interface RetailCartItemService extends CartItemService<RetailCartItem, R
     List<RetailOrder> orderAllCartItems(User currentUser, List<RetailCartItem> retailCartItems);
 
     @Override
-    List<RetailCartItem> getAll(User currentUser);
-
-    @Override
-    void delete(RetailCartItem retailCartItem);
-
-    @Override
-    RetailCartItem save(User currentUser, RetailCartItemDTO dto) throws AlreadyExistException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ResourceOwnedException, ResourceNotFoundException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, ProductExpiredException, BuyerAlreadyRejectedException;
-
-    @Override
     RetailOrder orderCartItem(User currentUser, RetailCartItem retailCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException;
-
-    @Override
-    RetailCartItem getById(int cartItemId) throws ResourceNotFoundException;
-
-    @Override
-    RetailCartItem getByProduct(User currentUser, Product product) throws ResourceNotFoundException;
-
-    @Override
-    List<RetailCartItem> getAllById(List<Integer> cartItemIds);
 }
