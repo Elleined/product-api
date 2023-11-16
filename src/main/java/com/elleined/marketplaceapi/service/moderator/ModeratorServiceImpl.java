@@ -63,7 +63,6 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     @Value("${cropTrade.img.directory}")
     private String cropTradeImgDirectory;
 
-
     @Override
     public Moderator getById(int moderatorId) throws ResourceNotFoundException {
         return moderatorRepository.findById(moderatorId).orElseThrow(() -> new ResourceNotFoundException("Moderator does not exists!"));
@@ -95,8 +94,6 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     public List<User> getAllUnverifiedUser() {
         return userVerificationRequest.getAllRequest();
     }
-
-
 
     @Override
     public void verifyUser(Moderator moderator, User userToBeVerified)
