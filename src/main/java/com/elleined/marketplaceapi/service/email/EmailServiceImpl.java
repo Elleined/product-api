@@ -20,7 +20,7 @@ public class EmailServiceImpl implements EmailService {
     private final static int PLUS_EXPIRATION_IN_SECONDS = 60;
     @Override
     public void sendAcceptedVerificationEmail(User userToBeVerified) {
-        String message = "Hello " + getFullName(userToBeVerified) + " We are happy to inform you that you're verification process in our application CropTrade are successful you can now list your product and enjoy our services";
+        String message = "Hello " + userToBeVerified.getFullName() + " We are happy to inform you that you're verification process in our application CropTrade are successful you can now list your product and enjoy our services";
         EmailMessage emailMessage = EmailMessage.builder()
                 .subject("CropTrade user verification")
                 .messageBody(message)
@@ -32,7 +32,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendRejectedVerificationEmail(User rejectedUser, String reason) {
-        String message = "Hello " + getFullName(rejectedUser) + " We are sorry to inform you that you're application for verification are rejected by the moderator because " + reason;
+        String message = "Hello " + rejectedUser.getFullName() + " We are sorry to inform you that you're application for verification are rejected by the moderator because " + reason;
         EmailMessage emailMessage = EmailMessage.builder()
                 .subject("CropTrade Verification Rejection")
                 .messageBody(message)
@@ -45,7 +45,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendProductListedEmail(User seller, Product product) {
-        String message = "Hello " + getFullName(seller) + " We are happy to inform you that you're product listing of " + product.getCrop() + "  are now approved by moderator your product will now be visible in marketplace";
+        String message = "Hello " + seller.getFullName() + " We are happy to inform you that you're product listing of " + product.getCrop() + "  are now approved by moderator your product will now be visible in marketplace";
         EmailMessage emailMessage = EmailMessage.builder()
                 .subject("Product listing approve")
                 .messageBody(message)
@@ -58,7 +58,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendRejectedProductEmail(Product product, String reason) {
         User seller = product.getSeller();
-        String message = "Hello " + getFullName(seller) + " We are sorry to inform you that you're product listing of " + product.getCrop() + " are rejected by the moderator because " + reason;
+        String message = "Hello " + seller.getFullName() + " We are sorry to inform you that you're product listing of " + product.getCrop() + " are rejected by the moderator because " + reason;
         EmailMessage emailMessage = EmailMessage.builder()
                 .subject("Product listing rejected")
                 .messageBody(message)
@@ -122,7 +122,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendWelcomeEmail(User registrant) {
-        String message = " Hello " + getFullName(registrant) + " Thank you for registering in our application we appreciate your trust. We ensure that you're data is secured and enjoy our services. Thanks...";
+        String message = " Hello " + registrant.getFullName() + " Thank you for registering in our application we appreciate your trust. We ensure that you're data is secured and enjoy our services. Thanks...";
         EmailMessage emailMessage = EmailMessage.builder()
                 .receiver(registrant.getUserCredential().getEmail())
                 .subject("Welcome to CropTrade")
@@ -141,9 +141,5 @@ public class EmailServiceImpl implements EmailService {
         OTPMessage receiveOTPMessage = emailClient.sendOTPMail(otpMessage);
         log.debug("Sending OTP for user with id of {} success {}", user.getId(), receiveOTPMessage);
         return receiveOTPMessage; // !!! Change this to receiveOTPMessage when you are ready to call this
-    }
-
-    private String getFullName(User user) {
-        return user.getUserDetails().getFirstName() + " " + user.getUserDetails().getMiddleName() + " " + user.getUserDetails().getLastName();
     }
 }
