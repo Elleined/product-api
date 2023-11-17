@@ -23,6 +23,7 @@ import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.repository.cart.WholeSaleCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,7 @@ import static org.mockito.Mockito.*;
 class WholeSaleCartItemServiceImplTest {
 
     @Mock
-    private WholeSaleProductServiceImpl wholeSaleProductService;
+    private WholeSaleProductService wholeSaleProductService;
     @Mock
     private WholeSaleCartItemMapper wholeSaleCartItemMapper;
     @Mock
@@ -502,7 +503,7 @@ class WholeSaleCartItemServiceImplTest {
         doReturn(false).when(wholeSaleProduct).isDeleted();
         doReturn(false).when(wholeSaleProduct).isSold();
         doReturn(true).when(wholeSaleProduct).isListed();
-        doCallRealMethod().when(wholeSaleProductService).isRejectedBySeller(user, wholeSaleProduct);
+        doReturn(true).when(wholeSaleProductService).isRejectedBySeller(any(User.class), any(WholeSaleProduct.class));
 
         // Calling the method
         assertThrowsExactly(BuyerAlreadyRejectedException.class, () -> wholeSaleCartItemService.save(user, dto));

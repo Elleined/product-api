@@ -25,7 +25,6 @@ import com.elleined.marketplaceapi.repository.cart.RetailCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
-import com.elleined.marketplaceapi.service.product.retail.RetailProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,7 +40,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.elleined.marketplaceapi.model.order.Order.Status.*;
+import static com.elleined.marketplaceapi.model.order.Order.Status.REJECTED;
 import static com.elleined.marketplaceapi.model.product.Product.State.SOLD;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
 import static com.elleined.marketplaceapi.model.product.Product.Status.INACTIVE;
@@ -51,7 +50,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RetailCartItemServiceImplTest {
     @Mock
-    private RetailProductServiceImpl retailProductService;
+    private RetailProductService retailProductService;
 
     @Mock
     private RetailCartItemMapper retailCartItemMapper;
@@ -436,7 +435,7 @@ class RetailCartItemServiceImplTest {
         doReturn(false).when(retailProduct).isSold();
         doReturn(true).when(retailProduct).isListed();
         doReturn(false).when(retailProduct).isExceedingToAvailableQuantity(anyInt());
-        doCallRealMethod().when(retailProductService).isRejectedBySeller(user, retailProduct);
+        doReturn(true).when(retailProductService).isRejectedBySeller(any(User.class), any(RetailProduct.class));
 
         // Assertions
         // Calling the method

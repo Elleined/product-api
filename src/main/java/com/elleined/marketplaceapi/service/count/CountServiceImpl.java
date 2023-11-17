@@ -27,8 +27,7 @@ public class CountServiceImpl implements CountService {
     @Override
     public int getAllProductCount() {
         return (int) productRepository.findAll().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() != Product.State.LISTING)
+                .filter(Product::isNotDeleted)
                 .count();
     }
 }
