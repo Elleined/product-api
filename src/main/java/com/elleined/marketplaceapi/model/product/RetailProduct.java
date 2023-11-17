@@ -82,6 +82,8 @@ public class RetailProduct extends Product {
     }
 
     public boolean isExpired() {
-        return LocalDate.now().isAfter(expirationDate) || this.getState() == Product.State.EXPIRED;
+        return LocalDate.now().isAfter(expirationDate) ||
+                this.getState() == Product.State.EXPIRED ||
+                LocalDate.now().equals(expirationDate);
     }
 }

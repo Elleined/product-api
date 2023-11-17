@@ -311,6 +311,7 @@ class WholeSaleCartItemServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = {"PENDING", "ACCEPTED"})
     void cannotAddToCartIfCurrentUserHasAlreadyPendingAndAcceptedOrderToProduct(String orderStatus) {
+        // Mock Data
         User user = spy(User.class);
         user.setWholeSaleOrders(new ArrayList<>());
 

@@ -2,9 +2,10 @@ package com.elleined.marketplaceapi.service.cart.retail;
 
 import com.elleined.marketplaceapi.dto.cart.RetailCartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
-import com.elleined.marketplaceapi.exception.product.*;
-import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
-import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
+import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
+import com.elleined.marketplaceapi.exception.product.ProductExpiredException;
+import com.elleined.marketplaceapi.exception.product.ProductNotListedException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -13,6 +14,7 @@ import com.elleined.marketplaceapi.mapper.cart.RetailCartItemMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.address.DeliveryAddress;
 import com.elleined.marketplaceapi.model.cart.RetailCartItem;
+import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.Product.State;
@@ -22,6 +24,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.cart.RetailCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
+import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.elleined.marketplaceapi.model.order.Order.Status.*;
+import static com.elleined.marketplaceapi.model.product.Product.State.SOLD;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
 import static com.elleined.marketplaceapi.model.product.Product.Status.INACTIVE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,42 +130,41 @@ class RetailCartItemServiceImplTest {
     }
 
     @Test
-    void shouldThrowProductAlreadyInCartException() {
+    void cannotAddToCartProductThatAlreadyExistsInCartItems() {
+        // Mock Data
         User user = User.builder()
                 .retailCartItems(new ArrayList<>())
                 .build();
 
+        RetailProduct retailProduct = new RetailProduct();
+
         RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
                 .productId(1)
                 .build();
-
-        RetailProduct retailProduct = mock(RetailProduct.class);
-        retailProduct.setId(1);
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
                 .retailProduct(retailProduct)
                 .build();
         user.getRetailCartItems().add(retailCartItem);
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
 
-        assertThrows(AlreadyExistException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Calling methods
+        // Assertions
+        assertThrowsExactly(AlreadyExistException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
-    void shouldThrowProductExpiredException() {
+    void cannotAddToCartExpiredProduct() {
+        // Mock Data
         User user = spy(User.class);
-        user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
-        user.setRetailOrders(new ArrayList<>());
-
-        RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
-                .productId(1)
-                .build();
 
         RetailProduct expiredRetailProduct = RetailProduct.retailProductBuilder()
-                .id(1)
                 .expirationDate(LocalDate.now().minusDays(1))
                 .build();
 
@@ -169,116 +172,68 @@ class RetailCartItemServiceImplTest {
                 .retailProduct(expiredRetailProduct)
                 .build();
 
-        when(retailProductService.getById(1)).thenReturn(expiredRetailProduct);
-        when(user.isProductAlreadyInCart(expiredRetailProduct)).thenReturn(false);
-
-        assertThrows(ProductExpiredException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrows(ProductExpiredException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
-    }
-
-    @Test
-    void shouldThrowProductHasPendingOrderException() {
-        User user = spy(User.class);
-        user.setRetailCartItems(new ArrayList<>());
-
-        RetailProduct retailProduct = mock(RetailProduct.class);
-        retailProduct.setId(1);
-
-        RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
-                .retailProduct(retailProduct)
-                .build();
-
         RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
                 .productId(1)
                 .build();
 
-        List<RetailOrder> retailOrders = Arrays.asList(
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(PENDING)
-                        .build(),
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(SOLD)
-                        .build(),
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(CANCELLED)
-                        .build(),
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(REJECTED)
-                        .build()
-        );
-        when(user.getRetailOrders()).thenReturn(retailOrders);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(expiredRetailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(retailProduct.isExpired()).thenReturn(false);
+        // Calling real method
+        // Assertion
+        assertThrowsExactly(ProductExpiredException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrowsExactly(ProductExpiredException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
-        assertThrowsExactly(ProductOrderAcceptedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrows(ProductOrderAcceptedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
-    @Test
-    void shouldThrowProductHasAcceptedOrderException() {
+    @ParameterizedTest
+    @ValueSource(strings = {"PENDING", "ACCEPTED"})
+    void cannotAddToCartIfCurrentUserHasAlreadyPendingAndAcceptedOrderToProduct(String orderStatus) {
+        // Mock Data
         User user = spy(User.class);
-        user.setRetailCartItems(new ArrayList<>());
-
-        RetailProduct retailProduct = mock(RetailProduct.class);
-        retailProduct.setId(1);
-
-        RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
-                .retailProduct(retailProduct)
-                .build();
-
-        RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
-                .productId(1)
-                .build();
-
-        List<RetailOrder> retailOrders = Arrays.asList(
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(ACCEPTED)
-                        .build(),
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(SOLD)
-                        .build(),
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(CANCELLED)
-                        .build(),
-                RetailOrder.retailOrderBuilder()
-                        .retailProduct(retailProduct)
-                        .status(REJECTED)
-                        .build()
-        );
-        when(user.getRetailOrders()).thenReturn(retailOrders);
-
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailProduct.isExpired()).thenReturn(false);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
-
-        assertThrowsExactly(ProductOrderPendingException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrowsExactly(ProductOrderPendingException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
-    }
-
-    @Test
-    void shouldThrowResourceOwnedException() {
-        User user = spy(User.class);
-        user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
         user.setRetailOrders(new ArrayList<>());
 
         RetailProduct retailProduct = spy(RetailProduct.class);
-        retailProduct.setId(1);
-        retailProduct.setExpirationDate(LocalDate.now().plusDays(10));
-        retailProduct.setStatus(INACTIVE);
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+                .retailProduct(retailProduct)
+                .status(Order.Status.valueOf(orderStatus))
+                .build();
+        user.getRetailOrders().add(retailOrder);
+
+        RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
+                .retailProduct(retailProduct)
+                .build();
+
+        RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
+                .productId(1)
+                .build();
+
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+
+        // Assertions
+        // Calling the method
+        assertThrows(ProductOrderException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrows(ProductOrderException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
+
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+    }
+
+    @Test
+    void cannotAddToCartOwnedProduct() {
+        // Mock data
+        User user = spy(User.class);
+        user.setRetailProducts(new ArrayList<>());
+
+        RetailProduct retailProduct = spy(RetailProduct.class);
         user.getRetailProducts().add(retailProduct);
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
@@ -289,27 +244,28 @@ class RetailCartItemServiceImplTest {
                 .productId(1)
                 .build();
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailProduct.isExpired()).thenReturn(false);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
-        when(user.hasOrder(retailProduct, ACCEPTED)).thenReturn(false);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
 
-        assertThrowsExactly(ResourceOwnedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrowsExactly(ResourceOwnedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Assertions
+        // Calling the method
+        assertThrows(ResourceOwnedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrows(ResourceOwnedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
+
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
-    void shouldThrowProductDeletedException() {
+    void cannotAddToCartAnDeletedProduct() {
+        // Mock data
         User user = spy(User.class);
-        user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
-        user.setRetailOrders(new ArrayList<>());
 
         RetailProduct retailProduct = spy(RetailProduct.class);
-        retailProduct.setId(1);
-        retailProduct.setExpirationDate(LocalDate.now().plusDays(10));
         retailProduct.setStatus(INACTIVE);
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
@@ -320,29 +276,30 @@ class RetailCartItemServiceImplTest {
                 .productId(1)
                 .build();
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailProduct.isExpired()).thenReturn(false);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
-        when(user.hasOrder(retailProduct, ACCEPTED)).thenReturn(false);
-        when(user.hasProduct(retailProduct)).thenReturn(false);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
 
-        assertThrowsExactly(ResourceNotFoundException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrowsExactly(ResourceNotFoundException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Assertions
+        // Calling the method
+        assertThrows(ResourceNotFoundException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrows(ResourceNotFoundException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
+
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
-    void shouldThrowProductAlreadySoldException() {
+    void cannotAddToCartAlreadySoldProduct() {
+        // Mock data
         User user = spy(User.class);
-        user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
-        user.setRetailOrders(new ArrayList<>());
 
         RetailProduct retailProduct = spy(RetailProduct.class);
-        retailProduct.setId(1);
-        retailProduct.setState(State.SOLD);
-        retailProduct.setExpirationDate(LocalDate.now().plusDays(10));
+        retailProduct.setState(SOLD);
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
                 .retailProduct(retailProduct)
@@ -352,31 +309,32 @@ class RetailCartItemServiceImplTest {
                 .productId(1)
                 .build();
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailProduct.isExpired()).thenReturn(false);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
-        when(user.hasOrder(retailProduct, ACCEPTED)).thenReturn(false);
-        when(user.hasProduct(retailProduct)).thenReturn(false);
-        when(retailProduct.isDeleted()).thenReturn(false);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isDeleted();
+        // Assertions
+        // Calling the method
+        assertThrows(ProductAlreadySoldException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrows(ProductAlreadySoldException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
-        assertThrowsExactly(ProductAlreadySoldException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrowsExactly(ProductAlreadySoldException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"SOLD", "PENDING", "REJECTED", "EXPIRED"})
-    void shouldThrowProductNotListedException(String productState) {
+    @ValueSource(strings = {"PENDING", "SOLD", "REJECTED", "EXPIRED"})
+    void cannotAddToCartNotListedProduct(String productStatus) {
+        // Mock data
         User user = spy(User.class);
         user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
-        user.setRetailOrders(new ArrayList<>());
 
         RetailProduct retailProduct = spy(RetailProduct.class);
-        retailProduct.setId(1);
-        retailProduct.setState(State.valueOf(productState));
-        retailProduct.setExpirationDate(LocalDate.now().plusDays(10));
+        retailProduct.setState(State.valueOf(productStatus));
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
                 .retailProduct(retailProduct)
@@ -386,71 +344,79 @@ class RetailCartItemServiceImplTest {
                 .productId(1)
                 .build();
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailProduct.isExpired()).thenReturn(false);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
-        when(user.hasOrder(retailProduct, ACCEPTED)).thenReturn(false);
-        when(user.hasProduct(retailProduct)).thenReturn(false);
-        when(retailProduct.isDeleted()).thenReturn(false);
-        when(retailProduct.isSold()).thenReturn(false);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isDeleted();
+        doReturn(false).when(retailProduct).isSold();
 
-        assertThrowsExactly(ProductNotListedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrowsExactly(ProductNotListedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
+        // Assertions
+        // Calling the method
+        assertThrows(ProductNotListedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrows(ProductNotListedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
-    void shouldThrowOrderQuantiantyExceedsException() {
+    void cannotAddToCartProductIfOrderQuantityExceedsToAvailableQuantityOfProduct() {
+        // Mock data
         User user = spy(User.class);
-        user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
-        user.setRetailOrders(new ArrayList<>());
 
         RetailProduct retailProduct = spy(RetailProduct.class);
-        retailProduct.setId(1);
-        retailProduct.setAvailableQuantity(10);
-        retailProduct.setState(State.REJECTED);// not listed
-        retailProduct.setExpirationDate(LocalDate.now().plusDays(10));
+        retailProduct.setAvailableQuantity(100);
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
                 .retailProduct(retailProduct)
-                .orderQuantity(20)
+                .orderQuantity(1000)
                 .build();
 
         RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder()
                 .productId(1)
-                .orderQuantity(20)
+                .orderQuantity(1000)
                 .build();
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailProduct.isExpired()).thenReturn(false);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
-        when(user.hasOrder(retailProduct, ACCEPTED)).thenReturn(false);
-        when(user.hasProduct(retailProduct)).thenReturn(false);
-        when(retailProduct.isDeleted()).thenReturn(false);
-        when(retailProduct.isSold()).thenReturn(false);
-        when(retailProduct.isListed()).thenReturn(true);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isDeleted();
+        doReturn(false).when(retailProduct).isSold();
+        doReturn(true).when(retailProduct).isListed();
 
+        // Assertions
+        // Calling the method
         assertThrowsExactly(OrderQuantiantyExceedsException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
         assertThrowsExactly(OrderQuantiantyExceedsException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Behavior verification
+        verifyNoMoreInteractions(retailProductService);
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
     @Test
-    void shouldThrowBuyerAlreadyRejectedException() {
+    void cannotAddToCartAProductThatRecentlyRejectedWithin24Hours() {
+        // Mock data
         User user = spy(User.class);
-        user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
         user.setRetailOrders(new ArrayList<>());
 
         RetailProduct retailProduct = spy(RetailProduct.class);
-        retailProduct.setId(1);
         retailProduct.setRetailOrders(new ArrayList<>());
-        retailProduct.setExpirationDate(LocalDate.now().plusDays(10));
+
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+                .retailProduct(retailProduct)
+                .status(REJECTED)
+                .updatedAt(LocalDateTime.now())
+                .build();
+        retailProduct.getRetailOrders().add(retailOrder);
+        user.getRetailOrders().add(retailOrder);
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
                 .retailProduct(retailProduct)
@@ -460,34 +426,26 @@ class RetailCartItemServiceImplTest {
                 .productId(1)
                 .build();
 
-        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
-                .retailProduct(retailProduct)
-                .orderDate(LocalDateTime.now())
-                .status(REJECTED)
-                .updatedAt(LocalDateTime.now())
-                .build();
-        user.getRetailOrders().add(retailOrder);
-        retailProduct.getRetailOrders().add(retailOrder);
+        // Stubbing methods
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isDeleted();
+        doReturn(false).when(retailProduct).isSold();
+        doReturn(true).when(retailProduct).isListed();
+        doReturn(false).when(retailProduct).isExceedingToAvailableQuantity(anyInt());
+        doCallRealMethod().when(retailProductService).isRejectedBySeller(user, retailProduct);
 
-        when(retailProductService.getById(1)).thenReturn(retailProduct);
-        when(retailProduct.isExpired()).thenReturn(false);
-        when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
-        when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
-        when(user.hasOrder(retailProduct, ACCEPTED)).thenReturn(false);
-        when(user.hasProduct(retailProduct)).thenReturn(false);
-        when(retailProduct.isDeleted()).thenReturn(false);
-        when(retailProduct.isSold()).thenReturn(false);
-        when(retailProduct.isListed()).thenReturn(true);
-        when(retailProduct.isExceedingToAvailableQuantity(retailCartItemDTO.getOrderQuantity())).thenReturn(false);
-        when(retailProductService.isRejectedBySeller(user, retailProduct)).thenCallRealMethod();
+        // Assertions
+        // Calling the method
+        assertThrows(BuyerAlreadyRejectedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrows(BuyerAlreadyRejectedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
 
-        assertThrowsExactly(BuyerAlreadyRejectedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrowsExactly(BuyerAlreadyRejectedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
-
-        verify(retailProductService, atMost(2)).isRejectedBySeller(user, retailProduct);
-        verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
+        // Behavior verification
+        verifyNoMoreInteractions(addressService, retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
-
 
     @Test
     void save() {
@@ -497,22 +455,7 @@ class RetailCartItemServiceImplTest {
         user.setRetailOrders(new ArrayList<>());
         user.setDeliveryAddresses(new ArrayList<>());
 
-        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
-                .id(1)
-                .expirationDate(LocalDate.now().plusDays(20))
-                .status(ACTIVE)
-                .state(State.LISTING)
-                .availableQuantity(100)
-                .pricePerUnit(20)
-                .quantityPerUnit(5)
-                .crop(Crop.builder()
-                        .name("Crop")
-                        .build())
-                .retailUnit(RetailUnit.retailUnitBuilder()
-                        .name("Retail unit")
-                        .build())
-                .picture("Picture")
-                .build();
+        RetailProduct retailProduct = getMockRetailProduct();
 
         RetailCartItemDTO dto = RetailCartItemDTO.retailCartItemDTOBuilder()
                 .productId(1)
@@ -551,22 +494,7 @@ class RetailCartItemServiceImplTest {
         user.setRetailCartItems(new ArrayList<>());
         user.setRetailOrders(new ArrayList<>());
 
-        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
-                .id(1)
-                .expirationDate(LocalDate.now().plusDays(20))
-                .status(ACTIVE)
-                .state(State.LISTING)
-                .availableQuantity(100)
-                .pricePerUnit(20)
-                .quantityPerUnit(5)
-                .crop(Crop.builder()
-                        .name("Crop")
-                        .build())
-                .retailUnit(RetailUnit.retailUnitBuilder()
-                        .name("Retail unit")
-                        .build())
-                .picture("Picture")
-                .build();
+        RetailProduct retailProduct = getMockRetailProduct();
 
         RetailCartItem retailCartItem = RetailCartItem.retailCartItemBuilder()
                 .id(1)
@@ -622,4 +550,22 @@ class RetailCartItemServiceImplTest {
         assertDoesNotThrow(() -> retailCartItemService.getByProduct(user, retailProduct1));
     }
 
+    private RetailProduct getMockRetailProduct() {
+        return RetailProduct.retailProductBuilder()
+                .id(1)
+                .expirationDate(LocalDate.now().plusDays(20))
+                .status(ACTIVE)
+                .state(State.LISTING)
+                .availableQuantity(100)
+                .pricePerUnit(20)
+                .quantityPerUnit(5)
+                .crop(Crop.builder()
+                        .name("Crop")
+                        .build())
+                .retailUnit(RetailUnit.retailUnitBuilder()
+                        .name("Retail unit")
+                        .build())
+                .picture("Picture")
+                .build();
+    }
 }
