@@ -3,6 +3,8 @@ package com.elleined.marketplaceapi.service.cart.wholesale;
 import com.elleined.marketplaceapi.dto.cart.WholeSaleCartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -62,14 +64,14 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
     }
 
     @Override
-    public WholeSaleCartItem save(User currentUser, WholeSaleCartItemDTO dto) throws AlreadyExistException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ResourceOwnedException, ResourceNotFoundException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, ProductExpiredException, BuyerAlreadyRejectedException {
+    public WholeSaleCartItem save(User currentUser, WholeSaleCartItemDTO dto) throws AlreadyExistException, ProductOrderAcceptedException, ProductOrderPendingException, ResourceOwnedException, ResourceNotFoundException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, ProductExpiredException, BuyerAlreadyRejectedException {
         WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(dto.getProductId());
         if (currentUser.isProductAlreadyInCart(wholeSaleProduct))
             throw new AlreadyExistException("Cannot add to cart! because you already have this product in your cart.");
         if (currentUser.hasOrder(wholeSaleProduct, PENDING))
-            throw new ProductHasPendingOrderException("Cannot add to cart! because you already has pending order for this product. Please wait until seller take action in you order request!");
+            throw new ProductOrderAcceptedException("Cannot add to cart! because you already has pending order for this product. Please wait until seller take action in you order request!");
         if (currentUser.hasOrder(wholeSaleProduct, ACCEPTED))
-            throw new ProductHasAcceptedOrderException("Cannot add to cart! because you already have accepted order for this product. Please contact the seller to settle your order");
+            throw new ProductOrderPendingException("Cannot add to cart! because you already have accepted order for this product. Please contact the seller to settle your order");
         if (currentUser.hasProduct(wholeSaleProduct))
             throw new ResourceOwnedException("Cannot add to cart! you cannot add to your cart your own product!");
         if (wholeSaleProduct.isDeleted())
@@ -91,12 +93,12 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
     }
 
     @Override
-    public WholeSaleOrder orderCartItem(User currentUser, WholeSaleCartItem wholeSaleCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException {
+    public WholeSaleOrder orderCartItem(User currentUser, WholeSaleCartItem wholeSaleCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException {
         WholeSaleProduct wholeSaleProduct = wholeSaleCartItem.getWholeSaleProduct();
         if (currentUser.hasOrder(wholeSaleProduct, PENDING))
-            throw new ProductHasPendingOrderException("Cannot order! because you already pending order for this product. Please wait until seller take action in you order request!");
+            throw new ProductOrderAcceptedException("Cannot order! because you already pending order for this product. Please wait until seller take action in you order request!");
         if (currentUser.hasOrder(wholeSaleProduct, ACCEPTED))
-            throw new ProductHasAcceptedOrderException("Cannot order! because you already have a accepted order for this product. Please contact the seller to settle your order!");
+            throw new ProductOrderPendingException("Cannot order! because you already have a accepted order for this product. Please contact the seller to settle your order!");
         if (currentUser.hasProduct(wholeSaleProduct))
             throw new ResourceOwnedException("You cannot order your own product listing!");
         if (wholeSaleProduct.isDeleted())
@@ -139,7 +141,7 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
     @Override
     public List<WholeSaleCartItem> getAllById(List<Integer> cartItemIds) {
         return wholeSaleCartItemRepository.findAllById(cartItemIds).stream()
-                .sorted(Comparator.comparing(WholeSaleCartItem::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(CartItem::getCreatedAt).reversed())
                 .toList();
     }
 }

@@ -6,6 +6,8 @@ import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
@@ -143,13 +145,13 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public RetailProduct updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public RetailProduct updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductOrderPendingException, ProductOrderAcceptedException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (retailProduct.hasAcceptedOrder())
-            throw new ProductHasAcceptedOrderException("Cannot update retail product! because theres an accepted order for this retail product.");
+            throw new ProductOrderPendingException("Cannot update retail product! because theres an accepted order for this retail product.");
         if (retailProduct.hasPendingOrder())
-            throw new ProductHasPendingOrderException("Cannot update retail product! because theres an pending order for this retail product");
+            throw new ProductOrderAcceptedException("Cannot update retail product! because theres an pending order for this retail product");
         if (retailProduct.hasSoldOrder())
             throw new ProductAlreadySoldException("Cannot update retail product! because this retail product is already been sold!");
         if (!seller.isVerified())
@@ -176,13 +178,13 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO dto, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductOrderPendingException, ProductOrderAcceptedException, IOException {
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (wholeSaleProduct.hasAcceptedOrder())
-            throw new ProductHasAcceptedOrderException("Cannot update whole sale product! because theres an accepted order for this whole sale product.");
+            throw new ProductOrderPendingException("Cannot update whole sale product! because theres an accepted order for this whole sale product.");
         if (wholeSaleProduct.hasPendingOrder())
-            throw new ProductHasPendingOrderException("Cannot update whole sale product! because theres an pending order for this whole sale product");
+            throw new ProductOrderAcceptedException("Cannot update whole sale product! because theres an pending order for this whole sale product");
         if (wholeSaleProduct.hasSoldOrder())
             throw new ProductAlreadySoldException("Cannot update whole sale product! because this whole sale product is already been sold!");
         if (!seller.isVerified())
@@ -209,7 +211,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
+    public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductOrderAcceptedException, ProductOrderPendingException {
         if (!seller.isVerified())
             throw new NotVerifiedException("Cannot delete product! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
         if (!seller.hasProduct(retailProduct))
@@ -217,9 +219,9 @@ public class SellerServiceImpl implements SellerService {
         if (retailProduct.isSold())
             throw new ProductAlreadySoldException("Cannot delete retail product! because this retail product is already sold");
         if (retailProduct.hasPendingOrder())
-            throw new ProductHasPendingOrderException("Cannot delete retail product! because this retail product has pending orders. Please settle first the pending order to delete this");
+            throw new ProductOrderAcceptedException("Cannot delete retail product! because this retail product has pending orders. Please settle first the pending order to delete this");
         if (retailProduct.hasAcceptedOrder())
-            throw new ProductHasAcceptedOrderException("Cannot delete retail product! because this retail product has accepted orders. Please settle first the accepted order to delete this");
+            throw new ProductOrderPendingException("Cannot delete retail product! because this retail product has accepted orders. Please settle first the accepted order to delete this");
 
         retailProduct.setStatus(Product.Status.INACTIVE);
         retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
@@ -229,7 +231,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
+    public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductOrderAcceptedException, ProductOrderPendingException {
         if (!seller.isVerified())
             throw new NotVerifiedException("Cannot delete product! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
         if (!seller.hasProduct(wholeSaleProduct))
@@ -237,9 +239,9 @@ public class SellerServiceImpl implements SellerService {
         if (wholeSaleProduct.isSold())
             throw new ProductAlreadySoldException("Cannot delete whole sale product! because this whole sale product is already sold");
         if (wholeSaleProduct.hasPendingOrder())
-            throw new ProductHasPendingOrderException("Cannot delete whole sale product! because this whole sale product has pending orders. Please settle first the pending order to delete this");
+            throw new ProductOrderAcceptedException("Cannot delete whole sale product! because this whole sale product has pending orders. Please settle first the pending order to delete this");
         if (wholeSaleProduct.hasAcceptedOrder())
-            throw new ProductHasAcceptedOrderException("Cannot delete whole sale product! because this whole sale product has accepted orders. Please settle first the accepted order to delete this");
+            throw new ProductOrderPendingException("Cannot delete whole sale product! because this whole sale product has accepted orders. Please settle first the accepted order to delete this");
 
         wholeSaleProduct.setStatus(Product.Status.INACTIVE);
         wholeSaleProductService.updateAllPendingAndAcceptedOrders(wholeSaleProduct, Status.CANCELLED);

@@ -124,7 +124,7 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
                 .filter(wholeSaleOrder -> wholeSaleOrder.getWholeSaleProduct().equals(wholeSaleProduct))
                 .anyMatch(wholeSaleOrder -> {
                     LocalDateTime reOrderingDate = wholeSaleOrder.getUpdatedAt().plusDays(1);
-                    return wholeSaleOrder.isRejected() && LocalDateTime.now().isBefore(reOrderingDate);
+                    return wholeSaleOrder.isRejected() && (LocalDateTime.now().equals(reOrderingDate) || LocalDateTime.now().isBefore(reOrderingDate));
                 });
     }
 }

@@ -4,6 +4,8 @@ package com.elleined.marketplaceapi.service.cart.retail;
 import com.elleined.marketplaceapi.dto.cart.RetailCartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -63,7 +65,7 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
     }
 
     @Override
-    public RetailCartItem save(User currentUser, RetailCartItemDTO dto) throws AlreadyExistException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ResourceOwnedException, ResourceNotFoundException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, ProductExpiredException, BuyerAlreadyRejectedException {
+    public RetailCartItem save(User currentUser, RetailCartItemDTO dto) throws AlreadyExistException, ProductOrderAcceptedException, ProductOrderPendingException, ResourceOwnedException, ResourceNotFoundException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, ProductExpiredException, BuyerAlreadyRejectedException {
         RetailProduct retailProduct = retailProductService.getById(dto.getProductId());
 
         if (currentUser.isProductAlreadyInCart(retailProduct))
@@ -71,9 +73,9 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
         if (retailProduct.isExpired())
             throw new ProductExpiredException("Cannot add to cart! because this product is already expired!");
         if (currentUser.hasOrder(retailProduct, PENDING))
-            throw new ProductHasPendingOrderException("Cannot add to cart! because you already has pending order for this product. Please wait until seller take action in you order request!");
+            throw new ProductOrderAcceptedException("Cannot add to cart! because you already has pending order for this product. Please wait until seller take action in you order request!");
         if (currentUser.hasOrder(retailProduct, ACCEPTED))
-            throw new ProductHasAcceptedOrderException("Cannot add to cart! because you already have accepted order for this product. Please contact the seller to settle your order");
+            throw new ProductOrderPendingException("Cannot add to cart! because you already have accepted order for this product. Please contact the seller to settle your order");
         if (currentUser.hasProduct(retailProduct))
             throw new ResourceOwnedException("Cannot add to cart! you cannot add to your cart your own product!");
         if (retailProduct.isDeleted())
@@ -98,15 +100,15 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
     }
 
     @Override
-    public RetailOrder orderCartItem(User currentUser, RetailCartItem retailCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException {
+    public RetailOrder orderCartItem(User currentUser, RetailCartItem retailCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException {
         RetailProduct retailProduct = retailCartItem.getRetailProduct();
 
         if (retailProduct.isExpired())
             throw new ProductExpiredException("Cannot order! because this product is already expired!");
         if (currentUser.hasOrder(retailProduct, PENDING))
-            throw new ProductHasPendingOrderException("Cannot order! because you already pending order for this product. Please wait until seller take action in you order request!");
+            throw new ProductOrderAcceptedException("Cannot order! because you already pending order for this product. Please wait until seller take action in you order request!");
         if (currentUser.hasOrder(retailProduct, ACCEPTED))
-            throw new ProductHasAcceptedOrderException("Cannot order! because you already have a accepted order for this product. Please contact the seller to settle your order!");
+            throw new ProductOrderPendingException("Cannot order! because you already have a accepted order for this product. Please contact the seller to settle your order!");
         if (currentUser.hasProduct(retailCartItem.getRetailProduct()))
             throw new ResourceOwnedException("You cannot order your own product listing!");
         if (retailProduct.isDeleted())

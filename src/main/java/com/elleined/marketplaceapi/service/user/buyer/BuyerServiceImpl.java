@@ -7,6 +7,8 @@ import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.order.OrderReachedCancellingTimeLimitException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -52,7 +54,7 @@ public class BuyerServiceImpl implements BuyerService {
     private final AddressService addressService;
 
     @Override
-    public RetailOrder order(User buyer, RetailOrderDTO dto) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
+    public RetailOrder order(User buyer, RetailOrderDTO dto) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
         RetailProduct retailProduct = retailProductService.getById(dto.getProductId());
 
         if (retailProduct.isExpired())
@@ -60,9 +62,9 @@ public class BuyerServiceImpl implements BuyerService {
         if (retailProduct.isRejected())
             throw new ProductRejectedException("Cannot order this retail product! because this retail product is rejected by moderator!");
         if (buyer.hasOrder(retailProduct, PENDING))
-            throw new ProductHasPendingOrderException("Cannot order this retail product! because you already have pending order. Please wait until seller take action in you order request!");
+            throw new ProductOrderAcceptedException("Cannot order this retail product! because you already have pending order. Please wait until seller take action in you order request!");
         if (buyer.hasOrder(retailProduct, ACCEPTED))
-            throw new ProductHasAcceptedOrderException("Cannot order this retail product! because you already have accepted order. Please contact the seller to settle your order");
+            throw new ProductOrderPendingException("Cannot order this retail product! because you already have accepted order. Please contact the seller to settle your order");
         if (retailProduct.isDeleted())
             throw new ResourceNotFoundException("Cannot order this retail product! because this retail product does not exists or might already been deleted!");
         if (retailProduct.isSold())
@@ -87,15 +89,15 @@ public class BuyerServiceImpl implements BuyerService {
     }
 
     @Override
-    public WholeSaleOrder order(User buyer, WholeSaleOrderDTO dto) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException{
+    public WholeSaleOrder order(User buyer, WholeSaleOrderDTO dto) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException{
         WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(dto.getProductId());
 
         if (wholeSaleProduct.isRejected())
             throw new ProductRejectedException("Cannot order this whole sale product! because this whole sale product is rejected by moderator!");
         if (buyer.hasOrder(wholeSaleProduct, PENDING))
-            throw new ProductHasPendingOrderException("Cannot order this whole sale product! because you already have pending order. Please wait until seller take action in you order request!");
+            throw new ProductOrderAcceptedException("Cannot order this whole sale product! because you already have pending order. Please wait until seller take action in you order request!");
         if (buyer.hasOrder(wholeSaleProduct, ACCEPTED))
-            throw new ProductHasAcceptedOrderException("Cannot order this whole sale product! because you already have accepted order. Please contact the seller to settle your order");
+            throw new ProductOrderPendingException("Cannot order this whole sale product! because you already have accepted order. Please contact the seller to settle your order");
         if (wholeSaleProduct.isDeleted())
             throw new ResourceNotFoundException("Cannot order this whole sale product! because this whole sale product does not exists or might already been deleted!");
         if (wholeSaleProduct.isSold())

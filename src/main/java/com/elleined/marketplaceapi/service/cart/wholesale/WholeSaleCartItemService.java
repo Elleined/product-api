@@ -3,6 +3,8 @@ package com.elleined.marketplaceapi.service.cart.wholesale;
 import com.elleined.marketplaceapi.dto.cart.WholeSaleCartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
@@ -17,5 +19,5 @@ public interface WholeSaleCartItemService extends CartItemService<WholeSaleCartI
     List<WholeSaleOrder> orderAllCartItems(User currentUser, List<WholeSaleCartItem> wholeSaleCartItems);
 
     @Override
-    WholeSaleOrder orderCartItem(User currentUser, WholeSaleCartItem wholeSaleCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException;
+    WholeSaleOrder orderCartItem(User currentUser, WholeSaleCartItem wholeSaleCartItem) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductAlreadySoldException, ProductNotListedException, ProductExpiredException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException;
 }

@@ -3,6 +3,8 @@ package com.elleined.marketplaceapi.service.cart;
 import com.elleined.marketplaceapi.dto.cart.CartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -22,8 +24,8 @@ public interface CartItemService<ENTITY extends CartItem, DTO extends CartItemDT
 
     ENTITY save(User currentUser, DTO dto)
             throws AlreadyExistException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException,
+            ProductOrderAcceptedException,
+            ProductOrderPendingException,
             ResourceOwnedException,
             ResourceNotFoundException,
             ProductAlreadySoldException,
@@ -35,8 +37,8 @@ public interface CartItemService<ENTITY extends CartItem, DTO extends CartItemDT
     Order orderCartItem(User currentUser, ENTITY entity)
             throws ResourceNotFoundException,
             ResourceOwnedException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException,
+            ProductOrderAcceptedException,
+            ProductOrderPendingException,
             ProductAlreadySoldException,
             ProductNotListedException,
             ProductExpiredException,

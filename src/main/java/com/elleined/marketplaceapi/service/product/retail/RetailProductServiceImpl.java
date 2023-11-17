@@ -151,7 +151,7 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(retailOrder -> retailOrder.getRetailProduct().equals(retailProduct))
                 .anyMatch(retailOrder -> {
                     LocalDateTime reOrderingDate = retailOrder.getUpdatedAt().plusDays(1);
-                    return retailOrder.isRejected() && LocalDateTime.now().isBefore(reOrderingDate);
+                    return retailOrder.isRejected() && (LocalDateTime.now().equals(reOrderingDate) || LocalDateTime.now().isBefore(reOrderingDate));
                 });
     }
 

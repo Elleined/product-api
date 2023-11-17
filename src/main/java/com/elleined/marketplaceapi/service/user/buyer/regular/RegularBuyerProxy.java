@@ -7,6 +7,8 @@ import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.order.OrderReachedCancellingTimeLimitException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -40,7 +42,7 @@ public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction 
     }
 
     @Override
-    public RetailOrder order(User buyer, RetailOrderDTO retailOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
+    public RetailOrder order(User buyer, RetailOrderDTO retailOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
         if (isBuyerExceedsToMaxOrderPerDay(buyer))
             throw new BuyerMaxOrderPerDayException("Cannot order product! because you already reached the max order per day which is " + MAX_ORDER_PER_DAY + " consider buying premium account to remove this restriction.");
         // Add more validation for regular buyer here for future
@@ -48,7 +50,7 @@ public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction 
     }
 
     @Override
-    public WholeSaleOrder order(User buyer, WholeSaleOrderDTO wholeSaleOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductHasPendingOrderException, ProductHasAcceptedOrderException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
+    public WholeSaleOrder order(User buyer, WholeSaleOrderDTO wholeSaleOrderDTO) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
         if (isBuyerExceedsToMaxOrderPerDay(buyer))
             throw new BuyerMaxOrderPerDayException("Cannot order product! because you already reached the max order per day which is " + MAX_ORDER_PER_DAY + " consider buying premium account to remove this restriction.");
         // Add more validation for regular buyer here for future

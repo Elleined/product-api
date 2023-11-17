@@ -6,6 +6,8 @@ import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -66,22 +68,22 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public RetailProduct updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public RetailProduct updateProduct(User seller, RetailProduct retailProduct, RetailProductDTO retailProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductOrderPendingException, ProductOrderAcceptedException, IOException {
         return sellerService.updateProduct(seller, retailProduct, retailProductDTO, productPicture);
     }
 
     @Override
-    public WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductHasAcceptedOrderException, ProductHasPendingOrderException, IOException {
+    public WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ResourceNotFoundException, ProductOrderPendingException, ProductOrderAcceptedException, IOException {
         return sellerService.updateProduct(seller, wholeSaleProduct, wholeSaleProductDTO, productPicture);
     }
 
     @Override
-    public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
+    public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductOrderAcceptedException, ProductOrderPendingException {
         sellerService.deleteProduct(seller, retailProduct);
     }
 
     @Override
-    public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductHasPendingOrderException, ProductHasAcceptedOrderException {
+    public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductOrderAcceptedException, ProductOrderPendingException {
         sellerService.deleteProduct(seller, wholeSaleProduct);
     }
 

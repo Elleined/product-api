@@ -6,6 +6,8 @@ import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -50,30 +52,30 @@ public interface SellerService {
             NotVerifiedException,
             ProductAlreadySoldException,
             ResourceNotFoundException,
-            ProductHasAcceptedOrderException,
-            ProductHasPendingOrderException, IOException;
+            ProductOrderPendingException,
+            ProductOrderAcceptedException, IOException;
 
     WholeSaleProduct updateProduct(User seller, WholeSaleProduct wholeSaleProduct, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
             ResourceNotFoundException,
-            ProductHasAcceptedOrderException,
-            ProductHasPendingOrderException, IOException;
+            ProductOrderPendingException,
+            ProductOrderAcceptedException, IOException;
 
     void deleteProduct(User seller, RetailProduct retailProduct)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException;
+            ProductOrderAcceptedException,
+            ProductOrderPendingException;
 
     void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct)
             throws NotOwnedException,
             NotVerifiedException,
             ProductAlreadySoldException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException;
+            ProductOrderAcceptedException,
+            ProductOrderPendingException;
 
     void acceptOrder(User seller, RetailOrder retailOrder, String messageToBuyer)
             throws NotOwnedException,

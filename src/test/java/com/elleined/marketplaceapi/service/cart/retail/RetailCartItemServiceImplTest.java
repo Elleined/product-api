@@ -3,6 +3,8 @@ package com.elleined.marketplaceapi.service.cart.retail;
 import com.elleined.marketplaceapi.dto.cart.RetailCartItemDTO;
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
@@ -215,8 +217,8 @@ class RetailCartItemServiceImplTest {
         when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
         when(retailProduct.isExpired()).thenReturn(false);
 
-        assertThrowsExactly(ProductHasPendingOrderException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrows(ProductHasPendingOrderException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
+        assertThrowsExactly(ProductOrderAcceptedException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrows(ProductOrderAcceptedException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
         verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 
@@ -261,8 +263,8 @@ class RetailCartItemServiceImplTest {
         when(user.isProductAlreadyInCart(retailProduct)).thenReturn(false);
         when(user.hasOrder(retailProduct, PENDING)).thenReturn(false);
 
-        assertThrowsExactly(ProductHasAcceptedOrderException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
-        assertThrowsExactly(ProductHasAcceptedOrderException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
+        assertThrowsExactly(ProductOrderPendingException.class, () -> retailCartItemService.save(user, retailCartItemDTO));
+        assertThrowsExactly(ProductOrderPendingException.class, () -> retailCartItemService.orderCartItem(user, retailCartItem));
         verifyNoInteractions(retailCartItemMapper, retailCartItemRepository, retailOrderRepository);
     }
 

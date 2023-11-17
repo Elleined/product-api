@@ -7,6 +7,8 @@ import com.elleined.marketplaceapi.exception.order.OrderAlreadyRejectedException
 import com.elleined.marketplaceapi.exception.order.OrderQuantiantyExceedsException;
 import com.elleined.marketplaceapi.exception.order.OrderReachedCancellingTimeLimitException;
 import com.elleined.marketplaceapi.exception.product.*;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -20,8 +22,8 @@ public interface BuyerService {
     RetailOrder order(User buyer, RetailOrderDTO retailOrderDTO)
             throws ResourceNotFoundException,
             ResourceOwnedException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException,
+            ProductOrderAcceptedException,
+            ProductOrderPendingException,
             ProductRejectedException,
             ProductAlreadySoldException,
             ProductNotListedException,
@@ -32,8 +34,8 @@ public interface BuyerService {
     WholeSaleOrder order(User buyer, WholeSaleOrderDTO wholeSaleOrderDTO)
             throws ResourceNotFoundException,
             ResourceOwnedException,
-            ProductHasPendingOrderException,
-            ProductHasAcceptedOrderException,
+            ProductOrderAcceptedException,
+            ProductOrderPendingException,
             ProductRejectedException,
             ProductAlreadySoldException,
             ProductNotListedException,
