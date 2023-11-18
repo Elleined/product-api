@@ -49,8 +49,8 @@ public class RetailOrderService implements OrderService<RetailOrder> {
     @Override
     public List<RetailOrder> getAllOrderedProductsByStatus(User buyer, Order.Status status) {
         return buyer.getRetailOrders().stream()
-                .filter(retailOrder -> retailOrder.getStatus() == status)
                 .filter(retailOrder -> retailOrder.getRetailProduct().getStatus() == Product.Status.ACTIVE)
+                .filter(retailOrder -> retailOrder.getStatus() == status)
                 .sorted(Comparator.comparing(Order::getOrderDate).reversed())
                 .toList();
     }
