@@ -11,5 +11,7 @@ public interface OTPService {
 
     OTPMessage sendOTP(String email) throws ResourceNotFoundException, OTPNotExpiredException;
 
-    boolean isOTPExpire();
+    boolean isOTPNotExpired();
+
+    boolean isOTPExpired();
 }

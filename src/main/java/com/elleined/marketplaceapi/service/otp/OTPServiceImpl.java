@@ -28,7 +28,7 @@ public class OTPServiceImpl implements OTPService {
 
     @Override
     public void authenticateOTP(int userInputOTP) throws OTPMismatchException, OTPExpiredException {
-        if (isOTPExpire()) throw new OTPExpiredException("OTP expired! Resend OTP to get your new OTP");
+        if (isOTPExpired()) throw new OTPExpiredException("OTP expired! Resend OTP to get your new OTP");
         if (otpMessage.getOtp() != userInputOTP) throw new OTPMismatchException("OTP mismatch!");
         log.debug("User OTP authenticated! User may now proceed in changing you password :)");
     }
@@ -36,18 +36,19 @@ public class OTPServiceImpl implements OTPService {
     @Override
     public OTPMessage sendOTP(String email) throws ResourceNotFoundException, OTPNotExpiredException {
         User user =  userRepository.fetchByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email of " + email + " does not exists!"));
-        if (isOTPAlreadySent() && !isOTPExpire()) throw new OTPNotExpiredException("OTP Not yet expired!");
+        if (isOTPNotExpired()) throw new OTPNotExpiredException("OTP Not yet expired!");
 
         this.otpMessage = emailService.sendOTP(user);
         return this.otpMessage;
     }
 
     @Override
-    public boolean isOTPExpire() {
-        return LocalTime.now().isAfter(otpMessage.getExpirationTime());
+    public boolean isOTPNotExpired() {
+        return otpMessage != null && LocalTime.now().isBefore(otpMessage.getExpirationTime());
     }
 
-    public boolean isOTPAlreadySent() {
-        return otpMessage != null;
+    @Override
+    public boolean isOTPExpired() {
+        return LocalTime.now().isAfter(otpMessage.getExpirationTime());
     }
 }
