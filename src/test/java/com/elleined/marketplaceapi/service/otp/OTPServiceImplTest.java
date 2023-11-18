@@ -36,7 +36,7 @@ class OTPServiceImplTest {
     void authenticateOTP() {
         // Mock data
         OTPMessage otpMessage = new OTPMessage();
-        otpMessage.setExpirationTime(LocalTime.now().minusMinutes(1)); // Expiration time will be set in the real call thats why we explicitly declare this
+        otpMessage.setExpirationTime(LocalTime.now().plusMinutes(1)); // Expiration time will be set in the real call thats why we explicitly declare this
         otpMessage.setOtp(123456);
         otpService.setOtpMessage(otpMessage);
 
@@ -49,7 +49,7 @@ class OTPServiceImplTest {
     void shouldNotBeAuthenticatedIfOTPIsWrong() {
         // Mock data
         OTPMessage otpMessage = new OTPMessage();
-        otpMessage.setExpirationTime(LocalTime.now().minusMinutes(1)); // Expiration time will be set in the real call thats why we explicitly declare this
+        otpMessage.setExpirationTime(LocalTime.now().plusMinutes(1)); // Expiration time will be set in the real call thats why we explicitly declare this
         otpMessage.setOtp(123456);
         otpService.setOtpMessage(otpMessage);
 
