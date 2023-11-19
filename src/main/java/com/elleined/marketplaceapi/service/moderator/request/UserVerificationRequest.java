@@ -26,7 +26,6 @@ import java.util.Set;
 @Transactional
 public class UserVerificationRequest implements Request<User> {
     private final UserRepository userRepository;
-    private final UserService userService;
     private final RegistrationPromoService registrationPromoService;
     private final ReferralService referralService;
     private final PremiumRepository premiumRepository;

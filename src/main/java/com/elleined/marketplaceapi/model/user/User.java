@@ -36,8 +36,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class User {
 
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(

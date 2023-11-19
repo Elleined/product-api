@@ -36,16 +36,16 @@ public class DepositRequest implements Request<DepositTransaction> {
                 .map(Premium::getUser)
                 .map(User::getDepositTransactions)
                 .flatMap(Collection::stream)
-                .filter(depositTransaction -> depositTransaction.getStatus() == Transaction.Status.PENDING)
-                .sorted(Comparator.comparing(DepositTransaction::getTransactionDate).reversed())
+                .filter(DepositTransaction::isPending)
+                .sorted(Comparator.comparing(Transaction::getTransactionDate).reversed())
                 .toList();
 
         List<DepositTransaction> regularUserDepositRequests = userRepository.findAll().stream()
                 .filter(user -> !user.isPremiumAndNotExpired())
                 .map(User::getDepositTransactions)
                 .flatMap(Collection::stream)
-                .filter(depositTransaction -> depositTransaction.getStatus() == Transaction.Status.PENDING)
-                .sorted(Comparator.comparing(DepositTransaction::getTransactionDate).reversed())
+                .filter(DepositTransaction::isPending)
+                .sorted(Comparator.comparing(Transaction::getTransactionDate).reversed())
                 .toList();
 
         List<DepositTransaction> depositTransactions = new ArrayList<>();
