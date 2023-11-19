@@ -11,9 +11,9 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.TransactionService;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
-import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -87,7 +87,7 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         List<PeerToPeerTransaction> userSentMoneyTransactions = sender.getSentMoneyTransactions();
         List<PeerToPeerTransaction>  sentMoneyTransactions =
-                TransactionUtils.getTransactionsByDateRange(userSentMoneyTransactions, currentDateTimeMidnight, tomorrowMidnight);
+                TransactionService.getTransactionsByDateRange(userSentMoneyTransactions, currentDateTimeMidnight, tomorrowMidnight);
 
         BigDecimal totalSentAmount = sentMoneyTransactions.stream()
                 .map(Transaction::getAmount)

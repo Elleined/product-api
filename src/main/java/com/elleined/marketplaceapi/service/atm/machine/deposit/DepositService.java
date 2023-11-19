@@ -13,13 +13,13 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.TransactionService;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
-import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,7 +100,7 @@ public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidato
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         List<DepositTransaction> userDepositTransactions = currentUser.getDepositTransactions();
         List<DepositTransaction> depositTransactions =
-                TransactionUtils.getTransactionsByDateRange(userDepositTransactions, currentDateTimeMidnight, tomorrowMidnight);
+                TransactionService.getTransactionsByDateRange(userDepositTransactions, currentDateTimeMidnight, tomorrowMidnight);
 
         BigDecimal totalDepositAmount = depositTransactions.stream()
                 .map(Transaction::getAmount)

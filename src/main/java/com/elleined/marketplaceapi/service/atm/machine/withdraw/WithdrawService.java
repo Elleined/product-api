@@ -14,11 +14,11 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.TransactionService;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.validator.NumberValidator;
-import com.elleined.marketplaceapi.utils.TransactionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -92,7 +92,7 @@ public class WithdrawService implements ATMLimitValidator, ATMLimitPerDayValidat
         final LocalDateTime tomorrowMidnight = currentDateTimeMidnight.plusDays(1);
         List<WithdrawTransaction> userWithdrawTransactions = currentUser.getWithdrawTransactions();
         List<WithdrawTransaction>  withdrawTransactions =
-                TransactionUtils.getTransactionsByDateRange(userWithdrawTransactions, currentDateTimeMidnight, tomorrowMidnight);
+                TransactionService.getTransactionsByDateRange(userWithdrawTransactions, currentDateTimeMidnight, tomorrowMidnight);
 
         BigDecimal totalWithdrawAmount = withdrawTransactions.stream()
                 .map(Transaction::getAmount)
