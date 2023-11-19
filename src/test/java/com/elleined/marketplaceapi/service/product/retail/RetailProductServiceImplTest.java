@@ -1,10 +1,13 @@
 package com.elleined.marketplaceapi.service.product.retail;
 
+import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product.State;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
@@ -48,16 +51,58 @@ class RetailProductServiceImplTest {
     @Test
     void getAllExcept() {
         // Mock data
+        User currentUser = User.builder()
+                .retailProducts(new ArrayList<>())
+                .build();
+
+        // Adding 3 retail product for currentUser which will not be included in result
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+
+        RetailProduct regularUserProduct = getMockRetailProduct();
+        User regularUser = User.builder()
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        regularUser.getRetailProducts().add(regularUserProduct);
+
+        RetailProduct premiumUserProduct = getMockRetailProduct();
+        User premiumUser = User.builder()
+                .premium(Premium.builder()
+                        .registrationDate(LocalDateTime.now())
+                        .build())
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        premiumUser.getRetailProducts().add(premiumUserProduct);
+
+        Premium premium = Premium.builder()
+                .user(premiumUser)
+                .build();
 
         // Stubbing methods
+        when(premiumRepository.findAll()).thenReturn(Arrays.asList(premium));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(regularUser));
 
         // Expected/ Actual values
+        List<RetailProduct> expected = Arrays.asList(premiumUserProduct, regularUserProduct);
 
         // Calling the method
+        List<RetailProduct> actual = retailProductService.getAllExcept(currentUser);
 
         // Assertions
+        assertIterableEquals(expected, actual);
 
         // Behavior verification
+        verify(premiumRepository).findAll();
+        verify(userRepository).findAll();
     }
 
     @ParameterizedTest
@@ -361,5 +406,12 @@ class RetailProductServiceImplTest {
         assertEquals(expectedTotalPrice, actualTotalPrice);
 
         // Behavior verification
+    }
+
+    private RetailProduct getMockRetailProduct() {
+        return RetailProduct.retailProductBuilder()
+                .state(State.LISTING)
+                .status(ACTIVE)
+                .build();
     }
 }
