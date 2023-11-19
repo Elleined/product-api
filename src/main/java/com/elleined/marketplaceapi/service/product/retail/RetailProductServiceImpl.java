@@ -84,11 +84,11 @@ public class RetailProductServiceImpl implements RetailProductService {
     public void deleteExpiredProducts() {
         List<RetailProduct> expiredProducts = retailProductRepository.findAll().stream()
                 .filter(RetailProduct::isExpired)
+                .filter(Product::isNotDeleted)
                 .toList();
 
         // Pending products
         expiredProducts.stream()
-                .filter(Product::isNotDeleted)
                 .filter(Product::isPending)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
@@ -97,7 +97,6 @@ public class RetailProductServiceImpl implements RetailProductService {
 
         // Listing retailProducts
         expiredProducts.stream()
-                .filter(Product::isNotDeleted)
                 .filter(Product::isListed)
                 .forEach(retailProduct -> {
                     retailProduct.setState(Product.State.EXPIRED);
@@ -133,13 +132,13 @@ public class RetailProductServiceImpl implements RetailProductService {
                 .filter(Order::isAccepted)
                 .toList();
 
-        pendingOrders.forEach(orderItem -> {
-            orderItem.setStatus(status);
-            orderItem.setUpdatedAt(LocalDateTime.now());
+        pendingOrders.forEach(order -> {
+            order.setStatus(status);
+            order.setUpdatedAt(LocalDateTime.now());
         });
-        acceptedOrders.forEach(orderItem -> {
-            orderItem.setStatus(status);
-            orderItem.setUpdatedAt(LocalDateTime.now());
+        acceptedOrders.forEach(order -> {
+            order.setStatus(status);
+            order.setUpdatedAt(LocalDateTime.now());
         });
         retailOrderRepository.saveAll(pendingOrders);
         retailOrderRepository.saveAll(acceptedOrders);

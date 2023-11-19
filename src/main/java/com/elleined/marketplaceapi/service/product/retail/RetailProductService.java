@@ -14,6 +14,10 @@ public interface RetailProductService extends ProductService<RetailProduct> {
      * 5(Quantity per unit)
      * 100(Available quantity)
      * Meaning 5 pesos per 50 pieces and has available quantity of 100
+     *
+     * first gets how many times that quantity per unit can be divided by available quantity
+     * then when we determine how many times does quantity per unit can be divided in available quantity
+     * we will now multiply that with price per unit
      */
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
     double calculateTotalPrice(RetailProduct retailProduct);
