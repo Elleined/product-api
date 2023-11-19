@@ -49,9 +49,6 @@ class RetailProductServiceImplTest {
     @InjectMocks
     private RetailProductServiceImpl retailProductService;
 
-    public void s() {
-
-    }
     @Test
     void getAllExcept() {
         // Mock data
