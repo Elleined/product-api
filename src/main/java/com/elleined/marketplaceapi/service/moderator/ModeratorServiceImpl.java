@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.exception.user.*;
 import com.elleined.marketplaceapi.mapper.ModeratorMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
@@ -18,10 +19,11 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
-import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
+import com.elleined.marketplaceapi.service.moderator.request.transaction.DepositRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
-import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
-import com.elleined.marketplaceapi.service.moderator.request.product.ProductRequest;
+import com.elleined.marketplaceapi.service.moderator.request.transaction.WithdrawRequest;
+import com.elleined.marketplaceapi.service.moderator.request.product.RetailProductRequest;
+import com.elleined.marketplaceapi.service.moderator.request.product.WholeSaleProductRequest;
 import com.elleined.marketplaceapi.service.password.ModeratorPasswordEncoder;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
@@ -48,8 +50,8 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     private final UserVerificationRequest userVerificationRequest;
 
-    private final ProductRequest<RetailProduct> retailProductRequest;
-    private final ProductRequest<WholeSaleProduct> wholeSaleProductRequest;
+    private final RetailProductRequest retailProductRequest;
+    private final WholeSaleProductRequest wholeSaleProductRequest;
 
     private final WithdrawRequest withdrawRequest;
     private final DepositRequest depositRequest;
@@ -190,20 +192,28 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void releaseAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions) {
+    public void releaseAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions) throws TransactionReleaseException, TransactionRejectedException {
+        if (depositTransactions.stream().anyMatch(Transaction::isRelease))
+            throw new TransactionReleaseException("Cannot release deposit! because one of the transactions is already been released!");
+        if (depositTransactions.stream().anyMatch(Transaction::isRejected))
+            throw new TransactionRejectedException("Cannot release deposit! because one of the transactions is already been rejected");
+
         // Add validation here
         depositRequest.acceptAll(moderator, depositTransactions);
     }
 
     @Override
     public void reject(Moderator moderator, DepositTransaction depositTransaction) throws TransactionReleaseException {
-        if (depositTransaction.isRelease()) throw new TransactionReleaseException("Cannot reject deposit! because this transaction is already been released!");
+        if (depositTransaction.isRelease())
+            throw new TransactionReleaseException("Cannot reject deposit! because this transaction is already been released!");
         // Add validation here
         depositRequest.reject(moderator, depositTransaction);
     }
 
     @Override
-    public void rejectAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions) {
+    public void rejectAllDepositRequest(Moderator moderator, Set<DepositTransaction> depositTransactions) throws TransactionReleaseException {
+        if (depositTransactions.stream().anyMatch(Transaction::isRelease))
+            throw new TransactionReleaseException("Cannot reject deposit! because one of the transactions is already been released!");
         // Add validation here
         depositRequest.rejectAll(moderator, depositTransactions);
     }
@@ -219,10 +229,14 @@ public class ModeratorServiceImpl implements ModeratorService {
 
         User requestingUserToWithdraw = withdrawTransaction.getUser();
         BigDecimal amountToBeWithdrawn = withdrawTransaction.getAmount();
-        if (Validator.notValidMultipartFile(proofOfTransaction)) throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
-        if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
-        if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
-        if (requestingUserToWithdraw.isBalanceNotEnough(amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance has only balance of " + requestingUserToWithdraw.getBalance() + " is below to requesting amount to be withdrawn which is " + amountToBeWithdrawn + ". Reject it!");
+        if (Validator.notValidMultipartFile(proofOfTransaction))
+            throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
+        if (withdrawTransaction.isRelease())
+            throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
+        if (withdrawTransaction.isRejected())
+            throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
+        if (requestingUserToWithdraw.isBalanceNotEnough(amountToBeWithdrawn))
+            throw new InsufficientBalanceException("Cannot release withdraw! because this user balance has only balance of " + requestingUserToWithdraw.getBalance() + " is below to requesting amount to be withdrawn which is " + amountToBeWithdrawn + ". Reject it!");
         // Add validation here
 
         withdrawTransaction.setProofOfTransaction(proofOfTransaction.getOriginalFilename());
@@ -246,8 +260,10 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
-        // Add validation here
+    public void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) throws TransactionReleaseException {
+        if (withdrawTransactions.stream().anyMatch(Transaction::isRelease))
+            throw new TransactionReleaseException("Cannot reject withdraw request! because one of transaction is already been released!");
+
         withdrawRequest.rejectAll(moderator, withdrawTransactions);
     }
 }

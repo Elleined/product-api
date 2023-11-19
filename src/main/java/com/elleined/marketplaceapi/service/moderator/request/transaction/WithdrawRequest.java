@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service.moderator.request;
+package com.elleined.marketplaceapi.service.moderator.request.transaction;
 
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
@@ -10,6 +10,7 @@ import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.atm.machine.withdraw.WithdrawService;
+import com.elleined.marketplaceapi.service.moderator.request.Request;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class WithdrawRequest implements Request<WithdrawTransaction> {
+public class WithdrawRequest implements TransactionRequest<WithdrawTransaction> {
     private final UserRepository userRepository;
     private final PremiumRepository premiumRepository;
 

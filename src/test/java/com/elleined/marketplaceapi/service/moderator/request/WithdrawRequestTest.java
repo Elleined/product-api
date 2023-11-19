@@ -10,6 +10,7 @@ import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.atm.machine.withdraw.WithdrawService;
+import com.elleined.marketplaceapi.service.moderator.request.transaction.WithdrawRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
