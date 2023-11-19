@@ -38,13 +38,13 @@ public class UserVerificationRequest implements Request<User> {
     public List<User> getAllRequest() {
         List<User> premiumUsers = premiumRepository.findAll().stream()
                 .map(Premium::getUser)
-                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
+                .filter(User::isNotVerified)
                 .filter(User::hasShopRegistration)
                 .filter(User::isNotRejected) // Checking for rejected user
                 .toList();
 
         List<User> regularUsers = userRepository.findAll().stream()
-                .filter(user -> user.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED)
+                .filter(User::isNotVerified)
                 .filter(User::hasShopRegistration)
                 .filter(User::isNotRejected) // Checking for rejected user
                 .toList();
@@ -57,10 +57,15 @@ public class UserVerificationRequest implements Request<User> {
 
     @Override
     public void accept(Moderator moderator, User userToBeVerified) {
-        if (registrationPromoService.isLegibleForRegistrationPromo()) registrationPromoService.availRegistrationPromo(userToBeVerified);
+        if (registrationPromoService.isLegibleForRegistrationPromo())
+            registrationPromoService.availRegistrationPromo(userToBeVerified);
+
         User invitingUser = referralService.getInvitingUser(userToBeVerified);
-        if (invitingUser != null) feeService.payInvitingUserForHisReferral(invitingUser);
-        if (invitingUser != null && feeService.isInvitingUserLegibleForExtraReferralReward(invitingUser)) feeService.payExtraReferralRewardForInvitingUser(invitingUser);
+        if (invitingUser != null)
+            feeService.payInvitingUserForHisReferral(invitingUser);
+
+        if (invitingUser != null && feeService.isInvitingUserLegibleForExtraReferralReward(invitingUser))
+            feeService.payExtraReferralRewardForInvitingUser(invitingUser);
 
         userToBeVerified.getUserVerification().setStatus(UserVerification.Status.VERIFIED);
         moderator.addVerifiedUser(userToBeVerified);

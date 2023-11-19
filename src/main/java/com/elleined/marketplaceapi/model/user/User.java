@@ -163,7 +163,7 @@ public class User {
     }
 
     public boolean isNotVerified() {
-        return this.getUserVerification().getStatus() != UserVerification.Status.VERIFIED;
+        return this.getUserVerification().getStatus() == UserVerification.Status.NOT_VERIFIED;
     }
 
     public boolean hasShopRegistration() {

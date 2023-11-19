@@ -18,8 +18,6 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 public interface UserService extends PasswordService {
-    BigDecimal REGISTRATION_REWARD = new BigDecimal(50);
-
     // Info will also be saved in forum api
     // first 500 registrant will receive a token as a reward
     User saveByDTO(UserDTO dto)
