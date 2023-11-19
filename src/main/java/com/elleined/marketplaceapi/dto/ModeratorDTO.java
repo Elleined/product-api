@@ -7,4 +7,5 @@ public record ModeratorDTO(
         int id,
         String name,
         CredentialDTO moderatorCredentialDTO) {
+
 }
