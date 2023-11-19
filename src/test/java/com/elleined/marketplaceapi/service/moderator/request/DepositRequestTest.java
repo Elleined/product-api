@@ -2,7 +2,10 @@ package com.elleined.marketplaceapi.service.moderator.request;
 
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction.Status;
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
+import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
@@ -18,10 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -106,14 +106,23 @@ class DepositRequestTest {
                 .releaseDepositRequest(new HashSet<>())
                 .build();
 
+        User user = User.builder()
+                .balance(new BigDecimal(0))
+                .build();
+
+        BigDecimal depositAmount = new BigDecimal(500);
         DepositTransaction depositTransaction = DepositTransaction.builder()
                 .status(Status.PENDING)
-                .user(new User())
-                .amount(new BigDecimal(100))
+                .user(user)
+                .amount(depositAmount)
                 .build();
 
         // Stubbing methods
-        doNothing().when(depositService).deposit(any(User.class), any(BigDecimal.class));
+        doAnswer(i -> {
+            user.setBalance(user.getBalance().add(depositAmount));
+            return user;
+        }).when(depositService).deposit(any(User.class), any(BigDecimal.class));
+
         when(depositTransactionRepository.save(any(DepositTransaction.class))).thenReturn(new DepositTransaction());
         when(moderatorRepository.save(any(Moderator.class))).thenReturn(new Moderator());
 
@@ -121,12 +130,58 @@ class DepositRequestTest {
         // Assertions
         assertDoesNotThrow(() ->  depositRequest.accept(moderator, depositTransaction));
         assertEquals(Status.RELEASE, depositTransaction.getStatus());
+        assertEquals(new BigDecimal(500), user.getBalance());
         assertTrue(moderator.getReleaseDepositRequest().contains(depositTransaction));
 
         // Behavior verification
         verify(depositTransactionRepository).save(any(DepositTransaction.class));
         verify(moderatorRepository).save(any(Moderator.class));
     }
+
+    @Test
+    void acceptAll() {
+        // Mock data
+        Moderator moderator = Moderator.builder()
+                .releaseDepositRequest(new HashSet<>())
+                .build();
+
+        BigDecimal depositAmount = new BigDecimal(500);
+        DepositTransaction depositTransaction = DepositTransaction.builder()
+                .status(Transaction.Status.PENDING)
+                .user(User.builder()
+                        .balance(new BigDecimal(0))
+                        .build())
+                .amount(depositAmount)
+                .build();
+
+        Set<DepositTransaction> depositTransactions = new HashSet<>(Arrays.asList(depositTransaction, depositTransaction, depositTransaction));
+
+        // Stubbing methods
+        doAnswer(i -> {
+            depositTransactions.stream()
+                    .map(DepositTransaction::getUser)
+                    .forEach(u -> u.setBalance(u.getBalance().add(depositAmount)));
+            return depositTransactions;
+        }).when(depositService).deposit(any(User.class), any(BigDecimal.class));
+
+        when(moderatorRepository.save(any(Moderator.class))).thenReturn(new Moderator());
+        when(depositTransactionRepository.saveAll(anySet())).thenReturn(new ArrayList<>());
+
+        // Expected/ Actual values
+        // Calling the method
+        // Assertions
+        assertDoesNotThrow(() -> depositRequest.acceptAll(moderator, depositTransactions));
+        assertTrue(depositTransactions.stream().allMatch(DepositTransaction::isRelease));
+        assertTrue(depositTransactions.stream()
+                .map(DepositTransaction::getUser)
+                .allMatch(u -> u.getBalance().equals(new BigDecimal(500))));
+        assertTrue(moderator.getReleaseDepositRequest().containsAll(depositTransactions));
+
+        // Behavior verification
+        verify(moderatorRepository).save(any(Moderator.class));
+        verify(depositTransactionRepository).saveAll(anySet());
+    }
+
 
     @Test
     void reject() {
@@ -152,5 +207,34 @@ class DepositRequestTest {
         // Behavior verification
         verify(depositTransactionRepository).save(any(DepositTransaction.class));
         verify(moderatorRepository).save(any(Moderator.class));
+    }
+
+    @Test
+    void rejectAll() {
+        // Mock data
+        Moderator moderator = Moderator.builder()
+                .rejectedDepositRequest(new HashSet<>())
+                .build();
+
+        DepositTransaction depositTransaction = DepositTransaction.builder()
+                .status(Transaction.Status.PENDING)
+                .build();
+
+        Set<DepositTransaction> depositTransactions = new HashSet<>(Arrays.asList(depositTransaction, depositTransaction, depositTransaction));
+
+        // Stubbing methods
+        when(moderatorRepository.save(any(Moderator.class))).thenReturn(new Moderator());
+        when(depositTransactionRepository.saveAll(anySet())).thenReturn(new ArrayList<>());
+
+        // Expected/ Actual values
+        // Calling the method
+        // Assertions
+        assertDoesNotThrow(() -> depositRequest.rejectAll(moderator, depositTransactions));
+        assertTrue(depositTransactions.stream().allMatch(DepositTransaction::isRejected));
+        assertTrue(moderator.getRejectedDepositRequest().containsAll(depositTransactions));
+
+        // Behavior verification
+        verify(moderatorRepository).save(any(Moderator.class));
+        verify(depositTransactionRepository).saveAll(anySet());
     }
 }

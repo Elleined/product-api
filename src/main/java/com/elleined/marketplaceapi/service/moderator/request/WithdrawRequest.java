@@ -69,7 +69,10 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
 
     @Override
     public void acceptAll(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
-        withdrawTransactions.forEach(withdrawTransaction -> withdrawTransaction.setStatus(Transaction.Status.RELEASE));
+        withdrawTransactions.forEach(w -> {
+            withdrawService.withdraw(w.getUser(), w.getAmount());
+            w.setStatus(Transaction.Status.RELEASE);
+        });
         moderator.getReleaseWithdrawRequests().addAll(withdrawTransactions);
 
         moderatorRepository.save(moderator);
@@ -91,7 +94,7 @@ public class WithdrawRequest implements Request<WithdrawTransaction> {
 
     @Override
     public void rejectAll(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
-        withdrawTransactions.forEach(withdrawTransaction -> withdrawTransaction.setStatus(Transaction.Status.REJECTED));
+        withdrawTransactions.forEach(w -> w.setStatus(Transaction.Status.REJECTED));
         moderator.getRejectedWithdrawRequests().addAll(withdrawTransactions);
 
         moderatorRepository.save(moderator);

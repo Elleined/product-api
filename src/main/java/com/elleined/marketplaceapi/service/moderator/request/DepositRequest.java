@@ -69,7 +69,16 @@ public class DepositRequest implements Request<DepositTransaction> {
 
     @Override
     public void acceptAll(Moderator moderator, Set<DepositTransaction> depositTransactions) {
-        depositTransactions.forEach(depositTransaction -> this.accept(moderator, depositTransaction));
+        depositTransactions.forEach(d -> {
+            depositService.deposit(d.getUser(), d.getAmount());
+            d.setStatus(Transaction.Status.RELEASE);
+        });
+
+        moderator.getReleaseDepositRequest().addAll(depositTransactions);
+
+        moderatorRepository.save(moderator);
+        depositTransactionRepository.saveAll(depositTransactions);
+
         log.debug("Transactions with ids of {} are now set to release", depositTransactions.stream().map(Transaction::getId).toList());
     }
 
@@ -86,7 +95,12 @@ public class DepositRequest implements Request<DepositTransaction> {
 
     @Override
     public void rejectAll(Moderator moderator, Set<DepositTransaction> depositTransactions) {
-        depositTransactions.forEach(depositTransaction -> this.reject(moderator, depositTransaction));
+        depositTransactions.forEach(d -> d.setStatus(Transaction.Status.REJECTED));
+        moderator.getRejectedDepositRequest().addAll(depositTransactions);
+
+        moderatorRepository.save(moderator);
+        depositTransactionRepository.saveAll(depositTransactions);
+
         log.debug("Transactions with ids of {} are now set to rejected", depositTransactions.stream().map(Transaction::getId).toList());
     }
 }
