@@ -44,8 +44,8 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
                 .filter(User::hasShopRegistration)
                 .map(User::getWholeSaleProducts)
                 .flatMap(Collection::stream)
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isListed)
                 .toList();
 
         List<WholeSaleProduct> regularUserProducts = userRepository.findAll().stream()
@@ -54,8 +54,8 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
                 .filter(User::hasShopRegistration)
                 .map(User::getWholeSaleProducts)
                 .flatMap(Collection::stream)
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isListed)
                 .toList();
 
         List<WholeSaleProduct> products = new ArrayList<>();
@@ -73,7 +73,7 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
     @Override
     public List<WholeSaleProduct> getAllByState(User seller, Product.State state) {
         return seller.getWholeSaleProducts().stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
+                .filter(Product::isNotDeleted)
                 .filter(product -> product.getState() == state)
                 .sorted(Comparator.comparing(Product::getListingDate).reversed())
                 .toList();
@@ -82,8 +82,8 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
     @Override
     public List<WholeSaleProduct> searchProductByCropName(String cropName) {
         return wholeSaleProductRepository.searchProductByCropName(cropName).stream()
-                .filter(product -> product.getStatus() == Product.Status.ACTIVE)
-                .filter(product -> product.getState() == Product.State.LISTING)
+                .filter(Product::isNotDeleted)
+                .filter(Product::isListed)
                 .toList();
     }
 

@@ -13,6 +13,7 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import lombok.Data;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -105,6 +106,208 @@ class RetailProductServiceImplTest {
         verify(premiumRepository).findAll();
         verify(userRepository).findAll();
     }
+
+    @Test
+    void getAllExceptWithVerifiedUsersOnly() {
+        // Mock data
+        User currentUser = User.builder()
+                .retailProducts(new ArrayList<>())
+                .build();
+
+        // Adding 3 retail product for currentUser which will not be included in result
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+
+        RetailProduct regularUserProduct = getMockRetailProduct();
+        User regularUser = User.builder()
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        regularUser.getRetailProducts().add(regularUserProduct);
+
+        RetailProduct premiumUserProduct = getMockRetailProduct();
+        User premiumUser = User.builder()
+                .premium(Premium.builder()
+                        .registrationDate(LocalDateTime.now())
+                        .build())
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        premiumUser.getRetailProducts().add(premiumUserProduct);
+
+        Premium premium = Premium.builder()
+                .user(premiumUser)
+                .build();
+
+        User unverfiedUser = User.builder()
+                .retailProducts(new ArrayList<>())
+                .userVerification(new UserVerification())
+                .build();
+        unverfiedUser.getRetailProducts().add(getMockRetailProduct());
+
+        // Stubbing methods
+        when(premiumRepository.findAll()).thenReturn(Arrays.asList(premium));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(regularUser, unverfiedUser));
+
+        // Expected/ Actual values
+        List<RetailProduct> expected = Arrays.asList(premiumUserProduct, regularUserProduct);
+
+        // Calling the method
+        List<RetailProduct> actual = retailProductService.getAllExcept(currentUser);
+
+        // Assertions
+        assertIterableEquals(expected, actual);
+
+        // Behavior verification
+        verify(premiumRepository).findAll();
+        verify(userRepository).findAll();
+    }
+
+    @Test
+    void getAllExceptWithVerifiedUsersAndHasShopRegistrationOnly() {
+        // Mock data
+        User currentUser = User.builder()
+                .retailProducts(new ArrayList<>())
+                .build();
+
+        // Adding 3 retail product for currentUser which will not be included in result
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+
+        RetailProduct regularUserProduct = getMockRetailProduct();
+        User regularUser = User.builder()
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        regularUser.getRetailProducts().add(regularUserProduct);
+
+        RetailProduct premiumUserProduct = getMockRetailProduct();
+        User premiumUser = User.builder()
+                .premium(Premium.builder()
+                        .registrationDate(LocalDateTime.now())
+                        .build())
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        premiumUser.getRetailProducts().add(premiumUserProduct);
+
+        Premium premium = Premium.builder()
+                .user(premiumUser)
+                .build();
+
+        User verifiedUserButNoShop = User.builder()
+                .retailProducts(new ArrayList<>())
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(null)
+                .build();
+
+        verifiedUserButNoShop.getRetailProducts().add(getMockRetailProduct());
+
+        // Stubbing methods
+        when(premiumRepository.findAll()).thenReturn(Arrays.asList(premium));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(regularUser, verifiedUserButNoShop));
+
+        // Expected/ Actual values
+        List<RetailProduct> expected = Arrays.asList(premiumUserProduct, regularUserProduct);
+
+        // Calling the method
+        List<RetailProduct> actual = retailProductService.getAllExcept(currentUser);
+
+        // Assertions
+        assertIterableEquals(expected, actual);
+
+        // Behavior verification
+        verify(premiumRepository).findAll();
+        verify(userRepository).findAll();
+    }
+
+    @Test
+    void getAllExceptWithVerifiedUsersAndHasShopRegistrationAndActiveProductOnly() {
+        // Mock data
+        User currentUser = User.builder()
+                .retailProducts(new ArrayList<>())
+                .build();
+
+        // Adding 3 retail product for currentUser which will not be included in result
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+        currentUser.getRetailProducts().add(getMockRetailProduct());
+
+        RetailProduct regularUserProduct = getMockRetailProduct();
+        User regularUser = User.builder()
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        regularUser.getRetailProducts().add(regularUserProduct);
+
+        RetailProduct premiumUserProduct = getMockRetailProduct();
+        User premiumUser = User.builder()
+                .premium(Premium.builder()
+                        .registrationDate(LocalDateTime.now())
+                        .build())
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .retailProducts(new ArrayList<>())
+                .build();
+        premiumUser.getRetailProducts().add(premiumUserProduct);
+
+        Premium premium = Premium.builder()
+                .user(premiumUser)
+                .build();
+
+        User verifiedUserWithShopButProductIsInactive = User.builder()
+                .retailProducts(new ArrayList<>())
+                .userVerification(UserVerification.builder()
+                        .status(UserVerification.Status.VERIFIED)
+                        .build())
+                .shop(new Shop())
+                .build();
+
+        RetailProduct inActiveProduct = RetailProduct.retailProductBuilder()
+                .status(INACTIVE)
+                .build();
+
+        verifiedUserWithShopButProductIsInactive.getRetailProducts().add(inActiveProduct);
+
+        // Stubbing methods
+        when(premiumRepository.findAll()).thenReturn(Arrays.asList(premium));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(regularUser, verifiedUserWithShopButProductIsInactive));
+
+        // Expected/ Actual values
+        List<RetailProduct> expected = Arrays.asList(premiumUserProduct, regularUserProduct);
+
+        // Calling the method
+        List<RetailProduct> actual = retailProductService.getAllExcept(currentUser);
+
+        // Assertions
+        assertIterableEquals(expected, actual);
+
+        // Behavior verification
+        verify(premiumRepository).findAll();
+        verify(userRepository).findAll();
+    }
+
 
     @ParameterizedTest
     @ValueSource(strings = {"PENDING", "LISTING", "SOLD", "REJECTED", "EXPIRED"})
