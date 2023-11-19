@@ -22,13 +22,12 @@ import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
 import com.elleined.marketplaceapi.service.moderator.request.UserVerificationRequest;
 import com.elleined.marketplaceapi.service.moderator.request.WithdrawRequest;
 import com.elleined.marketplaceapi.service.moderator.request.product.ProductRequest;
-import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
+import com.elleined.marketplaceapi.service.password.ModeratorPasswordEncoder;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,11 +41,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEncoder<Moderator> {
+public class ModeratorServiceImpl implements ModeratorService {
     private final ModeratorRepository moderatorRepository;
     private final ModeratorMapper moderatorMapper;
-
-    private final PasswordEncoder passwordEncoder;
+    private final ModeratorPasswordEncoder moderatorPasswordEncoder;
 
     private final UserVerificationRequest userVerificationRequest;
 
@@ -71,7 +69,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     @Override
     public Moderator save(ModeratorDTO moderatorDTO) {
         Moderator moderator = moderatorMapper.toEntity(moderatorDTO);
-        this.encodePassword(moderator, moderatorDTO.moderatorCredentialDTO().getPassword());
+        moderatorPasswordEncoder.encodePassword(moderator, moderatorDTO.moderatorCredentialDTO().getPassword());
         moderatorRepository.save(moderator);
         log.debug("Moderator name of {} successfully saved with id of {}", moderatorDTO.name(), moderatorDTO.id());
         return moderator;
@@ -83,9 +81,7 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
         if (!moderatorRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
         Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Moderator does not exists!"));
 
-        String rawPassword = moderatorCredentialDTO.getPassword();
-        String encodedPassword = moderator.getModeratorCredential().getPassword();
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        if (!moderatorPasswordEncoder.matches(moderator, moderatorCredentialDTO.getPassword())) throw new InvalidUserCredentialException("You have entered an invalid username or password");
         log.debug("Moderator with id of {} are now logged in", moderator.getId());
         return moderatorMapper.toDTO(moderator);
     }
@@ -253,11 +249,5 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     public void rejectAllWithdrawRequest(Moderator moderator, Set<WithdrawTransaction> withdrawTransactions) {
         // Add validation here
         withdrawRequest.rejectAll(moderator, withdrawTransactions);
-    }
-
-    @Override
-    public void encodePassword(Moderator moderator, String rawPassword) {
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        moderator.getModeratorCredential().setPassword(encodedPassword);
     }
 }

@@ -25,14 +25,13 @@ import com.elleined.marketplaceapi.repository.ShopRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
-import com.elleined.marketplaceapi.service.password.EntityPasswordEncoder;
+import com.elleined.marketplaceapi.service.password.UserPasswordEncoder;
 import com.elleined.marketplaceapi.service.validator.*;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,14 +48,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserServiceImpl
         implements UserService,
-        EntityPasswordEncoder<User>,
         ReferralService,
         RegistrationPromoService,
         VerificationService {
 
     private final ShopMapper shopMapper;
 
-    private final PasswordEncoder passwordEncoder;
+    private final UserPasswordEncoder userPasswordEncoder;
 
     private final ImageUploader imageUploader;
 
@@ -129,7 +127,7 @@ public class UserServiceImpl
         if (userRepository.fetchAllMobileNumber().contains(mobileNumber)) throw new AlreadyExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
 
         User registeringUser = userMapper.toEntity(userDTO);
-        this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
+        userPasswordEncoder.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         // saveForumUser(registeringUser);
@@ -185,8 +183,7 @@ public class UserServiceImpl
         if (!userRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
 
         User user = getByEmail(userCredentialDTO.getEmail());
-        String encodedPassword = user.getUserCredential().getPassword();
-        if (!passwordEncoder.matches(userCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        if (!userPasswordEncoder.matches(user, userCredentialDTO.getPassword())) throw new InvalidUserCredentialException("You have entered an invalid username or password");
         log.debug("User with email of {} logged in marketplace api", userCredentialDTO.getEmail());
         return user;
     }
@@ -254,12 +251,6 @@ public class UserServiceImpl
     }
 
     @Override
-    public void encodePassword(User user, String rawPassword) {
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        user.getUserCredential().setPassword(encodedPassword);
-    }
-
-    @Override
     public void changePassword(String email, String newPassword, String retypeNewPassword)
             throws PasswordException,
             ResourceNotFoundException {
@@ -268,19 +259,18 @@ public class UserServiceImpl
         if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
         passwordValidator.validate(newPassword);
 
-        this.encodePassword(user, newPassword);
+        userPasswordEncoder.encodePassword(user, newPassword);
         userRepository.save(user);
         log.debug("User with id of {} successfully changed his/her password", user.getId());
     }
 
     @Override
     public void changePassword(User user, String oldPassword, String newPassword, String retypeNewPassword) throws PasswordException {
-        String encodedPassword = user.getUserCredential().getPassword();
-        if (!passwordEncoder.matches(oldPassword, encodedPassword)) throw new PasswordNotMatchException("Old password didn't match to your current password!");
+        if (!userPasswordEncoder.matches(user, oldPassword)) throw new PasswordNotMatchException("Old password didn't match to your current password!");
         if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
         passwordValidator.validate(newPassword);
 
-        this.encodePassword(user, newPassword);
+        userPasswordEncoder.encodePassword(user, newPassword);
         userRepository.save(user);
         log.debug("User with id of {} successfully changed his/her password", user.getId());
     }

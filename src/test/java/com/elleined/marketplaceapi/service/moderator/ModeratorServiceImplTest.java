@@ -1,6 +1,9 @@
 package com.elleined.marketplaceapi.service.moderator;
 
+import com.elleined.marketplaceapi.dto.CredentialDTO;
+import com.elleined.marketplaceapi.dto.ModeratorDTO;
 import com.elleined.marketplaceapi.mapper.ModeratorMapper;
+import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
@@ -46,33 +49,29 @@ class ModeratorServiceImplTest {
     private ModeratorServiceImpl moderatorService;
 
     @Test
-    void getById() {
-        // Mock data
-
-        // Stubbing methods
-
-        // Expected/ Actual values
-
-        // Calling the method
-
-        // Assertions
-
-        // Behavior verification
-    }
-
-    @Test
     void save() {
         // Mock data
+        ModeratorDTO moderatorDTO = ModeratorDTO.builder()
+                .moderatorCredentialDTO(CredentialDTO.builder()
+                        .password("password")
+                        .build())
+                .build();
 
         // Stubbing methods
+        when(moderatorMapper.toEntity(any(ModeratorDTO.class))).thenReturn(new Moderator());
+        when(moderatorRepository.save(any(Moderator.class))).thenReturn(new Moderator());
 
         // Expected/ Actual values
 
         // Calling the method
+        moderatorService.save(moderatorDTO);
 
         // Assertions
 
+
         // Behavior verification
+        verify(moderatorMapper).toEntity(any(ModeratorDTO.class));
+        verify(moderatorRepository).save(any(Moderator.class));
     }
 
     @Test
