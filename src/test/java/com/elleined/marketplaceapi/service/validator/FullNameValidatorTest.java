@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.service.validator;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
+import com.elleined.marketplaceapi.exception.field.FullNameException;
 import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ class FullNameValidatorTest {
     @Test
     void shouldNotContainAnyLetters() {
         FullNameValidator fullNameValidator = new FullNameValidator();
-        assertThrowsExactly(HasDigitException.class, () -> fullNameValidator.validate(
+        assertThrowsExactly(FullNameException.class, () -> fullNameValidator.validate(
                 UserDTO.UserDetailsDTO.builder()
                         .firstName("Your n5me")
                         .middleName("Your m1ddle name")
