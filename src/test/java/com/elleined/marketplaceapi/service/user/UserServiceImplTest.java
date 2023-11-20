@@ -7,11 +7,13 @@ import com.elleined.marketplaceapi.dto.address.AddressDTO;
 import com.elleined.marketplaceapi.exception.field.FullNameException;
 import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
+import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
 import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.exception.resource.exists.EmailAlreadyExistsException;
 import com.elleined.marketplaceapi.exception.resource.exists.MobileNumberExistsException;
+import com.elleined.marketplaceapi.exception.resource.exists.ShopNameAlreadyExistsException;
 import com.elleined.marketplaceapi.mapper.ShopMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
@@ -30,6 +32,7 @@ import com.elleined.marketplaceapi.service.validator.EmailValidator;
 import com.elleined.marketplaceapi.service.validator.FullNameValidator;
 import com.elleined.marketplaceapi.service.validator.NumberValidator;
 import com.elleined.marketplaceapi.service.validator.PasswordValidator;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -802,7 +806,7 @@ class UserServiceImplTest {
             invitedUser.getUserCredential().setPassword("hashedPassword");
             return invitedUser;
         }).when(userPasswordEncoder).encodePassword(any(User.class), anyString());
-        
+
         when(userRepository.save(any(User.class))).thenReturn(invitedUser);
 
         doAnswer(i -> {
@@ -865,138 +869,280 @@ class UserServiceImplTest {
     }
 
     @Test
-    void resendValidId() {
+    void resendValidId() throws IOException {
         // Mock data
+        String oldValidId = "oldValidId";
+        User user = spy(User.class);
+        user.setUserVerification(UserVerification.builder()
+                .validId(oldValidId)
+                .build());
 
         // Stubbing methods
+        doReturn(false).when(user).isVerified();
+        doReturn(true).when(user).hasShopRegistration();
+        when(userRepository.save(any(User.class))).thenReturn(new User());
 
         // Expected/ Actual values
 
         // Calling the method
+        userService.resendValidId(user, MultiPartFileDataFactory.notEmpty());
 
         // Assertions
+        assertNotNull(user.getUserVerification().getValidId());
+        assertNotEquals(oldValidId, user.getUserVerification().getValidId());
 
         // Behavior verification
+        verify(userRepository).save(any(User.class));
+        verify(imageUploader).upload(anyString(), any(MultipartFile.class));
+        assertDoesNotThrow(() -> userService.resendValidId(user, MultiPartFileDataFactory.notEmpty()));
     }
 
     @Test
     void login() {
         // Mock data
+        CredentialDTO credentialDTO = CredentialDTO.builder()
+                .email("email")
+                .password("password")
+                .build();
 
         // Stubbing methods
+        List<String> emails = spy(ArrayList.class);
 
         // Expected/ Actual values
 
+        when(userRepository.fetchAllEmail()).thenReturn(emails);
+        when(userRepository.fetchByEmail(anyString())).thenReturn(Optional.of(new User()));
+
+        when(emails.contains(anyString())).thenReturn(true);
+        when(userPasswordEncoder.matches(any(User.class), anyString())).thenReturn(true);
+
         // Calling the method
+        userService.login(credentialDTO);
 
         // Assertions
 
         // Behavior verification
-    }
-
-    @Test
-    void getByEmail() {
-        // Mock data
-
-        // Stubbing methods
-
-        // Expected/ Actual values
-
-        // Calling the method
-
-        // Assertions
-
-        // Behavior verification
+        verify(userRepository).fetchByEmail(anyString());
+        verify(userRepository).fetchAllEmail();
+        verify(userPasswordEncoder).matches(any(User.class), anyString());
+        assertDoesNotThrow(() -> userService.login(credentialDTO));
     }
 
     @Test
     void isLegibleForRegistrationPromo() {
         // Mock data
+        List<User> users = spy(ArrayList.class);
 
         // Stubbing methods
+        when(users.size()).thenReturn(RegistrationPromoService.REGISTRATION_LIMIT_PROMO);
+        when(userRepository.findAll()).thenReturn(users);
 
         // Expected/ Actual values
 
         // Calling the method
-
         // Assertions
+        assertTrue(userService.isLegibleForRegistrationPromo());
 
         // Behavior verification
+        verify(userRepository).findAll();
     }
 
     @Test
     void availRegistrationPromo() {
         // Mock data
+        User user = User.builder()
+                .balance(new BigDecimal(0))
+                .build();
 
         // Stubbing methods
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // Expected/ Actual values
+        BigDecimal expected = new BigDecimal(50);
 
         // Calling the method
+        userService.availRegistrationPromo(user);
 
         // Assertions
+        assertEquals(expected, user.getBalance());
 
         // Behavior verification
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
-    void sendShopRegistration() {
+    void sendShopRegistration() throws IOException {
         // Mock data
+        User owner = spy(User.class);
+        owner.setUserVerification(new UserVerification());
+
+        Shop shop = new Shop();
 
         // Stubbing methods
+        doReturn(false).when(owner).isVerified();
+        doReturn(false).when(owner).hasShopRegistration();
+
+        when(shopMapper.toEntity(any(User.class), anyString(), anyString(), any(MultipartFile.class)))
+                .thenAnswer(i -> {
+                    owner.setShop(shop);
+                    return shop;
+                });
 
         // Expected/ Actual values
 
         // Calling the method
+        userService.sendShopRegistration(owner,
+                "Shop name",
+                "Shop Desc",
+                MultiPartFileDataFactory.notEmpty(),
+                MultiPartFileDataFactory.notEmpty());
 
         // Assertions
+        assertNotNull(owner.getShop());
+        assertNotNull(owner.getUserVerification().getValidId());
 
         // Behavior verification
+        verify(shopMapper).toEntity(any(User.class), anyString(), anyString(), any(MultipartFile.class));
+        verify(shopRepository).findAll();
+        verify(userRepository).save(any(User.class));
+        verify(shopRepository).save(any(Shop.class));
+        verify(imageUploader, times(2)).upload(anyString(), any(MultipartFile.class));
+        // assertDoesNotThrow(() -> userService.sendShopRegistration(any(User.class), anyString(), anyString(), any(MultipartFile.class), any(MultipartFile.class)));
     }
 
     @Test
-    void getByReferralCode() {
+    @DisplayName("send shop registration validation 1: valid id and shop picture cannot be null or empty")
+    void validIdAndShopPictureCannotBeNullOrEmpty() throws IOException {
         // Mock data
-
-        // Stubbing methods
-
         // Expected/ Actual values
 
         // Calling the method
-
         // Assertions
+        assertThrowsExactly(ResourceException.class, () -> userService.sendShopRegistration(new User(),
+                "Shop name",
+                "Shop Desc",
+                MultiPartFileDataFactory.empty(),
+                MultiPartFileDataFactory.empty()));
 
         // Behavior verification
+        verifyNoInteractions(imageUploader,
+                shopRepository,
+                userRepository,
+                shopMapper);
+    }
+
+    @Test
+    @DisplayName("send shop registration validation 2: shop name and shop desc cannot be null or empty")
+    void shopNameAndShopDescriptionCannotBeNullOrEmpty() throws IOException {
+        // Mock data
+        // Expected/ Actual values
+
+        // Calling the method
+        // Assertions
+        assertThrowsExactly(NotValidBodyException.class, () -> userService.sendShopRegistration(new User(),
+                "",
+                "",
+                MultiPartFileDataFactory.notEmpty(),
+                MultiPartFileDataFactory.notEmpty()));
+
+        // Behavior verification
+        verifyNoInteractions(imageUploader,
+                shopRepository,
+                userRepository,
+                shopMapper);
+    }
+
+    @Test
+    @DisplayName("send shop registration validation 2: shop name should be unique")
+    void shopNameShouldBeUnique() throws IOException {
+        // Mock data
+        User owner = spy(User.class);
+        owner.setUserVerification(new UserVerification());
+
+        String shouldBeUniqueShopName = "ExistingShopName";
+        List<Shop> shops = Arrays.asList(
+                Shop.builder()
+                        .name("ExistingShopName")
+                        .build()
+        );
+
+        // Stubbing methods
+        doReturn(false).when(owner).isVerified();
+        doReturn(false).when(owner).hasShopRegistration();
+
+        when(shopRepository.findAll()).thenReturn(shops);
+        // Expected/ Actual values
+
+        // Calling the method
+        // Assertions
+        assertThrowsExactly(ShopNameAlreadyExistsException.class,
+                () -> userService.sendShopRegistration(owner,
+                        shouldBeUniqueShopName,
+                        "Shop desc",
+                        MultiPartFileDataFactory.notEmpty(),
+                        MultiPartFileDataFactory.notEmpty()));
+
+        // Behavior verification
+        verifyNoMoreInteractions(shopRepository);
+        verifyNoInteractions(imageUploader, userRepository, shopMapper);
     }
 
     @Test
     void addInvitedUser() {
         // Mock data
+        User invitedUser = new User();
+
+        User invtingUser = User.builder()
+                .referredUsers(new HashSet<>())
+                .build();
 
         // Stubbing methods
+        when(userRepository.fetchByReferralCode(anyString())).thenReturn(Optional.of(invtingUser));
+        when(userRepository.save(any(User.class))).thenReturn(invitedUser);
 
         // Expected/ Actual values
 
         // Calling the method
+        userService.addInvitedUser("", invitedUser);
 
         // Assertions
+        assertNotNull(invtingUser);
+        assertTrue(invtingUser.getReferredUsers().contains(invitedUser));
 
         // Behavior verification
+        verify(userRepository).save(any(User.class));
     }
 
+
     @Test
+    @Disabled
+    /**
+     * dun sa get inviting user ang nakukuha lng din is yung pinasang invited user hnd yung nagrefer sakanya
+     */
     void getInvitingUser() {
         // Mock data
+        User invitedUser = new User();
+
+        User expectedInvitingUser = User.builder()
+                .referredUsers(new HashSet<>())
+                .build();
+        expectedInvitingUser.getReferredUsers().add(invitedUser);
+
+        List<User> users = Collections.singletonList(expectedInvitingUser);
 
         // Stubbing methods
+        when(userRepository.findAll()).thenReturn(users);
 
         // Expected/ Actual values
-
         // Calling the method
+        User actualInvitingUser = userService.getInvitingUser(invitedUser);
 
         // Assertions
+        assertNotNull(actualInvitingUser);
+        assertEquals(expectedInvitingUser, actualInvitingUser);
 
         // Behavior verification
+        verify(userRepository).findAll();
     }
 
     @Test
@@ -1004,14 +1150,50 @@ class UserServiceImplTest {
         // Mock data
 
         // Stubbing methods
+        when(userRepository.fetchByEmail(anyString())).thenReturn(Optional.of(new User()));
+        when(passwordValidator.isPasswordNotMatch(anyString(), anyString())).thenReturn(false);
+        doNothing().when(userPasswordEncoder).encodePassword(any(User.class), anyString());
 
         // Expected/ Actual values
+        String email = "email";
+        String pass = "pass";
+        String confirmPass = "pass";
 
         // Calling the method
+        userService.changePassword(email, pass, confirmPass);
 
         // Assertions
 
         // Behavior verification
+        verify(passwordValidator).isPasswordNotMatch(anyString(), anyString());
+        verify(passwordValidator).validate(anyString());
+        verify(userPasswordEncoder).encodePassword(any(User.class), anyString());
+        verify(userRepository).save(any(User.class));
+        assertDoesNotThrow(() -> userService.changePassword(email, pass, confirmPass));
+        // verifyNoInteractions(passwordValidator, userPasswordEncoder, userRepository);
+    }
+
+    @Test
+    @DisplayName("change password validation 1: pass and re-type pass should be match")
+    void changePasswordNewPassShouldMatchWithReTypePass() {
+        // Mock data
+
+        // Stubbing methods
+        when(userRepository.fetchByEmail(anyString())).thenReturn(Optional.of(new User()));
+        when(passwordValidator.isPasswordNotMatch(anyString(), anyString())).thenReturn(true);
+
+        // Expected/ Actual values
+        String email = "email";
+        String pass = "pass";
+        String confirmPass = "unMatchPassword";
+
+        // Calling the method
+        // Assertions
+        assertThrowsExactly(PasswordNotMatchException.class, () -> userService.changePassword(email, pass, confirmPass));
+
+        // Behavior verification
+        verifyNoMoreInteractions(passwordValidator, userRepository);
+        verifyNoInteractions(userPasswordEncoder);
     }
 
     @Test

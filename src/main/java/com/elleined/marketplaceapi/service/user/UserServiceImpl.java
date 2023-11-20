@@ -170,6 +170,7 @@ public class UserServiceImpl
     @Override
     public void resendValidId(User currentUser, MultipartFile validId)
             throws UserAlreadyVerifiedException, NoShopRegistrationException, IOException {
+
         if (Validator.notValidMultipartFile(validId)) throw new ResourceException("Picture attachment cannot be null!");
         if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! you are already been verified");
         if (!currentUser.hasShopRegistration()) throw new NoShopRegistrationException("Cannot resent valid id! you need to submit a shop registration before resending you valid id.");
@@ -243,7 +244,7 @@ public class UserServiceImpl
     @Override
     public void addInvitedUser(String invitingUserReferralCode, User invitedUser) {
         User invitingUser = getByReferralCode(invitingUserReferralCode);
-        invitingUser.addInvitedUser(invitedUser);
+        invitingUser.getReferredUsers().add(invitedUser);
         userRepository.save(invitingUser);
         log.debug("User with id of {} invited user with id of {} successfully", invitingUser.getId(), invitedUser.getId());
     }
@@ -264,7 +265,8 @@ public class UserServiceImpl
             ResourceNotFoundException {
 
         User user = getByEmail(email);
-        if (passwordValidator.isPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        if (passwordValidator.isPasswordNotMatch(newPassword, retypeNewPassword))
+            throw new PasswordNotMatchException("New and re-type password not match!");
         passwordValidator.validate(newPassword);
 
         userPasswordEncoder.encodePassword(user, newPassword);
