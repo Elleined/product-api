@@ -36,7 +36,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -738,18 +740,98 @@ class UserServiceImplTest {
     }
 
     @Test
-    void saveByDTOWithPicture() {
+    void saveByDTOWithPicture() throws IOException {
         // Mock data
+        String notExistingEmail = "notExistingEmail@gmail.com";
+        String notExistingMobileNumber = "09111111111";
+
+        String firstName = "firstName";
+        String password = "password";
+        String confirmPassword = "confirmPassword";
+        UserDTO userDTO = UserDTO.builder()
+                .userDetailsDTO(UserDTO.UserDetailsDTO.builder()
+                        .firstName(firstName)
+                        .middleName("MIddle name")
+                        .lastName("Last name")
+                        .gender("MALE")
+                        .birthDate(LocalDate.now())
+                        .mobileNumber(notExistingMobileNumber)
+                        .picture("picutre")
+                        .suffix("NONE")
+                        .build())
+                .addressDTO(AddressDTO.builder()
+                        .details("detauk")
+                        .regionName("region name")
+                        .provinceName("province name")
+                        .cityName("city name")
+                        .baranggayName("barnaggay name")
+                        .build())
+                .userCredentialDTO(CredentialDTO.builder()
+                        .email(notExistingEmail)
+                        .password(password)
+                        .confirmPassword(confirmPassword)
+                        .build())
+                .invitationReferralCode(null)
+                .build();
+
+        List<String> emails = Arrays.asList("email@gmail.com");
+        List<String> mobileNumbers = Arrays.asList("09999999999");
+
+        UserAddress userAddress = new UserAddress();
+        User invitedUser = User.builder()
+                .userCredential(Credential.builder()
+                        .email(notExistingEmail)
+                        .password(password)
+                        .build())
+                .userDetails(UserDetails.builder()
+                        .firstName(firstName)
+                        .build())
+                .build();
 
         // Stubbing methods
+        when(userRepository.fetchAllEmail()).thenReturn(emails);
+        when(userRepository.fetchAllMobileNumber()).thenReturn(mobileNumbers);
+
+        doNothing().when(numberValidator).validate(anyString());
+        doNothing().when(fullNameValidator).validate(any(UserDTO.UserDetailsDTO.class));
+        doNothing().when(emailValidator).validate(anyString());
+        doNothing().when(passwordValidator).validate(anyString());
+        when(passwordValidator.isPasswordNotMatch(anyString(), anyString())).thenReturn(false);
+        when(userMapper.toEntity(any(UserDTO.class))).thenReturn(invitedUser);
+        doAnswer(i -> {
+            invitedUser.getUserCredential().setPassword("hashedPassword");
+            return invitedUser;
+        }).when(userPasswordEncoder).encodePassword(any(User.class), anyString());
+        when(userRepository.save(any(User.class))).thenReturn(invitedUser);
+        doAnswer(i -> {
+            invitedUser.setAddress(userAddress);
+            return invitedUser;
+        }).when(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
 
         // Expected/ Actual values
 
         // Calling the method
+        userService.saveByDTO(userDTO, MultiPartFileDataFactory.notEmpty());
 
         // Assertions
+        assertNotNull(invitedUser.getAddress());
+        assertNotNull(invitedUser.getUserDetails().getPicture());
+        assertNotEquals(userDTO.getUserCredentialDTO().getPassword(), invitedUser.getUserCredential().getPassword());
 
         // Behavior verification
+        verify(numberValidator).validate(anyString());
+        verify(fullNameValidator).validate(any(UserDTO.UserDetailsDTO.class));
+        verify(emailValidator).validate(anyString());
+        verify(passwordValidator).validate(anyString());
+        verify(passwordValidator).isPasswordNotMatch(anyString(), anyString());
+        verify(userRepository).fetchAllEmail();
+        verify(userRepository).fetchAllMobileNumber();
+        verify(userMapper).toEntity(any(UserDTO.class));
+        verify(userPasswordEncoder).encodePassword(any(User.class), anyString());
+        verify(userRepository, times(2)).save(any(User.class));
+        verify(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
+        verify(imageUploader).upload(anyString(), any(MultipartFile.class));
+        assertDoesNotThrow(() ->  userService.saveByDTO(userDTO));
     }
 
     @Test
