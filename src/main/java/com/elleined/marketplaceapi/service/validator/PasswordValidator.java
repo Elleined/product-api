@@ -21,6 +21,10 @@ public class PasswordValidator implements Validator<String> {
         if (isNLettersLong(password, 8)) throw new WeakPasswordException("Password must be 8 character long!");
     }
 
+    public boolean isPasswordNotMatch(String password, String confirmPassword) {
+        return !password.equals(confirmPassword);
+    }
+
     public final boolean containsWhiteSpace(String password) {
         return password.contains(" ");
     }

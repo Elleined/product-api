@@ -9,9 +9,6 @@ public interface PasswordService {
             throws PasswordException,
             ResourceNotFoundException;
 
-    default boolean isTwoPasswordNotMatch(String password, String anotherPassword) {
-        return !password.equals(anotherPassword);
-    }
 
     void changePassword(User user, String oldPassword, String newPassword, String retypeNewPassword) throws PasswordException;
 }

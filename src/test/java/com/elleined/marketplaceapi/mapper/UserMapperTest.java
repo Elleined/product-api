@@ -87,6 +87,7 @@ class UserMapperTest {
         assertNotNull(actual.getUserCredential());
 
         assertNotNull(actual.getUserDetails());
+        assertNotNull(actual.getUserDetails().getPicture());
 
         assertNull(actual.getAddress());
         assertNull(actual.getShop());

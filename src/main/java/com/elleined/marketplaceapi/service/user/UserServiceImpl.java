@@ -11,9 +11,7 @@ import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
-import com.elleined.marketplaceapi.exception.resource.ResourceException;
-import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
+import com.elleined.marketplaceapi.exception.resource.*;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
@@ -122,16 +120,21 @@ public class UserServiceImpl
         fullNameValidator.validate(userDTO.getUserDetailsDTO());
         emailValidator.validate(email);
         passwordValidator.validate(password);
-        if (isTwoPasswordNotMatch(password, confirmPassword)) throw new PasswordNotMatchException("Password and confirm password not match!");
-        if (userRepository.fetchAllEmail().contains(email)) throw new AlreadyExistException("This email " + email + " is already associated with an account!");
-        if (userRepository.fetchAllMobileNumber().contains(mobileNumber)) throw new AlreadyExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
+        if (passwordValidator.isPasswordNotMatch(password, confirmPassword))
+            throw new PasswordNotMatchException("Password and confirm password not match!");
+        if (userRepository.fetchAllEmail().contains(email))
+            throw new EmailAlreadyExistsException("This email " + email + " is already associated with an account!");
+        if (userRepository.fetchAllMobileNumber().contains(mobileNumber))
+            throw new MobileNumberExistsException("Mobile number of " + mobileNumber + " are already associated with another account!");
 
         User registeringUser = userMapper.toEntity(userDTO);
+        if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode()))
+            addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
+
         userPasswordEncoder.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         // saveForumUser(registeringUser);
-        if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode())) addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
         log.debug("User with name of {} saved successfully with id of {}", registeringUser.getUserDetails().getFirstName(), registeringUser.getId());
         return registeringUser;
@@ -140,8 +143,9 @@ public class UserServiceImpl
     @Override
     public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
         if (Validator.notValidMultipartFile(profilePicture)) throw new ResourceException("Profile picture attachment cannot be null!");
-        dto.getUserDetailsDTO().setPicture(profilePicture.getOriginalFilename());
         User registeringUser = saveByDTO(dto);
+        registeringUser.getUserDetails().setPicture(profilePicture.getOriginalFilename());
+
         userRepository.save(registeringUser);
 
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.PROFILE_PICTURES_FOLDER, profilePicture);
@@ -256,7 +260,7 @@ public class UserServiceImpl
             ResourceNotFoundException {
 
         User user = getByEmail(email);
-        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        if (passwordValidator.isPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
         passwordValidator.validate(newPassword);
 
         userPasswordEncoder.encodePassword(user, newPassword);
@@ -267,7 +271,7 @@ public class UserServiceImpl
     @Override
     public void changePassword(User user, String oldPassword, String newPassword, String retypeNewPassword) throws PasswordException {
         if (!userPasswordEncoder.matches(user, oldPassword)) throw new PasswordNotMatchException("Old password didn't match to your current password!");
-        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        if (passwordValidator.isPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
         passwordValidator.validate(newPassword);
 
         userPasswordEncoder.encodePassword(user, newPassword);

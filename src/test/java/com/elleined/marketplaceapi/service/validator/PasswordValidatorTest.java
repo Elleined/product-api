@@ -69,4 +69,22 @@ class PasswordValidatorTest {
         assertEquals(preferredPasswordLength, password.length());
         assertFalse(passwordValidator.isNLettersLong(password, preferredPasswordLength));
     }
+
+    @Test
+    void isPasswordNotMatch() {
+        // Mock data
+        PasswordValidator passwordValidator = new PasswordValidator();
+        String password = "password";
+        String confirmPassword = "confirmPassword";
+
+        // Stubbing methods
+
+        // Expected/ Actual values
+
+        // Calling the method
+        // Assertions
+        assertTrue(passwordValidator.isPasswordNotMatch(password, confirmPassword));
+
+        // Behavior verification
+    }
 }
