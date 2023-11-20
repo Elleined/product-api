@@ -9,10 +9,12 @@ import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
+import com.elleined.marketplaceapi.exception.resource.ResourceException;
 import com.elleined.marketplaceapi.exception.resource.exists.EmailAlreadyExistsException;
 import com.elleined.marketplaceapi.exception.resource.exists.MobileNumberExistsException;
 import com.elleined.marketplaceapi.mapper.ShopMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
+import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.Credential;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.address.UserAddress;
@@ -748,6 +750,32 @@ class UserServiceImplTest {
         // Assertions
 
         // Behavior verification
+    }
+
+    @Test
+    void saveByDTOWithPictureShouldNotBeEmpty() {
+        // Mock data
+        assertThrowsExactly(ResourceException.class, () -> userService.saveByDTO(new UserDTO(), MultiPartFileDataFactory.empty()));
+
+        // Stubbing methods
+
+        // Expected/ Actual values
+
+        // Calling the method
+
+        // Assertions
+
+        // Behavior verification
+        verifyNoInteractions(numberValidator,
+                fullNameValidator,
+                emailValidator,
+                passwordValidator,
+                userRepository,
+                userMapper,
+                userPasswordEncoder,
+                addressService,
+                imageUploader
+                );
     }
 
     @Test
