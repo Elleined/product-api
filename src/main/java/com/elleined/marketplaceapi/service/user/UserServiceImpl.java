@@ -12,6 +12,10 @@ import com.elleined.marketplaceapi.exception.field.password.PasswordException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
 import com.elleined.marketplaceapi.exception.resource.*;
+import com.elleined.marketplaceapi.exception.resource.exists.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.exists.EmailAlreadyExistsException;
+import com.elleined.marketplaceapi.exception.resource.exists.MobileNumberExistsException;
+import com.elleined.marketplaceapi.exception.resource.exists.ShopNameAlreadyExistsException;
 import com.elleined.marketplaceapi.exception.user.InvalidUserCredentialException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
@@ -128,10 +132,10 @@ public class UserServiceImpl
             throw new MobileNumberExistsException("Mobile number of " + mobileNumber + " are already associated with another account!");
 
         User registeringUser = userMapper.toEntity(userDTO);
+        userPasswordEncoder.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         if (!StringUtil.isNotValid(userDTO.getInvitationReferralCode()))
             addInvitedUser(userDTO.getInvitationReferralCode(), registeringUser);
 
-        userPasswordEncoder.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
         userRepository.save(registeringUser);
         addressService.saveUserAddress(registeringUser, userDTO.getAddressDTO());
         // saveForumUser(registeringUser);
@@ -216,9 +220,9 @@ public class UserServiceImpl
         if (Validator.notValidMultipartFile(shopPicture)) throw new ResourceException("Shop Picture attachment cannot be null!");
         if (StringUtil.isNotValid(shopName)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop name!");
         if (StringUtil.isNotValid(description)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop description!");
-        if (owner.isVerified()) throw new AlreadyExistException("Cannot send shop registration! because you are already been verified!");
+        if (owner.isVerified()) throw new UserAlreadyVerifiedException("Cannot send shop registration! because you are already been verified!");
         if (owner.hasShopRegistration()) throw new AlreadyExistException("Cannot send shop registration! because you already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
-        if (isShopNameAlreadyExists(shopName)) throw new AlreadyExistException("Cannot send shop registration! because the shop name you provided " + shopName + " already been taken by another seller!");
+        if (isShopNameAlreadyExists(shopName)) throw new ShopNameAlreadyExistsException("Cannot send shop registration! because the shop name you provided " + shopName + " already been taken by another seller!");
 
         Shop shop = shopMapper.toEntity(owner, shopName, description, shopPicture);
         owner.getUserVerification().setValidId(validId.getOriginalFilename());

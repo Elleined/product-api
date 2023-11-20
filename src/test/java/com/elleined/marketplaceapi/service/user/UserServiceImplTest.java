@@ -9,13 +9,13 @@ import com.elleined.marketplaceapi.exception.field.MalformedEmailException;
 import com.elleined.marketplaceapi.exception.field.MobileNumberException;
 import com.elleined.marketplaceapi.exception.field.password.PasswordNotMatchException;
 import com.elleined.marketplaceapi.exception.field.password.WeakPasswordException;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
-import com.elleined.marketplaceapi.exception.resource.EmailAlreadyExistsException;
-import com.elleined.marketplaceapi.exception.resource.MobileNumberExistsException;
+import com.elleined.marketplaceapi.exception.resource.exists.EmailAlreadyExistsException;
+import com.elleined.marketplaceapi.exception.resource.exists.MobileNumberExistsException;
 import com.elleined.marketplaceapi.mapper.ShopMapper;
 import com.elleined.marketplaceapi.mapper.UserMapper;
 import com.elleined.marketplaceapi.model.Credential;
 import com.elleined.marketplaceapi.model.Shop;
+import com.elleined.marketplaceapi.model.address.UserAddress;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.model.user.UserVerification;
@@ -31,8 +31,6 @@ import com.elleined.marketplaceapi.service.validator.PasswordValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -230,13 +228,14 @@ class UserServiceImplTest {
                         .password(password)
                         .confirmPassword(confirmPassword)
                         .build())
-                .invitationReferralCode("")
+                .invitationReferralCode(null)
                 .build();
 
         List<String> emails = Arrays.asList("email@gmail.com");
         List<String> mobileNumbers = Arrays.asList("09999999999");
 
-        User savedUser = User.builder()
+        UserAddress userAddress = new UserAddress();
+        User invitedUser = User.builder()
                 .userCredential(Credential.builder()
                         .email(notExistingEmail)
                         .password(password)
@@ -244,7 +243,6 @@ class UserServiceImplTest {
                 .userDetails(UserDetails.builder()
                         .firstName(firstName)
                         .build())
-                .deliveryAddresses(new ArrayList<>())
                 .build();
 
         // Stubbing methods
@@ -256,10 +254,16 @@ class UserServiceImplTest {
         doNothing().when(emailValidator).validate(anyString());
         doNothing().when(passwordValidator).validate(anyString());
         when(passwordValidator.isPasswordNotMatch(anyString(), anyString())).thenReturn(false);
-        when(userMapper.toEntity(any(UserDTO.class))).thenReturn(savedUser);
-        doNothing().when(userPasswordEncoder).encodePassword(any(User.class), anyString());
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-        doNothing().when(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
+        when(userMapper.toEntity(any(UserDTO.class))).thenReturn(invitedUser);
+        doAnswer(i -> {
+            invitedUser.getUserCredential().setPassword("hashedPassword");
+            return invitedUser;
+        }).when(userPasswordEncoder).encodePassword(any(User.class), anyString());
+        when(userRepository.save(any(User.class))).thenReturn(invitedUser);
+        doAnswer(i -> {
+            invitedUser.setAddress(userAddress);
+            return invitedUser;
+        }).when(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
 
         // Expected/ Actual values
 
@@ -267,6 +271,8 @@ class UserServiceImplTest {
         userService.saveByDTO(userDTO);
 
         // Assertions
+        assertNotNull(invitedUser.getAddress());
+        assertNotEquals(userDTO.getUserCredentialDTO().getPassword(), invitedUser.getUserCredential().getPassword());
 
         // Behavior verification
         verify(numberValidator).validate(anyString());
@@ -278,7 +284,7 @@ class UserServiceImplTest {
         verify(userRepository).fetchAllMobileNumber();
         verify(userMapper).toEntity(any(UserDTO.class));
         verify(userPasswordEncoder).encodePassword(any(User.class), anyString());
-        verify(userRepository, atMost(2)).save(any(User.class));
+        verify(userRepository).save(any(User.class));
         verify(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
         assertDoesNotThrow(() ->  userService.saveByDTO(userDTO));
     }
@@ -637,6 +643,96 @@ class UserServiceImplTest {
         verifyNoInteractions(userMapper,
                 userPasswordEncoder,
                 addressService);
+    }
+
+    @Test
+    @DisplayName("saving user workflow 1: adding registating user to inviting user invited users")
+    void whenRegistratingUserHaveReferralCodeHeShouldBeAddedToInvitingUserInvitedUsers() {
+        // Mock data
+        UserDTO userDTO = UserDTO.builder()
+                .userDetailsDTO(UserDTO.UserDetailsDTO.builder()
+                        .firstName("First name")
+                        .middleName("MIddle name")
+                        .lastName("Last name")
+                        .gender("MALE")
+                        .birthDate(LocalDate.now())
+                        .mobileNumber("09999999991")
+                        .picture("picutre")
+                        .suffix("NONE")
+                        .build())
+                .addressDTO(AddressDTO.builder()
+                        .details("detauk")
+                        .regionName("region name")
+                        .provinceName("province name")
+                        .cityName("city name")
+                        .baranggayName("barnaggay name")
+                        .build())
+                .userCredentialDTO(CredentialDTO.builder()
+                        .email("uniqueEmail@gmail.com")
+                        .password("password")
+                        .confirmPassword("confirmPassword")
+                        .build())
+                .invitationReferralCode("invitingUserReferralCode")
+                .build();
+
+        List<String> existingEmails = List.of("existingEmail@gmail.com");
+        List<String> existingMobileNumbers = List.of("09999999999");
+
+        UserAddress userAddress = new UserAddress();
+        User invitedUser = User.builder()
+                .userCredential(Credential.builder()
+                        .email("uniqueEmail@gmail.com")
+                        .password("password")
+                        .build())
+                .userDetails(UserDetails.builder()
+                        .firstName("firstName")
+                        .build())
+                .build();
+
+        User invitingUser = User.builder()
+                .referralCode("invitingUserReferralCode")
+                .referredUsers(new HashSet<>())
+                .build();
+
+        // Stubbing methods
+        when(userRepository.fetchAllEmail()).thenReturn(existingEmails);
+        when(userRepository.fetchAllMobileNumber()).thenReturn(existingMobileNumbers);
+        when(userRepository.fetchByReferralCode(anyString())).thenReturn(Optional.of(invitingUser));
+
+        doNothing().when(numberValidator).validate(anyString());
+        doNothing().when(fullNameValidator).validate(any(UserDTO.UserDetailsDTO.class));
+        doNothing().when(emailValidator).validate(anyString());
+        doNothing().when(passwordValidator).validate(anyString());
+        when(passwordValidator.isPasswordNotMatch(anyString(), anyString())).thenReturn(false);
+        when(userMapper.toEntity(userDTO)).thenReturn(invitedUser);
+        when(userRepository.save(any(User.class))).thenReturn(invitedUser);
+        doAnswer(i -> {
+            invitingUser.setAddress(userAddress);
+            return invitingUser;
+        }).when(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
+        // Expected/ Actual values
+
+        // Calling the method
+        // Assertions
+        assertDoesNotThrow(() -> userService.saveByDTO(userDTO));
+        assertNotNull(invitingUser);
+        assertNotNull(invitingUser.getAddress());
+
+        // Behavior verification
+        verify(numberValidator).validate(anyString());
+        verify(fullNameValidator).validate(any(UserDTO.UserDetailsDTO.class));
+        verify(emailValidator).validate(anyString());
+        verify(passwordValidator).validate(anyString());
+        verify(passwordValidator).isPasswordNotMatch(anyString(), anyString());
+        verify(userRepository).fetchAllEmail();
+        verify(userRepository).fetchAllMobileNumber();
+        verify(userMapper).toEntity(any(UserDTO.class));
+        verify(userPasswordEncoder).encodePassword(any(User.class), anyString());
+
+        verify(userRepository).fetchByReferralCode(anyString());
+        verify(userRepository, times(2)).save(any(User.class));
+        verify(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
+        assertDoesNotThrow(() ->  userService.saveByDTO(userDTO));
     }
 
     @Test

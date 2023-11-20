@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.service.user;
 
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.exists.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.user.NoShopRegistrationException;
 import com.elleined.marketplaceapi.exception.user.UserAlreadyVerifiedException;
 import com.elleined.marketplaceapi.model.user.User;

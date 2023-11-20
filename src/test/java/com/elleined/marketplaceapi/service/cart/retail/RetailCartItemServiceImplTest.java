@@ -6,7 +6,7 @@ import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException
 import com.elleined.marketplaceapi.exception.product.ProductExpiredException;
 import com.elleined.marketplaceapi.exception.product.ProductNotListedException;
 import com.elleined.marketplaceapi.exception.product.order.ProductOrderException;
-import com.elleined.marketplaceapi.exception.resource.AlreadyExistException;
+import com.elleined.marketplaceapi.exception.resource.exists.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
