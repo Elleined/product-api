@@ -802,11 +802,15 @@ class UserServiceImplTest {
             invitedUser.getUserCredential().setPassword("hashedPassword");
             return invitedUser;
         }).when(userPasswordEncoder).encodePassword(any(User.class), anyString());
+        
         when(userRepository.save(any(User.class))).thenReturn(invitedUser);
+
         doAnswer(i -> {
             invitedUser.setAddress(userAddress);
             return invitedUser;
         }).when(addressService).saveUserAddress(any(User.class), any(AddressDTO.class));
+
+        doNothing().when(imageUploader).upload(anyString(), any(MultipartFile.class));
 
         // Expected/ Actual values
 
