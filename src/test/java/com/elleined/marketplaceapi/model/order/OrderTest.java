@@ -11,7 +11,7 @@ class OrderTest {
     @Test
     void reachedCancellingTimeLimit() {
         Order order = RetailOrder.retailOrderBuilder()
-                .updatedAt(LocalDateTime.now().minusDays(1))
+                .updatedAt(LocalDateTime.now().minusDays(1)) // Kahapon inorder kaya ngayon hnd na pede i cancel
                 .build();
 
         assertTrue(order.reachedCancellingTimeLimit());

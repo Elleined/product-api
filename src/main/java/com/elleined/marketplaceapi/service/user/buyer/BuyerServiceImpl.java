@@ -57,8 +57,6 @@ public class BuyerServiceImpl implements BuyerService {
     public RetailOrder order(User buyer, RetailOrderDTO dto) throws ResourceNotFoundException, ResourceOwnedException, ProductOrderAcceptedException, ProductOrderPendingException, ProductRejectedException, ProductAlreadySoldException, ProductNotListedException, OrderQuantiantyExceedsException, BuyerAlreadyRejectedException, ProductExpiredException {
         RetailProduct retailProduct = retailProductService.getById(dto.getProductId());
 
-        if (retailProduct.isExpired())
-            throw new ProductExpiredException("Cannot order this retail product! because this retail product is already expired!");
         if (retailProduct.isRejected())
             throw new ProductRejectedException("Cannot order this retail product! because this retail product is rejected by moderator!");
         if (buyer.hasOrder(retailProduct, PENDING))
@@ -73,10 +71,12 @@ public class BuyerServiceImpl implements BuyerService {
             throw new ProductNotListedException("Cannot order this retail product! because this retail product are not yet listed!");
         if (buyer.hasProduct(retailProduct))
             throw new ResourceOwnedException("You cannot order your own retail product listing!");
-        if (retailProduct.isExceedingToAvailableQuantity(dto.getOrderQuantity()))
-            throw new OrderQuantiantyExceedsException("Cannot order this retail product! because you are trying to order that exceeds to available amount!");
         if (retailProductService.isRejectedBySeller(buyer, retailProduct))
             throw new BuyerAlreadyRejectedException("Cannot order this retail product! because seller of this retail product is rejected you order request before!. Please wait after 1 day to re-oder this product");
+        if (retailProduct.isExceedingToAvailableQuantity(dto.getOrderQuantity()))
+            throw new OrderQuantiantyExceedsException("Cannot order this retail product! because you are trying to order that exceeds to available amount!");
+        if (retailProduct.isExpired())
+            throw new ProductExpiredException("Cannot order this retail product! because this retail product is already expired!");
 
         double price = retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId());
