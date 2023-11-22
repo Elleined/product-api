@@ -29,6 +29,7 @@ import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
+import com.elleined.marketplaceapi.service.user.buyer.regular.RegularBuyerProxy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,8 +63,9 @@ class BuyerServiceImplTest {
     private WholeSaleOrderMapper wholeSaleOrderMapper;
     @Mock
     private AddressService addressService;
+
     @InjectMocks
-    private BuyerServiceImpl buyerService;
+    private BuyerService buyerService;
 
     @Test
     void order() {
