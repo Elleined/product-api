@@ -26,6 +26,7 @@ import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,7 +44,7 @@ import static com.elleined.marketplaceapi.model.order.Order.Status.*;
 @Qualifier("buyerServiceImpl")
 public class BuyerServiceImpl implements BuyerService {
     private final RetailProductService retailProductService;
-    private final ProductService<WholeSaleProduct> wholeSaleProductService;
+    private final WholeSaleProductService wholeSaleProductService;
 
     private final WholeSaleOrderRepository wholeSaleOrderRepository;
     private final RetailOrderRepository retailOrderRepository;
