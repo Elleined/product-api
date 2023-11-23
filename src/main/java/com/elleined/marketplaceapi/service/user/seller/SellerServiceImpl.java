@@ -302,7 +302,7 @@ public class SellerServiceImpl implements SellerService {
         retailOrder.setUpdatedAt(LocalDateTime.now());
         retailOrder.setSellerMessage(messageToBuyer);
 
-        orderRepository.save(retailOrder);
+        retailOrderRepository.save(retailOrder);
         log.debug("Seller successfully updated retail order with id of {} status from {} to {}", retailOrder.getId(), oldStatus, retailOrder.getStatus());
     }
 
@@ -319,7 +319,7 @@ public class SellerServiceImpl implements SellerService {
         wholeSaleOrder.setUpdatedAt(LocalDateTime.now());
         wholeSaleOrder.setSellerMessage(messageToBuyer);
 
-        orderRepository.save(wholeSaleOrder);
+        wholeSaleOrderRepository.save(wholeSaleOrder);
         log.debug("Seller successfully updated whole sale order with id of {} status from {} to {}", wholeSaleOrder.getId(), oldStatus, wholeSaleOrder.getStatus());
     }
 
@@ -329,8 +329,8 @@ public class SellerServiceImpl implements SellerService {
             throw new NotOwnedException("Cannot sold order! because you don't owned this order!");
 
         RetailProduct retailProduct = retailOrder.getRetailProduct();
-        int newAvailableQuantity = retailProduct.getAvailableQuantity() - retailOrder.getOrderQuantity();
-        if (newAvailableQuantity <= 0) {
+
+        if (retailProduct.hasNoAvailableQuantity(retailOrder.getOrderQuantity())) {
             retailProduct.setState(Product.State.SOLD);
             retailOrder.setStatus(Status.SOLD);
 
@@ -343,6 +343,7 @@ public class SellerServiceImpl implements SellerService {
             return;
         }
 
+        int newAvailableQuantity = retailProduct.getAvailableQuantity() - retailOrder.getOrderQuantity();
         retailProduct.setAvailableQuantity(newAvailableQuantity);
         retailOrder.setStatus(Status.SOLD);
 

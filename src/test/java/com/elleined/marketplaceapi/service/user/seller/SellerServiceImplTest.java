@@ -9,8 +9,10 @@ import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.Crop;
+import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
@@ -398,22 +400,28 @@ class SellerServiceImplTest {
         // Expected and Actual Value
 
         // Mock Data
-        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
-                .availableQuantity(100)
-                .build();
+        User user = spy(User.class);
+        RetailProduct retailProduct = spy(RetailProduct.class);
 
         RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
                 .retailProduct(retailProduct)
-                .orderQuantity(100)
                 .build();
 
         // Stubbing methods
+        doReturn(false).when(retailProduct).hasNoAvailableQuantity(anyInt());
+        doReturn(false).when(retailProduct).isRejected();
+        doReturn(true).when(user).hasSellableProductOrder(any(RetailOrder.class));
 
+        when(retailOrderRepository.save(any(RetailOrder.class))).thenReturn(new RetailOrder());
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.acceptOrder(user, retailOrder, "Message"));
+        assertEquals(Order.Status.ACCEPTED, retailOrder.getStatus());
+        assertNotNull(retailOrder.getUpdatedAt());
+        assertNotNull(retailOrder.getSellerMessage());
 
         // Behavior Verifications
+        verify(retailOrderRepository).save(any(RetailOrder.class));
     }
 
     @Test
@@ -421,14 +429,27 @@ class SellerServiceImplTest {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+        WholeSaleProduct wholeSaleProduct = spy(WholeSaleProduct.class);
+
+        WholeSaleOrder retailOrder = WholeSaleOrder.wholeSaleOrderBuilder()
+                .wholeSaleProduct(wholeSaleProduct)
+                .build();
 
         // Stubbing methods
+        doReturn(false).when(wholeSaleProduct).isRejected();
+        doReturn(true).when(user).hasSellableProductOrder(any(WholeSaleOrder.class));
 
+        when(wholeSaleOrderRepository.save(any(WholeSaleOrder.class))).thenReturn(new WholeSaleOrder());
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.acceptOrder(user, retailOrder, "Message"));
+        assertEquals(Order.Status.ACCEPTED, retailOrder.getStatus());
+        assertNotNull(retailOrder.getUpdatedAt());
+        assertNotNull(retailOrder.getSellerMessage());
 
         // Behavior Verifications
+        verify(wholeSaleOrderRepository).save(any(WholeSaleOrder.class));
     }
 
     @Test
@@ -436,14 +457,22 @@ class SellerServiceImplTest {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+        RetailOrder retailOrder = spy(RetailOrder.class);
 
         // Stubbing methods
+        doReturn(true).when(user).hasSellableProductOrder(any(RetailOrder.class));
+        when(retailOrderRepository.save(any(RetailOrder.class))).thenReturn(new RetailOrder());
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.rejectOrder(user, retailOrder, "Message"));
+        assertEquals(Order.Status.REJECTED, retailOrder.getStatus());
+        assertNotNull(retailOrder.getUpdatedAt());
+        assertNotNull(retailOrder.getSellerMessage());
 
         // Behavior Verifications
+        verify(retailOrderRepository).save(any(RetailOrder.class));
     }
 
     @Test
@@ -451,43 +480,126 @@ class SellerServiceImplTest {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+        WholeSaleOrder wholeSaleOrder = spy(WholeSaleOrder.class);
 
         // Stubbing methods
+        doReturn(true).when(user).hasSellableProductOrder(any(WholeSaleOrder.class));
+        when(wholeSaleOrderRepository.save(any(WholeSaleOrder.class))).thenReturn(new WholeSaleOrder());
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.rejectOrder(user, wholeSaleOrder, "Message"));
+        assertEquals(Order.Status.REJECTED, wholeSaleOrder.getStatus());
+        assertNotNull(wholeSaleOrder.getUpdatedAt());
+        assertNotNull(wholeSaleOrder.getSellerMessage());
 
         // Behavior Verifications
+        verify(wholeSaleOrderRepository).save(any(WholeSaleOrder.class));
     }
 
     @Test
-    void soldOrder() {
+    @DisplayName("sold retail order scenario 1: available quantity are not yet below zero hence only marking the order sold not the product")
+    void retailSoldOrderCase1() {
         // Expected and Actual Value
 
         // Mock Data
 
+        User user = spy(User.class);
+        RetailProduct retailProduct = spy(RetailProduct.class);
+
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+                .retailProduct(retailProduct)
+                .purchaser(new User())
+                .build();
+
         // Stubbing methods
+        doReturn(true).when(user).hasSellableProductOrder(any(RetailOrder.class));
+        doReturn(false).when(retailProduct).hasNoAvailableQuantity(anyInt());
+        when(privateChatRoomService.getChatRoom(any(User.class), any(User.class), any(Product.class))).thenReturn(new PrivateChatRoom());
+        doNothing().when(privateChatRoomService).deleteAllMessages(any(PrivateChatRoom.class));
+        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(new RetailProduct());
+        when(retailOrderRepository.save(any(RetailOrder.class))).thenReturn(new RetailOrder());
+        doNothing().when(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.soldOrder(user, retailOrder));
+        assertEquals(Order.Status.SOLD, retailOrder.getStatus());
 
         // Behavior Verifications
+        verify(privateChatRoomService).getChatRoom(any(User.class), any(User.class), any(Product.class));
+        verify(privateChatRoomService).deleteAllMessages(any(PrivateChatRoom.class));
+        verify(retailProductRepository).save(any(RetailProduct.class));
+        verify(retailOrderRepository).save(any(RetailOrder.class));
+        verify(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
     }
 
+    @Test
+    @DisplayName("sold retail order scenario 2: available quantity are below zero hence only marking the order sold and the product sold")
+    void retailSoldOrderCase2() {
+        // Expected and Actual Value
+
+        // Mock Data
+        User user = spy(User.class);
+        RetailProduct retailProduct = spy(RetailProduct.class);
+
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+                .retailProduct(retailProduct)
+                .purchaser(new User())
+                .build();
+
+        // Stubbing methods
+        doReturn(true).when(user).hasSellableProductOrder(any(RetailOrder.class));
+        doReturn(true).when(retailProduct).hasNoAvailableQuantity(anyInt());
+
+        when(privateChatRoomService.getChatRoom(any(User.class), any(User.class), any(Product.class))).thenReturn(new PrivateChatRoom());
+        doNothing().when(privateChatRoomService).deleteAllMessages(any(PrivateChatRoom.class));
+        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(new RetailProduct());
+        when(retailOrderRepository.save(any(RetailOrder.class))).thenReturn(new RetailOrder());
+        doNothing().when(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
+
+        // Calling the method
+        // Assertions
+        assertDoesNotThrow(() -> sellerService.soldOrder(user, retailOrder));
+        assertEquals(Order.Status.SOLD, retailOrder.getStatus());
+        assertEquals(Product.State.SOLD, retailProduct.getState());
+
+        // Behavior Verifications
+        verify(privateChatRoomService).getChatRoom(any(User.class), any(User.class), any(Product.class));
+        verify(privateChatRoomService).deleteAllMessages(any(PrivateChatRoom.class));
+        verify(retailProductRepository).save(any(RetailProduct.class));
+        verify(retailOrderRepository).save(any(RetailOrder.class));
+        verify(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
+    }
     @Test
     void wholeSaleSoldOrder() {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+        WholeSaleProduct wholeSaleProduct = spy(WholeSaleProduct.class);
+
+        WholeSaleOrder wholeSaleOrder = WholeSaleOrder.wholeSaleOrderBuilder()
+                .wholeSaleProduct(wholeSaleProduct)
+                .purchaser(new User())
+                .build();
 
         // Stubbing methods
+        doReturn(true).when(user).hasSellableProductOrder(any(WholeSaleOrder.class));
+
+        when(privateChatRoomService.getChatRoom(any(User.class), any(User.class), any(Product.class))).thenReturn(new PrivateChatRoom());
+        doNothing().when(privateChatRoomService).deleteAllMessages(any(PrivateChatRoom.class));
+        when(wholeSaleOrderRepository.save(any(WholeSaleOrder.class))).thenReturn(new WholeSaleOrder());
+        doNothing().when(wholeSaleProductService).updateAllPendingAndAcceptedOrders(any(WholeSaleProduct.class), any(Order.Status.class));
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.soldOrder(user, wholeSaleOrder));
+        assertEquals(Order.Status.SOLD, wholeSaleOrder.getStatus());
 
         // Behavior Verifications
+        verify(privateChatRoomService).getChatRoom(any(User.class), any(User.class), any(Product.class));
+        verify(privateChatRoomService).deleteAllMessages(any(PrivateChatRoom.class));
     }
 }
