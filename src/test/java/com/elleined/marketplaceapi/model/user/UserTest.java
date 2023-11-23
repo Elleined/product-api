@@ -134,7 +134,7 @@ class UserTest {
     void isPremiumAndNotExpired() {
         User user = User.builder()
                 .premium(Premium.builder()
-                        .registrationDate(LocalDateTime.now().minusMonths(1))
+                        .registrationDate(LocalDateTime.now())
                         .build())
                 .build();
 

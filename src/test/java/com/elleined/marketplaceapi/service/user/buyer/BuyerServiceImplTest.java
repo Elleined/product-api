@@ -65,7 +65,7 @@ class BuyerServiceImplTest {
     private AddressService addressService;
 
     @InjectMocks
-    private BuyerService buyerService;
+    private BuyerServiceImpl buyerService;
 
     @Test
     void order() {

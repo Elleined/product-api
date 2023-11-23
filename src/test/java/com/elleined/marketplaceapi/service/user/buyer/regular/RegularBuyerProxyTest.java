@@ -81,8 +81,6 @@ class RegularBuyerProxyTest {
     @Test
     @DisplayName("order validations 1: cannot order if there are more than 10 pending/ created order within this day")
     void cannotOrderIfThereAre10PendingOrderWithinThisDay() {
-        // Expected/ Actual values
-
         // Mock data
         List<RetailOrder> retailOrders = Arrays.asList(
                 getRetailOrder(),
@@ -99,23 +97,14 @@ class RegularBuyerProxyTest {
                 getWholeSaleOrder()
         );
 
-        // Mock data
         User user = new User();
-        user.setWholeSaleOrders(wholeSaleOrders);
         user.setRetailOrders(retailOrders);
+        user.setWholeSaleOrders(wholeSaleOrders);
 
-        // Stubbing methods
-        when(buyerService.order(any(User.class), any(RetailOrderDTO.class))).thenReturn(new RetailOrder());
-        when(buyerService.order(any(User.class), any(WholeSaleOrderDTO.class))).thenReturn(new WholeSaleOrder());
-
-        // Calling the method
-        // Assertions
         assertThrowsExactly(BuyerMaxOrderPerDayException.class, () -> regularBuyerProxy.order(user, new RetailOrderDTO()));
         assertThrowsExactly(BuyerMaxOrderPerDayException.class, () -> regularBuyerProxy.order(user, new WholeSaleOrderDTO()));
 
-        // Behavior verification
-        verify(buyerService).order(any(User.class), any(RetailOrderDTO.class));
-        verify(buyerService).order(any(User.class), any(WholeSaleOrderDTO.class));
+        verifyNoInteractions(buyerService);
     }
 
     @Test
