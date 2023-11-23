@@ -23,12 +23,14 @@ import java.io.IOException;
 
 public interface SellerService {
 
+    // not implemented
     RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage)
             throws NotOwnedException,
             ProductSaleException,
             FieldException,
             ProductNotListedException;
 
+    // not implemented
     WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage)
             throws NotOwnedException,
             ProductSaleException,
