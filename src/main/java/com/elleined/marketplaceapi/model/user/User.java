@@ -148,10 +148,6 @@ public class User {
     @OneToMany(mappedBy = "receiver")
     private List<PrivateChatRoom> participatingChatRooms;
 
-    public void addInvitedUser(User invitedUser) {
-        this.getReferredUsers().add(invitedUser);
-    }
-
     public boolean isPremiumAndNotExpired() {
         if (this.getPremium() == null) return false;
         LocalDateTime premiumExpiration = this.getPremium().getRegistrationDate().plusMonths(1);

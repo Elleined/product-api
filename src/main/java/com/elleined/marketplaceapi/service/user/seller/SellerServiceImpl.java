@@ -150,7 +150,7 @@ public class SellerServiceImpl implements SellerService {
             throw new ProductOrderAcceptedException("Cannot update retail product! because theres an pending order for this retail product");
         if (retailProduct.hasSoldOrder())
             throw new ProductAlreadySoldException("Cannot update retail product! because this retail product is already been sold!");
-        if (!seller.isVerified())
+        if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot update retail product! because you are not yet been verified! Consider register shop first then get verified afterwards to update this retail product!");
         if (!seller.hasProduct(retailProduct))
             throw new NotOwnedException("Cannot update retail product! because you don't owned this retail product!");
@@ -183,7 +183,7 @@ public class SellerServiceImpl implements SellerService {
             throw new ProductOrderAcceptedException("Cannot update whole sale product! because theres an pending order for this whole sale product");
         if (wholeSaleProduct.hasSoldOrder())
             throw new ProductAlreadySoldException("Cannot update whole sale product! because this whole sale product is already been sold!");
-        if (!seller.isVerified())
+        if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot update whole sale product! because you are not yet been verified! Consider register shop first then get verified afterwards to update this whole sale product!");
         if (!seller.hasProduct(wholeSaleProduct))
             throw new NotOwnedException("Cannot update whole sale product! because you don't owned this whole sale product!");
@@ -208,7 +208,7 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void deleteProduct(User seller, RetailProduct retailProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductOrderAcceptedException, ProductOrderPendingException {
-        if (!seller.isVerified())
+        if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot delete product! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
         if (!seller.hasProduct(retailProduct))
             throw new NotOwnedException("Cannot delete retail product! because you don't owned this retail product!");
@@ -228,7 +228,7 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public void deleteProduct(User seller, WholeSaleProduct wholeSaleProduct) throws NotOwnedException, NotVerifiedException, ProductAlreadySoldException, ProductOrderAcceptedException, ProductOrderPendingException {
-        if (!seller.isVerified())
+        if (seller.isNotVerified())
             throw new NotVerifiedException("Cannot delete product! because you are not yet been verified! Consider register shop first then get verified afterwards to delete this product");
         if (!seller.hasProduct(wholeSaleProduct))
             throw new NotOwnedException("Cannot delete whole sale product! because you don't owned this whole sale product!");
@@ -249,8 +249,7 @@ public class SellerServiceImpl implements SellerService {
     @Override
     public void acceptOrder(User seller, RetailOrder retailOrder, String messageToBuyer) throws NotOwnedException, NotValidBodyException, ProductRejectedException {
         RetailProduct retailProduct = retailOrder.getRetailProduct();
-        int newAvailableQuantity = retailProduct.getAvailableQuantity() - retailOrder.getOrderQuantity();
-        if (newAvailableQuantity < 0) throw new ProductAlreadySoldException("Cannot accept order! because this product is already been sold and there are now available quantity!");
+        if (retailProduct.hasNoAvailableQuantity(retailOrder.getOrderQuantity())) throw new ProductAlreadySoldException("Cannot accept order! because this product is already been sold and there are now available quantity!");
 
         if (retailProduct.isRejected())
             throw new ProductRejectedException("Cannot accept order! because with this product is rejected by the moderator!");

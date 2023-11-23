@@ -86,4 +86,8 @@ public class RetailProduct extends Product {
                 this.getState() == Product.State.EXPIRED ||
                 LocalDate.now().equals(expirationDate);
     }
+
+    public boolean hasNoAvailableQuantity(int orderQuantity) {
+        return (this.getAvailableQuantity() - orderQuantity) < 0;
+    }
 }

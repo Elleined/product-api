@@ -4,13 +4,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.Crop;
+import com.elleined.marketplaceapi.model.order.Order;
+import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
+import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
+import com.elleined.marketplaceapi.model.user.UserVerification;
 import com.elleined.marketplaceapi.repository.order.OrderRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
@@ -23,6 +30,7 @@ import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.unit.RetailUnitService;
 import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -97,6 +105,7 @@ class SellerServiceImplTest {
     }
 
     @Test
+    @DisplayName("save retail product scenario 1: crop name should be saved if doesn't exist in database")
     void saveProduct() throws IOException {
         // Expected and Actual Value
 
@@ -104,13 +113,13 @@ class SellerServiceImplTest {
         User user = spy(User.class);
 
         RetailProductDTO retailProductDTO = RetailProductDTO.retailProductDTOBuilder()
-
+                .cropName("Crop")
                 .build();
 
         // Stubbing methods
-        doReturn(true).when(user).isNotVerified();
+        doReturn(false).when(user).isNotVerified();
 
-        when(cropService.notExist(anyString())).thenReturn(false);
+        doReturn(true).when(cropService).notExist(anyString());
         when(cropService.save(anyString())).thenReturn(new Crop());
         when(cropService.getByName(anyString())).thenReturn(new Crop());
         when(retailUnitService.getById(anyInt())).thenReturn(new RetailUnit());
@@ -120,7 +129,6 @@ class SellerServiceImplTest {
         // Calling the method
         // Assertions
         assertDoesNotThrow(() -> sellerService.saveProduct(user, retailProductDTO, MultiPartFileDataFactory.notEmpty()));
-
 
         // Behavior Verifications
         verify(cropService).notExist(anyString());
@@ -133,48 +141,200 @@ class SellerServiceImplTest {
     }
 
     @Test
-    void wholeSaleSaveProduct() {
+    @DisplayName("save retail product scenario 2: crop name should not be saved exists in database")
+    void saveRetailProductScenario2CropNameExistsInDatabase() throws IOException {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+
+        RetailProductDTO retailProductDTO = RetailProductDTO.retailProductDTOBuilder()
+                .cropName("Crop")
+                .build();
 
         // Stubbing methods
+        doReturn(false).when(user).isNotVerified();
 
+        doReturn(false).when(cropService).notExist(anyString());
+        when(cropService.getByName(anyString())).thenReturn(new Crop());
+        when(retailUnitService.getById(anyInt())).thenReturn(new RetailUnit());
+        when(retailProductMapper.toEntity(any(RetailProductDTO.class), any(User.class), any(Crop.class), any(RetailUnit.class), anyString())).thenReturn(new RetailProduct());
+        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(new RetailProduct());
+        doNothing().when(imageUploader).upload(anyString(), any(MultipartFile.class));
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.saveProduct(user, retailProductDTO, MultiPartFileDataFactory.notEmpty()));
 
         // Behavior Verifications
+        verify(cropService).notExist(anyString());
+        verify(cropService).getByName(anyString());
+        verify(retailUnitService).getById(anyInt());
+        verify(retailProductMapper).toEntity(any(RetailProductDTO.class), any(User.class), any(Crop.class), any(RetailUnit.class), anyString());
+        verify(retailProductRepository).save(any(RetailProduct.class));
+        verify(imageUploader).upload(anyString(), any(MultipartFile.class));
     }
 
     @Test
-    void updateProduct() {
+    @DisplayName("save whole sale product scenario 1: crop name should be saved if doesn't exist in database")
+    void wholeSaleSaveProduct() throws IOException {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+
+        WholeSaleProductDTO wholeSaleProductDTO = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
+                .cropName("Crop")
+                .build();
 
         // Stubbing methods
+        doReturn(false).when(user).isNotVerified();
 
+        doReturn(true).when(cropService).notExist(anyString());
+        when(cropService.save(anyString())).thenReturn(new Crop());
+        when(cropService.getByName(anyString())).thenReturn(new Crop());
+        when(wholeSaleUnitService.getById(anyInt())).thenReturn(new WholeSaleUnit());
+        when(wholeSaleProductMapper.toEntity(any(WholeSaleProductDTO.class), any(User.class), any(Crop.class), any(WholeSaleUnit.class), anyString())).thenReturn(new WholeSaleProduct());
+        when(wholeSaleProductRepository.save(any(WholeSaleProduct.class))).thenReturn(new WholeSaleProduct());
+        doNothing().when(imageUploader).upload(anyString(), any(MultipartFile.class));
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.saveProduct(user, wholeSaleProductDTO, MultiPartFileDataFactory.notEmpty()));
 
         // Behavior Verifications
+        verify(cropService).notExist(anyString());
+        verify(cropService).save(anyString());
+        verify(cropService).getByName(anyString());
+        verify(wholeSaleUnitService).getById(anyInt());
+        verify(wholeSaleProductMapper).toEntity(any(WholeSaleProductDTO.class), any(User.class), any(Crop.class), any(WholeSaleUnit.class), anyString());
+        verify(wholeSaleProductRepository).save(any(WholeSaleProduct.class));
+        verify(imageUploader).upload(anyString(), any(MultipartFile.class));
     }
 
     @Test
-    void wholeSaleUpdateProduct() {
+    @DisplayName("save whole sale product scenario 2: crop name should not be saved if exist in database")
+    void wholeSaleSaveProductScenario2CropNameExistsInDatabase() throws IOException {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+
+        WholeSaleProductDTO wholeSaleProductDTO = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
+                .cropName("Crop")
+                .build();
 
         // Stubbing methods
+        doReturn(false).when(user).isNotVerified();
 
+        doReturn(false).when(cropService).notExist(anyString());
+        when(cropService.getByName(anyString())).thenReturn(new Crop());
+        when(wholeSaleUnitService.getById(anyInt())).thenReturn(new WholeSaleUnit());
+        when(wholeSaleProductMapper.toEntity(any(WholeSaleProductDTO.class), any(User.class), any(Crop.class), any(WholeSaleUnit.class), anyString())).thenReturn(new WholeSaleProduct());
+        when(wholeSaleProductRepository.save(any(WholeSaleProduct.class))).thenReturn(new WholeSaleProduct());
+        doNothing().when(imageUploader).upload(anyString(), any(MultipartFile.class));
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.saveProduct(user, wholeSaleProductDTO, MultiPartFileDataFactory.notEmpty()));
 
         // Behavior Verifications
+        verify(cropService).notExist(anyString());
+        verify(cropService).getByName(anyString());
+        verify(wholeSaleUnitService).getById(anyInt());
+        verify(wholeSaleProductMapper).toEntity(any(WholeSaleProductDTO.class), any(User.class), any(Crop.class), any(WholeSaleUnit.class), anyString());
+        verify(wholeSaleProductRepository).save(any(WholeSaleProduct.class));
+        verify(imageUploader).upload(anyString(), any(MultipartFile.class));
+    }
+
+    @Test
+    void updateProduct() throws IOException {
+        // Expected and Actual Value
+
+        // Mock Data
+        User user = spy(User.class);
+
+        RetailProduct retailProduct = spy(RetailProduct.class);
+
+        RetailProductDTO retailProductDTO = RetailProductDTO.retailProductDTOBuilder()
+                .cropName("Crop")
+                .build();
+
+        // Stubbing methods
+        doReturn(false).when(retailProduct).hasAcceptedOrder();
+        doReturn(false).when(retailProduct).hasPendingOrder();
+        doReturn(false).when(retailProduct).hasSoldOrder();
+        doReturn(false).when(user).isNotVerified();
+        doReturn(true).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isSold();
+        doReturn(false).when(retailProduct).isDeleted();
+        doReturn(true).when(cropService).notExist(anyString());
+
+        doNothing().when(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
+        when(cropService.getByName(anyString())).thenReturn(new Crop());
+        when(cropService.save(anyString())).thenReturn(new Crop());
+        when(retailUnitService.getById(anyInt())).thenReturn(new RetailUnit());
+        when(retailProductMapper.toUpdate(any(RetailProduct.class), any(RetailProductDTO.class), any(RetailUnit.class), any(Crop.class), anyString())).thenReturn(new RetailProduct());
+        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(new RetailProduct());
+        doNothing().when(imageUploader).upload(anyString(), any(MultipartFile.class));
+
+        // Calling the method
+        // Assertions
+        assertDoesNotThrow(() -> sellerService.updateProduct(user, retailProduct, retailProductDTO, MultiPartFileDataFactory.notEmpty()));
+        assertEquals(Product.State.PENDING, retailProduct.getState());
+        // Behavior Verifications
+        verify(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
+        verify(cropService).notExist(anyString());
+        verify(cropService).save(anyString());
+        verify(cropService).getByName(anyString());
+        verify(retailUnitService).getById(anyInt());
+        verify(retailProductMapper).toUpdate(any(RetailProduct.class), any(RetailProductDTO.class), any(RetailUnit.class), any(Crop.class), anyString());
+        verify(retailProductRepository).save(any(RetailProduct.class));
+        verify(imageUploader).upload(anyString(), any(MultipartFile.class));
+    }
+
+    @Test
+    void wholeSaleUpdateProduct() throws IOException {
+        // Expected and Actual Value
+
+        // Mock Data
+        User user = spy(User.class);
+
+        WholeSaleProduct wholeSaleProduct = spy(WholeSaleProduct.class);
+
+        WholeSaleProductDTO wholeSaleProductDTO = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
+                .cropName("Crop")
+                .build();
+
+        // Stubbing methods
+        doReturn(false).when(wholeSaleProduct).hasAcceptedOrder();
+        doReturn(false).when(wholeSaleProduct).hasPendingOrder();
+        doReturn(false).when(wholeSaleProduct).hasSoldOrder();
+        doReturn(false).when(user).isNotVerified();
+        doReturn(true).when(user).hasProduct(any(WholeSaleProduct.class));
+        doReturn(false).when(wholeSaleProduct).isSold();
+        doReturn(false).when(wholeSaleProduct).isDeleted();
+        doReturn(true).when(cropService).notExist(anyString());
+
+        doNothing().when(wholeSaleProductService).updateAllPendingAndAcceptedOrders(any(WholeSaleProduct.class), any(Order.Status.class));
+        when(cropService.getByName(anyString())).thenReturn(new Crop());
+        when(cropService.save(anyString())).thenReturn(new Crop());
+        when(wholeSaleUnitService.getById(anyInt())).thenReturn(new WholeSaleUnit());
+        when(wholeSaleProductMapper.toUpdate(any(WholeSaleProduct.class), any(WholeSaleProductDTO.class), any(Crop.class), any(WholeSaleUnit.class), anyString())).thenReturn(new WholeSaleProduct());
+        when(wholeSaleProductRepository.save(any(WholeSaleProduct.class))).thenReturn(new WholeSaleProduct());
+        doNothing().when(imageUploader).upload(anyString(), any(MultipartFile.class));
+
+        // Calling the method
+        // Assertions
+        assertDoesNotThrow(() -> sellerService.updateProduct(user, wholeSaleProduct, wholeSaleProductDTO, MultiPartFileDataFactory.notEmpty()));
+        assertEquals(Product.State.PENDING, wholeSaleProduct.getState());
+
+        // Behavior Verifications
+        verify(wholeSaleProductService).updateAllPendingAndAcceptedOrders(any(WholeSaleProduct.class), any(Order.Status.class));
+        verify(cropService).notExist(anyString());
+        verify(cropService).save(anyString());
+        verify(cropService).getByName(anyString());
+        verify(wholeSaleUnitService).getById(anyInt());
+        verify(wholeSaleProductMapper).toUpdate(any(WholeSaleProduct.class), any(WholeSaleProductDTO.class), any(Crop.class), any(WholeSaleUnit.class), anyString());
+        verify(wholeSaleProductRepository).save(any(WholeSaleProduct.class));
+        verify(imageUploader).upload(anyString(), any(MultipartFile.class));
     }
 
     @Test
@@ -182,14 +342,27 @@ class SellerServiceImplTest {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+        RetailProduct retailProduct = spy(RetailProduct.class);
 
         // Stubbing methods
+        doReturn(false).when(user).isNotVerified();
+        doReturn(true).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isSold();
+        doReturn(false).when(retailProduct).hasPendingOrder();
+        doReturn(false).when(retailProduct).hasAcceptedOrder();
+
+        doNothing().when(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
+        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(new RetailProduct());
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.deleteProduct(user, retailProduct));
+        assertEquals(Product.Status.INACTIVE, retailProduct.getStatus());
 
         // Behavior Verifications
+        verify(retailProductService).updateAllPendingAndAcceptedOrders(any(RetailProduct.class), any(Order.Status.class));
+        verify(retailProductRepository).save(any(RetailProduct.class));
     }
 
     @Test
@@ -197,14 +370,27 @@ class SellerServiceImplTest {
         // Expected and Actual Value
 
         // Mock Data
+        User user = spy(User.class);
+        WholeSaleProduct wholeSaleProduct = spy(WholeSaleProduct.class);
 
         // Stubbing methods
+        doReturn(false).when(user).isNotVerified();
+        doReturn(true).when(user).hasProduct(any(WholeSaleProduct.class));
+        doReturn(false).when(wholeSaleProduct).isSold();
+        doReturn(false).when(wholeSaleProduct).hasPendingOrder();
+        doReturn(false).when(wholeSaleProduct).hasAcceptedOrder();
+
+        doNothing().when(wholeSaleProductService).updateAllPendingAndAcceptedOrders(any(WholeSaleProduct.class), any(Order.Status.class));
+        when(wholeSaleProductRepository.save(any(WholeSaleProduct.class))).thenReturn(new WholeSaleProduct());
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.deleteProduct(user, wholeSaleProduct));
+        assertEquals(Product.Status.INACTIVE, wholeSaleProduct.getStatus());
 
         // Behavior Verifications
+        verify(wholeSaleProductService).updateAllPendingAndAcceptedOrders(any(WholeSaleProduct.class), any(Order.Status.class));
+        verify(wholeSaleProductRepository).save(any(WholeSaleProduct.class));
     }
 
     @Test
@@ -212,6 +398,14 @@ class SellerServiceImplTest {
         // Expected and Actual Value
 
         // Mock Data
+        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
+                .availableQuantity(100)
+                .build();
+
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+                .retailProduct(retailProduct)
+                .orderQuantity(100)
+                .build();
 
         // Stubbing methods
 

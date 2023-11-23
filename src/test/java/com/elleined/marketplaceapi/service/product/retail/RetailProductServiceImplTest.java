@@ -612,6 +612,19 @@ class RetailProductServiceImplTest {
         // Behavior verification
     }
 
+    @Test
+    void hasNoAvailableQuantity() {
+        RetailProduct retailProduct = RetailProduct.retailProductBuilder()
+                .availableQuantity(100)
+                .build();
+
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+                .orderQuantity(1000)
+                .build();
+
+        assertTrue(retailProduct.hasNoAvailableQuantity(retailOrder.getOrderQuantity()));
+    }
+
     private RetailProduct getMockRetailProduct() {
         return RetailProduct.retailProductBuilder()
                 .state(State.LISTING)
