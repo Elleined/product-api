@@ -35,6 +35,8 @@ import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
 import com.elleined.marketplaceapi.service.product.ProductService;
+import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.unit.RetailUnitService;
 import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
@@ -65,8 +67,8 @@ public class SellerServiceImpl implements SellerService {
     private final RetailProductRepository retailProductRepository;
     private final WholeSaleProductRepository wholeSaleProductRepository;
 
-    private final ProductService<RetailProduct> retailProductService;
-    private final ProductService<WholeSaleProduct> wholeSaleProductService;
+    private final RetailProductService retailProductService;
+    private final WholeSaleProductService wholeSaleProductService;
 
     private final WholeSaleProductMapper wholeSaleProductMapper;
     private final RetailProductMapper retailProductMapper;
