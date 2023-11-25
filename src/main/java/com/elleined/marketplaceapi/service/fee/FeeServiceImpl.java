@@ -34,11 +34,10 @@ public class FeeServiceImpl implements FeeService {
     public void payForPremium(User user) {
         BigDecimal userOldBalance = user.getBalance();
         user.setBalance(userOldBalance.subtract(new BigDecimal(PREMIUM_USER_FEE)));
-        BigDecimal userNewBalance = user.getBalance();
         userRepository.save(user);
         appWalletService.addAndSaveBalance(PREMIUM_USER_FEE);
 
-        log.debug("User with id of {} buys premium account amounting {}. This amount is deducted to his/her account balance and now has new balance of {} from {}", user.getId(), PREMIUM_USER_FEE, userNewBalance, userOldBalance);
+        log.debug("User with id of {} buys premium account amounting {}. This amount is deducted to his/her account balance and now has new balance of {} from {}", user.getId(), PREMIUM_USER_FEE, user.getBalance(), userOldBalance);
     }
 
     @Override
