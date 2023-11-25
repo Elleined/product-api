@@ -11,8 +11,10 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,7 +43,8 @@ class DepositServiceTest {
 
     @Mock
     private DepositTransactionService depositTransactionService;
-
+    @Mock
+    private ATMValidator atmValidator;
     @Mock
     private ATMFeeService feeService;
 
@@ -89,7 +92,8 @@ class DepositServiceTest {
     }
 
     @Test
-    void shouldThrowPictureNotValidException() {
+    @DisplayName("requesst withdraw validation 1: proof of transaction must be valid")
+    void requestDepositProofOfTransactionMustBeValid() {
         User user = new User();
         BigDecimal amount = new BigDecimal(500);
 
@@ -103,6 +107,7 @@ class DepositServiceTest {
     }
 
     @Test
+
     void shouldThrowBelowMinimumException() {
         User mockUser = new User();
         MultipartFile mockMultiPartFile = MultiPartFileDataFactory.notEmpty();
@@ -129,18 +134,12 @@ class DepositServiceTest {
     }
 
     @Test
-    void shouldThrowNotValidAmountException() {
+    void shouldThrowNotValidAmountException() throws IOException {
         User user = new User();
-        MultipartFile mockMultiPartFile = MultiPartFileDataFactory.notEmpty();
 
-        BigDecimal negativeAmount = new BigDecimal(-1);
-        BigDecimal nullAmount = null;
+        when(atmValidator.isNotValidAmount(any(BigDecimal.class))).thenReturn(true);
 
-        assertNotNull(mockMultiPartFile);
-        assertNotEquals(MultiPartFileDataFactory.empty(), mockMultiPartFile);
-
-        assertThrows(NotValidAmountException.class, () -> depositService.requestDeposit(user, nullAmount, mockMultiPartFile));
-        assertThrows(NotValidAmountException.class, () -> depositService.requestDeposit(user, negativeAmount, mockMultiPartFile));
+        assertThrows(NotValidAmountException.class, () -> depositService.requestDeposit(user, new BigDecimal(0), MultiPartFileDataFactory.notEmpty()));
 
         verifyNoInteractions(depositTransactionService, imageUploader);
     }

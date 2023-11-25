@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +32,8 @@ class PeerToPeerServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ATMValidator atmValidator;
 
     @Mock
     private ATMFeeService feeService;
@@ -91,25 +94,6 @@ class PeerToPeerServiceTest {
     }
 
     @Test
-    void shouldNotSentMoneyToHimself() {
-        User sender = User.builder()
-                .id(1)
-                .build();
-
-        User receiver = User.builder()
-                .id(2)
-                .build();
-
-        BigDecimal negativeAmount = new BigDecimal(-1);
-        BigDecimal nullAmount = null;
-
-        assertThrows(NotValidAmountException.class, () -> peerToPeerService.peerToPeer(sender, receiver, negativeAmount));
-        assertThrows(NotValidAmountException.class, () -> peerToPeerService.peerToPeer(sender, receiver, nullAmount));
-
-        verifyNoInteractions(feeService, appWalletService, p2PTransactionService, userRepository);
-    }
-
-    @Test
     void sentAmountCannotBeGreaterThanCurrentBalance() {
         User sender = User.builder()
                 .id(1)
@@ -163,21 +147,7 @@ class PeerToPeerServiceTest {
                 .id(2)
                 .build();
 
-        List<WithdrawTransaction> withdrawTransactions = Arrays.asList(
-                WithdrawTransaction.builder()
-                        .status(Transaction.Status.PENDING)
-                        .amount(new BigDecimal(2_500))
-                        .build(),
-                WithdrawTransaction.builder()
-                        .status(Transaction.Status.PENDING)
-                        .amount(new BigDecimal(2_000))
-                        .build(),
-                WithdrawTransaction.builder()
-                        .status(Transaction.Status.PENDING)
-                        .amount(new BigDecimal(500))
-                        .build()
-        );
-        sender.setWithdrawTransactions(withdrawTransactions);
+        when(atmValidator.isUserTotalPendingRequestAmountAboveBalance(sender, sentAmount)).thenReturn(true);
 
         assertThrows(InsufficientFundException.class, () -> peerToPeerService.peerToPeer(sender, receiver, sentAmount));
         verifyNoInteractions(feeService, appWalletService, p2PTransactionService, userRepository);

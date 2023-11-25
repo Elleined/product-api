@@ -88,18 +88,14 @@ class WithdrawServiceTest {
 
     @Test
     void sentAmountCannotBeNullOrNegative() {
-        String number = "09999999999";
         User user = User.builder()
                 .balance(new BigDecimal(5_000))
                 .build();
 
-        doNothing().when(numberValidator).validate(number);
+        doNothing().when(numberValidator).validate(anyString());
+        when(atmValidator.isNotValidAmount(any(BigDecimal.class))).thenReturn(true);
 
-        BigDecimal negativeAmount = new BigDecimal(-1);
-        BigDecimal nullAmount = null;
-
-        assertThrows(NotValidAmountException.class, () -> withdrawService.requestWithdraw(user, negativeAmount, number));
-        assertThrows(NotValidAmountException.class, () -> withdrawService.requestWithdraw(user, nullAmount, number));
+        assertThrowsExactly(NotValidAmountException.class, () -> withdrawService.requestWithdraw(user, new BigDecimal(0), ""));
         verifyNoInteractions(withdrawTransactionService);
     }
 
@@ -125,23 +121,9 @@ class WithdrawServiceTest {
                 .balance(balance)
                 .build();
 
-        List<WithdrawTransaction> withdrawTransactions = Arrays.asList(
-                WithdrawTransaction.builder()
-                        .status(Transaction.Status.PENDING)
-                        .amount(new BigDecimal(2_500))
-                        .build(),
-                WithdrawTransaction.builder()
-                        .status(Transaction.Status.PENDING)
-                        .amount(new BigDecimal(2_000))
-                        .build(),
-                WithdrawTransaction.builder()
-                        .status(Transaction.Status.PENDING)
-                        .amount(new BigDecimal(500))
-                        .build()
-        );
-        user.setWithdrawTransactions(withdrawTransactions);
+        doNothing().when(numberValidator).validate(anyString());
 
-        doNothing().when(numberValidator).validate(number);
+        when(atmValidator.isUserTotalPendingRequestAmountAboveBalance(user, withdrawalAmount)).thenReturn(true);
         assertThrows(InsufficientFundException.class, () -> withdrawService.requestWithdraw(user, withdrawalAmount, number));
 
         verifyNoInteractions(withdrawTransactionService);
