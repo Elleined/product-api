@@ -26,21 +26,12 @@ public interface OrderService<ENTITY extends Order> {
                 .toList();
     }
 
-    static <T extends Order> List<T> getByDateRange(List<T> orders, Order.Status status, LocalDate start, LocalDate end) {
-        return orders.stream()
-                .filter(order -> order.getStatus() == status)
-                .filter(orderItem -> orderItem.getUpdatedAt().toLocalDate().isEqual(start)
-                        || (orderItem.getUpdatedAt().toLocalDate().isAfter(start) && orderItem.getUpdatedAt().toLocalDate().isBefore(end))
-                        || orderItem.getUpdatedAt().toLocalDate().equals(end))
-                .toList();
-    }
-
     static <T extends Order> List<T> getByDateRange(List<T> orders, Order.Status status, LocalDateTime start, LocalDateTime end) {
         return orders.stream()
                 .filter(order -> order.getStatus() == status)
-                .filter(orderItem -> orderItem.getUpdatedAt().isEqual(start)
-                        || (orderItem.getUpdatedAt().isAfter(start) && orderItem.getUpdatedAt().isBefore(end))
-                        || orderItem.getUpdatedAt().equals(end))
+                .filter(orderItem -> orderItem.getUpdatedAt().isEqual(start) ||
+                        (orderItem.getUpdatedAt().isAfter(start) && orderItem.getUpdatedAt().isBefore(end)) ||
+                        orderItem.getUpdatedAt().equals(end))
                 .toList();
     }
 }
