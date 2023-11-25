@@ -28,6 +28,7 @@ import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.order.OrderService;
 import com.elleined.marketplaceapi.service.product.ProductService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import com.elleined.marketplaceapi.service.user.seller.premium.PremiumSellerProxy;
 import com.elleined.marketplaceapi.utils.Formatter;
@@ -54,14 +55,14 @@ public class RegularSellerProxy implements SellerService, RegularSellerRestricti
 
     private final SellerService sellerService;
 
-    private final ProductService<WholeSaleProduct> wholeSaleProductService;
+    private final WholeSaleProductService wholeSaleProductService;
     private final RetailProductService retailProductService;
 
     private final FeeService feeService;
 
 
     public RegularSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
-                              ProductService<WholeSaleProduct> wholeSaleProductService,
+                              WholeSaleProductService wholeSaleProductService,
                               RetailProductService retailProductService,
                               FeeService feeService) {
         this.sellerService = sellerService;
