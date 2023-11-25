@@ -6,17 +6,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import java.math.BigDecimal;
 
 public interface ATMValidator {
+    boolean isNotValidAmount(BigDecimal amount);
 
-    static boolean isNotValidAmount(BigDecimal amount) {
-        return amount == null || amount.compareTo(BigDecimal.ZERO) <= 0;
-    }
-
-    static boolean isUserTotalPendingRequestAmountAboveBalance(User currentUser, BigDecimal sentAmount) {
-        BigDecimal totalPendingAmount = currentUser.getWithdrawTransactions().stream()
-                .filter(WithdrawTransaction::isPending)
-                .map(WithdrawTransaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return totalPendingAmount.add(sentAmount).compareTo(currentUser.getBalance()) > 0;
-    }
+    boolean isUserTotalPendingRequestAmountAboveBalance(User currentUser, BigDecimal sentAmount);
 }

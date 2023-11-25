@@ -33,6 +33,7 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
     public static final int MINIMUM_AMOUNT = 500;
 
     private final UserRepository userRepository;
+    private final ATMValidator atmValidator;
     private final ATMFeeService feeService;
     private final P2PTransactionService p2PTransactionService;
     private final AppWalletService appWalletService;
@@ -44,10 +45,10 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
             LimitException {
 
         if (isSenderSendingToHimself(sender, receiver)) throw new SendingToHimselfException("You cannot send to yourself");
-        if (ATMValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Cannot send money! because amount should be positive and cannot be zero!");
+        if (atmValidator.isNotValidAmount(sentAmount)) throw new NotValidAmountException("Cannot send money! because amount should be positive and cannot be zero!");
         if (sender.isBalanceNotEnough(sentAmount)) throw new InsufficientFundException("Insufficient Funds!");
         if (reachedLimitAmountPerDay(sender)) throw new PeerToPeerLimitPerDayException("Cannot send money! Because you already reached the sent amount limit per day which is " + PEER_TO_PEER_LIMIT_PER_DAY);
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(sender, sentAmount)) throw new InsufficientFundException("Cannot send money! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(sender, sentAmount)) throw new InsufficientFundException("Cannot send money! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
 
         float p2pFee = feeService.getP2pFee(sentAmount);
         BigDecimal finalSentAmount = sentAmount.subtract(new BigDecimal(p2pFee));

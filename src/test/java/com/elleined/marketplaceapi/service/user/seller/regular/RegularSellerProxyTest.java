@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.user.seller.regular;
 
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
@@ -16,6 +17,8 @@ class RegularSellerProxyTest {
     private  SellerService sellerService;
     @Mock
     private RegularSellerRestriction regularSellerRestriction;
+    @Mock
+    private ATMValidator atmValidator;
     @Mock
     private  RetailProductService retailProductService;
     @Mock

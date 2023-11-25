@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.validator.NumberValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,8 @@ class WithdrawServiceTest {
     private UserRepository userRepository;
     @Mock
     private NumberValidator numberValidator;
+    @Mock
+    private ATMValidator atmValidator;
     @Mock
     private WithdrawTransactionService withdrawTransactionService;
     @Mock

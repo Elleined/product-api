@@ -40,11 +40,13 @@ public class PremiumSellerProxy implements SellerService {
 
     private final SellerService sellerService;
     private final FeeService feeService;
+    private final ATMValidator atmValidator;
 
     public PremiumSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
-                              FeeService feeService) {
+                              FeeService feeService, ATMValidator atmValidator) {
         this.sellerService = sellerService;
         this.feeService = feeService;
+        this.atmValidator = atmValidator;
     }
 
     @Override
@@ -113,7 +115,7 @@ public class PremiumSellerProxy implements SellerService {
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
         if (seller.isBalanceNotEnough(successfulTransactionFee))
             throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
@@ -126,7 +128,7 @@ public class PremiumSellerProxy implements SellerService {
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
         if (seller.isBalanceNotEnough(successfulTransactionFee))
             throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
-        if (ATMValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
+        if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 

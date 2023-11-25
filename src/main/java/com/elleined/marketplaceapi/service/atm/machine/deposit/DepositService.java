@@ -45,6 +45,7 @@ public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidato
     private final UserRepository userRepository;
 
     private final ATMFeeService feeService;
+    private final ATMValidator atmValidator;
 
     private final DepositTransactionService depositTransactionService;
 
@@ -73,7 +74,7 @@ public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidato
             DepositLimitException, IOException {
 
         if (Validator.notValidMultipartFile(proofOfTransaction)) throw new PictureNotValidException("Cannot deposit! Please provide proof of transaction!");
-        if (ATMValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
+        if (atmValidator.isNotValidAmount(depositedAmount)) throw new NotValidAmountException("Amount should be positive and cannot be zero!");
         if (isBelowMinimum(depositedAmount)) throw new DepositAmountBelowMinimumException("Cannot deposit! because you are trying to deposit an amount that is below minimum which is " + MINIMUM_DEPOSIT_AMOUNT);
         if (isAboveMaximum(depositedAmount)) throw new DepositAmountAboveMaximumException("You cannot deposit an amount that is greater than to deposit limit which is " + DEPOSIT_LIMIT_PER_DAY);
         if (reachedLimitAmountPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! Because you already reached the deposit limit per day which is " + DEPOSIT_LIMIT_PER_DAY);
