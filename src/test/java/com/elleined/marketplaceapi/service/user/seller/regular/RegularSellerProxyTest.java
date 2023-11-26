@@ -1,8 +1,10 @@
 package com.elleined.marketplaceapi.service.user.seller.regular;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
@@ -118,18 +120,39 @@ class RegularSellerProxyTest {
     }
 
     @Test
-    void wholeSaleSaveProduct() {
+    void wholeSaleSaveProduct() throws IOException {
         // Expected values
+        double expectedListingFee = 10;
+        BigDecimal expectedUserBalance = new BigDecimal(490);
 
         // Mock Data
+        User user = spy(User.class);
+        user.setBalance(new BigDecimal(500));
+
+        WholeSaleProductDTO wholeSaleProductDTO = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
+                .totalPrice(500)
+                .build();
 
         // Stubbing methods
+        doReturn(false).when(user).isBalanceNotEnough(any());
+        when(sellerFeeService.getListingFee(anyDouble())).thenReturn(expectedListingFee);
+        when(atmValidator.isUserTotalPendingRequestAmountAboveBalance(any(User.class), any(BigDecimal.class))).thenReturn(false);
+        doAnswer(i -> {
+            user.setBalance(user.getBalance().subtract(new BigDecimal(expectedListingFee)));
+            return user;
+        }).when(feeService).deductListingFee(any(User.class), anyDouble());
+        when(sellerService.saveProduct(any(User.class), any(WholeSaleProductDTO.class), any(MultipartFile.class))).thenReturn(new WholeSaleProduct());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> regularSellerProxy.saveProduct(user, wholeSaleProductDTO, MultiPartFileDataFactory.notEmpty()));
+        assertEquals(expectedUserBalance, user.getBalance());
 
         // Behavior verification
+        verify(sellerFeeService).getListingFee(anyDouble());
+        verify(atmValidator).isUserTotalPendingRequestAmountAboveBalance(any(User.class), any(BigDecimal.class));
+        verify(feeService).deductListingFee(any(User.class), anyDouble());
+        verify(sellerService).saveProduct(any(User.class), any(WholeSaleProductDTO.class), any(MultipartFile.class));
     }
 
     @Test
