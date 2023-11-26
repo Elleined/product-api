@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.service.validator;
 
 import com.elleined.marketplaceapi.dto.UserDTO;
 import com.elleined.marketplaceapi.exception.field.FullNameException;
-import com.elleined.marketplaceapi.exception.field.HasDigitException;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import org.springframework.stereotype.Service;
 

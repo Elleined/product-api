@@ -7,8 +7,8 @@ import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.order.MaxOrderRejectionException;
 import com.elleined.marketplaceapi.exception.product.*;
-import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
 import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -25,9 +25,9 @@ import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
+import com.elleined.marketplaceapi.service.user.seller.fee.PremiumSellerFeeService;
 import com.elleined.marketplaceapi.service.user.seller.fee.RegularSellerFeeService;
 import com.elleined.marketplaceapi.service.user.seller.fee.SellerFeeService;
-import com.elleined.marketplaceapi.service.user.seller.premium.PremiumSellerProxy;
 import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -60,7 +60,9 @@ public class RegularSellerProxy implements SellerService {
 
 
     public RegularSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
-                              SellerFeeService sellerFeeService, ATMValidator atmValidator, RegularSellerRestriction regularSellerRestriction,
+                              SellerFeeService sellerFeeService,
+                              ATMValidator atmValidator,
+                              RegularSellerRestriction regularSellerRestriction,
                               RetailProductService retailProductService,
                               FeeService feeService) {
         this.sellerService = sellerService;
@@ -92,7 +94,7 @@ public class RegularSellerProxy implements SellerService {
         // Add more validation for regular seller here for future
 
         double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO.getPricePerUnit(), retailProductDTO.getQuantityPerUnit(), retailProductDTO.getAvailableQuantity());
-        double listingFee = getListingFee(totalPrice);
+        double listingFee = sellerFeeService.getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
             throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(listingFee)))
@@ -105,9 +107,9 @@ public class RegularSellerProxy implements SellerService {
     @Override
     public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO wholeSaleProductDTO, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
         double totalPrice = wholeSaleProductDTO.getTotalPrice();
-        double listingFee = getListingFee(totalPrice);
+        double listingFee = sellerFeeService.getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
-            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(listingFee)))
             throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductListingFee(seller, listingFee);
@@ -124,9 +126,9 @@ public class RegularSellerProxy implements SellerService {
         // Add more validation for regular seller here for future
 
         double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO.getPricePerUnit(), retailProductDTO.getQuantityPerUnit(), retailProductDTO.getAvailableQuantity());
-        double listingFee = getListingFee(totalPrice);
+        double listingFee = sellerFeeService.getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
-            throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
         feeService.deductListingFee(seller, listingFee);
 
         return sellerService.updateProduct(seller, retailProduct, retailProductDTO, productPicture);
@@ -141,9 +143,9 @@ public class RegularSellerProxy implements SellerService {
         // Add more validation for regular seller here for future
 
         double totalPrice = wholeSaleProductDTO.getTotalPrice();
-        double listingFee = getListingFee(totalPrice);
+        double listingFee = sellerFeeService.getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
-            throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot update product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
         feeService.deductListingFee(seller, listingFee);
 
         return sellerService.updateProduct(seller, wholeSaleProduct, wholeSaleProductDTO, productPicture);
@@ -214,9 +216,9 @@ public class RegularSellerProxy implements SellerService {
     @Override
     public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         double orderPrice = retailOrder.getPrice();
-        double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
+        double successfulTransactionFee = sellerFeeService.getSuccessfulTransactionFee(orderPrice);
         if (seller.isBalanceNotEnough(successfulTransactionFee))
-            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice + ". Consider buying premium account to lessen the successful transaction fee to" + PremiumSellerProxy.SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE);
+            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + RegularSellerFeeService.SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice + ". Consider buying premium account to lessen the successful transaction fee to" + PremiumSellerFeeService.SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE);
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
@@ -227,9 +229,9 @@ public class RegularSellerProxy implements SellerService {
     @Override
     public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         double orderPrice = wholeSaleOrder.getPrice();
-        double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
+        double successfulTransactionFee = sellerFeeService.getSuccessfulTransactionFee(orderPrice);
         if (seller.isBalanceNotEnough(successfulTransactionFee))
-            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice + ". Consider buying premium account to lessen the successful transaction fee to" + PremiumSellerProxy.SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE);
+            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + RegularSellerFeeService.SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice + ". Consider buying premium account to lessen the successful transaction fee to" + PremiumSellerFeeService.SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE);
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);

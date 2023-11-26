@@ -1,7 +1,7 @@
 package com.elleined.marketplaceapi.controller.constants.seller;
 
 
-import com.elleined.marketplaceapi.service.user.seller.regular.RegularSellerProxy;
+import com.elleined.marketplaceapi.service.user.seller.fee.RegularSellerFeeService;
 import com.elleined.marketplaceapi.service.user.seller.regular.RegularSellerRestriction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegularSellerConstantsController {
     @GetMapping("/listing-fee")
     public float getListingFee() {
-        return RegularSellerProxy.LISTING_FEE_PERCENTAGE;
+        return RegularSellerFeeService.LISTING_FEE_PERCENTAGE;
     }
 
     @GetMapping("/transaction-fee")
     public float getTransactionFee() {
-        return RegularSellerProxy.SUCCESSFUL_TRANSACTION_FEE;
+        return RegularSellerFeeService.SUCCESSFUL_TRANSACTION_FEE;
     }
 
     @GetMapping("/max-accepted-order")

@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.atm.machine.validator;
 
-import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 
 import java.math.BigDecimal;

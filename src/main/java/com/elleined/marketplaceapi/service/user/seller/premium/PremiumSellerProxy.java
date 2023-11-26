@@ -6,8 +6,8 @@ import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
 import com.elleined.marketplaceapi.exception.product.*;
-import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
 import com.elleined.marketplaceapi.exception.product.order.ProductOrderAcceptedException;
+import com.elleined.marketplaceapi.exception.product.order.ProductOrderPendingException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.user.InsufficientBalanceException;
 import com.elleined.marketplaceapi.exception.user.NotOwnedException;
@@ -20,6 +20,8 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
+import com.elleined.marketplaceapi.service.user.seller.fee.PremiumSellerFeeService;
+import com.elleined.marketplaceapi.service.user.seller.fee.SellerFeeService;
 import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,12 +38,15 @@ import java.math.BigDecimal;
 @Qualifier("premiumSellerProxy")
 public class PremiumSellerProxy implements SellerService {
 
+    private final SellerFeeService sellerFeeService;
     private final SellerService sellerService;
     private final FeeService feeService;
     private final ATMValidator atmValidator;
 
-    public PremiumSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
+    public PremiumSellerProxy(@Qualifier("premiumSellerFeeService") SellerFeeService sellerFeeService,
+                              @Qualifier("sellerServiceImpl") SellerService sellerService,
                               FeeService feeService, ATMValidator atmValidator) {
+        this.sellerFeeService = sellerFeeService;
         this.sellerService = sellerService;
         this.feeService = feeService;
         this.atmValidator = atmValidator;
@@ -110,9 +115,9 @@ public class PremiumSellerProxy implements SellerService {
     @Override
     public void soldOrder(User seller, RetailOrder retailOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         double orderPrice = retailOrder.getPrice();
-        double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
+        double successfulTransactionFee = sellerFeeService.getSuccessfulTransactionFee(orderPrice);
         if (seller.isBalanceNotEnough(successfulTransactionFee))
-            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
+            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + PremiumSellerFeeService.SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
@@ -123,9 +128,9 @@ public class PremiumSellerProxy implements SellerService {
     @Override
     public void soldOrder(User seller, WholeSaleOrder wholeSaleOrder) throws NotOwnedException, InsufficientFundException, InsufficientBalanceException {
         double orderPrice = wholeSaleOrder.getPrice();
-        double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
+        double successfulTransactionFee = sellerFeeService.getSuccessfulTransactionFee(orderPrice);
         if (seller.isBalanceNotEnough(successfulTransactionFee))
-            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
+            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + Formatter.formatDouble(successfulTransactionFee) + ", which is " + PremiumSellerFeeService.SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + Formatter.formatDouble(orderPrice));
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(successfulTransactionFee)))
             throw new InsufficientFundException("Cannot order product! because you're balance cannot be less than in you're total pending withdraw request. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
