@@ -72,6 +72,7 @@ class RegularSellerProxyTest {
     void saveProduct() throws IOException {
         // Expected values
         double expectedTotalPrice = 10;
+        double expectedListingFee = 10;
 
         // Mock Data
         User user = spy(User.class);
@@ -88,11 +89,11 @@ class RegularSellerProxyTest {
         when(regularSellerRestriction.isExceedsToMaxAcceptedOrder(any(User.class))).thenReturn(false);
         when(regularSellerRestriction.isExceedsToMaxPendingOrder(any(User.class))).thenReturn(false);
         when(regularSellerRestriction.isExceedsToMaxListingPerDay(any(User.class))).thenReturn(false);
-        when(retailProductService.calculateTotalPrice(any(Integer.class), any(Integer.class), any(Integer.class))).thenReturn(expectedTotalPrice);
+        when(retailProductService.calculateTotalPrice(any(Double.class), any(Integer.class), any(Integer.class))).thenReturn(expectedTotalPrice);
         when(atmValidator.isUserTotalPendingRequestAmountAboveBalance(any(User.class), any(BigDecimal.class))).thenReturn(false);
 
         doAnswer(i -> {
-            // user.setBalance(user.getBalance().subtract(new BigDecimal()));
+            user.setBalance(user.getBalance().subtract(new BigDecimal(expectedListingFee)));
             return user;
         }).when(feeService).deductListingFee(any(User.class), anyDouble());
         when(sellerService.saveProduct(any(User.class), any(RetailProductDTO.class), any(MultipartFile.class))).thenReturn(new RetailProduct());
