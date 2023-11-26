@@ -8,19 +8,19 @@ import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
-import org.junit.jupiter.api.Assertions;
+import com.elleined.marketplaceapi.service.user.seller.fee.SellerFeeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +28,8 @@ class RegularSellerProxyTest {
 
     @Mock
     private  SellerService sellerService;
+    @Mock
+    private SellerFeeService sellerFeeService;
     @Mock
     private RegularSellerRestriction regularSellerRestriction;
     @Mock
@@ -74,8 +76,10 @@ class RegularSellerProxyTest {
         double expectedTotalPrice = 10;
         double expectedListingFee = 10;
 
+        BigDecimal expectedUserBalance = new BigDecimal(490);
         // Mock Data
         User user = spy(User.class);
+        user.setBalance(new BigDecimal(500));
 
         RetailProductDTO retailProductDTO = RetailProductDTO.retailProductDTOBuilder()
                 .pricePerUnit(1)
@@ -90,8 +94,8 @@ class RegularSellerProxyTest {
         when(regularSellerRestriction.isExceedsToMaxPendingOrder(any(User.class))).thenReturn(false);
         when(regularSellerRestriction.isExceedsToMaxListingPerDay(any(User.class))).thenReturn(false);
         when(retailProductService.calculateTotalPrice(any(Double.class), any(Integer.class), any(Integer.class))).thenReturn(expectedTotalPrice);
+        when(sellerFeeService.getListingFee(anyDouble())).thenReturn(expectedListingFee);
         when(atmValidator.isUserTotalPendingRequestAmountAboveBalance(any(User.class), any(BigDecimal.class))).thenReturn(false);
-
         doAnswer(i -> {
             user.setBalance(user.getBalance().subtract(new BigDecimal(expectedListingFee)));
             return user;
@@ -101,9 +105,16 @@ class RegularSellerProxyTest {
         // Calling the method
         // Assestions
         assertDoesNotThrow(() -> regularSellerProxy.saveProduct(user, retailProductDTO, MultiPartFileDataFactory.notEmpty()));
+        assertEquals(expectedUserBalance, user.getBalance());
 
         // Behavior verification
-
+        verify(regularSellerRestriction).isExceedsToMaxAcceptedOrder(any(User.class));
+        verify(regularSellerRestriction).isExceedsToMaxPendingOrder(any(User.class));
+        verify(regularSellerRestriction).isExceedsToMaxListingPerDay(any(User.class));
+        verify(sellerFeeService).getListingFee(anyDouble());
+        verify(atmValidator).isUserTotalPendingRequestAmountAboveBalance(any(User.class), any(BigDecimal.class));
+        verify(feeService).deductListingFee(any(User.class), anyDouble());
+        verify(sellerService).saveProduct(any(User.class), any(RetailProductDTO.class), any(MultipartFile.class));
     }
 
     @Test
