@@ -38,7 +38,7 @@ public class WholeSaleUnitService implements UnitService {
     @Override
     public List<String> getAll() {
         return wholeSaleUnitRepository.findAll().stream()
-                .map(WholeSaleUnit::getName)
+                    .map(WholeSaleUnit::getName)
                 .sorted()
                 .toList();
     }

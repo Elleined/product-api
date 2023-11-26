@@ -25,6 +25,8 @@ import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
+import com.elleined.marketplaceapi.service.user.seller.fee.RegularSellerFeeService;
+import com.elleined.marketplaceapi.service.user.seller.fee.SellerFeeService;
 import com.elleined.marketplaceapi.service.user.seller.premium.PremiumSellerProxy;
 import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.extern.slf4j.Slf4j;
@@ -44,10 +46,9 @@ import static com.elleined.marketplaceapi.service.user.seller.regular.RegularSel
 @Transactional
 @Primary
 public class RegularSellerProxy implements SellerService {
-    public final static float LISTING_FEE_PERCENTAGE = 2;
-    public final static float SUCCESSFUL_TRANSACTION_FEE = 2;
-
     private final SellerService sellerService;
+
+    private final SellerFeeService sellerFeeService;
 
     private final ATMValidator atmValidator;
 
@@ -59,10 +60,11 @@ public class RegularSellerProxy implements SellerService {
 
 
     public RegularSellerProxy(@Qualifier("sellerServiceImpl") SellerService sellerService,
-                              ATMValidator atmValidator, RegularSellerRestriction regularSellerRestriction,
+                              SellerFeeService sellerFeeService, ATMValidator atmValidator, RegularSellerRestriction regularSellerRestriction,
                               RetailProductService retailProductService,
                               FeeService feeService) {
         this.sellerService = sellerService;
+        this.sellerFeeService = sellerFeeService;
         this.atmValidator = atmValidator;
         this.regularSellerRestriction = regularSellerRestriction;
         this.retailProductService = retailProductService;
@@ -92,7 +94,7 @@ public class RegularSellerProxy implements SellerService {
         double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO.getPricePerUnit(), retailProductDTO.getQuantityPerUnit(), retailProductDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
-            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot save product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
         if (atmValidator.isUserTotalPendingRequestAmountAboveBalance(seller, new BigDecimal(listingFee)))
             throw new InsufficientFundException("Cannot save product! because you're balance cannot be less than in you're total pending withdraw request which. Cancel some of your withdraw request or wait for our team to settle you withdraw request.");
         feeService.deductListingFee(seller, listingFee);
@@ -120,7 +122,6 @@ public class RegularSellerProxy implements SellerService {
         if (regularSellerRestriction.isExceedsToMaxPendingOrder(seller))
             throw new SellerMaxPendingOrderException("Cannot update product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed. Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
-
 
         double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO.getPricePerUnit(), retailProductDTO.getQuantityPerUnit(), retailProductDTO.getAvailableQuantity());
         double listingFee = getListingFee(totalPrice);
@@ -236,11 +237,4 @@ public class RegularSellerProxy implements SellerService {
         sellerService.soldOrder(seller, wholeSaleOrder);
     }
 
-    private double getListingFee(double productTotalPrice) {
-        return (productTotalPrice * (LISTING_FEE_PERCENTAGE / 100f));
-    }
-
-    private double getSuccessfulTransactionFee(double orderPrice) {
-        return (orderPrice * (SUCCESSFUL_TRANSACTION_FEE / 100f));
-    }
 }

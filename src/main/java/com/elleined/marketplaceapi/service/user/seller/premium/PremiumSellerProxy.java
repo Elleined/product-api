@@ -36,8 +36,6 @@ import java.math.BigDecimal;
 @Qualifier("premiumSellerProxy")
 public class PremiumSellerProxy implements SellerService {
 
-    public static final float SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE = 1;
-
     private final SellerService sellerService;
     private final FeeService feeService;
     private final ATMValidator atmValidator;
@@ -135,7 +133,4 @@ public class PremiumSellerProxy implements SellerService {
         sellerService.soldOrder(seller, wholeSaleOrder);
     }
 
-    private double getSuccessfulTransactionFee(double orderPrice) {
-        return (orderPrice * (SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE / 100f));
-    }
 }
