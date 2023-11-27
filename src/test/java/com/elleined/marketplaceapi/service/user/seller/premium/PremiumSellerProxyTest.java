@@ -3,8 +3,13 @@ package com.elleined.marketplaceapi.service.user.seller.premium;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
@@ -15,7 +20,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,12 +47,14 @@ class PremiumSellerProxyTest {
         // Mock Data
 
         // Stubbing methods
+        when(sellerService.saleProduct(any(User.class), any(RetailProduct.class), anyInt())).thenReturn(new RetailProduct());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.saleProduct(new User(), new RetailProduct(), 100));
 
         // Behavior verification
+        verify(sellerService).saleProduct(any(User.class), any(RetailProduct.class), anyInt());
     }
 
     @Test
@@ -55,102 +64,116 @@ class PremiumSellerProxyTest {
         // Mock Data
 
         // Stubbing methods
+        when(sellerService.saleProduct(any(User.class), any(WholeSaleProduct.class), anyInt())).thenReturn(new WholeSaleProduct());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.saleProduct(new User(), new WholeSaleProduct(), 100));
 
         // Behavior verification
+        verify(sellerService).saleProduct(any(User.class), any(WholeSaleProduct.class), anyInt());
     }
 
     @Test
-    void saveProduct() {
+    void saveProduct() throws IOException {
         // Expected values
 
         // Mock Data
 
         // Stubbing methods
+        when(sellerService.saveProduct(any(User.class), any(RetailProductDTO.class), any(MultipartFile.class))).thenReturn(new RetailProduct());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.saveProduct(new User(), new RetailProductDTO(), MultiPartFileDataFactory.notEmpty()));
 
         // Behavior verification
+        verify(sellerService).saveProduct(any(User.class), any(RetailProductDTO.class), any(MultipartFile.class));
     }
 
     @Test
-    void wholeSaleSaveProduct() {
+    void wholeSaleSaveProduct() throws IOException {
         // Expected values
 
         // Mock Data
 
         // Stubbing methods
+        when(sellerService.saveProduct(any(User.class), any(WholeSaleProductDTO.class), any(MultipartFile.class))).thenReturn(new WholeSaleProduct());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.saveProduct(new User(), new WholeSaleProductDTO(), MultiPartFileDataFactory.notEmpty()));
 
         // Behavior verification
+        verify(sellerService).saveProduct(any(User.class), any(WholeSaleProductDTO.class), any(MultipartFile.class));
     }
 
     @Test
-    void updateProduct() {
+    void updateProduct() throws IOException {
         // Expected values
 
         // Mock Data
 
         // Stubbing methods
+        when(sellerService.updateProduct(any(User.class), any(RetailProduct.class), any(RetailProductDTO.class), any(MultipartFile.class))).thenReturn(new RetailProduct());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.updateProduct(new User(), new RetailProduct(), new RetailProductDTO(), MultiPartFileDataFactory.notEmpty()));
 
         // Behavior verification
+        verify(sellerService).updateProduct(any(User.class), any(RetailProduct.class), any(RetailProductDTO.class), any(MultipartFile.class));
     }
 
     @Test
-    void wholeSaleUpdateProduct() {
+    void wholeSaleUpdateProduct() throws IOException {
         // Expected values
 
         // Mock Data
 
         // Stubbing methods
+        when(sellerService.updateProduct(any(User.class), any(WholeSaleProduct.class), any(WholeSaleProductDTO.class), any(MultipartFile.class))).thenReturn(new WholeSaleProduct());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.updateProduct(new User(), new WholeSaleProduct(), new WholeSaleProductDTO(), MultiPartFileDataFactory.notEmpty()));
 
         // Behavior verification
+        verify(sellerService).updateProduct(any(User.class), any(WholeSaleProduct.class), any(WholeSaleProductDTO.class), any(MultipartFile.class));
     }
 
     @Test
-    void deleteProduct() {
-        // Expected values
+    void deleteProduct() throws IOException {
+// Expected values
 
         // Mock Data
 
         // Stubbing methods
+        doNothing().when(sellerService).deleteProduct(any(User.class), any(RetailProduct.class));
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.deleteProduct(new User(), new RetailProduct()));
 
         // Behavior verification
+        verify(sellerService).deleteProduct(any(User.class), any(RetailProduct.class));
     }
 
     @Test
     void wholeSaleDeleteProduct() {
-        // Expected values
+// Expected values
 
         // Mock Data
 
         // Stubbing methods
+        doNothing().when(sellerService).deleteProduct(any(User.class), any(WholeSaleProduct.class));
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.deleteProduct(new User(), new WholeSaleProduct()));
 
         // Behavior verification
+        verify(sellerService).deleteProduct(any(User.class), any(WholeSaleProduct.class));
     }
 
     @Test
@@ -160,12 +183,14 @@ class PremiumSellerProxyTest {
         // Mock Data
 
         // Stubbing methods
+        doNothing().when(sellerService).acceptOrder(any(User.class), any(RetailOrder.class), anyString());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.acceptOrder(new User(), new RetailOrder(), ""));
 
         // Behavior verification
+        verify(sellerService).acceptOrder(any(User.class), any(RetailOrder.class), anyString());
     }
 
     @Test
@@ -175,12 +200,14 @@ class PremiumSellerProxyTest {
         // Mock Data
 
         // Stubbing methods
+        doNothing().when(sellerService).acceptOrder(any(User.class), any(WholeSaleOrder.class), anyString());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.acceptOrder(new User(), new WholeSaleOrder(), ""));
 
         // Behavior verification
+        verify(sellerService).acceptOrder(any(User.class), any(WholeSaleOrder.class), anyString());
     }
 
     @Test
@@ -190,12 +217,14 @@ class PremiumSellerProxyTest {
         // Mock Data
 
         // Stubbing methods
+        doNothing().when(sellerService).rejectOrder(any(User.class), any(RetailOrder.class), anyString());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.rejectOrder(new User(), new RetailOrder(), ""));
 
         // Behavior verification
+        verify(sellerService).rejectOrder(any(User.class), any(RetailOrder.class), anyString());
     }
 
     @Test
@@ -205,12 +234,14 @@ class PremiumSellerProxyTest {
         // Mock Data
 
         // Stubbing methods
+        doNothing().when(sellerService).rejectOrder(any(User.class), any(WholeSaleOrder.class), anyString());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> premiumSellerProxy.rejectOrder(new User(), new WholeSaleOrder(), ""));
 
         // Behavior verification
+        verify(sellerService).rejectOrder(any(User.class), any(WholeSaleOrder.class), anyString());
     }
 
     @Test
