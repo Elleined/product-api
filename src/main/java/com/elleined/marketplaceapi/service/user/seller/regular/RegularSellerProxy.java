@@ -124,7 +124,6 @@ public class RegularSellerProxy implements SellerService {
         if (regularSellerRestriction.isExceedsToMaxPendingOrder(seller))
             throw new SellerMaxPendingOrderException("Cannot update product! because you already exceeds to max pending which is " + MAX_PENDING_ORDER + " please accept first some orders to proceed. Consider buying premium account to remove this restriction.");
         // Add more validation for regular seller here for future
-
         double totalPrice = retailProductService.calculateTotalPrice(retailProductDTO.getPricePerUnit(), retailProductDTO.getQuantityPerUnit(), retailProductDTO.getAvailableQuantity());
         double listingFee = sellerFeeService.getListingFee(totalPrice);
         if (seller.isBalanceNotEnough(listingFee))
