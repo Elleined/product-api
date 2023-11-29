@@ -14,7 +14,7 @@ import java.util.List;
 public class CropController {
     private final CropService cropService;
 
-    @GetMapping("/crops")
+    @GetMapping
     public List<String> getAllCrops() {
         return cropService.getAll();
     }
