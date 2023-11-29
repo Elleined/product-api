@@ -23,7 +23,7 @@ public class OTPController {
     }
 
     // Use this method also to resendOTP
-    @PostMapping("/send-otp")
+    @PostMapping("/send")
     public OTPMessage sendOTP(@RequestParam("email") String email) {
         return otpService.sendOTP(email);
     }
