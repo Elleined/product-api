@@ -35,8 +35,8 @@ public class AfterStartUp {
 
     private final static String CROPS_JSON = "/json/crops.json";
     private final static String USERS_JSON = "/json/users.json";
-    private final static String RETAIL_UNITS_JSON = "/json/retail_units.json";
-    private final static String WHOLE_SALE_UNITS_JSON = "/json/whole_sale_units.json";
+    private final static String RETAIL_UNITS_JSON = "/json/unit/retail_units.json";
+    private final static String WHOLE_SALE_UNITS_JSON = "/json/unit/whole_sale_units.json";
 
     @PostConstruct
     public void init() throws IOException {

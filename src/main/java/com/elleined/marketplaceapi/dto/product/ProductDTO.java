@@ -24,6 +24,7 @@ public class ProductDTO {
 
     @Positive(message = "Unit id cannot be negative or less than 0")
     private int unitId;
+
     private String unitName;
 
     @NotBlank(message = "Description cannot be null, blank, or empty")

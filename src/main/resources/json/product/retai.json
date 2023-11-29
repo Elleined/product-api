@@ -1,0 +1,10 @@
+{
+  "cropName": "Dragon Fruit",
+  "unitId": 1,
+  "description": "Dragon fruit description",
+  "availableQuantity": 10,
+  "pricePerUnit": 50,
+  "quantityPerUnit": 5,
+  "harvestDate": "2023-10-17",
+  "expirationDate": "2023-10-25"
+}
