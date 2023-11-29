@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{currentUserId}/atm-transactions")
 @RequiredArgsConstructor
-public class ATMTransactionController {
+public class    ATMTransactionController {
     private final ATMFeeService atmFeeService;
     private final UserService userService;
 

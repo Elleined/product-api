@@ -17,7 +17,7 @@ import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/{userId}/export/pdf/whole-sale-orders")
+    @RequestMapping("/users/{userId}/export/pdf/whole-sale-orders")
 public class WholeSaleOrderExporterController {
     private final UserService userService;
 

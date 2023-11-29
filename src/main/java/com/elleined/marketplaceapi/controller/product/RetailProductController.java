@@ -20,7 +20,7 @@ public class RetailProductController {
 
     private final UserService userService;
 
-    @GetMapping("/{currentUserId}")
+    @GetMapping("/listed/{currentUserId}")
     public List<RetailProductDTO> getAllExcept(@PathVariable("currentUserId") int currentUserId) {
         User currentUser = userService.getById(currentUserId);
         return retailProductService.getAllExcept(currentUser).stream()

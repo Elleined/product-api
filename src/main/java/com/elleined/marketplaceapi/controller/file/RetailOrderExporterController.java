@@ -18,7 +18,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/export/pdf/retail-orders")
-public class RetailOrderExporterController {
+public class    RetailOrderExporterController {
     private final UserService userService;
     private final OrderService<RetailOrder> retailOrderService;
     private final RetailOrderExporter retailOrderExporter;
@@ -37,6 +37,22 @@ public class RetailOrderExporterController {
         retailOrderExporter.export(response, soldOrders);
     }
 
+    @GetMapping("/sales-report-by-date-range")
+    public void export(HttpServletResponse response,
+                       @PathVariable("userId") int userId,
+                       @RequestParam("startDate") LocalDate start,
+                       @RequestParam("endDate") LocalDate end) throws IOException {
+        response.setContentType("application/pdf");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=sales-report.pdf";
+        response.setHeader(headerKey, headerValue);
+
+        User user = userService.getById(userId);
+        List<RetailOrder> soldOrders = retailOrderService.getAllProductOrderByStatus(user, Order.Status.SOLD);
+
+        retailOrderExporter.export(response, soldOrders, start, end);
+    }
+
     @GetMapping("/sellers-sales-report")
     public void exportAll(HttpServletResponse response) throws IOException {
         Set<User> sellers = userService.getAllSeller();
@@ -51,22 +67,6 @@ public class RetailOrderExporterController {
                 .toList();
 
         retailOrderExporter.export(response, sellersAllSoldOrder);
-    }
-
-    @GetMapping("/sales-report-by-date-range")
-    public void export(HttpServletResponse response,
-                          @PathVariable("userId") int userId,
-                          @RequestParam("startDate") LocalDate start,
-                          @RequestParam("endDate") LocalDate end) throws IOException {
-        response.setContentType("application/pdf");
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=sales-report.pdf";
-        response.setHeader(headerKey, headerValue);
-
-        User user = userService.getById(userId);
-        List<RetailOrder> soldOrders = retailOrderService.getAllProductOrderByStatus(user, Order.Status.SOLD);
-
-        retailOrderExporter.export(response, soldOrders, start, end);
     }
 
     @GetMapping("/sellers-sales-report-by-range")

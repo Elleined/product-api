@@ -17,7 +17,6 @@ public class ImageUploader implements Uploader {
         File uploadPathWithImg = new File(uploadPath + attachment.getOriginalFilename());
         if (uploadPathWithImg.exists()) return;
         attachment.transferTo(uploadPathWithImg);
-        attachment.transferTo(uploadPathWithImg);
         log.debug("Picture uploaded successfully to {}", uploadPathWithImg);
     }
 }
