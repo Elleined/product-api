@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class OTPController {
     private final OTPService otpService;
 
-    @PostMapping("/authenticateOTP")
+    @PostMapping("/authenticate")
     public APIResponse authenticateOTP(@RequestParam("userInputOTP") int userInputOTP) {
         otpService.authenticateOTP(userInputOTP);
         return new APIResponse(HttpStatus.ACCEPTED, "User OTP authenticated! User may now proceed in changing you password :)");
     }
 
     // Use this method also to resendOTP
-    @PostMapping("/sendOTP")
+    @PostMapping("/send-otp")
     public OTPMessage sendOTP(@RequestParam("email") String email) {
         return otpService.sendOTP(email);
     }
