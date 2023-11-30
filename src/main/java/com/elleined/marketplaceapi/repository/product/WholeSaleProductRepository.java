@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface WholeSaleProductRepository extends JpaRepository<WholeSaleProduct, Integer> {
-    @Query("SELECT wsp FROM RetailProduct wsp WHERE wsp.crop.name LIKE CONCAT('%', :cropName, '%')")
+    @Query("SELECT wsp FROM WholeSaleProduct wsp WHERE wsp.crop.name LIKE CONCAT('%', :cropName, '%')")
     List<WholeSaleProduct> searchProductByCropName(@Param("cropName") String cropName);
 }
