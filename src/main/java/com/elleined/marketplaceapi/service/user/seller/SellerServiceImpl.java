@@ -123,6 +123,8 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public WholeSaleProduct saveProduct(User seller, WholeSaleProductDTO dto, MultipartFile productPicture) throws NotVerifiedException, InsufficientFundException, ProductExpirationLimitException, IOException {
+        if (dto.getTotalPrice() <= 0)
+            throw new ProductPriceException("Please provide the desire total price of your product");
         if (Validator.notValidMultipartFile(productPicture))
             throw new ResourceException("Cannot save product! please provide product picture!");
         if (seller.isNotVerified())

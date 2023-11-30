@@ -186,6 +186,7 @@ class SellerServiceImplTest {
 
         WholeSaleProductDTO wholeSaleProductDTO = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
                 .cropName("Crop")
+                .totalPrice(1)
                 .build();
 
         // Stubbing methods
@@ -201,6 +202,7 @@ class SellerServiceImplTest {
         // Calling the method
         // Assertions
         assertDoesNotThrow(() -> sellerService.saveProduct(user, wholeSaleProductDTO, MultiPartFileDataFactory.notEmpty()));
+        assertNotEquals(0, wholeSaleProductDTO.getTotalPrice());
 
         // Behavior Verifications
         verify(cropService).notExist(anyString());
@@ -222,6 +224,7 @@ class SellerServiceImplTest {
 
         WholeSaleProductDTO wholeSaleProductDTO = WholeSaleProductDTO.wholeSaleProductDTOBuilder()
                 .cropName("Crop")
+                .totalPrice(1)
                 .build();
 
         // Stubbing methods
@@ -236,6 +239,7 @@ class SellerServiceImplTest {
         // Calling the method
         // Assertions
         assertDoesNotThrow(() -> sellerService.saveProduct(user, wholeSaleProductDTO, MultiPartFileDataFactory.notEmpty()));
+        assertNotEquals(0, wholeSaleProductDTO.getTotalPrice());
 
         // Behavior Verifications
         verify(cropService).notExist(anyString());

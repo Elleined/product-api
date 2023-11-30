@@ -4,5 +4,6 @@
   "description": "Dragon fruit description",
   "availableQuantity": 10,
   "harvestDate": "2023-10-17",
-  "expirationDate": "2023-10-25"
+  "expirationDate": "2023-10-25",
+  "totalPrice": 100
 }
