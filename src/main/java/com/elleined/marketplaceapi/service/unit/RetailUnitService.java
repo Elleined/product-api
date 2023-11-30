@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class RetailUnitService implements UnitService {
     @Override
     public List<RetailUnit> getAll() {
         return retailUnitRepository.findAll().stream()
-                .sorted()
+                .sorted(Comparator.comparing(Unit::getName))
                 .toList();
     }
 
