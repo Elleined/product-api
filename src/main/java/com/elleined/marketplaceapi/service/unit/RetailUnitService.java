@@ -1,8 +1,10 @@
 package com.elleined.marketplaceapi.service.unit;
 
+import com.elleined.marketplaceapi.dto.UnitDTO;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.mapper.unit.RetailUnitMapper;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
+import com.elleined.marketplaceapi.model.unit.Unit;
 import com.elleined.marketplaceapi.repository.unit.RetailUnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +37,10 @@ public class RetailUnitService implements UnitService {
     }
 
     @Override
-    public List<String> getAll() {
+    public List<RetailUnit> getAll() {
         return retailUnitRepository.findAll().stream()
-                .map(RetailUnit::getName)
                 .sorted()
                 .toList();
     }
+
 }

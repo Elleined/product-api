@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.controller;
 
+import com.elleined.marketplaceapi.dto.UnitDTO;
 import com.elleined.marketplaceapi.service.unit.RetailUnitService;
 import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +18,18 @@ public class UnitController {
     private final WholeSaleUnitService wholeSaleUnitService;
 
     @GetMapping("/retail-units")
-    public List<String> getAllRetailUnits() {
-        return retailUnitService.getAll();
+    public List<UnitDTO> getAllRetailUnits() {
+        return retailUnitService.getAll().stream()
+                .map(retailUnitService::toDTO)
+                .toList();
     }
 
     @GetMapping("/whole-sale-units")
-    public List<String> getAllWholeSaleUnits() {
-        return wholeSaleUnitService.getAll();
+    public List<UnitDTO> getAllWholeSaleUnits() {
+        return wholeSaleUnitService.getAll().stream()
+                .map(wholeSaleUnitService::toDTO)
+                .toList();
     }
+
+
 }
