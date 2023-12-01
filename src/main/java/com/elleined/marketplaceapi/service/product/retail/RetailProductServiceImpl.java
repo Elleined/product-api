@@ -175,10 +175,10 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
-    public double calculateTotalPrice(SaleRetailProductRequest saleRetailProductRequest) {
+    public double calculateTotalPrice(RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) {
         return calculateTotalPrice(saleRetailProductRequest.getPricePerUnit(),
                 saleRetailProductRequest.getQuantityPerUnit(),
-                saleRetailProductRequest.getAvailableQuantity());
+                retailProduct.getAvailableQuantity());
     }
 
     @Override
@@ -186,6 +186,11 @@ public class RetailProductServiceImpl implements RetailProductService {
         return calculateTotalPrice(retailProduct.getPricePerUnit(),
                 retailProduct.getQuantityPerUnit(),
                 retailProduct.getAvailableQuantity());
+    }
+
+    @Override
+    public double calculateSalePrice(double totalPrice, int salePercentage) {
+        return (totalPrice * (salePercentage / 100f));
     }
 
     @Override

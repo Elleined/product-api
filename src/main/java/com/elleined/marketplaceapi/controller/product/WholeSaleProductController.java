@@ -7,11 +7,9 @@ import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.user.UserService;
-import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -42,7 +40,7 @@ public class WholeSaleProductController {
     public double calculateTotalPrice(@RequestParam("totalPrice") double totalPrice,
                                       @RequestParam("salePercentage") int salePercentage) {
         if (salePercentage > 100) throw new ProductPriceException("Sale percentage cannot be greater than 100");
-        return wholeSaleProductService.calculateTotalPriceByPercentage(totalPrice, salePercentage);
+        return wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
     }
 
     @GetMapping("/search-by-crop-name")

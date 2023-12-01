@@ -14,7 +14,4 @@ public class SaleRetailProductRequest extends SaleProductRequest {
 
     @Positive(message = "Quantity Per Unit cannot be 0 or less than 0")
     private int quantityPerUnit;
-
-    @Positive(message = "Available Quantity percentage cannot be 0 or less than 0")
-    private int availableQuantity;
 }

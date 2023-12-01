@@ -56,7 +56,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -99,23 +98,20 @@ public class SellerServiceImpl implements SellerService {
         if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
 
-        double totalPrice = retailProductService.calculateTotalPrice(saleRetailProductRequest);
-        double salePrice = (totalPrice * (salePercentage / 100f));
+        double totalPrice = retailProductService.calculateTotalPrice(retailProduct, saleRetailProductRequest);
+        double salePrice = retailProductService.calculateSalePrice(totalPrice, salePercentage);
         if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
 
         SaleRetailProduct saleRetailProduct = SaleRetailProduct.saleRetailProductBuilder()
                 .retailProduct(retailProduct)
                 .salePercentage(salePercentage)
+                .pricePerUnit(saleRetailProductRequest.getPricePerUnit())
+                .quantityPerUnit(saleRetailProductRequest.getQuantityPerUnit())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        retailProduct.setPricePerUnit(saleRetailProductRequest.getPricePerUnit());
-        retailProduct.setQuantityPerUnit(saleRetailProductRequest.getQuantityPerUnit());
-        retailProduct.setAvailableQuantity(saleRetailProductRequest.getAvailableQuantity());
         retailProduct.setSaleRetailProduct(saleRetailProduct);
-        retailProduct.setState(Product.State.PENDING);
 
-        retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
         retailProductRepository.save(retailProduct);
         saleRetailProductRepository.save(saleRetailProduct);
         log.debug("Retail product with id of {} set as sale successfully", retailProduct.getId());
@@ -129,21 +125,18 @@ public class SellerServiceImpl implements SellerService {
 
         if (!seller.hasProduct(wholeSaleProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!wholeSaleProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
-        double salePrice = wholeSaleProductService.calculateTotalPriceByPercentage(saleWholeSaleRequest);
+        double salePrice = wholeSaleProductService.calculateSalePrice(saleWholeSaleRequest);
         if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
 
         SaleWholeSaleProduct saleWholeSaleProduct = SaleWholeSaleProduct.saleWholeSaleProductBuilder()
                 .wholeSaleProduct(wholeSaleProduct)
                 .salePercentage(salePercentage)
+                .salePrice(salePrice)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-
         wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
-        wholeSaleProduct.setPrice(new BigDecimal(salePrice));
-        wholeSaleProduct.setState(Product.State.PENDING);
 
-        wholeSaleProductService.updateAllPendingAndAcceptedOrders(wholeSaleProduct, Status.CANCELLED);
         wholeSaleProductRepository.save(wholeSaleProduct);
         saleWholeSaleProductRepository.save(saleWholeSaleProduct);
         log.debug("Whole sale product with id of {} set as sale successfully!", wholeSaleProduct.getId());

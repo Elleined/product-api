@@ -21,13 +21,18 @@ public class SaleWholeSaleProduct extends SaleProduct {
     @OneToOne(optional = false)
     @JoinColumn(
             name = "sale_product_id",
-            referencedColumnName = "product_id"
+            referencedColumnName = "product_id",
+            nullable = false
     )
     private WholeSaleProduct wholeSaleProduct;
 
+    @Column(name = "sale_price", nullable = false)
+    private double salePrice;
+
     @Builder(builderMethodName = "saleWholeSaleProductBuilder")
-    public SaleWholeSaleProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, double salePercentage, WholeSaleProduct wholeSaleProduct) {
+    public SaleWholeSaleProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, double salePercentage, WholeSaleProduct wholeSaleProduct, double salePrice) {
         super(id, createdAt, updatedAt, salePercentage);
         this.wholeSaleProduct = wholeSaleProduct;
+        this.salePrice = salePrice;
     }
 }

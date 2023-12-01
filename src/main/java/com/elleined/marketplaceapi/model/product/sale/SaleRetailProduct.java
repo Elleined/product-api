@@ -25,10 +25,18 @@ public class SaleRetailProduct extends SaleProduct {
     )
     private RetailProduct retailProduct;
 
+    @Column(name = "price_per_unit", nullable = false)
+    private double pricePerUnit;
+
+    @Column(name = "quantity_per_unit", nullable = false)
+    private int quantityPerUnit;
+
 
     @Builder(builderMethodName = "saleRetailProductBuilder")
-    public SaleRetailProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, double salePercentage, RetailProduct retailProduct) {
+    public SaleRetailProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, double salePercentage, RetailProduct retailProduct, double pricePerUnit, int quantityPerUnit) {
         super(id, createdAt, updatedAt, salePercentage);
         this.retailProduct = retailProduct;
+        this.pricePerUnit = pricePerUnit;
+        this.quantityPerUnit = quantityPerUnit;
     }
 }

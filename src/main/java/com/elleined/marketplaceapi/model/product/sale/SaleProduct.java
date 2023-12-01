@@ -22,16 +22,17 @@ public abstract class SaleProduct {
     @Column(
             name = "sale_product_id",
             nullable = false,
-            updatable = false
+            updatable = false,
+            unique = true
     )
     private int id;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "sale_percentage")
+    @Column(name = "sale_percentage", nullable = false)
     private double salePercentage;
 }
