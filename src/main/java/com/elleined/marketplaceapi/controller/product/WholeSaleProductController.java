@@ -42,7 +42,7 @@ public class WholeSaleProductController {
     public double calculateTotalPrice(@RequestParam("totalPrice") double totalPrice,
                                       @RequestParam("salePercentage") int salePercentage) {
         if (salePercentage > 100) throw new ProductPriceException("Sale percentage cannot be greater than 100");
-        return Formatter.formatDouble((totalPrice * (salePercentage / 100f)));
+        return wholeSaleProductService.calculateTotalPriceByPercentage(totalPrice, salePercentage);
     }
 
     @GetMapping("/search-by-crop-name")

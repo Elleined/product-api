@@ -1,5 +1,6 @@
 package com.elleined.marketplaceapi.service.product.wholesale;
 
+import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
@@ -11,6 +12,7 @@ import com.elleined.marketplaceapi.repository.PremiumRepository;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
+import com.elleined.marketplaceapi.utils.Formatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -126,5 +128,15 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
                     LocalDateTime reOrderingDate = wholeSaleOrder.getUpdatedAt().plusDays(1);
                     return wholeSaleOrder.isRejected() && (LocalDateTime.now().equals(reOrderingDate) || LocalDateTime.now().isBefore(reOrderingDate));
                 });
+    }
+
+    @Override
+    public double calculateTotalPriceByPercentage(SaleWholeSaleRequest saleWholeSaleRequest) {
+        return Formatter.formatDouble((saleWholeSaleRequest.getTotalPrice() * (saleWholeSaleRequest.getSalePercentage() / 100f)));
+    }
+
+    @Override
+    public double calculateTotalPriceByPercentage(double totalPrice, int salePercentage) {
+        return Formatter.formatDouble((totalPrice * (salePercentage / 100f)));
     }
 }

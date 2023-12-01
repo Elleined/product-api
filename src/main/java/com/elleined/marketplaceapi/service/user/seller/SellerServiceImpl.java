@@ -26,6 +26,7 @@ import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
@@ -44,6 +45,7 @@ import com.elleined.marketplaceapi.service.unit.RetailUnitService;
 import com.elleined.marketplaceapi.service.unit.WholeSaleUnitService;
 import com.elleined.marketplaceapi.service.validator.Validator;
 import com.elleined.marketplaceapi.utils.DirectoryFolders;
+import com.elleined.marketplaceapi.utils.Formatter;
 import com.elleined.marketplaceapi.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -93,7 +96,6 @@ public class SellerServiceImpl implements SellerService {
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
         int salePercentage = saleRetailProductRequest.getSalePercentage();
 
-        if (retailProductService.salePercentageNotValid(salePercentage)) throw new FieldException("Cannot sale this product! Sale percentage must be a positive value and should not exceeds to 100. Please ensure that the sale percentage is greater than 0 and sale percentage is lower than 100.");
         if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
 
@@ -122,6 +124,29 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        int salePercentage = saleWholeSaleRequest.getSalePercentage();
+        double totalPrice = Formatter.formatDouble(wholeSaleProduct.getPrice().doubleValue());
+
+        if (!seller.hasProduct(wholeSaleProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
+        if (!wholeSaleProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
+        double salePrice = wholeSaleProductService.calculateTotalPriceByPercentage(saleWholeSaleRequest);
+        if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
+
+        SaleWholeSaleProduct saleWholeSaleProduct = SaleWholeSaleProduct.saleWholeSaleProductBuilder()
+                .wholeSaleProduct(wholeSaleProduct)
+                .salePercentage(salePercentage)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
+        wholeSaleProduct.setPrice(new BigDecimal(salePrice));
+        wholeSaleProduct.setState(Product.State.PENDING);
+
+        wholeSaleProductService.updateAllPendingAndAcceptedOrders(wholeSaleProduct, Status.CANCELLED);
+        wholeSaleProductRepository.save(wholeSaleProduct);
+        saleWholeSaleProductRepository.save(saleWholeSaleProduct);
+        log.debug("Whole sale product with id of {} set as sale successfully!", wholeSaleProduct.getId());
         return wholeSaleProduct;
     }
 
