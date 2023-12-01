@@ -20,7 +20,7 @@ public abstract class SaleProduct {
 
     @Id
     @Column(
-            name = "product_id",
+            name = "sale_product_id",
             nullable = false,
             updatable = false
     )
