@@ -6,6 +6,9 @@ import com.elleined.marketplaceapi.model.cart.WholeSaleCartItem;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
+import com.elleined.marketplaceapi.model.product.sale.SaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
@@ -37,6 +40,10 @@ public class WholeSaleProduct extends Product {
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
+    @OneToOne(mappedBy = "wholeSaleProduct")
+    @PrimaryKeyJoinColumn
+    private SaleWholeSaleProduct saleWholeSaleProduct;
+
     // whole sale product id reference is on tbl order whole sale
     @OneToMany(mappedBy = "wholeSaleProduct")
     private List<WholeSaleOrder> wholeSaleOrders;
@@ -46,10 +53,11 @@ public class WholeSaleProduct extends Product {
     private List<WholeSaleCartItem> wholeSaleCartItems;
 
     @Builder(builderMethodName = "wholeSaleProductBuilder")
-    public WholeSaleProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, SaleStatus saleStatus, List<PrivateChatRoom> privateChatRooms, WholeSaleUnit wholeSaleUnit, BigDecimal price, List<WholeSaleOrder> wholeSaleOrders, List<WholeSaleCartItem> wholeSaleCartItems) {
-        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, saleStatus, privateChatRooms);
+    public WholeSaleProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, WholeSaleUnit wholeSaleUnit, BigDecimal price, SaleWholeSaleProduct saleWholeSaleProduct, List<WholeSaleOrder> wholeSaleOrders, List<WholeSaleCartItem> wholeSaleCartItems) {
+        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, privateChatRooms);
         this.wholeSaleUnit = wholeSaleUnit;
         this.price = price;
+        this.saleWholeSaleProduct = saleWholeSaleProduct;
         this.wholeSaleOrders = wholeSaleOrders;
         this.wholeSaleCartItems = wholeSaleCartItems;
     }

@@ -17,21 +17,7 @@ import java.time.LocalDate;
 public class WholeSaleProductDTO extends ProductDTO {
 
     @Builder(builderMethodName = "wholeSaleProductDTOBuilder")
-    public WholeSaleProductDTO(int id, @NotBlank(message = "Crop name cannot be null, blank, or empty") String cropName, @Positive(message = "Unit id cannot be negative or less than 0") int unitId, String unitName, @NotBlank(message = "Description cannot be null, blank, or empty") String description, String picture, String state, int sellerId, String sellerName, String saleStatus, @Positive(message = "Available quantity cannot be negative or less than 0") int availableQuantity, @NotNull(message = "Harvest date cannot null") @PastOrPresent(message = "Cannot sell an product that are not have been harvested yet") LocalDate harvestDate, LocalDate listingDate, String shopName, double totalPrice) {
-        super(id,
-                cropName,
-                unitId,
-                unitName,
-                description,
-                picture,
-                state,
-                sellerId,
-                sellerName,
-                saleStatus,
-                availableQuantity,
-                harvestDate,
-                listingDate,
-                shopName,
-                totalPrice);
+    public WholeSaleProductDTO(int id, @NotBlank(message = "Crop name cannot be null, blank, or empty") String cropName, @Positive(message = "Unit id cannot be negative or less than 0") int unitId, String unitName, @NotBlank(message = "Description cannot be null, blank, or empty") String description, String picture, String state, int sellerId, String sellerName, @Positive(message = "Available quantity cannot be negative or less than 0") int availableQuantity, @NotNull(message = "Harvest date cannot null") @PastOrPresent(message = "Cannot sell an product that are not have been harvested yet") LocalDate harvestDate, LocalDate listingDate, String shopName, double totalPrice) {
+        super(id, cropName, unitId, unitName, description, picture, state, sellerId, sellerName, availableQuantity, harvestDate, listingDate, shopName, totalPrice);
     }
 }

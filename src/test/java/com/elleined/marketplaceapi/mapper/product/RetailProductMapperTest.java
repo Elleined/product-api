@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_ON_SALE;
 import static com.elleined.marketplaceapi.model.product.Product.State.PENDING;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,7 +53,6 @@ class RetailProductMapperTest {
                 .crop(Crop.builder()
                         .name("Crop")
                         .build())
-                .saleStatus(NOT_ON_SALE)
                 .pricePerUnit(50)
                 .quantityPerUnit(100)
                 .expirationDate(LocalDate.now())
@@ -79,7 +77,6 @@ class RetailProductMapperTest {
         assertEquals(expected.getState().name(), actual.getState());
         assertEquals(expected.getSeller().getId(), actual.getSellerId());
         assertEquals(expected.getSeller().getFullName(), actual.getSellerName());
-        assertEquals(expected.getSaleStatus().name(), actual.getSaleStatus());
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
         assertNotNull(actual.getHarvestDate());
         assertNotNull(actual.getListingDate());
@@ -118,6 +115,7 @@ class RetailProductMapperTest {
                 .build();
 
         RetailProduct actual = retailProductMapper.toEntity(expected, seller, crop, retailUnit, "Prodict PIcture");
+        assertNull(actual.getSaleRetailProduct());
         assertEquals(0, actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
@@ -127,7 +125,6 @@ class RetailProductMapperTest {
         assertEquals(PENDING, actual.getState());
         assertEquals(ACTIVE, actual.getStatus());
         assertNotNull(actual.getCrop());
-        assertEquals(NOT_ON_SALE, actual.getSaleStatus());
         assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
         assertEquals(expected.getQuantityPerUnit(), actual.getQuantityPerUnit());
         assertNotNull(actual.getExpirationDate());
@@ -173,7 +170,6 @@ class RetailProductMapperTest {
                 .crop(Crop.builder()
                         .name("Crop")
                         .build())
-                .saleStatus(NOT_ON_SALE)
                 .pricePerUnit(50)
                 .quantityPerUnit(100)
                 .expirationDate(LocalDate.now())
@@ -213,7 +209,6 @@ class RetailProductMapperTest {
         assertEquals(expected.getState(), actual.getState());
         assertEquals(expected.getStatus(), actual.getStatus());
         assertEquals(expected.getCrop(), actual.getCrop());
-        assertEquals(expected.getSaleStatus(), actual.getSaleStatus());
         assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
         assertEquals(expected.getQuantityPerUnit(), actual.getQuantityPerUnit());
         assertEquals(expected.getExpirationDate(), actual.getExpirationDate());

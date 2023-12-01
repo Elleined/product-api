@@ -37,8 +37,6 @@ public class ProductDTO {
     private int sellerId;
     private String sellerName;
 
-    private String saleStatus;
-
     @Positive(message = "Available quantity cannot be negative or less than 0")
     private int availableQuantity;
 

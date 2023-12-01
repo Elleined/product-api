@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_ON_SALE;
 import static com.elleined.marketplaceapi.model.product.Product.State.PENDING;
 import static com.elleined.marketplaceapi.model.product.Product.Status.ACTIVE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,7 +54,6 @@ class WholeSaleProductMapperTest {
                 .crop(Crop.builder()
                         .name("Crop")
                         .build())
-                .saleStatus(NOT_ON_SALE)
                 .wholeSaleUnit(WholeSaleUnit.wholeSaleUnitBuilder()
                         .id(1)
                         .name("Whole sale unit")
@@ -76,7 +74,6 @@ class WholeSaleProductMapperTest {
         assertEquals(expected.getState().name(), actual.getState());
         assertEquals(expected.getSeller().getId(), actual.getSellerId());
         assertEquals(expected.getSeller().getFullName(), actual.getSellerName());
-        assertEquals(expected.getSaleStatus().name(), actual.getSaleStatus());
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
         assertNotNull(actual.getHarvestDate());
         assertNotNull(actual.getListingDate());
@@ -110,7 +107,7 @@ class WholeSaleProductMapperTest {
                 .build();
 
         WholeSaleProduct actual = wholeSaleProductMapper.toEntity(expected, seller, crop, wholeSaleUnit, "Picture");
-
+        assertNull(actual.getSaleWholeSaleProduct());
         assertEquals(0, actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
@@ -120,7 +117,6 @@ class WholeSaleProductMapperTest {
         assertEquals(PENDING, actual.getState());
         assertEquals(ACTIVE, actual.getStatus());
         assertNotNull(actual.getCrop());
-        assertEquals(NOT_ON_SALE, actual.getSaleStatus());
         assertNotNull(actual.getWholeSaleUnit());
         assertEquals(expected.getTotalPrice(), actual.getPrice().doubleValue());
         assertNotNull(actual.getWholeSaleOrders());
@@ -169,7 +165,6 @@ class WholeSaleProductMapperTest {
                 .crop(Crop.builder()
                         .name("Crop")
                         .build())
-                .saleStatus(NOT_ON_SALE)
                 .wholeSaleUnit(WholeSaleUnit.wholeSaleUnitBuilder()
                         .id(1)
                         .name("Whole sale unit")
@@ -206,7 +201,6 @@ class WholeSaleProductMapperTest {
         assertEquals(expected.getState(), actual.getState());
         assertEquals(expected.getStatus(), actual.getStatus());
         assertEquals(expected.getCrop(), actual.getCrop());
-        assertEquals(expected.getSaleStatus(), actual.getSaleStatus());
         assertEquals(expected.getWholeSaleUnit(), actual.getWholeSaleUnit());
         assertIterableEquals(expected.getWholeSaleOrders(), actual.getWholeSaleOrders());
         assertIterableEquals(expected.getWholeSaleCartItems(), actual.getWholeSaleCartItems());

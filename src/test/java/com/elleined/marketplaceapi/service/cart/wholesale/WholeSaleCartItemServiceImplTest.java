@@ -4,9 +4,9 @@ import com.elleined.marketplaceapi.dto.cart.WholeSaleCartItemDTO;
 import com.elleined.marketplaceapi.exception.product.ProductAlreadySoldException;
 import com.elleined.marketplaceapi.exception.product.ProductNotListedException;
 import com.elleined.marketplaceapi.exception.product.order.ProductOrderException;
-import com.elleined.marketplaceapi.exception.resource.exists.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.exception.resource.ResourceOwnedException;
+import com.elleined.marketplaceapi.exception.resource.exists.AlreadyExistException;
 import com.elleined.marketplaceapi.exception.user.buyer.BuyerAlreadyRejectedException;
 import com.elleined.marketplaceapi.mapper.cart.WholeSaleCartItemMapper;
 import com.elleined.marketplaceapi.model.Crop;
@@ -41,7 +41,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.elleined.marketplaceapi.model.product.Product.SaleStatus.NOT_ON_SALE;
 import static com.elleined.marketplaceapi.model.product.Product.State;
 import static com.elleined.marketplaceapi.model.product.Product.State.LISTING;
 import static com.elleined.marketplaceapi.model.product.Product.State.SOLD;
@@ -271,7 +270,6 @@ class WholeSaleCartItemServiceImplTest {
                 .crop(Crop.builder()
                         .name("Crop")
                         .build())
-                .saleStatus(NOT_ON_SALE)
                 .wholeSaleUnit(WholeSaleUnit.wholeSaleUnitBuilder()
                         .id(1)
                         .name("Whole sale unit")

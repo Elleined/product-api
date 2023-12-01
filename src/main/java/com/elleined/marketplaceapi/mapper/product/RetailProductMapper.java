@@ -10,8 +10,7 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
         imports = {Product.State.class,
-                Product.Status.class,
-                Product.SaleStatus.class}
+                Product.Status.class}
 )
 public interface RetailProductMapper {
 
@@ -35,7 +34,6 @@ public interface RetailProductMapper {
             @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "state", expression = "java(State.PENDING)"),
-            @Mapping(target = "saleStatus", expression = "java(SaleStatus.NOT_ON_SALE)"),
             @Mapping(target = "status", expression = "java(Status.ACTIVE)"),
             @Mapping(target = "crop", expression = "java(crop)"),
             @Mapping(target = "retailUnit", expression = "java(retailUnit)"),
@@ -62,7 +60,6 @@ public interface RetailProductMapper {
             @Mapping(target = "retailOrders", ignore = true),
 
             @Mapping(target = "picture", expression = "java(picture)"),
-            @Mapping(target = "saleStatus", expression = "java(retailProduct.getSaleStatus())"),
             @Mapping(target = "retailUnit", expression = "java(retailUnit)"),
             @Mapping(target = "crop", expression = "java(crop)"),
     })

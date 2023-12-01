@@ -5,6 +5,8 @@ import com.elleined.marketplaceapi.model.cart.RetailCartItem;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
+import com.elleined.marketplaceapi.model.product.sale.SaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
@@ -41,6 +43,10 @@ public class RetailProduct extends Product {
     )
     private RetailUnit retailUnit;
 
+    @OneToOne(mappedBy = "retailProduct")
+    @PrimaryKeyJoinColumn
+    private SaleRetailProduct saleRetailProduct;
+
     // retail product id reference is in tbl order retail
     @OneToMany(mappedBy = "retailProduct")
     private List<RetailOrder> retailOrders;
@@ -50,15 +56,17 @@ public class RetailProduct extends Product {
     private List<RetailCartItem> retailCartItems;
 
     @Builder(builderMethodName = "retailProductBuilder")
-    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, SaleStatus saleStatus, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit, LocalDate expirationDate, RetailUnit retailUnit, List<RetailOrder> retailOrders, List<RetailCartItem> retailCartItems) {
-        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, saleStatus, privateChatRooms);
+    public RetailProduct(int id, String description, int availableQuantity, LocalDate harvestDate, LocalDateTime listingDate, String picture, State state, Status status, User seller, Crop crop, List<PrivateChatRoom> privateChatRooms, double pricePerUnit, int quantityPerUnit, LocalDate expirationDate, RetailUnit retailUnit, SaleRetailProduct saleRetailProduct, List<RetailOrder> retailOrders, List<RetailCartItem> retailCartItems) {
+        super(id, description, availableQuantity, harvestDate, listingDate, picture, state, status, seller, crop, privateChatRooms);
         this.pricePerUnit = pricePerUnit;
         this.quantityPerUnit = quantityPerUnit;
         this.expirationDate = expirationDate;
         this.retailUnit = retailUnit;
+        this.saleRetailProduct = saleRetailProduct;
         this.retailOrders = retailOrders;
         this.retailCartItems = retailCartItems;
     }
+
 
     @Override
     public boolean hasSoldOrder() {

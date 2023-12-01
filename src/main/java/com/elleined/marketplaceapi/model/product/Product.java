@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.model.product;
 
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
+import com.elleined.marketplaceapi.model.product.sale.SaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -86,17 +87,10 @@ public abstract class Product {
     )
     private Crop crop;
 
-    @Column(name = "sale_status", nullable = false)
-    private SaleStatus saleStatus;
-
     // product id is in chat room table
     @OneToMany(mappedBy = "productToSettle")
     private List<PrivateChatRoom> privateChatRooms;
 
-    public enum SaleStatus {
-        SALE,
-        NOT_ON_SALE
-    }
 
     public enum State {
         PENDING,
