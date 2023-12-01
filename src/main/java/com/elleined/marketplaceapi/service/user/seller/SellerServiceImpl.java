@@ -91,13 +91,12 @@ public class SellerServiceImpl implements SellerService {
         // dpt mapepending ulit yung product
         int salePercentage = saleRetailProductRequest.getSalePercentage();
 
-
         if (salePercentage <= 0) throw new FieldException("Cannot sale this product! Sale percentage must be a positive value. Please ensure that the sale percentage is greater than 0.");
         if (salePercentage > 100) throw new FieldException("Cannot sale this product! Sale percentage should not exceeds to 100. Please ensure that the sale percentage is lower than 100");
         if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
 
-        double totalPrice = retailProductService.calculateTotalPrice(retailProduct);
+        double totalPrice = retailProductService.calculateTotalPrice(saleRetailProductRequest);
         double salePrice = (totalPrice * (salePercentage / 100f));
         if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
 
