@@ -33,6 +33,8 @@ import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
+import com.elleined.marketplaceapi.repository.product.sale.SaleRetailProductRepository;
+import com.elleined.marketplaceapi.repository.product.sale.SaleWholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
@@ -78,6 +80,9 @@ public class SellerServiceImpl implements SellerService {
 
     private final CropService cropService;
 
+    private final SaleRetailProductRepository saleRetailProductRepository;
+    private final SaleWholeSaleProductRepository saleWholeSaleProductRepository;
+
     private final RetailUnitService retailUnitService;
     private final WholeSaleUnitService wholeSaleUnitService;
 
@@ -103,8 +108,15 @@ public class SellerServiceImpl implements SellerService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+        retailProduct.setPricePerUnit(saleRetailProductRequest.getPricePerUnit());
+        retailProduct.setQuantityPerUnit(saleRetailProductRequest.getQuantityPerUnit());
+        retailProduct.setAvailableQuantity(saleRetailProductRequest.getAvailableQuantity());
+        retailProduct.setSaleRetailProduct(saleRetailProduct);
 
-
+        retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
+        retailProductRepository.save(retailProduct);
+        saleRetailProductRepository.save(saleRetailProduct);
+        log.debug("Retail product with id of {} set as sale successfully", retailProduct.getId());
         return retailProduct;
     }
 

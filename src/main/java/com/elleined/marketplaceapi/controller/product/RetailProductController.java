@@ -54,6 +54,7 @@ public class RetailProductController {
         return retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, availableQuantity);
     }
 
+
     @GetMapping("/search-by-crop-name")
     public List<RetailProductDTO> searchProductByCropName(@RequestParam("cropName") String cropName) {
         return retailProductService.searchProductByCropName(cropName).stream()

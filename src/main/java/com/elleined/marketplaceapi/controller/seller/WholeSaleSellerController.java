@@ -1,12 +1,16 @@
 package com.elleined.marketplaceapi.controller.seller;
 
 import com.elleined.marketplaceapi.dto.order.WholeSaleOrderDTO;
+import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.mapper.order.WholeSaleOrderMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
 import com.elleined.marketplaceapi.model.order.Order.Status;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.order.OrderService;
@@ -51,6 +55,23 @@ public class WholeSaleSellerController {
         this.wholeSaleProductService = wholeSaleProductService;
         this.wholeSaleProductMapper = wholeSaleProductMapper;
     }
+
+    @PatchMapping("/{productId}/sale")
+    public WholeSaleProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
+                                           @PathVariable("productId") int productId,
+                                           @Valid @RequestBody SaleWholeSaleRequest saleWholeSaleRequest) {
+
+        User seller = userService.getById(sellerId);
+        WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(productId);
+        if (seller.isPremiumAndNotExpired()) {
+            WholeSaleProduct saleProduct = premiumSeller.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
+            return wholeSaleProductMapper.toDTO(saleProduct);
+        }
+
+        WholeSaleProduct saleProduct = regularSeller.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
+        return wholeSaleProductMapper.toDTO(saleProduct);
+    }
+
 
     @GetMapping("/orders")
     public List<WholeSaleOrderDTO> getAllSellerProductOrderByStatus(@PathVariable("currentUserId") int sellerId,

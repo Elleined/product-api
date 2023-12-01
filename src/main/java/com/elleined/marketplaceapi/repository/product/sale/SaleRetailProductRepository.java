@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.repository.product;
+package com.elleined.marketplaceapi.repository.product.sale;
 
 import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
