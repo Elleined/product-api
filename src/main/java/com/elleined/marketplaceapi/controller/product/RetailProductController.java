@@ -46,6 +46,14 @@ public class RetailProductController {
         return retailProductService.calculateOrderPrice(retailProduct, userOrderQuantity);
     }
 
+    @GetMapping("/calculate-total-price")
+    public double calculateTotalPrice(@RequestParam("pricePerUnit") double pricePerUnit,
+                                      @RequestParam("quantityPerUnit") int quantityPerUnit,
+                                      @RequestParam("availableQuantity") int availableQuantity) {
+
+        return retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, availableQuantity);
+    }
+
     @GetMapping("/search-by-crop-name")
     public List<RetailProductDTO> searchProductByCropName(@RequestParam("cropName") String cropName) {
         return retailProductService.searchProductByCropName(cropName).stream()
