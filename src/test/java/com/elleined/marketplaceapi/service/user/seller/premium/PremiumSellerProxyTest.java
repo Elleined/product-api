@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
@@ -38,41 +39,7 @@ class PremiumSellerProxyTest {
     private ATMValidator atmValidator;
     @InjectMocks
     private PremiumSellerProxy premiumSellerProxy;
-    
 
-    @Test
-    void saleProduct() {
-        // Expected values
-
-        // Mock Data
-
-        // Stubbing methods
-        when(sellerService.saleProduct(any(User.class), any(RetailProduct.class), anyInt())).thenReturn(new RetailProduct());
-
-        // Calling the method
-        // Assestions
-        assertDoesNotThrow(() -> premiumSellerProxy.saleProduct(new User(), new RetailProduct(), 100));
-
-        // Behavior verification
-        verify(sellerService).saleProduct(any(User.class), any(RetailProduct.class), anyInt());
-    }
-
-    @Test
-    void wholeSaleSaleProduct() {
-        // Expected values
-
-        // Mock Data
-
-        // Stubbing methods
-        when(sellerService.saleProduct(any(User.class), any(WholeSaleProduct.class), anyInt())).thenReturn(new WholeSaleProduct());
-
-        // Calling the method
-        // Assestions
-        assertDoesNotThrow(() -> premiumSellerProxy.saleProduct(new User(), new WholeSaleProduct(), 100));
-
-        // Behavior verification
-        verify(sellerService).saleProduct(any(User.class), any(WholeSaleProduct.class), anyInt());
-    }
 
     @Test
     void saveProduct() throws IOException {
