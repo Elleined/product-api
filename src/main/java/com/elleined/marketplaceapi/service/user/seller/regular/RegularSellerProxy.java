@@ -78,13 +78,22 @@ public class RegularSellerProxy implements SellerService {
 
     @Override
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        // TODO: deduct listing fee
+        double totalPrice = retailProductService.calculateTotalPrice(saleRetailProductRequest);
+        double listingFee = sellerFeeService.getListingFee(totalPrice);
+        if (seller.isBalanceNotEnough(listingFee))
+            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
+        feeService.deductListingFee(seller, listingFee);
+
         return sellerService.saleProduct(seller, retailProduct, saleRetailProductRequest);
     }
 
     @Override
     public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        // TODO: deduct listing fee
+        double listingFee = sellerFeeService.getListingFee(saleWholeSaleRequest.getTotalPrice());
+        if (seller.isBalanceNotEnough(listingFee))
+            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(saleWholeSaleRequest.getTotalPrice()) + ". Consider buying premium account to remove listing fee.");
+        feeService.deductListingFee(seller, listingFee);
+
         return sellerService.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
     }
 

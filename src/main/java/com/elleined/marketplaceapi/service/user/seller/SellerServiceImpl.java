@@ -91,7 +91,6 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        // dpt mapepending ulit yung product
         int salePercentage = saleRetailProductRequest.getSalePercentage();
 
         if (retailProductService.salePercentageNotValid(salePercentage)) throw new FieldException("Cannot sale this product! Sale percentage must be a positive value and should not exceeds to 100. Please ensure that the sale percentage is greater than 0 and sale percentage is lower than 100.");
@@ -112,6 +111,7 @@ public class SellerServiceImpl implements SellerService {
         retailProduct.setQuantityPerUnit(saleRetailProductRequest.getQuantityPerUnit());
         retailProduct.setAvailableQuantity(saleRetailProductRequest.getAvailableQuantity());
         retailProduct.setSaleRetailProduct(saleRetailProduct);
+        retailProduct.setState(Product.State.PENDING);
 
         retailProductService.updateAllPendingAndAcceptedOrders(retailProduct, Status.CANCELLED);
         retailProductRepository.save(retailProduct);
