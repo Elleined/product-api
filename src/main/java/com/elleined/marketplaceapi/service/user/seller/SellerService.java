@@ -2,6 +2,8 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
@@ -23,15 +25,13 @@ import java.io.IOException;
 
 public interface SellerService {
 
-    // not implemented
-    RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage)
+    RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest)
             throws NotOwnedException,
             ProductSaleException,
             FieldException,
             ProductNotListedException;
 
-    // not implemented
-    WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage)
+    WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest)
             throws NotOwnedException,
             ProductSaleException,
             FieldException,

@@ -2,6 +2,8 @@ package com.elleined.marketplaceapi.service.user.seller.premium;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
@@ -53,13 +55,13 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        return sellerService.saleProduct(seller, retailProduct, salePercentage);
+    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        return sellerService.saleProduct(seller, retailProduct, saleRetailProductRequest);
     }
 
     @Override
-    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        return sellerService.saleProduct(seller, wholeSaleProduct, salePercentage);
+    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        return sellerService.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
     }
 
     @Override

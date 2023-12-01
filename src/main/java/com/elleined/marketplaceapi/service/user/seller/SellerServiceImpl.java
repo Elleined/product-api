@@ -2,6 +2,8 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
@@ -84,10 +86,14 @@ public class SellerServiceImpl implements SellerService {
     @Value("${cropTrade.img.directory}")
     private String cropTradeImgDirectory;
 
-
     @Override
-    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        // dpt mapepending ulit yung product
+        int salePercentage = saleRetailProductRequest.getSalePercentage();
+
+
         if (salePercentage <= 0) throw new FieldException("Cannot sale this product! Sale percentage must be a positive value. Please ensure that the sale percentage is greater than 0.");
+        if (salePercentage > 100) throw new FieldException("Cannot sale this product! Sale percentage should not exceeds to 100. Please ensure that the sale percentage is lower than 100");
         if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
 
@@ -99,7 +105,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, int salePercentage) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
         return null;
     }
 
