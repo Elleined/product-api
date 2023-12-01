@@ -187,4 +187,9 @@ public class RetailProductServiceImpl implements RetailProductService {
                 retailProduct.getQuantityPerUnit(),
                 retailProduct.getAvailableQuantity());
     }
+
+    @Override
+    public boolean salePercentageNotValid(int salePercentage) {
+        return salePercentage <= 0 || salePercentage > 100;
+    }
 }
