@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
 import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
@@ -18,6 +20,8 @@ import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
@@ -45,6 +49,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @ExtendWith(MockitoExtension.class)
 class SellerServiceImplTest {
@@ -90,31 +95,74 @@ class SellerServiceImplTest {
     @Test
     void saleProduct() {
         // Expected and Actual Value
+        double expectedTotalPrice = 900;
+        double expectedSalePrice = 899;
 
         // Mock Data
+        User seller = spy(User.class);
+
+        RetailProduct retailProduct = spy(RetailProduct.class);
+        SaleRetailProductRequest saleWholeSaleRequest = SaleRetailProductRequest.saleRetailProductRequestBuilder()
+                .salePercentage(90)
+                .build();
 
         // Stubbing methods
+        doReturn(true).when(seller).hasProduct(retailProduct);
+        doReturn(true).when(retailProduct).isListed();
+
+        when(retailProductService.calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class))).thenReturn(expectedTotalPrice);
+        when(retailProductService.calculateSalePrice(anyDouble(), anyInt())).thenReturn(expectedSalePrice);
+        when(saleRetailProductMapper.toEntity(any(SaleRetailProductRequest.class), any(RetailProduct.class))).thenReturn(new SaleRetailProduct());
+        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(new RetailProduct());
+        when(saleRetailProductRepository.save(any(SaleRetailProduct.class))).thenReturn(new SaleRetailProduct());
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.saleProduct(seller, retailProduct, saleWholeSaleRequest));
 
         // Behavior Verifications
+        verify(retailProductService).calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class));
+        verify(retailProductService).calculateSalePrice(anyDouble(), anyInt());
+        verify(saleRetailProductMapper).toEntity(any(SaleRetailProductRequest.class), any(RetailProduct.class));
+        verify(retailProductRepository).save(any(RetailProduct.class));
+        verify(saleRetailProductRepository).save(any(SaleRetailProduct.class));
     }
 
     @Test
     void wholeSaleSaleProduct() {
         // Expected and Actual Value
+        double expectedTotalPrice = 900;
+        int expectedSalePrice = 899;
 
         // Mock Data
+        User seller = spy(User.class);
+
+        WholeSaleProduct wholeSaleProduct = spy(WholeSaleProduct.class);
+        wholeSaleProduct.setPrice(new BigDecimal(expectedTotalPrice));
+
+        SaleWholeSaleRequest saleWholeSaleRequest = SaleWholeSaleRequest.saleWholeSaleProductRequestBuilder()
+                .salePercentage(90)
+                .salePrice(expectedSalePrice)
+                .build();
 
         // Stubbing methods
+        doReturn(true).when(seller).hasProduct(wholeSaleProduct);
+        doReturn(true).when(wholeSaleProduct).isListed();
+
+        when(wholeSaleProductService.calculateSalePrice(any(SaleWholeSaleRequest.class))).thenReturn((double) expectedSalePrice);
+        when(saleWholeSaleProductMapper.toEntity(any(SaleWholeSaleRequest.class), any(WholeSaleProduct.class))).thenReturn(new SaleWholeSaleProduct());
+        when(wholeSaleProductRepository.save(any(WholeSaleProduct.class))).thenReturn(new WholeSaleProduct());
+        when(saleWholeSaleProductRepository.save(any(SaleWholeSaleProduct.class))).thenReturn(new SaleWholeSaleProduct());
 
         // Calling the method
-
         // Assertions
+        assertDoesNotThrow(() -> sellerService.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest));
 
         // Behavior Verifications
+        verify(wholeSaleProductService).calculateSalePrice(any(SaleWholeSaleRequest.class));
+        verify(saleWholeSaleProductMapper).toEntity(any(SaleWholeSaleRequest.class), any(WholeSaleProduct.class));
+        verify(wholeSaleProductRepository).save(any(WholeSaleProduct.class));
+        verify(saleWholeSaleProductRepository).save(any(SaleWholeSaleProduct.class));
     }
 
     @Test
