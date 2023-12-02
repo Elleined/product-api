@@ -15,14 +15,14 @@ import org.mapstruct.*;
 public interface WholeSaleProductMapper {
 
     @Mappings({
-            @Mapping(target = "state", source = "wholeSaleProduct.state"),
-            @Mapping(target = "sellerId", source = "wholeSaleProduct.seller.id"),
+            @Mapping(target = "state", source = "state"),
+            @Mapping(target = "sellerId", source = "seller.id"),
             @Mapping(target = "sellerName", expression = "java(wholeSaleProduct.getSeller().getFullName())"),
-            @Mapping(target = "cropName", source = "wholeSaleProduct.crop.name"),
-            @Mapping(target = "shopName", source = "wholeSaleProduct.seller.shop.name"),
+            @Mapping(target = "cropName", source = "crop.name"),
+            @Mapping(target = "shopName", source = "seller.shop.name"),
             @Mapping(target = "listingDate", expression = "java(wholeSaleProduct.getListingDate().toLocalDate())"),
-            @Mapping(target = "unitId", source = "wholeSaleProduct.wholeSaleUnit.id"),
-            @Mapping(target = "unitName", source = "wholeSaleProduct.wholeSaleUnit.name"),
+            @Mapping(target = "unitId", source = "wholeSaleUnit.id"),
+            @Mapping(target = "unitName", source = "wholeSaleUnit.name"),
             @Mapping(target = "totalPrice", source = "price")
     })
     WholeSaleProductDTO toDTO(WholeSaleProduct wholeSaleProduct);
@@ -62,7 +62,7 @@ public interface WholeSaleProductMapper {
             @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnit)"),
             @Mapping(target = "crop", expression = "java(crop)"),
-            @Mapping(target = "price", source = "dto.totalPrice")
+            @Mapping(target = "price", source = "totalPrice")
     })
     WholeSaleProduct toUpdate(@MappingTarget WholeSaleProduct wholeSaleProduct,
                               WholeSaleProductDTO dto,

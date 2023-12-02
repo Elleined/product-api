@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.mapper.product.sale;
 
-import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import org.mapstruct.Context;
@@ -20,4 +20,6 @@ public interface SaleWholeSaleProductMapper {
     })
     SaleWholeSaleProduct toEntity(SaleWholeSaleRequest saleWholeSaleRequest,
                                   @Context WholeSaleProduct wholeSaleProduct);
+
+    SaleWholeSaleRequest toDTO(SaleWholeSaleProduct saleWholeSaleProduct);
 }

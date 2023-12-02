@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.dto.product.sale;
+package com.elleined.marketplaceapi.dto.product.sale.request;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleProductRequest {
+public abstract class SaleProductRequest {
     @Positive(message = "Sale percentage cannot be 0 or less than 0")
     @Size(max = 100, message = "Sale percentage must be in range of 1 - 100 only")
     private int salePercentage;

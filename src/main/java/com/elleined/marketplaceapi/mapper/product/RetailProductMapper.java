@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
@@ -10,20 +11,22 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
         imports = {Product.State.class,
-                Product.Status.class}
+                Product.Status.class},
+        uses = {SaleRetailProductMapper.class}
 )
 public interface RetailProductMapper {
 
     @Mappings({
-            @Mapping(target = "state", source = "retailProduct.state"),
-            @Mapping(target = "sellerId", source = "retailProduct.seller.id"),
+            @Mapping(target = "state", source = "state"),
+            @Mapping(target = "sellerId", source = "seller.id"),
             @Mapping(target = "sellerName", expression = "java(retailProduct.getSeller().getFullName())"),
-            @Mapping(target = "cropName", source = "retailProduct.crop.name"),
-            @Mapping(target = "shopName", source = "retailProduct.seller.shop.name"),
+            @Mapping(target = "cropName", source = "crop.name"),
+            @Mapping(target = "shopName", source = "seller.shop.name"),
             @Mapping(target = "totalPrice", expression = "java(price)"),
             @Mapping(target = "listingDate", expression = "java(retailProduct.getListingDate().toLocalDate())"),
             @Mapping(target = "unitId", source = "retailUnit.id"),
-            @Mapping(target = "unitName", source = "retailUnit.name")
+            @Mapping(target = "unitName", source = "retailUnit.name"),
+            @Mapping(target = "saleRetailProductDTO", source = "saleRetailProduct")
     })
     RetailProductDTO toDTO(RetailProduct retailProduct,
                            @Context double price);

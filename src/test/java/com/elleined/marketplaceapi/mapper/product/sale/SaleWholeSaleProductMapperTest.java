@@ -1,6 +1,6 @@
 package com.elleined.marketplaceapi.mapper.product.sale;
 
-import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)

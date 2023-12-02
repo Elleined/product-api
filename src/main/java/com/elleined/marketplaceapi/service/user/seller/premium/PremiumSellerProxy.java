@@ -2,8 +2,8 @@ package com.elleined.marketplaceapi.service.user.seller.premium;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
-import com.elleined.marketplaceapi.dto.product.sale.SaleWholeSaleRequest;
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;

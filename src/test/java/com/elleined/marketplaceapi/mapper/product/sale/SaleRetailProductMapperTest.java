@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.mapper.product.sale;
 
-import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
-import com.elleined.marketplaceapi.mapper.CredentialMapper;
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SaleRetailProductMapperTest {
@@ -45,6 +43,30 @@ class SaleRetailProductMapperTest {
         assertNotNull(saleRetailProduct.getRetailProduct());
         assertNotNull(saleRetailProduct.getCreatedAt());
         assertNotNull(saleRetailProduct.getUpdatedAt());
+        // Behavior verification
+    }
+
+
+    @Test
+    void toDTO() {
+        // Expected value
+        double expectedSalePrice = 100;
+
+        // Mock Data
+        SaleRetailProduct actual = SaleRetailProduct.saleRetailProductBuilder()
+                .id(1)
+                .quantityPerUnit(1)
+                .pricePerUnit(1)
+                .salePercentage(1)
+                .build();
+
+        // Stubbing methods
+
+        // Calling the method
+        // Assestions
+
+
+
         // Behavior verification
     }
 }

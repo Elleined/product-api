@@ -1,5 +1,7 @@
 package com.elleined.marketplaceapi.dto.product;
 
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -16,8 +18,12 @@ import java.time.LocalDate;
 @Setter
 public class WholeSaleProductDTO extends ProductDTO {
 
+    @JsonProperty("salePayload")
+    private SaleWholeSaleRequest saleWholeSaleDTO;
+
     @Builder(builderMethodName = "wholeSaleProductDTOBuilder")
-    public WholeSaleProductDTO(int id, @NotBlank(message = "Crop name cannot be null, blank, or empty") String cropName, @Positive(message = "Unit id cannot be negative or less than 0") int unitId, String unitName, @NotBlank(message = "Description cannot be null, blank, or empty") String description, String picture, String state, int sellerId, String sellerName, @Positive(message = "Available quantity cannot be negative or less than 0") int availableQuantity, @NotNull(message = "Harvest date cannot null") @PastOrPresent(message = "Cannot sell an product that are not have been harvested yet") LocalDate harvestDate, LocalDate listingDate, String shopName, double totalPrice) {
+    public WholeSaleProductDTO(int id, @NotBlank(message = "Crop name cannot be null, blank, or empty") String cropName, @Positive(message = "Unit id cannot be negative or less than 0") int unitId, String unitName, @NotBlank(message = "Description cannot be null, blank, or empty") String description, String picture, String state, int sellerId, String sellerName, @Positive(message = "Available quantity cannot be negative or less than 0") int availableQuantity, @NotNull(message = "Harvest date cannot null") @PastOrPresent(message = "Cannot sell an product that are not have been harvested yet") LocalDate harvestDate, LocalDate listingDate, String shopName, double totalPrice, SaleWholeSaleRequest saleWholeSaleDTO) {
         super(id, cropName, unitId, unitName, description, picture, state, sellerId, sellerName, availableQuantity, harvestDate, listingDate, shopName, totalPrice);
+        this.saleWholeSaleDTO = saleWholeSaleDTO;
     }
 }

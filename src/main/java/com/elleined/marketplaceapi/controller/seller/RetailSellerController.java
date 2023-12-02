@@ -3,7 +3,7 @@ package com.elleined.marketplaceapi.controller.seller;
 
 import com.elleined.marketplaceapi.dto.order.RetailOrderDTO;
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.mapper.order.RetailOrderMapper;
 import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.model.order.Order.Status;
