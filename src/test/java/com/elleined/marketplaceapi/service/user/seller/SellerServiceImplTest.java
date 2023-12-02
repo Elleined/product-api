@@ -7,6 +7,8 @@ import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleWholeSaleProductMapper;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
@@ -25,6 +27,8 @@ import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
 import com.elleined.marketplaceapi.repository.product.RetailProductRepository;
 import com.elleined.marketplaceapi.repository.product.WholeSaleProductRepository;
+import com.elleined.marketplaceapi.repository.product.sale.SaleRetailProductRepository;
+import com.elleined.marketplaceapi.repository.product.sale.SaleWholeSaleProductRepository;
 import com.elleined.marketplaceapi.service.CropService;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.message.prv.PrivateChatRoomService;
@@ -68,11 +72,18 @@ class SellerServiceImplTest {
     @Mock
     private CropService cropService;
     @Mock
-    private OrderRepository orderRepository;
+    private SaleRetailProductRepository saleRetailProductRepository;
+    @Mock
+    private SaleRetailProductMapper saleRetailProductMapper;
+    @Mock
+    private SaleWholeSaleProductRepository saleWholeSaleProductRepository;
+    @Mock
+    private SaleWholeSaleProductMapper saleWholeSaleProductMapper;
     @Mock
     private RetailUnitService retailUnitService;
     @Mock
     private WholeSaleUnitService wholeSaleUnitService;
+
     @InjectMocks
     private SellerServiceImpl sellerService;
 
