@@ -16,10 +16,8 @@ public interface SaleWholeSaleProductMapper {
 
             @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())"),
-            @Mapping(target = "salePrice", expression = "java(salePrice)"),
             @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProduct)")
     })
     SaleWholeSaleProduct toEntity(SaleWholeSaleRequest saleWholeSaleRequest,
-                                  @Context WholeSaleProduct wholeSaleProduct,
-                                  @Context double salePrice);
+                                  @Context WholeSaleProduct wholeSaleProduct);
 }

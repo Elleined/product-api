@@ -125,7 +125,7 @@ public class SellerServiceImpl implements SellerService {
         double salePrice = wholeSaleProductService.calculateSalePrice(saleWholeSaleRequest);
         if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
 
-        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(saleWholeSaleRequest, wholeSaleProduct, salePrice);
+        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(saleWholeSaleRequest, wholeSaleProduct);
         wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
 
         wholeSaleProductRepository.save(wholeSaleProduct);
