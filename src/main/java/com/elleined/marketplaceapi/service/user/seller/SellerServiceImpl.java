@@ -17,6 +17,8 @@ import com.elleined.marketplaceapi.exception.user.NotOwnedException;
 import com.elleined.marketplaceapi.exception.user.NotVerifiedException;
 import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleWholeSaleProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
 import com.elleined.marketplaceapi.model.order.Order.Status;
@@ -83,7 +85,10 @@ public class SellerServiceImpl implements SellerService {
     private final CropService cropService;
 
     private final SaleRetailProductRepository saleRetailProductRepository;
+    private final SaleRetailProductMapper saleRetailProductMapper;
+
     private final SaleWholeSaleProductRepository saleWholeSaleProductRepository;
+    private final SaleWholeSaleProductMapper saleWholeSaleProductMapper;
 
     private final RetailUnitService retailUnitService;
     private final WholeSaleUnitService wholeSaleUnitService;
@@ -102,15 +107,7 @@ public class SellerServiceImpl implements SellerService {
         double salePrice = retailProductService.calculateSalePrice(totalPrice, salePercentage);
         if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
 
-        SaleRetailProduct saleRetailProduct = SaleRetailProduct.saleRetailProductBuilder()
-                .retailProduct(retailProduct)
-                .salePercentage(salePercentage)
-                .pricePerUnit(saleRetailProductRequest.getPricePerUnit())
-                .quantityPerUnit(saleRetailProductRequest.getQuantityPerUnit())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-        retailProduct.setSaleRetailProduct(saleRetailProduct);
+        SaleRetailProduct saleRetailProduct = saleRetailProductMapper.toEntity(saleRetailProductRequest, retailProduct);
 
         retailProductRepository.save(retailProduct);
         saleRetailProductRepository.save(saleRetailProduct);
@@ -128,13 +125,7 @@ public class SellerServiceImpl implements SellerService {
         double salePrice = wholeSaleProductService.calculateSalePrice(saleWholeSaleRequest);
         if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
 
-        SaleWholeSaleProduct saleWholeSaleProduct = SaleWholeSaleProduct.saleWholeSaleProductBuilder()
-                .wholeSaleProduct(wholeSaleProduct)
-                .salePercentage(salePercentage)
-                .salePrice(salePrice)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(saleWholeSaleRequest, wholeSaleProduct, salePrice);
         wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
 
         wholeSaleProductRepository.save(wholeSaleProduct);
