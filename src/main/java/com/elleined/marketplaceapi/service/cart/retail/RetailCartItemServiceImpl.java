@@ -91,13 +91,12 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
         if (retailProductService.isRejectedBySeller(currentUser, retailProduct))
             throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
-        double price = retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
+        double price = retailProduct.isSold()
+                ? retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), dto.getOrderQuantity())
+                : retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
+
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, dto.getDeliveryAddressId());
         RetailCartItem retailCartItem = retailCartItemMapper.toEntity(dto, currentUser, deliveryAddress, price, retailProduct);
-        if (retailProduct.isSale()) {
-            double salePrice = retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), dto.getOrderQuantity());
-            retailCartItem.setPrice(salePrice);
-        }
 
         retailCartItemRepository.save(retailCartItem);
         log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), dto.getProductId(), retailCartItem.getId());

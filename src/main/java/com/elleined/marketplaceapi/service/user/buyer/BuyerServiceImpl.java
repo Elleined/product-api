@@ -83,13 +83,12 @@ public class BuyerServiceImpl implements BuyerService {
         if (retailProduct.isExpired())
             throw new ProductExpiredException("Cannot order this retail product! because this retail product is already expired!");
 
-        double price = retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
+        double price = retailProduct.isSale()
+                ? retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), dto.getOrderQuantity())
+                : retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
+
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId());
         RetailOrder retailOrder = retailOrderMapper.toEntity(dto, buyer, deliveryAddress, price, retailProduct);
-        if (retailProduct.isSale()) {
-            double salePrice = retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), dto.getOrderQuantity());
-            retailOrder.setPrice(salePrice);
-        }
 
         buyer.getRetailOrders().add(retailOrder);
         retailOrderRepository.save(retailOrder);

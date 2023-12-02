@@ -111,7 +111,6 @@ class SellerServiceImplTest {
         when(retailProductService.calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class))).thenReturn(expectedTotalPrice);
         when(retailProductService.calculateSalePrice(anyDouble(), anyInt())).thenReturn(expectedSalePrice);
         when(saleRetailProductMapper.toEntity(any(SaleRetailProductRequest.class), any(RetailProduct.class))).thenReturn(new SaleRetailProduct());
-        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(new RetailProduct());
         when(saleRetailProductRepository.save(any(SaleRetailProduct.class))).thenReturn(new SaleRetailProduct());
 
         // Calling the method
@@ -122,7 +121,6 @@ class SellerServiceImplTest {
         verify(retailProductService).calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class));
         verify(retailProductService).calculateSalePrice(anyDouble(), anyInt());
         verify(saleRetailProductMapper).toEntity(any(SaleRetailProductRequest.class), any(RetailProduct.class));
-        verify(retailProductRepository).save(any(RetailProduct.class));
         verify(saleRetailProductRepository).save(any(SaleRetailProduct.class));
     }
 
