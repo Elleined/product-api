@@ -111,6 +111,8 @@ public abstract class Product {
 
     public abstract boolean hasAcceptedOrder();
 
+    public abstract boolean isSale();
+
 
     public boolean isListed() {
         return this.getState() == State.LISTING;

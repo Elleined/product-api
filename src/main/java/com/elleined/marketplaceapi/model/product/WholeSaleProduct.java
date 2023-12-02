@@ -82,4 +82,9 @@ public class WholeSaleProduct extends Product {
                 .map(WholeSaleOrder::getStatus)
                 .anyMatch(orderStatus -> orderStatus.equals(Order.Status.ACCEPTED));
     }
+
+    @Override
+    public boolean isSale() {
+        return saleWholeSaleProduct != null;
+    }
 }
