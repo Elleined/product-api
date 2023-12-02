@@ -1,9 +1,11 @@
 package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleWholeSaleProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -25,11 +28,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class WholeSaleProductMapperTest {
 
+    @Spy
+    private SaleWholeSaleProductMapper saleWholeSaleProductMapper = Mappers.getMapper(SaleWholeSaleProductMapper.class);
     @InjectMocks
     private WholeSaleProductMapper wholeSaleProductMapper = Mappers.getMapper(WholeSaleProductMapper.class);
     @Test
     void toDTO() {
         double expectedTotalPrice = 1_000;
+        SaleWholeSaleProduct saleWholeSaleProduct = SaleWholeSaleProduct.saleWholeSaleProductBuilder()
+                .salePrice(1)
+                .salePercentage(1)
+                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .build();
+
         WholeSaleProduct expected = WholeSaleProduct.wholeSaleProductBuilder()
                 .id(1)
                 .description("Description")
@@ -39,6 +51,7 @@ class WholeSaleProductMapperTest {
                 .picture("Picture.jpg")
                 .state(PENDING)
                 .status(ACTIVE)
+                .saleWholeSaleProduct(saleWholeSaleProduct)
                 .seller(User.builder()
                         .id(1)
                         .userDetails(UserDetails.builder()
@@ -77,6 +90,7 @@ class WholeSaleProductMapperTest {
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());
         assertNotNull(actual.getHarvestDate());
         assertNotNull(actual.getListingDate());
+        assertNotNull(actual.getSaleWholeSaleResponse());
         assertEquals(expected.getSeller().getShop().getName(), actual.getShopName());
         assertEquals(expectedTotalPrice, actual.getTotalPrice());
     }
@@ -140,6 +154,8 @@ class WholeSaleProductMapperTest {
                 .name("whole sale unit")
                 .build();
 
+        SaleWholeSaleProduct saleWholeSaleProduct = new SaleWholeSaleProduct();
+
         double expectedTotalPrice = 1_000;
         WholeSaleProduct expected = WholeSaleProduct.wholeSaleProductBuilder()
                 .id(1)
@@ -150,6 +166,7 @@ class WholeSaleProductMapperTest {
                 .picture("Picture.jpg")
                 .state(PENDING)
                 .status(ACTIVE)
+                .saleWholeSaleProduct(saleWholeSaleProduct)
                 .seller(User.builder()
                         .id(1)
                         .userDetails(UserDetails.builder()
@@ -193,6 +210,7 @@ class WholeSaleProductMapperTest {
 
 
         // All field must be the same after updating
+        assertEquals(expected.getSaleWholeSaleProduct(), actual.getSaleWholeSaleProduct());
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());

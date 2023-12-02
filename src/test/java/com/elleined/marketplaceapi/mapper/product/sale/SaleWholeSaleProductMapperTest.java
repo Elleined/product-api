@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper.product.sale;
 
 import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
+import com.elleined.marketplaceapi.dto.product.sale.response.SaleWholeSaleResponse;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,28 @@ class SaleWholeSaleProductMapperTest {
         assertNotNull(saleWholeSaleProduct.getWholeSaleProduct());
         assertNotNull(saleWholeSaleProduct.getCreatedAt());
         assertNotNull(saleWholeSaleProduct.getUpdatedAt());
+
+        // Behavior verification
+    }
+
+    @Test
+    void toDTO() {
+        // Expected values
+
+        // Mock Data
+        SaleWholeSaleProduct expected = SaleWholeSaleProduct.saleWholeSaleProductBuilder()
+                .id(1)
+                .salePrice(900)
+                .salePercentage(1)
+                .build();
+
+        // Stubbing methods
+        SaleWholeSaleResponse actual = saleWholeSaleProductMapper.toDTO(expected);
+        // Calling the method
+        // Assestions
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getSalePrice(), actual.getSalePrice());
+        assertEquals(expected.getSalePercentage(), actual.getSalePercentage());
 
         // Behavior verification
     }

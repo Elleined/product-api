@@ -1,9 +1,11 @@
 package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.Shop;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -24,11 +27,21 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class RetailProductMapperTest {
 
+    @Spy
+    private SaleRetailProductMapper saleRetailProductMapper = Mappers.getMapper(SaleRetailProductMapper.class);
     @InjectMocks
     private RetailProductMapper retailProductMapper = Mappers.getMapper(RetailProductMapper.class);
 
     @Test
     void toDTO() {
+        SaleRetailProduct saleRetailProduct = SaleRetailProduct.saleRetailProductBuilder()
+                .quantityPerUnit(1)
+                .pricePerUnit(1)
+                .salePercentage(1)
+                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .build();
+
         RetailProduct expected = RetailProduct.retailProductBuilder()
                 .id(1)
                 .description("Description")
@@ -38,6 +51,7 @@ class RetailProductMapperTest {
                 .picture("Picture.jpg")
                 .state(PENDING)
                 .status(ACTIVE)
+                .saleRetailProduct(saleRetailProduct)
                 .seller(User.builder()
                         .id(1)
                         .userDetails(UserDetails.builder()
@@ -68,6 +82,7 @@ class RetailProductMapperTest {
         double expectedTotalPrice = 5_000;
         RetailProductDTO actual = retailProductMapper.toDTO(expected, expectedTotalPrice);
 
+
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getCrop().getName(), actual.getCropName());
         assertEquals(expected.getRetailUnit().getId(), actual.getUnitId());
@@ -81,6 +96,7 @@ class RetailProductMapperTest {
         assertNotNull(actual.getHarvestDate());
         assertNotNull(actual.getListingDate());
         assertNotNull(actual.getExpirationDate());
+        assertNotNull(actual.getSaleRetailProductResponse());
         assertEquals(expected.getSeller().getShop().getName(), actual.getShopName());
         assertEquals(expectedTotalPrice, actual.getTotalPrice());// total price
         assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
@@ -146,6 +162,12 @@ class RetailProductMapperTest {
                 .name("Retail unit")
                 .build();
 
+        SaleRetailProduct saleRetailProduct = SaleRetailProduct.saleRetailProductBuilder()
+                .salePercentage(1)
+                .pricePerUnit(1)
+                .quantityPerUnit(1)
+                .build();
+
         RetailProduct expected = RetailProduct.retailProductBuilder()
                 .id(1)
                 .description("Description")
@@ -155,6 +177,7 @@ class RetailProductMapperTest {
                 .picture("Picture.jpg")
                 .state(PENDING)
                 .status(ACTIVE)
+                .saleRetailProduct(saleRetailProduct)
                 .seller(User.builder()
                         .id(1)
                         .userDetails(UserDetails.builder()
@@ -201,6 +224,7 @@ class RetailProductMapperTest {
         assertEquals(expectedPicture, expected.getPicture());
 
         // All field must be the same after updating
+        assertEquals(expected.getSaleRetailProduct(), actual.getSaleRetailProduct());
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getAvailableQuantity(), actual.getAvailableQuantity());

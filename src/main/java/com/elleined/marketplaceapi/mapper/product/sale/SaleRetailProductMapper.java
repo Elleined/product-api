@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper.product.sale;
 
 import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.response.SaleRetailProductResponse;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import org.mapstruct.Context;
@@ -25,5 +26,5 @@ public interface SaleRetailProductMapper {
     @Mappings({
             @Mapping(target = "salePrice", expression = "java(salePrice)")
     })
-    SaleRetailProductRequest toDTO(SaleRetailProduct saleRetailProduct, @Context double salePrice);
+    SaleRetailProductResponse toDTO(SaleRetailProduct saleRetailProduct, @Context double salePrice);
 }

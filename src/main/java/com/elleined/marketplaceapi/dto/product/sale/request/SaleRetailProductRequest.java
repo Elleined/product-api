@@ -17,13 +17,10 @@ public class SaleRetailProductRequest extends SaleProductRequest {
     @Positive(message = "Quantity Per Unit cannot be 0 or less than 0")
     private int quantityPerUnit;
 
-    private double salePrice;
-
     @Builder(builderMethodName = "saleRetailProductRequestBuilder")
-    public SaleRetailProductRequest(@Positive(message = "Sale percentage cannot be 0 or less than 0") @Size(max = 100, message = "Sale percentage must be in range of 1 - 100 only") int salePercentage, double pricePerUnit, int quantityPerUnit, double salePrice) {
+    public SaleRetailProductRequest(@Positive(message = "Sale percentage cannot be 0 or less than 0") @Size(max = 100, message = "Sale percentage must be in range of 1 - 100 only") Integer salePercentage, double pricePerUnit, int quantityPerUnit) {
         super(salePercentage);
         this.pricePerUnit = pricePerUnit;
         this.quantityPerUnit = quantityPerUnit;
-        this.salePrice = salePrice;
     }
 }

@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.mapper.product.sale.SaleWholeSaleProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
@@ -10,7 +11,8 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
         imports = {Product.State.class,
-                Product.Status.class}
+                Product.Status.class},
+        uses = SaleWholeSaleProductMapper.class
 )
 public interface WholeSaleProductMapper {
 
@@ -23,12 +25,14 @@ public interface WholeSaleProductMapper {
             @Mapping(target = "listingDate", expression = "java(wholeSaleProduct.getListingDate().toLocalDate())"),
             @Mapping(target = "unitId", source = "wholeSaleUnit.id"),
             @Mapping(target = "unitName", source = "wholeSaleUnit.name"),
-            @Mapping(target = "totalPrice", source = "price")
+            @Mapping(target = "totalPrice", source = "price"),
+            @Mapping(target = "saleWholeSaleResponse", source = "saleWholeSaleProduct")
     })
     WholeSaleProductDTO toDTO(WholeSaleProduct wholeSaleProduct);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(target = "saleWholeSaleProduct", ignore = true),
 
             @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
@@ -58,11 +62,12 @@ public interface WholeSaleProductMapper {
             @Mapping(target = "privateChatRooms", ignore = true),
             @Mapping(target = "wholeSaleCartItems", ignore = true),
             @Mapping(target = "wholeSaleOrders", ignore = true),
+            @Mapping(target = "saleWholeSaleProduct", ignore = true),
 
             @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "wholeSaleUnit", expression = "java(wholeSaleUnit)"),
             @Mapping(target = "crop", expression = "java(crop)"),
-            @Mapping(target = "price", source = "totalPrice")
+            @Mapping(target = "price", source = "totalPrice"),
     })
     WholeSaleProduct toUpdate(@MappingTarget WholeSaleProduct wholeSaleProduct,
                               WholeSaleProductDTO dto,

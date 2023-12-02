@@ -1,6 +1,7 @@
 package com.elleined.marketplaceapi.mapper.product.sale;
 
 import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.response.SaleRetailProductResponse;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import org.junit.jupiter.api.Test;
@@ -53,19 +54,23 @@ class SaleRetailProductMapperTest {
         double expectedSalePrice = 100;
 
         // Mock Data
-        SaleRetailProduct actual = SaleRetailProduct.saleRetailProductBuilder()
+        SaleRetailProduct expected = SaleRetailProduct.saleRetailProductBuilder()
                 .id(1)
                 .quantityPerUnit(1)
                 .pricePerUnit(1)
                 .salePercentage(1)
                 .build();
 
+        SaleRetailProductResponse actual = saleRetailProductMapper.toDTO(expected, expectedSalePrice);
         // Stubbing methods
 
         // Calling the method
         // Assestions
-
-
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getQuantityPerUnit(), actual.getQuantityPerUnit());
+        assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
+        assertEquals(expected.getSalePercentage(), actual.getSalePercentage());
+        assertEquals(expectedSalePrice, actual.getSalePrice());
 
         // Behavior verification
     }

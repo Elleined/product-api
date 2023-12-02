@@ -26,13 +26,14 @@ public interface RetailProductMapper {
             @Mapping(target = "listingDate", expression = "java(retailProduct.getListingDate().toLocalDate())"),
             @Mapping(target = "unitId", source = "retailUnit.id"),
             @Mapping(target = "unitName", source = "retailUnit.name"),
-            @Mapping(target = "saleRetailProductDTO", source = "saleRetailProduct")
+            @Mapping(target = "saleRetailProductResponse", source = "saleRetailProduct")
     })
     RetailProductDTO toDTO(RetailProduct retailProduct,
                            @Context double price);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(target = "saleRetailProduct", ignore = true),
 
             @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "listingDate", expression = "java(java.time.LocalDateTime.now())"),
@@ -61,6 +62,7 @@ public interface RetailProductMapper {
             @Mapping(target = "privateChatRooms", ignore = true),
             @Mapping(target = "retailCartItems", ignore = true),
             @Mapping(target = "retailOrders", ignore = true),
+            @Mapping(target = "saleRetailProduct", ignore = true),
 
             @Mapping(target = "picture", expression = "java(picture)"),
             @Mapping(target = "retailUnit", expression = "java(retailUnit)"),

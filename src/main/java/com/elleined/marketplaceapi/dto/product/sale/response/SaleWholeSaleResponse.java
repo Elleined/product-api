@@ -10,11 +10,8 @@ import lombok.Setter;
 @Setter
 public class SaleWholeSaleResponse extends SaleProductResponse {
 
-    private int salePrice;
-
     @Builder(builderMethodName = "saleWholeSaleResponseBuilder")
-    public SaleWholeSaleResponse(int id, int salePercentage, double salePrice, int salePrice1) {
+    public SaleWholeSaleResponse(int id, int salePercentage, double salePrice) {
         super(id, salePercentage, salePrice);
-        this.salePrice = salePrice1;
     }
 }

@@ -109,7 +109,6 @@ public class SellerServiceImpl implements SellerService {
 
         SaleRetailProduct saleRetailProduct = saleRetailProductMapper.toEntity(saleRetailProductRequest, retailProduct);
 
-        retailProductRepository.save(retailProduct);
         saleRetailProductRepository.save(saleRetailProduct);
         log.debug("Retail product with id of {} set as sale successfully", retailProduct.getId());
         return retailProduct;
@@ -128,8 +127,8 @@ public class SellerServiceImpl implements SellerService {
         SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(saleWholeSaleRequest, wholeSaleProduct);
         wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
 
-        wholeSaleProductRepository.save(wholeSaleProduct);
         saleWholeSaleProductRepository.save(saleWholeSaleProduct);
+        wholeSaleProductRepository.save(wholeSaleProduct);
         log.debug("Whole sale product with id of {} set as sale successfully!", wholeSaleProduct.getId());
         return wholeSaleProduct;
     }

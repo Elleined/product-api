@@ -21,7 +21,8 @@ public class SaleRetailProduct extends SaleProduct {
     @OneToOne(optional = false)
     @JoinColumn(
             name = "sale_product_id",
-            referencedColumnName = "product_id"
+            referencedColumnName = "product_id",
+            nullable = false
     )
     private RetailProduct retailProduct;
 
