@@ -2,6 +2,7 @@ package com.elleined.marketplaceapi.service.user.seller.regular;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
@@ -48,31 +49,63 @@ class RegularSellerProxyTest {
     @Test
     void saleProduct() {
         // Expected values
+        double expectedTotalPrice = 900;
+        double expectedListingFee = 90;
+        BigDecimal expectedUserBalance = new BigDecimal(10);
 
         // Mock Data
-
+        User seller = spy(User.class);
+        seller.setBalance(new BigDecimal(100));
         // Stubbing methods
+        doReturn(false).when(seller).isBalanceNotEnough(any());
+
+        when(retailProductService.calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class))).thenReturn(expectedTotalPrice);
+        when(sellerFeeService.getListingFee(anyDouble())).thenReturn(expectedListingFee);
+
+        doAnswer(i -> {
+            seller.setBalance(seller.getBalance().subtract(new BigDecimal(expectedListingFee)));
+            return seller;
+        }).when(feeService).deductListingFee(any(User.class), anyDouble());
 
         // Calling the method
-
         // Assestions
+        assertDoesNotThrow(() -> regularSellerProxy.saleProduct(seller, new RetailProduct(), new SaleRetailProductRequest()));
+        assertEquals(expectedUserBalance, seller.getBalance());
 
         // Behavior verification
+        verify(retailProductService).calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class));
+        verify(sellerFeeService).getListingFee(anyDouble());
+        verify(feeService).deductListingFee(any(User.class), anyDouble());
     }
 
     @Test
     void wholeSaleSaleProduct() {
         // Expected values
+        double expectedListingFee = 90;
+        BigDecimal expectedUserBalance = new BigDecimal(10);
 
         // Mock Data
-
+        User seller = spy(User.class);
+        seller.setBalance(new BigDecimal(100));
         // Stubbing methods
 
-        // Calling the method
+        doReturn(false).when(seller).isBalanceNotEnough(any());
+        
+        when(sellerFeeService.getListingFee(anyDouble())).thenReturn(expectedListingFee);
 
+        doAnswer(i -> {
+            seller.setBalance(seller.getBalance().subtract(new BigDecimal(expectedListingFee)));
+            return seller;
+        }).when(feeService).deductListingFee(any(User.class), anyDouble());
+
+        // Calling the method
         // Assestions
+        assertDoesNotThrow(() -> regularSellerProxy.saleProduct(seller, new RetailProduct(), new SaleRetailProductRequest()));
+        assertEquals(expectedUserBalance, seller.getBalance());
 
         // Behavior verification
+        verify(sellerFeeService).getListingFee(anyDouble());
+        verify(feeService).deductListingFee(any(User.class), anyDouble());
     }
 
     @Test
