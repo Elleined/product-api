@@ -6,6 +6,7 @@ import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.PremiumRepository;
@@ -161,6 +162,11 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
+    public double calculateOrderPrice(SaleRetailProduct saleRetailProduct, int userOrderQuantity) {
+        return saleRetailProduct.getPricePerUnit() * userOrderQuantity;
+    }
+
+    @Override
     public double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity) {
         int counter = 0;
         while (availableQuantity > 0) {
@@ -191,10 +197,5 @@ public class RetailProductServiceImpl implements RetailProductService {
     @Override
     public double calculateSalePrice(double totalPrice, int salePercentage) {
         return (totalPrice * (salePercentage / 100f));
-    }
-
-    @Override
-    public boolean salePercentageNotValid(int salePercentage) {
-        return salePercentage <= 0 || salePercentage > 100;
     }
 }

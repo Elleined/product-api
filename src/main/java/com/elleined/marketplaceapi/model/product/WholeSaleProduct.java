@@ -87,4 +87,10 @@ public class WholeSaleProduct extends Product {
     public boolean isSale() {
         return saleWholeSaleProduct != null;
     }
+
+    public double getRealPrice() {
+        return this.isSale()
+                ? this.getSaleWholeSaleProduct().getSalePrice()
+                : this.getPrice().doubleValue();
+    }
 }

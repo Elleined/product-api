@@ -87,7 +87,7 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
 
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, dto.getDeliveryAddressId());
         WholeSaleCartItem wholeSaleCartItem = wholeSaleCartItemMapper.toEntity(dto, currentUser, deliveryAddress, wholeSaleProduct);
-        currentUser.getWholeSaleCartItems().add(wholeSaleCartItem);
+        if (wholeSaleProduct.isSale()) wholeSaleCartItem.setPrice(wholeSaleProduct.getSaleWholeSaleProduct().getSalePrice());
 
         wholeSaleCartItemRepository.save(wholeSaleCartItem);
         log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), dto.getProductId(), wholeSaleCartItem.getId());
@@ -113,6 +113,7 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
             throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
         WholeSaleOrder wholeSaleOrder = wholeSaleCartItemMapper.cartItemToOrder(wholeSaleCartItem);
+        if (wholeSaleProduct.isSale()) wholeSaleOrder.setPrice(wholeSaleProduct.getSaleWholeSaleProduct().getSalePrice());
 
         wholeSaleCartItemRepository.delete(wholeSaleCartItem);
         wholeSaleOrderRepository.save(wholeSaleOrder);

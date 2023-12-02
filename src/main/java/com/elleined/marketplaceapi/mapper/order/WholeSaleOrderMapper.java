@@ -40,4 +40,5 @@ public interface WholeSaleOrderMapper extends OrderMapper<WholeSaleOrderDTO, Who
             @Mapping(target = "orderStatus", source = "status")
     })
     WholeSaleOrderDTO toDTO(WholeSaleOrder wholeSaleOrder);
+
 }

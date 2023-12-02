@@ -89,6 +89,7 @@ public class RetailProduct extends Product {
                 .anyMatch(orderStatus -> orderStatus.equals(Order.Status.ACCEPTED));
     }
 
+
     @Override
     public boolean isSale() {
         return saleRetailProduct != null;

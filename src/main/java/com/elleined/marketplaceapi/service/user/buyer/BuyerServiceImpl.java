@@ -23,6 +23,8 @@ import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
@@ -84,6 +86,10 @@ public class BuyerServiceImpl implements BuyerService {
         double price = retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId());
         RetailOrder retailOrder = retailOrderMapper.toEntity(dto, buyer, deliveryAddress, price, retailProduct);
+        if (retailProduct.isSale()) {
+            double salePrice = retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), dto.getOrderQuantity());
+            retailOrder.setPrice(salePrice);
+        }
 
         buyer.getRetailOrders().add(retailOrder);
         retailOrderRepository.save(retailOrder);
@@ -114,6 +120,7 @@ public class BuyerServiceImpl implements BuyerService {
 
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(buyer, dto.getDeliveryAddressId());
         WholeSaleOrder wholeSaleOrder = wholeSaleOrderMapper.toEntity(dto, buyer, deliveryAddress, wholeSaleProduct);
+        if (wholeSaleProduct.isSale()) wholeSaleOrder.setPrice(wholeSaleProduct.getSaleWholeSaleProduct().getSalePrice());
 
         buyer.getWholeSaleOrders().add(wholeSaleOrder);
         wholeSaleOrderRepository.save(wholeSaleOrder);

@@ -2,12 +2,14 @@ package com.elleined.marketplaceapi.service.product.retail;
 
 import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.service.product.ProductService;
 
 public interface RetailProductService extends ProductService<RetailProduct> {
     void deleteExpiredProducts();
 
     double calculateOrderPrice(RetailProduct retailProduct, int userOrderQuantity);
+    double calculateOrderPrice(SaleRetailProduct saleRetailProduct, int userOrderQuantity);
 
     /**
      * Sample:
@@ -25,6 +27,4 @@ public interface RetailProductService extends ProductService<RetailProduct> {
     double calculateTotalPrice(RetailProduct retailProduct);
 
     double calculateSalePrice(double totalPrice, int salePercentage);
-
-    boolean salePercentageNotValid(int salePercentage);
 }

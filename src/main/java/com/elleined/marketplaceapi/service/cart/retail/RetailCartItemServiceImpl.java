@@ -94,7 +94,10 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
         double price = retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
         DeliveryAddress deliveryAddress = addressService.getDeliveryAddressById(currentUser, dto.getDeliveryAddressId());
         RetailCartItem retailCartItem = retailCartItemMapper.toEntity(dto, currentUser, deliveryAddress, price, retailProduct);
-        currentUser.getRetailCartItems().add(retailCartItem);
+        if (retailProduct.isSale()) {
+            double salePrice = retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), dto.getOrderQuantity());
+            retailCartItem.setPrice(salePrice);
+        }
 
         retailCartItemRepository.save(retailCartItem);
         log.debug("User with id of {} added to successfully added to cart product with id of {} and now has cart item id of {}", currentUser.getId(), dto.getProductId(), retailCartItem.getId());
@@ -125,6 +128,11 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
             throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
         RetailOrder retailOrder = retailCartItemMapper.cartItemToOrder(retailCartItem);
+        if (retailProduct.isSale()) {
+            double salePrice = retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), retailCartItem.getOrderQuantity());
+            retailOrder.setPrice(salePrice);
+        }
+
         retailCartItemRepository.delete(retailCartItem);
         retailOrderRepository.save(retailOrder);
         log.debug("Cart item with id of {} are now moved to order item with id of {}", retailCartItem.getId(), retailOrder.getId());
