@@ -43,7 +43,6 @@ public class RetailProduct extends Product {
     private RetailUnit retailUnit;
 
     @OneToOne(mappedBy = "retailProduct")
-    @PrimaryKeyJoinColumn
     private SaleRetailProduct saleRetailProduct;
 
     // retail product id reference is in tbl order retail

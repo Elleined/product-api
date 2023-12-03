@@ -6,18 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
 
 @NoArgsConstructor
 @Getter
 @Setter
 public class SaleWholeSaleRequest extends SaleProductRequest {
 
-    @Positive(message = "Sale price cannot be 0 or less than 0")
-    private int salePrice;
-
     @Builder(builderMethodName = "saleWholeSaleProductRequestBuilder")
-    public SaleWholeSaleRequest(@Positive(message = "Sale percentage cannot be 0 or less than 0") @Size(max = 100, message = "Sale percentage must be in range of 1 - 100 only") int salePercentage, int salePrice) {
+    public SaleWholeSaleRequest(@Positive(message = "Sale percentage cannot be 0 or less than 0") @Range(max = 100, message = "Sale percentage must be in range of 1 - 100 only") int salePercentage) {
         super(salePercentage);
-        this.salePrice = salePrice;
     }
 }

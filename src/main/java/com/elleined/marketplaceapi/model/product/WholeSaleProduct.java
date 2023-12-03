@@ -39,7 +39,6 @@ public class WholeSaleProduct extends Product {
     private BigDecimal price;
 
     @OneToOne(mappedBy = "wholeSaleProduct")
-    @PrimaryKeyJoinColumn
     private SaleWholeSaleProduct saleWholeSaleProduct;
 
     // whole sale product id reference is on tbl order whole sale

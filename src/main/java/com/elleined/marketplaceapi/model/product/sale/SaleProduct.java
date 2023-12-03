@@ -18,11 +18,20 @@ import java.time.LocalDateTime;
 public abstract class SaleProduct {
 
     @Id
+    @GeneratedValue(
+            strategy = GenerationType.TABLE,
+            generator = "saleProductAutoIncrement"
+    )
+    @SequenceGenerator(
+            allocationSize = 1,
+            name = "saleProductAutoIncrement",
+            sequenceName = "saleProductAutoIncrement"
+    )
     @Column(
-            name = "sale_product_id",
+            name = "sale_id",
+            unique = true,
             nullable = false,
-            updatable = false,
-            unique = true
+            updatable = false
     )
     private int id;
 

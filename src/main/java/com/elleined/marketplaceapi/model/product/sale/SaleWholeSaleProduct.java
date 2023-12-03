@@ -16,10 +16,9 @@ import java.time.LocalDateTime;
 @Setter
 public class SaleWholeSaleProduct extends SaleProduct {
 
-    @MapsId
     @OneToOne(optional = false)
     @JoinColumn(
-            name = "sale_product_id",
+            name = "product_id",
             referencedColumnName = "product_id",
             nullable = false
     )
