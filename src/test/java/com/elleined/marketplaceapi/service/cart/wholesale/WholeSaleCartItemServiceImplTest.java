@@ -17,6 +17,7 @@ import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
@@ -155,6 +156,50 @@ class WholeSaleCartItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("save cart scenario: whole sale product is on sale ")
+    void addToCartWholeSaleProductThatIsOnSale() {
+        User user = User.builder()
+                .id(1)
+                .wholeSaleProducts(new ArrayList<>())
+                .wholeSaleOrders(new ArrayList<>())
+                .deliveryAddresses(new ArrayList<>())
+                .wholeSaleCartItems(new ArrayList<>())
+                .build();
+
+        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
+                .id(1)
+                .build();
+        user.getDeliveryAddresses().add(deliveryAddress);
+
+        WholeSaleProduct wholeSaleProduct = getMockWholeSaleProduct();
+        wholeSaleProduct.setSaleWholeSaleProduct(SaleWholeSaleProduct.saleWholeSaleProductBuilder()
+                .salePrice(100)
+                .build());
+
+        WholeSaleCartItemDTO dto = WholeSaleCartItemDTO.wholeSaleCartItemDTOBuilder()
+                .productId(1)
+                .deliveryAddressId(1)
+                .build();
+
+        WholeSaleCartItem wholeSaleCartItem = new WholeSaleCartItem();
+
+        when(wholeSaleProductService.getById(dto.getProductId())).thenReturn(wholeSaleProduct);
+        when(addressService.getDeliveryAddressById(user, dto.getDeliveryAddressId())).thenReturn(deliveryAddress);
+        when(wholeSaleCartItemMapper.toEntity(dto, user, deliveryAddress, wholeSaleProduct)).thenReturn(wholeSaleCartItem);
+        when(wholeSaleCartItemRepository.save(wholeSaleCartItem)).thenReturn(wholeSaleCartItem);
+
+        wholeSaleCartItemService.save(user, dto);
+
+        assertEquals(wholeSaleProduct.getSaleWholeSaleProduct().getSalePrice(), wholeSaleCartItem.getPrice());
+
+        verify(wholeSaleProductService).isRejectedBySeller(user, wholeSaleProduct);
+        verify(addressService).getDeliveryAddressById(user, dto.getDeliveryAddressId());
+        verify(wholeSaleCartItemMapper).toEntity(dto, user, deliveryAddress, wholeSaleProduct);
+        verify(wholeSaleCartItemRepository).save(wholeSaleCartItem);
+        assertDoesNotThrow(() -> wholeSaleCartItemService.save(user, dto));
+    }
+
+    @Test
     void orderCartItem() {
         // Mock Data
         User user = User.builder()
@@ -195,6 +240,55 @@ class WholeSaleCartItemServiceImplTest {
 
         // Assertions
         assertFalse(user.getWholeSaleCartItems().contains(wholeSaleCartItem));
+        assertDoesNotThrow(() -> wholeSaleCartItemService.orderCartItem(user, wholeSaleCartItem));
+    }
+
+    @Test
+    @DisplayName("order cart item: product is on sale it should get the sale price instead of real price")
+    void orderCartItemThatIsOnsale() {
+        // Mock Data
+        User user = User.builder()
+                .id(1)
+                .wholeSaleProducts(new ArrayList<>())
+                .wholeSaleOrders(new ArrayList<>())
+                .deliveryAddresses(new ArrayList<>())
+                .wholeSaleCartItems(new ArrayList<>())
+                .build();
+
+        WholeSaleProduct wholeSaleProduct = getMockWholeSaleProduct();
+        wholeSaleProduct.setSaleWholeSaleProduct(SaleWholeSaleProduct.saleWholeSaleProductBuilder()
+                .salePrice(100)
+                .build());
+
+        WholeSaleCartItem wholeSaleCartItem = WholeSaleCartItem.wholeSaleCartItemBuilder()
+                .id(1)
+                .wholeSaleProduct(wholeSaleProduct)
+                .build();
+        user.getWholeSaleCartItems().add(wholeSaleCartItem);
+
+        WholeSaleOrder wholeSaleOrder = WholeSaleOrder.wholeSaleOrderBuilder()
+                .id(1)
+                .build();
+
+        // Stubbing external dependencies
+        when(wholeSaleCartItemMapper.cartItemToOrder(any(WholeSaleCartItem.class))).thenReturn(wholeSaleOrder);
+        doAnswer(i -> user.getWholeSaleCartItems().remove(wholeSaleCartItem))
+                .when(wholeSaleCartItemRepository)
+                .delete(any(WholeSaleCartItem.class));
+        when(wholeSaleOrderRepository.save(any(WholeSaleOrder.class))).thenReturn(wholeSaleOrder);
+
+        // Calling the method
+        wholeSaleCartItemService.orderCartItem(user, wholeSaleCartItem);
+
+        // Behavior Verification
+        verify(wholeSaleProductService).isRejectedBySeller(user, wholeSaleProduct);
+        verify(wholeSaleCartItemMapper).cartItemToOrder(wholeSaleCartItem);
+        verify(wholeSaleCartItemRepository).delete(wholeSaleCartItem);
+        verify(wholeSaleOrderRepository).save(wholeSaleOrder);
+
+        // Assertions
+        assertFalse(user.getWholeSaleCartItems().contains(wholeSaleCartItem));
+        assertEquals(wholeSaleProduct.getSaleWholeSaleProduct().getSalePrice(), wholeSaleOrder.getPrice());
         assertDoesNotThrow(() -> wholeSaleCartItemService.orderCartItem(user, wholeSaleCartItem));
     }
 
