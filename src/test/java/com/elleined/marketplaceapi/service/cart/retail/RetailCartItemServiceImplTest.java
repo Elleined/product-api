@@ -19,12 +19,14 @@ import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.Product.State;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.cart.RetailCartItemRepository;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.service.address.AddressService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -448,43 +450,96 @@ class RetailCartItemServiceImplTest {
 
     @Test
     void save() {
-        User user = new User();
-        user.setRetailProducts(new ArrayList<>());
-        user.setRetailCartItems(new ArrayList<>());
-        user.setRetailOrders(new ArrayList<>());
-        user.setDeliveryAddresses(new ArrayList<>());
+        // Expected values
+        double expectedOrderPrice = 100.0;
 
-        RetailProduct retailProduct = getMockRetailProduct();
+        // Mock Data
+        User user = spy(User.class);
 
-        RetailCartItemDTO dto = RetailCartItemDTO.retailCartItemDTOBuilder()
-                .productId(1)
-                .orderQuantity(20)
-                .deliveryAddressId(1)
-                .build();
+        RetailProduct retailProduct = spy(RetailProduct.class);
+
+        RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder().build();
+        // Stubbing methods
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isDeleted();
+        doReturn(false).when(retailProduct).isSold();
+        doReturn(true).when(retailProduct).isListed();
+        doReturn(false).when(retailProduct).isExceedingToAvailableQuantity(anyInt());
+
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        when(retailProductService.isRejectedBySeller(any(User.class), any(RetailProduct.class))).thenReturn(false);
+        when(retailProductService.calculateOrderPrice(any(RetailProduct.class), anyInt())).thenReturn(expectedOrderPrice);
+        when(addressService.getDeliveryAddressById(any(User.class), anyInt())).thenReturn(new DeliveryAddress());
+        when(retailCartItemMapper.toEntity(any(RetailCartItemDTO.class), any(User.class), any(DeliveryAddress.class), anyDouble(), any(RetailProduct.class))).thenReturn(new RetailCartItem());
+        when(retailCartItemRepository.save(any(RetailCartItem.class))).thenReturn(new RetailCartItem());
+
+        // Calling the method
+        // Assestions
+        assertDoesNotThrow(() -> retailCartItemService.save(user, retailCartItemDTO));
+
+        // Behavior verification
+
+        verify(retailProductService).getById(anyInt());
+        verify(retailProductService).isRejectedBySeller(any(User.class), any(RetailProduct.class));
+        verify(retailProductService).calculateOrderPrice(any(RetailProduct.class), anyInt());
+        verify(addressService).getDeliveryAddressById(any(User.class), anyInt());
+        verify(retailCartItemMapper).toEntity(any(RetailCartItemDTO.class), any(User.class), any(DeliveryAddress.class), anyDouble(), any(RetailProduct.class));
+        verify(retailCartItemRepository).save(any(RetailCartItem.class));
+    }
+
+    @Test
+    @DisplayName("save cart scenario: product is onsale price it will should get is the sale price instead of real price")
+    void addToCartProductThatIsOnSale() {
+        // Expected values
+        double expectedSalePrice = 100.0;
+
+        // Mock Data
+        User user = spy(User.class);
+
+        RetailProduct retailProduct = spy(RetailProduct.class);
+        retailProduct.setSaleRetailProduct(new SaleRetailProduct());
+
+        RetailCartItemDTO retailCartItemDTO = RetailCartItemDTO.retailCartItemDTOBuilder().build();
 
         RetailCartItem retailCartItem = new RetailCartItem();
+        // Stubbing methods
+        doReturn(false).when(user).isProductAlreadyInCart(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isDeleted();
+        doReturn(false).when(retailProduct).isSold();
+        doReturn(true).when(retailProduct).isListed();
+        doReturn(false).when(retailProduct).isExceedingToAvailableQuantity(anyInt());
+        doReturn(true).when(retailProduct).isSale();
 
-        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
-                .id(1)
-                .build();
-        user.getDeliveryAddresses().add(deliveryAddress);
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        when(retailProductService.isRejectedBySeller(any(User.class), any(RetailProduct.class))).thenReturn(false);
+        when(retailProductService.calculateOrderPrice(any(SaleRetailProduct.class), anyInt())).thenReturn(expectedSalePrice);
+        when(addressService.getDeliveryAddressById(any(User.class), anyInt())).thenReturn(new DeliveryAddress());
+        when(retailCartItemMapper.toEntity(any(RetailCartItemDTO.class), any(User.class), any(DeliveryAddress.class), anyDouble(), any(RetailProduct.class))).thenAnswer(i -> {
+            retailCartItem.setPrice(expectedSalePrice);
+            return retailCartItem;
+        });
+        when(retailCartItemRepository.save(any(RetailCartItem.class))).thenReturn(new RetailCartItem());
 
-        double price = 50_000.00;
-        when(retailProductService.getById(dto.getProductId())).thenReturn(retailProduct);
-        when(retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity())).thenReturn(price);
-        when(addressService.getDeliveryAddressById(user, dto.getDeliveryAddressId())).thenReturn(deliveryAddress);
-        when(retailCartItemMapper.toEntity(dto, user, deliveryAddress, price, retailProduct)).thenReturn(retailCartItem);
-        when(retailCartItemRepository.save(retailCartItem)).thenReturn(retailCartItem);
+        // Calling the method
+        // Assestions
+        assertDoesNotThrow(() -> retailCartItemService.save(user, retailCartItemDTO));
+        assertEquals(expectedSalePrice, retailCartItem.getPrice());
+        // Behavior verification
 
-        retailCartItemService.save(user, dto);
-
-        verify(retailProductService).isRejectedBySeller(user, retailProduct);
-        verify(retailProductService).calculateOrderPrice(retailProduct, dto.getOrderQuantity());
-        verify(addressService).getDeliveryAddressById(user, dto.getDeliveryAddressId());
-        verify(retailCartItemMapper).toEntity(dto, user, deliveryAddress, price, retailProduct);
-        verify(retailCartItemRepository).save(retailCartItem);
-        assertDoesNotThrow(() -> retailCartItemService.save(user, dto));
+        verify(retailProductService).getById(anyInt());
+        verify(retailProductService).isRejectedBySeller(any(User.class), any(RetailProduct.class));
+        verify(retailProductService).calculateOrderPrice(any(SaleRetailProduct.class), anyInt());
+        verify(addressService).getDeliveryAddressById(any(User.class), anyInt());
+        verify(retailCartItemMapper).toEntity(any(RetailCartItemDTO.class), any(User.class), any(DeliveryAddress.class), anyDouble(), any(RetailProduct.class));
+        verify(retailCartItemRepository).save(any(RetailCartItem.class));
     }
+
 
     @Test
     void orderCartItem() {

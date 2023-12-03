@@ -91,7 +91,7 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
         if (retailProductService.isRejectedBySeller(currentUser, retailProduct))
             throw new BuyerAlreadyRejectedException("Cannot add to cart! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
-        double price = retailProduct.isSold()
+        double price = retailProduct.isSale()
                 ? retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), dto.getOrderQuantity())
                 : retailProductService.calculateOrderPrice(retailProduct, dto.getOrderQuantity());
 
