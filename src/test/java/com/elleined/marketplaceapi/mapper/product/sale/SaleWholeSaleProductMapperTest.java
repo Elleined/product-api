@@ -23,22 +23,22 @@ class SaleWholeSaleProductMapperTest {
     @Test
     void toEntity() {
         // Expected/ Actual values
+        double expectedSalePrice = 100;
 
         // Mock data
         SaleWholeSaleRequest saleWholeSaleRequest = SaleWholeSaleRequest.saleWholeSaleProductRequestBuilder()
                 .salePercentage(90)
-                .salePrice(800)
                 .build();
 
         // Stubbing methods
         WholeSaleProduct wholeSaleProduct = new WholeSaleProduct();
 
         // Calling the method
-        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(saleWholeSaleRequest, wholeSaleProduct);
+        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(wholeSaleProduct, saleWholeSaleRequest.getSalePercentage(), expectedSalePrice);
 
         // Assertions
         assertEquals(0, saleWholeSaleProduct.getId());
-        assertEquals(saleWholeSaleRequest.getSalePrice(), saleWholeSaleProduct.getSalePrice());
+        assertEquals(expectedSalePrice, saleWholeSaleProduct.getSalePrice());
         assertEquals(saleWholeSaleRequest.getSalePercentage(), saleWholeSaleProduct.getSalePercentage());
         assertNotNull(saleWholeSaleProduct.getWholeSaleProduct());
         assertNotNull(saleWholeSaleProduct.getCreatedAt());

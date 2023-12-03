@@ -3,6 +3,7 @@ package com.elleined.marketplaceapi.service.user.seller.regular;
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
+import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.mock.MultiPartFileDataFactory;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
@@ -12,6 +13,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import com.elleined.marketplaceapi.service.user.seller.fee.SellerFeeService;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,8 @@ class RegularSellerProxyTest {
     private ATMValidator atmValidator;
     @Mock
     private  RetailProductService retailProductService;
+    @Mock
+    private WholeSaleProductService wholeSaleProductService;
     @Mock
     private  FeeService feeService;
     @InjectMocks
@@ -81,16 +85,26 @@ class RegularSellerProxyTest {
     @Test
     void wholeSaleSaleProduct() {
         // Expected values
+        double expectedSalePrice = 100;
         double expectedListingFee = 90;
         BigDecimal expectedUserBalance = new BigDecimal(10);
 
         // Mock Data
         User seller = spy(User.class);
         seller.setBalance(new BigDecimal(100));
+
+        SaleWholeSaleRequest saleWholeSaleRequest = SaleWholeSaleRequest.saleWholeSaleProductRequestBuilder()
+                .salePercentage(90)
+                .build();
         // Stubbing methods
 
+        WholeSaleProduct wholeSaleProduct = WholeSaleProduct.wholeSaleProductBuilder()
+                .price(new BigDecimal(900))
+                .build();
+
         doReturn(false).when(seller).isBalanceNotEnough(any());
-        
+
+        when(wholeSaleProductService.calculateSalePrice(anyDouble(), anyInt())).thenReturn(expectedSalePrice);
         when(sellerFeeService.getListingFee(anyDouble())).thenReturn(expectedListingFee);
 
         doAnswer(i -> {
@@ -100,7 +114,7 @@ class RegularSellerProxyTest {
 
         // Calling the method
         // Assestions
-        assertDoesNotThrow(() -> regularSellerProxy.saleProduct(seller, new RetailProduct(), new SaleRetailProductRequest()));
+        assertDoesNotThrow(() -> regularSellerProxy.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest));
         assertEquals(expectedUserBalance, seller.getBalance());
 
         // Behavior verification

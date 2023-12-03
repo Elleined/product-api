@@ -23,6 +23,8 @@ import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import com.elleined.marketplaceapi.repository.order.WholeSaleOrderRepository;
@@ -121,6 +123,68 @@ class BuyerServiceImplTest {
     }
 
     @Test
+    @DisplayName("order product scenario: product is on sale")
+    void orderProductThatIsOnSale() {
+        // Mock data
+        double expectedSalePrice = 100;
+        User user = spy(User.class);
+        user.setRetailOrders(new ArrayList<>());
+
+        RetailOrderDTO retailOrderDTO = RetailOrderDTO.retailOrderDTOBuilder()
+
+                .build();
+
+        RetailProduct retailProduct = spy(RetailProduct.class);
+        retailProduct.setSaleRetailProduct(new SaleRetailProduct());
+
+        RetailOrder retailOrder = RetailOrder.retailOrderBuilder()
+
+                .build();
+
+        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
+
+                .build();
+
+        // Stubbing methods
+        doReturn(false).when(retailProduct).isExpired();
+        doReturn(false).when(retailProduct).isRejected();
+        doReturn(false).when(user).hasOrder(any(RetailProduct.class), any(Order.Status.class));
+        doReturn(false).when(retailProduct).isDeleted();
+        doReturn(false).when(retailProduct).isSold();
+        doReturn(true).when(retailProduct).isListed();
+        doReturn(false).when(user).hasProduct(any(RetailProduct.class));
+        doReturn(false).when(retailProduct).isExceedingToAvailableQuantity(anyInt());
+        doReturn(true).when(retailProduct).isSale();
+
+        when(retailProductService.getById(anyInt())).thenReturn(retailProduct);
+        when(retailProductService.isRejectedBySeller(any(User.class), any(RetailProduct.class))).thenReturn(false);
+        when(retailProductService.calculateOrderPrice(any(SaleRetailProduct.class), anyInt())).thenReturn(expectedSalePrice);
+        when(addressService.getDeliveryAddressById(any(User.class), anyInt())).thenReturn(deliveryAddress);
+        when(retailOrderMapper.toEntity(any(RetailOrderDTO.class), any(User.class), any(DeliveryAddress.class), anyDouble(), any(RetailProduct.class))).thenAnswer(i -> {
+            retailOrder.setPrice(expectedSalePrice);
+            return retailOrder;
+        });
+        when(retailOrderRepository.save(any(RetailOrder.class))).thenReturn(retailOrder);
+
+        // Expected/ Actual values
+
+        // Calling the method
+        buyerService.order(user, retailOrderDTO);
+
+        // Assertions
+        assertTrue(user.getRetailOrders().contains(retailOrder));
+        assertEquals(expectedSalePrice, retailOrder.getPrice());
+
+        // Behavior verification
+        verify(retailProductService).getById(anyInt());
+        verify(retailProductService).isRejectedBySeller(any(User.class), any(RetailProduct.class));
+        verify(retailProductService).calculateOrderPrice(any(SaleRetailProduct.class), anyInt());
+        verify(addressService).getDeliveryAddressById(any(User.class), anyInt());
+        verify(retailOrderMapper).toEntity(any(RetailOrderDTO.class), any(User.class), any(DeliveryAddress.class), anyDouble(), any(RetailProduct.class));
+        verify(retailOrderRepository).save(any(RetailOrder.class));
+    }
+
+    @Test
     void WholeSaleOrder() {
         // Mock data
         User user = spy(User.class);
@@ -162,6 +226,62 @@ class BuyerServiceImplTest {
 
         // Assertions
         assertTrue(user.getWholeSaleOrders().contains(wholeSaleOrder));
+
+        // Behavior verification
+        verify(wholeSaleProductService).getById(anyInt());
+        verify(wholeSaleProductService).isRejectedBySeller(any(User.class), any(WholeSaleProduct.class));
+        verify(addressService).getDeliveryAddressById(any(User.class), anyInt());
+        verify(wholeSaleOrderMapper).toEntity(any(WholeSaleOrderDTO.class), any(User.class), any(DeliveryAddress.class), any(WholeSaleProduct.class));
+        verify(wholeSaleOrderRepository).save(any(WholeSaleOrder.class));
+    }
+
+    @Test
+    void orderWholeSaleProductThatIsOnSale() {
+        // Mock data
+        User user = spy(User.class);
+        user.setWholeSaleOrders(new ArrayList<>());
+
+        WholeSaleOrderDTO wholeSaleOrderDTO = WholeSaleOrderDTO.wholeSaleOrderDTOBuilder()
+
+                .build();
+
+        WholeSaleProduct wholeSaleProduct = spy(WholeSaleProduct.class);
+        wholeSaleProduct.setSaleWholeSaleProduct(SaleWholeSaleProduct.saleWholeSaleProductBuilder()
+                .salePrice(100)
+                .build());
+
+        WholeSaleOrder wholeSaleOrder = WholeSaleOrder.wholeSaleOrderBuilder()
+
+                .build();
+
+        DeliveryAddress deliveryAddress = DeliveryAddress.deliveryAddressBuilder()
+
+                .build();
+
+        double expectedOrderPrice = 10;
+        // Stubbing methods
+        doReturn(false).when(wholeSaleProduct).isRejected();
+        doReturn(false).when(user).hasOrder(any(WholeSaleProduct.class), any(Order.Status.class));
+        doReturn(false).when(wholeSaleProduct).isDeleted();
+        doReturn(false).when(wholeSaleProduct).isSold();
+        doReturn(true).when(wholeSaleProduct).isListed();
+        doReturn(false).when(user).hasProduct(any(WholeSaleProduct.class));
+        doReturn(true).when(wholeSaleProduct).isSale();
+
+        when(wholeSaleProductService.getById(anyInt())).thenReturn(wholeSaleProduct);
+        when(wholeSaleProductService.isRejectedBySeller(any(User.class), any(WholeSaleProduct.class))).thenReturn(false);
+        when(addressService.getDeliveryAddressById(any(User.class), anyInt())).thenReturn(deliveryAddress);
+        when(wholeSaleOrderMapper.toEntity(any(WholeSaleOrderDTO.class), any(User.class), any(DeliveryAddress.class), any(WholeSaleProduct.class))).thenReturn(wholeSaleOrder);
+        when(wholeSaleOrderRepository.save(any(WholeSaleOrder.class))).thenReturn(wholeSaleOrder);
+
+        // Expected/ Actual values
+
+        // Calling the method
+        buyerService.order(user, wholeSaleOrderDTO);
+
+        // Assertions
+        assertTrue(user.getWholeSaleOrders().contains(wholeSaleOrder));
+        assertEquals(wholeSaleProduct.getSaleWholeSaleProduct().getSalePrice(), wholeSaleOrder.getPrice());
 
         // Behavior verification
         verify(wholeSaleProductService).getById(anyInt());
@@ -496,6 +616,9 @@ class BuyerServiceImplTest {
         // Behavior verification
         verifyNoInteractions(addressService, retailOrderMapper, retailOrderRepository);
     }
+
+
+
 
     @Test
     void cancelOrder() {

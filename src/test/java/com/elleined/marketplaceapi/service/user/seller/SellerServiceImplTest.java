@@ -138,15 +138,14 @@ class SellerServiceImplTest {
 
         SaleWholeSaleRequest saleWholeSaleRequest = SaleWholeSaleRequest.saleWholeSaleProductRequestBuilder()
                 .salePercentage(90)
-                .salePrice(expectedSalePrice)
                 .build();
 
         // Stubbing methods
         doReturn(true).when(seller).hasProduct(wholeSaleProduct);
         doReturn(true).when(wholeSaleProduct).isListed();
 
-        when(wholeSaleProductService.calculateSalePrice(any(SaleWholeSaleRequest.class))).thenReturn((double) expectedSalePrice);
-        when(saleWholeSaleProductMapper.toEntity(any(SaleWholeSaleRequest.class), any(WholeSaleProduct.class))).thenReturn(new SaleWholeSaleProduct());
+        when(wholeSaleProductService.calculateSalePrice(anyDouble(), anyInt())).thenReturn((double) expectedSalePrice);
+        when(saleWholeSaleProductMapper.toEntity(any(WholeSaleProduct.class), anyInt(), anyDouble())).thenReturn(new SaleWholeSaleProduct());
         when(wholeSaleProductRepository.save(any(WholeSaleProduct.class))).thenReturn(new WholeSaleProduct());
         when(saleWholeSaleProductRepository.save(any(SaleWholeSaleProduct.class))).thenReturn(new SaleWholeSaleProduct());
 
@@ -155,8 +154,8 @@ class SellerServiceImplTest {
         assertDoesNotThrow(() -> sellerService.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest));
 
         // Behavior Verifications
-        verify(wholeSaleProductService).calculateSalePrice(any(SaleWholeSaleRequest.class));
-        verify(saleWholeSaleProductMapper).toEntity(any(SaleWholeSaleRequest.class), any(WholeSaleProduct.class));
+        verify(wholeSaleProductService).calculateSalePrice(anyDouble(), anyInt());
+        verify(saleWholeSaleProductMapper).toEntity(any(WholeSaleProduct.class), anyInt(), anyDouble());
         verify(wholeSaleProductRepository).save(any(WholeSaleProduct.class));
         verify(saleWholeSaleProductRepository).save(any(SaleWholeSaleProduct.class));
     }
