@@ -26,6 +26,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
 import com.elleined.marketplaceapi.service.user.seller.SellerService;
 import com.elleined.marketplaceapi.service.user.seller.fee.PremiumSellerFeeService;
 import com.elleined.marketplaceapi.service.user.seller.fee.RegularSellerFeeService;
@@ -57,6 +58,7 @@ public class RegularSellerProxy implements SellerService {
     private final RegularSellerRestriction regularSellerRestriction;
 
     private final RetailProductService retailProductService;
+    private final WholeSaleProductService wholeSaleProductService;
 
     private final FeeService feeService;
 
@@ -66,12 +68,13 @@ public class RegularSellerProxy implements SellerService {
                               ATMValidator atmValidator,
                               RegularSellerRestriction regularSellerRestriction,
                               RetailProductService retailProductService,
-                              FeeService feeService) {
+                              WholeSaleProductService wholeSaleProductService, FeeService feeService) {
         this.sellerService = sellerService;
         this.sellerFeeService = sellerFeeService;
         this.atmValidator = atmValidator;
         this.regularSellerRestriction = regularSellerRestriction;
         this.retailProductService = retailProductService;
+        this.wholeSaleProductService = wholeSaleProductService;
         this.feeService = feeService;
     }
 
@@ -89,9 +92,13 @@ public class RegularSellerProxy implements SellerService {
 
     @Override
     public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        double listingFee = sellerFeeService.getListingFee(saleWholeSaleRequest.getSalePrice());
+        int salePercentage = saleWholeSaleRequest.getSalePercentage();
+        double totalPrice = Formatter.formatDouble(wholeSaleProduct.getPrice().doubleValue());
+
+        double salePrice = wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
+        double listingFee = sellerFeeService.getListingFee(salePrice);
         if (seller.isBalanceNotEnough(listingFee))
-            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(saleWholeSaleRequest.getSalePrice()) + ". Consider buying premium account to remove listing fee.");
+            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + salePrice + ". Consider buying premium account to remove listing fee.");
         feeService.deductListingFee(seller, listingFee);
 
         return sellerService.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);

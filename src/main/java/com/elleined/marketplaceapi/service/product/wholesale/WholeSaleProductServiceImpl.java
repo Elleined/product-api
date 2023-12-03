@@ -131,11 +131,6 @@ public class WholeSaleProductServiceImpl implements WholeSaleProductService {
     }
 
     @Override
-    public double calculateSalePrice(SaleWholeSaleRequest saleWholeSaleRequest) {
-        return Formatter.formatDouble((saleWholeSaleRequest.getSalePrice() * (saleWholeSaleRequest.getSalePercentage() / 100f)));
-    }
-
-    @Override
     public double calculateSalePrice(double totalPrice, int salePercentage) {
         return Formatter.formatDouble((totalPrice * (salePercentage / 100f)));
     }

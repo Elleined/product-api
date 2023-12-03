@@ -123,10 +123,10 @@ public class SellerServiceImpl implements SellerService {
 
         if (!seller.hasProduct(wholeSaleProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!wholeSaleProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
-        double salePrice = wholeSaleProductService.calculateSalePrice(saleWholeSaleRequest);
+        double salePrice = wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
         if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
 
-        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(saleWholeSaleRequest, wholeSaleProduct);
+        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(wholeSaleProduct, salePercentage, totalPrice);
         wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
 
         saleWholeSaleProductRepository.save(saleWholeSaleProduct);
