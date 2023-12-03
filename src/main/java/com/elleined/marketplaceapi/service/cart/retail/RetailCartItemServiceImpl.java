@@ -127,10 +127,6 @@ public class RetailCartItemServiceImpl implements RetailCartItemService {
             throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
         RetailOrder retailOrder = retailCartItemMapper.cartItemToOrder(retailCartItem);
-        if (retailProduct.isSale()) {
-            double salePrice = retailProductService.calculateOrderPrice(retailProduct.getSaleRetailProduct(), retailCartItem.getOrderQuantity());
-            retailOrder.setPrice(salePrice);
-        }
 
         retailCartItemRepository.delete(retailCartItem);
         retailOrderRepository.save(retailOrder);

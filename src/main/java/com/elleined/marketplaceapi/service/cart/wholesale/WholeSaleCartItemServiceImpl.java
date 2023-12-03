@@ -113,7 +113,6 @@ public class WholeSaleCartItemServiceImpl implements WholeSaleCartItemService {
             throw new BuyerAlreadyRejectedException("Cannot order! because seller of this product already rejected your order request before. Please wait after 1 day to re-oder this product!");
 
         WholeSaleOrder wholeSaleOrder = wholeSaleCartItemMapper.cartItemToOrder(wholeSaleCartItem);
-        if (wholeSaleProduct.isSale()) wholeSaleOrder.setPrice(wholeSaleProduct.getSaleWholeSaleProduct().getSalePrice());
 
         wholeSaleCartItemRepository.delete(wholeSaleCartItem);
         wholeSaleOrderRepository.save(wholeSaleOrder);
