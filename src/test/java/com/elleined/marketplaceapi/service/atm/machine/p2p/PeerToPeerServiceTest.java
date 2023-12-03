@@ -1,12 +1,9 @@
 package com.elleined.marketplaceapi.service.atm.machine.p2p;
 
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
-import com.elleined.marketplaceapi.exception.atm.NotValidAmountException;
 import com.elleined.marketplaceapi.exception.atm.SendingToHimselfException;
 import com.elleined.marketplaceapi.exception.atm.limit.PeerToPeerLimitPerDayException;
 import com.elleined.marketplaceapi.model.atm.transaction.PeerToPeerTransaction;
-import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
-import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;

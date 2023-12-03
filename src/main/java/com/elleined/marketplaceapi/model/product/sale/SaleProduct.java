@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.model.product.sale;
 
-import com.elleined.marketplaceapi.model.product.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

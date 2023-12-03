@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.model.product.sale;
 
-import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import jakarta.persistence.*;
 import lombok.Builder;

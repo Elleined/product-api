@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.model.product;
 
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.message.prv.PrivateChatRoom;
-import com.elleined.marketplaceapi.model.product.sale.SaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

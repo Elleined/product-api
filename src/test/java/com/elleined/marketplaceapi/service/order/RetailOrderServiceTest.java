@@ -8,7 +8,6 @@ import com.elleined.marketplaceapi.model.user.Premium;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.order.RetailOrderRepository;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.elleined.marketplaceapi.model.order.Order.Status.PENDING;
 import static com.elleined.marketplaceapi.model.order.Order.Status.valueOf;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 

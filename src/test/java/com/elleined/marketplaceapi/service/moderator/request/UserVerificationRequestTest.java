@@ -11,9 +11,7 @@ import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.fee.FeeService;
 import com.elleined.marketplaceapi.service.user.ReferralService;
 import com.elleined.marketplaceapi.service.user.RegistrationPromoService;
-import com.elleined.marketplaceapi.service.user.UserService;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +23,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.elleined.marketplaceapi.model.user.UserVerification.Status.*;
+import static com.elleined.marketplaceapi.model.user.UserVerification.Status.NOT_VERIFIED;
+import static com.elleined.marketplaceapi.model.user.UserVerification.Status.VERIFIED;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

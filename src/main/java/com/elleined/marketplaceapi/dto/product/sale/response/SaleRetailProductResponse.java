@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.dto.product.sale.response;
 
-import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

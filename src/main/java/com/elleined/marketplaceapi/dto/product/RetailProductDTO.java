@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.dto.product;
 
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.dto.product.sale.response.SaleRetailProductResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

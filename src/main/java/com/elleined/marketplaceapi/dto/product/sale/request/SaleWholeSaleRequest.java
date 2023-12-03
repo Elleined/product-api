@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class SaleWholeSaleRequest extends SaleProductRequest {
 
-    @Positive(message = "Total price cannot be 0 or less than 0")
+    @Positive(message = "Sale price cannot be 0 or less than 0")
     private int salePrice;
 
     @Builder(builderMethodName = "saleWholeSaleProductRequestBuilder")
