@@ -28,4 +28,8 @@ public interface ProductService<T extends Product> {
     void updateAllPendingAndAcceptedOrders(T t, Status status);
 
     boolean isRejectedBySeller(User buyer, T t);
+
+    default int getSalePercentage(double totalPrice, double salePrice) {
+        return (int) ((salePrice / totalPrice) * 100);
+    }
 }
