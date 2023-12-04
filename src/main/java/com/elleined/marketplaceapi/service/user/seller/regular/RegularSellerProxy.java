@@ -90,7 +90,7 @@ public class RegularSellerProxy implements SellerService {
 
     @Override
     public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, double salePrice) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        double listingFee = sellerFeeService.getListingFee(salePrice.doubleValue());
+        double listingFee = sellerFeeService.getListingFee(salePrice);
         if (seller.isBalanceNotEnough(listingFee))
             throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + salePrice + ". Consider buying premium account to remove listing fee.");
         feeService.deductListingFee(seller, listingFee);
