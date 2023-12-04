@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.product.retail;
 
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.service.product.ProductService;
@@ -23,8 +22,6 @@ public interface RetailProductService extends ProductService<RetailProduct> {
      * we will now multiply that with price per unit
      */
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
-    double calculateTotalPrice(RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest);
     double calculateTotalPrice(RetailProduct retailProduct);
 
-    double calculateSalePrice(double totalPrice, int salePercentage);
 }

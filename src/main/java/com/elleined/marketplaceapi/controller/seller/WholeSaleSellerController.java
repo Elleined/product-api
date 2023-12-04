@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.controller.seller;
 
 import com.elleined.marketplaceapi.dto.order.WholeSaleOrderDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.mapper.order.WholeSaleOrderMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
 import com.elleined.marketplaceapi.model.order.Order.Status;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -56,16 +56,16 @@ public class WholeSaleSellerController {
     @PatchMapping("/{productId}/sale")
     public WholeSaleProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
                                            @PathVariable("productId") int productId,
-                                           @Valid @RequestBody SaleWholeSaleRequest saleWholeSaleRequest) {
+                                           @RequestParam("salePrice") double salePrice ) {
 
         User seller = userService.getById(sellerId);
         WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(productId);
         if (seller.isPremiumAndNotExpired()) {
-            WholeSaleProduct saleProduct = premiumSeller.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
+            WholeSaleProduct saleProduct = premiumSeller.saleProduct(seller, wholeSaleProduct, salePrice);
             return wholeSaleProductMapper.toDTO(saleProduct);
         }
 
-        WholeSaleProduct saleProduct = regularSeller.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
+        WholeSaleProduct saleProduct = regularSeller.saleProduct(seller, wholeSaleProduct, salePrice);
         return wholeSaleProductMapper.toDTO(saleProduct);
     }
 

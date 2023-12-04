@@ -2,8 +2,6 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
 import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
@@ -100,30 +98,28 @@ class SellerServiceImplTest {
         User seller = spy(User.class);
 
         RetailProduct retailProduct = spy(RetailProduct.class);
-        SaleRetailProductRequest saleWholeSaleRequest = SaleRetailProductRequest.saleRetailProductRequestBuilder()
-                .salePercentage(90)
-                .build();
 
         // Stubbing methods
         doReturn(true).when(seller).hasProduct(retailProduct);
         doReturn(true).when(retailProduct).isListed();
 
-        when(retailProductService.calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class))).thenReturn(expectedTotalPrice);
-        when(retailProductService.calculateSalePrice(anyDouble(), anyInt())).thenReturn(expectedSalePrice);
-        when(saleRetailProductMapper.toEntity(any(SaleRetailProductRequest.class), any(RetailProduct.class))).thenReturn(new SaleRetailProduct());
+        when(retailProductService.calculateTotalPrice(any(RetailProduct.class))).thenReturn(expectedTotalPrice);
+        when(retailProductService.calculateTotalPrice(anyDouble(), anyInt(), anyInt())).thenReturn(expectedSalePrice);
+        when(saleRetailProductMapper.toEntity(any(RetailProduct.class), anyInt(), anyInt())).thenReturn(new SaleRetailProduct());
         when(saleRetailProductRepository.save(any(SaleRetailProduct.class))).thenReturn(new SaleRetailProduct());
-
+        when(retailProductRepository.save(any(RetailProduct.class))).thenReturn(retailProduct);
         // Calling the method
         // Assertions
-        assertDoesNotThrow(() -> sellerService.saleProduct(seller, retailProduct, saleWholeSaleRequest));
-
+        assertDoesNotThrow(() -> sellerService.saleProduct(seller, retailProduct, 9, 0));
+        assertNotNull(retailProduct.getSaleRetailProduct());
         // Behavior Verifications
-        verify(retailProductService).calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class));
-        verify(retailProductService).calculateSalePrice(anyDouble(), anyInt());
-        verify(saleRetailProductMapper).toEntity(any(SaleRetailProductRequest.class), any(RetailProduct.class));
+        verify(retailProductService).calculateTotalPrice(any(RetailProduct.class));
+        verify(retailProductService).calculateTotalPrice(anyDouble(), anyInt(), anyInt());
+        verify(saleRetailProductMapper).toEntity(any(RetailProduct.class), anyInt(), anyInt());
         verify(saleRetailProductRepository).save(any(SaleRetailProduct.class));
+        verify(retailProductRepository).save(any(RetailProduct.class));
     }
-
+//
     @Test
     void wholeSaleSaleProduct() {
         // Expected and Actual Value
@@ -136,26 +132,21 @@ class SellerServiceImplTest {
         WholeSaleProduct wholeSaleProduct = spy(WholeSaleProduct.class);
         wholeSaleProduct.setPrice(new BigDecimal(expectedTotalPrice));
 
-        SaleWholeSaleRequest saleWholeSaleRequest = SaleWholeSaleRequest.saleWholeSaleProductRequestBuilder()
-                .salePercentage(90)
-                .build();
-
         // Stubbing methods
         doReturn(true).when(seller).hasProduct(wholeSaleProduct);
         doReturn(true).when(wholeSaleProduct).isListed();
 
-        when(wholeSaleProductService.calculateSalePrice(anyDouble(), anyInt())).thenReturn((double) expectedSalePrice);
-        when(saleWholeSaleProductMapper.toEntity(any(WholeSaleProduct.class), anyInt(), anyDouble())).thenReturn(new SaleWholeSaleProduct());
+        when(saleWholeSaleProductMapper.toEntity(any(WholeSaleProduct.class), anyDouble())).thenReturn(new SaleWholeSaleProduct());
         when(wholeSaleProductRepository.save(any(WholeSaleProduct.class))).thenReturn(new WholeSaleProduct());
         when(saleWholeSaleProductRepository.save(any(SaleWholeSaleProduct.class))).thenReturn(new SaleWholeSaleProduct());
 
         // Calling the method
         // Assertions
-        assertDoesNotThrow(() -> sellerService.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest));
+        assertDoesNotThrow(() -> sellerService.saleProduct(seller, wholeSaleProduct, expectedSalePrice));
+        assertNotNull(wholeSaleProduct.getSaleWholeSaleProduct());
 
         // Behavior Verifications
-        verify(wholeSaleProductService).calculateSalePrice(anyDouble(), anyInt());
-        verify(saleWholeSaleProductMapper).toEntity(any(WholeSaleProduct.class), anyInt(), anyDouble());
+        verify(saleWholeSaleProductMapper).toEntity(any(WholeSaleProduct.class), anyDouble());
         verify(wholeSaleProductRepository).save(any(WholeSaleProduct.class));
         verify(saleWholeSaleProductRepository).save(any(SaleWholeSaleProduct.class));
     }

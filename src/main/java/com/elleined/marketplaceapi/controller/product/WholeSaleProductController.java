@@ -3,6 +3,7 @@ package com.elleined.marketplaceapi.controller.product;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
 import com.elleined.marketplaceapi.exception.product.ProductPriceException;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
+import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
@@ -35,18 +36,17 @@ public class WholeSaleProductController {
         return wholeSaleProductMapper.toDTO(wholeSaleProduct);
     }
 
-
-    @GetMapping("/calculate-total-price")
-    public double calculateTotalPrice(@RequestParam("totalPrice") double totalPrice,
-                                      @RequestParam("salePercentage") int salePercentage) {
-        if (salePercentage > 100) throw new ProductPriceException("Sale percentage cannot be greater than 100");
-        return wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
-    }
-
     @GetMapping("/search-by-crop-name")
     public List<WholeSaleProductDTO> searchProductByCropName(@RequestParam("cropName") String cropName) {
         return wholeSaleProductService.searchProductByCropName(cropName).stream()
                 .map(wholeSaleProductMapper::toDTO)
                 .toList();
+    }
+
+    @GetMapping("/{productId}/calculate-sale-percentage")
+    public double getSalePercentage(@PathVariable("productId") int productId,
+                                    @RequestParam("salePrice") int salePrice) {
+        WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(productId);
+        return wholeSaleProductService.getSalePercentage(wholeSaleProduct.getPrice().doubleValue(), salePrice);
     }
 }

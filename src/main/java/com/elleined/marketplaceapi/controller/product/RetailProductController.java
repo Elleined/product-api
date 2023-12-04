@@ -46,6 +46,15 @@ public class RetailProductController {
         return retailProductService.calculateOrderPrice(retailProduct, userOrderQuantity);
     }
 
+    @GetMapping("/search-by-crop-name")
+    public List<RetailProductDTO> searchProductByCropName(@RequestParam("cropName") String cropName) {
+        return retailProductService.searchProductByCropName(cropName).stream()
+                .map(p -> {
+                    double price = retailProductService.calculateTotalPrice(p);
+                    return retailProductMapper.toDTO(p, price);
+                }).toList();
+    }
+
     @GetMapping("/calculate-total-price")
     public double calculateTotalPrice(@RequestParam("pricePerUnit") double pricePerUnit,
                                       @RequestParam("quantityPerUnit") int quantityPerUnit,
@@ -54,13 +63,14 @@ public class RetailProductController {
         return retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, availableQuantity);
     }
 
+    @GetMapping("/{productId}/calculate-sale-percentage")
+    public double getSalePercentage(@PathVariable("productId") int productId,
+                                    @RequestParam("quantityPerUnit") int quantityPerUnit,
+                                    @RequestParam("pricePerUnit") int pricePerUnit) {
 
-    @GetMapping("/search-by-crop-name")
-    public List<RetailProductDTO> searchProductByCropName(@RequestParam("cropName") String cropName) {
-        return retailProductService.searchProductByCropName(cropName).stream()
-                .map(p -> {
-                    double price = retailProductService.calculateTotalPrice(p);
-                    return retailProductMapper.toDTO(p, price);
-                }).toList();
+        RetailProduct retailProduct = retailProductService.getById(productId);
+        double currentTotalPrice = retailProductService.calculateTotalPrice(retailProduct);
+        double salePrice = retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, retailProduct.getAvailableQuantity());
+        return retailProductService.getSalePercentage(currentTotalPrice, salePrice);
     }
 }

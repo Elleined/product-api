@@ -40,7 +40,4 @@ public abstract class SaleProduct {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    @Column(name = "sale_percentage", nullable = false)
-    private double salePercentage;
 }

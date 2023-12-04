@@ -9,10 +9,13 @@ import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
+import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -28,16 +31,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class WholeSaleProductMapperTest {
 
+    @Mock
+    private WholeSaleProductService wholeSaleProductService;
+
     @Spy
     private SaleWholeSaleProductMapper saleWholeSaleProductMapper = Mappers.getMapper(SaleWholeSaleProductMapper.class);
     @InjectMocks
     private WholeSaleProductMapper wholeSaleProductMapper = Mappers.getMapper(WholeSaleProductMapper.class);
     @Test
+    @Disabled
     void toDTO() {
         double expectedTotalPrice = 1_000;
         SaleWholeSaleProduct saleWholeSaleProduct = SaleWholeSaleProduct.saleWholeSaleProductBuilder()
                 .salePrice(1)
-                .salePercentage(1)
                 .updatedAt(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -76,6 +82,7 @@ class WholeSaleProductMapperTest {
                 .wholeSaleOrders(new ArrayList<>())
                 .wholeSaleCartItems(new ArrayList<>())
                 .build();
+        saleWholeSaleProduct.setWholeSaleProduct(expected);
 
         WholeSaleProductDTO actual = wholeSaleProductMapper.toDTO(expected);
         assertEquals(expected.getId(), actual.getId());

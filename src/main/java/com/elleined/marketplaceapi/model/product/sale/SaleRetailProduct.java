@@ -32,8 +32,8 @@ public class SaleRetailProduct extends SaleProduct {
 
 
     @Builder(builderMethodName = "saleRetailProductBuilder")
-    public SaleRetailProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, double salePercentage, RetailProduct retailProduct, double pricePerUnit, int quantityPerUnit) {
-        super(id, createdAt, updatedAt, salePercentage);
+    public SaleRetailProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, RetailProduct retailProduct, double pricePerUnit, int quantityPerUnit) {
+        super(id, createdAt, updatedAt);
         this.retailProduct = retailProduct;
         this.pricePerUnit = pricePerUnit;
         this.quantityPerUnit = quantityPerUnit;

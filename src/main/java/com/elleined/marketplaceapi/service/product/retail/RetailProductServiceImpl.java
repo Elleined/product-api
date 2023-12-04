@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.product.retail;
 
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.RetailOrder;
@@ -181,21 +180,9 @@ public class RetailProductServiceImpl implements RetailProductService {
     }
 
     @Override
-    public double calculateTotalPrice(RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) {
-        return calculateTotalPrice(saleRetailProductRequest.getPricePerUnit(),
-                saleRetailProductRequest.getQuantityPerUnit(),
-                retailProduct.getAvailableQuantity());
-    }
-
-    @Override
     public double calculateTotalPrice(RetailProduct retailProduct) {
         return calculateTotalPrice(retailProduct.getPricePerUnit(),
                 retailProduct.getQuantityPerUnit(),
                 retailProduct.getAvailableQuantity());
-    }
-
-    @Override
-    public double calculateSalePrice(double totalPrice, int salePercentage) {
-        return (totalPrice * (salePercentage / 100f));
     }
 }
