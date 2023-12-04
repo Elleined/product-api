@@ -25,6 +25,7 @@ import com.elleined.marketplaceapi.model.order.WholeSaleOrder;
 import com.elleined.marketplaceapi.model.product.Product;
 import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
+import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.unit.WholeSaleUnit;
@@ -94,23 +95,20 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int quantityPerUnit, int pricePerUnit) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-//        int salePercentage = quantityPerUnit.getSalePercentage();
-//
-//        if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
-//        if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
-//
-//        double totalPrice = retailProductService.calculateTotalPrice(retailProduct, quantityPerUnit);
-//        double salePrice = retailProductService.calculateSalePrice(totalPrice, salePercentage);
-//        if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
-//
-//        SaleRetailProduct saleRetailProduct = saleRetailProductMapper.toEntity(quantityPerUnit, retailProduct);
-//        retailProduct.setSaleRetailProduct(saleRetailProduct);
-//
-//        saleRetailProductRepository.save(saleRetailProduct);
-//        retailProductRepository.save(retailProduct);
-//        log.debug("Retail product with id of {} set as sale successfully", retailProduct.getId());
-//        return retailProduct;
-        return null;
+        if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
+        if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
+
+        double currentTotalPrice = retailProductService.calculateTotalPrice(retailProduct);
+        double salePrice = retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, retailProduct.getAvailableQuantity());
+        if (salePrice >= currentTotalPrice) throw new ProductSaleException("Cannot sale this product! Sale price should be lower than the current total price.");
+
+        SaleRetailProduct saleRetailProduct = saleRetailProductMapper.toEntity(retailProduct, quantityPerUnit, pricePerUnit);
+        retailProduct.setSaleRetailProduct(saleRetailProduct);
+
+        saleRetailProductRepository.save(saleRetailProduct);
+        retailProductRepository.save(retailProduct);
+        log.debug("Retail product with id of {} set as sale successfully", retailProduct.getId());
+        return retailProduct;
     }
 
     @Override
