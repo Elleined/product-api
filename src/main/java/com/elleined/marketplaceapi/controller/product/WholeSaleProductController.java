@@ -36,14 +36,6 @@ public class WholeSaleProductController {
         return wholeSaleProductMapper.toDTO(wholeSaleProduct);
     }
 
-
-    @GetMapping("/calculate-total-price")
-    public double calculateTotalPrice(@RequestParam("totalPrice") double totalPrice,
-                                      @RequestParam("salePercentage") int salePercentage) {
-        if (salePercentage > 100) throw new ProductPriceException("Sale percentage cannot be greater than 100");
-        return wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
-    }
-
     @GetMapping("/search-by-crop-name")
     public List<WholeSaleProductDTO> searchProductByCropName(@RequestParam("cropName") String cropName) {
         return wholeSaleProductService.searchProductByCropName(cropName).stream()
