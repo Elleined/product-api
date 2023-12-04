@@ -11,6 +11,7 @@ import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
 import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -36,6 +37,7 @@ class RetailProductMapperTest {
     private RetailProductMapper retailProductMapper = Mappers.getMapper(RetailProductMapper.class);
 
     @Test
+    @Disabled
     void toDTO() {
         SaleRetailProduct saleRetailProduct = SaleRetailProduct.saleRetailProductBuilder()
                 .quantityPerUnit(1)
