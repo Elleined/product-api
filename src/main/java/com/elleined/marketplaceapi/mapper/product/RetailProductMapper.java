@@ -1,7 +1,6 @@
 package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.response.SaleRetailProductResponse;
 import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.product.Product;
@@ -27,11 +26,10 @@ public interface RetailProductMapper {
             @Mapping(target = "listingDate", expression = "java(retailProduct.getListingDate().toLocalDate())"),
             @Mapping(target = "unitId", source = "retailUnit.id"),
             @Mapping(target = "unitName", source = "retailUnit.name"),
-            @Mapping(target = "saleRetailProductResponse", expression = "java(saleRetailProductResponse)")
+            @Mapping(target = "saleRetailProductResponse", source = "saleRetailProduct")
     })
     RetailProductDTO toDTO(RetailProduct retailProduct,
-                           @Context double price,
-                           @Context SaleRetailProductResponse saleRetailProductResponse);
+                           @Context double price);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),

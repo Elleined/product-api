@@ -24,5 +24,4 @@ public interface RetailProductService extends ProductService<RetailProduct> {
     double calculateTotalPrice(double pricePerUnit, int quantityPerUnit, int availableQuantity);
     double calculateTotalPrice(RetailProduct retailProduct);
 
-    double calculateSalePrice(double totalPrice, int salePercentage);
 }

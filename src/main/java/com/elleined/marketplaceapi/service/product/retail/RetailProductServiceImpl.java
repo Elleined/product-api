@@ -185,9 +185,4 @@ public class RetailProductServiceImpl implements RetailProductService {
                 retailProduct.getQuantityPerUnit(),
                 retailProduct.getAvailableQuantity());
     }
-
-    @Override
-    public double calculateSalePrice(double totalPrice, int salePercentage) {
-        return (totalPrice * (salePercentage / 100f));
-    }
 }
