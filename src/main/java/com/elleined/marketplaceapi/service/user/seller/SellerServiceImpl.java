@@ -126,7 +126,6 @@ public class SellerServiceImpl implements SellerService {
         wholeSaleProductRepository.save(wholeSaleProduct);
         log.debug("Whole sale product with id of {} set as sale successfully!", wholeSaleProduct.getId());
         return wholeSaleProduct;
-        return null;
     }
 
     @Override
