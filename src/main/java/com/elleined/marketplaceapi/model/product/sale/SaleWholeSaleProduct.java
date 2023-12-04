@@ -28,8 +28,8 @@ public class SaleWholeSaleProduct extends SaleProduct {
     private double salePrice;
 
     @Builder(builderMethodName = "saleWholeSaleProductBuilder")
-    public SaleWholeSaleProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, double salePercentage, WholeSaleProduct wholeSaleProduct, double salePrice) {
-        super(id, createdAt, updatedAt, salePercentage);
+    public SaleWholeSaleProduct(int id, LocalDateTime createdAt, LocalDateTime updatedAt, WholeSaleProduct wholeSaleProduct, double salePrice) {
+        super(id, createdAt, updatedAt);
         this.wholeSaleProduct = wholeSaleProduct;
         this.salePrice = salePrice;
     }
