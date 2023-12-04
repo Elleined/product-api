@@ -1,6 +1,8 @@
 package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
+import com.elleined.marketplaceapi.dto.product.sale.response.SaleRetailProductResponse;
+import com.elleined.marketplaceapi.dto.product.sale.response.SaleWholeSaleResponse;
 import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.Shop;
@@ -37,7 +39,6 @@ class RetailProductMapperTest {
         SaleRetailProduct saleRetailProduct = SaleRetailProduct.saleRetailProductBuilder()
                 .quantityPerUnit(1)
                 .pricePerUnit(1)
-                .salePercentage(1)
                 .updatedAt(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -79,9 +80,16 @@ class RetailProductMapperTest {
                 .privateChatRooms(new ArrayList<>())
                 .build();
 
-        double expectedTotalPrice = 5_000;
-        RetailProductDTO actual = retailProductMapper.toDTO(expected, expectedTotalPrice);
+        SaleRetailProductResponse saleRetailProductResponse = SaleRetailProductResponse.saleRetailProductResponseBuilder()
+                .id(1)
+                .salePercentage(90)
+                .pricePerUnit(1)
+                .quantityPerUnit(1)
+                .salePrice(90)
+                .build();
 
+        double expectedTotalPrice = 5_000;
+        RetailProductDTO actual = retailProductMapper.toDTO(expected, expectedTotalPrice, saleRetailProductResponse);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getCrop().getName(), actual.getCropName());
@@ -96,7 +104,10 @@ class RetailProductMapperTest {
         assertNotNull(actual.getHarvestDate());
         assertNotNull(actual.getListingDate());
         assertNotNull(actual.getExpirationDate());
+
         assertNotNull(actual.getSaleRetailProductResponse());
+        assertEquals(saleRetailProductResponse, actual.getSaleRetailProductResponse());
+
         assertEquals(expected.getSeller().getShop().getName(), actual.getShopName());
         assertEquals(expectedTotalPrice, actual.getTotalPrice());// total price
         assertEquals(expected.getPricePerUnit(), actual.getPricePerUnit());
@@ -163,7 +174,6 @@ class RetailProductMapperTest {
                 .build();
 
         SaleRetailProduct saleRetailProduct = SaleRetailProduct.saleRetailProductBuilder()
-                .salePercentage(1)
                 .pricePerUnit(1)
                 .quantityPerUnit(1)
                 .build();

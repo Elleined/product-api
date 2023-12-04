@@ -32,4 +32,5 @@ public interface SaleRetailProductMapper {
     SaleRetailProductResponse toDTO(SaleRetailProduct saleRetailProduct,
                                     @Context int salePercentage,
                                     @Context double salePrice);
+    
 }

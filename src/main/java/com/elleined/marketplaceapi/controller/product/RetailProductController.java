@@ -67,6 +67,7 @@ public class RetailProductController {
     public double getSalePercentage(@PathVariable("productId") int productId,
                                     @RequestParam("quantityPerUnit") int quantityPerUnit,
                                     @RequestParam("pricePerUnit") int pricePerUnit) {
+
         RetailProduct retailProduct = retailProductService.getById(productId);
         double currentTotalPrice = retailProductService.calculateTotalPrice(retailProduct);
         double salePrice = retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, retailProduct.getAvailableQuantity());
