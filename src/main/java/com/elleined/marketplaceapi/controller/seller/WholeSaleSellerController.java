@@ -56,7 +56,7 @@ public class WholeSaleSellerController {
     @PatchMapping("/{productId}/sale")
     public WholeSaleProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
                                            @PathVariable("productId") int productId,
-                                           @RequestParam("salePrice") BigDecimal salePrice ) {
+                                           @RequestParam("salePrice") double salePrice ) {
 
         User seller = userService.getById(sellerId);
         WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(productId);
