@@ -79,26 +79,22 @@ public class RegularSellerProxy implements SellerService {
 
     @Override
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int quantityPerUnit, int pricePerUnit) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-//        double totalPrice = retailProductService.calculateTotalPrice(retailProduct, quantityPerUnit);
-//        double listingFee = sellerFeeService.getListingFee(totalPrice);
-//        if (seller.isBalanceNotEnough(listingFee))
-//            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
-//        feeService.deductListingFee(seller, listingFee);
-//
+        double totalPrice = retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, retailProduct.getAvailableQuantity());
+        double listingFee = sellerFeeService.getListingFee(totalPrice);
+        if (seller.isBalanceNotEnough(listingFee))
+            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + Formatter.formatDouble(totalPrice) + ". Consider buying premium account to remove listing fee.");
+        feeService.deductListingFee(seller, listingFee);
+
         return sellerService.saleProduct(seller, retailProduct, quantityPerUnit, pricePerUnit);
     }
 
     @Override
     public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, BigDecimal salePrice) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-//        int salePercentage = salePrice.getSalePercentage();
-//        double totalPrice = Formatter.formatDouble(wholeSaleProduct.getPrice().doubleValue());
-//
-//        double salePrice = wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
-//        double listingFee = sellerFeeService.getListingFee(salePrice);
-//        if (seller.isBalanceNotEnough(listingFee))
-//            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + salePrice + ". Consider buying premium account to remove listing fee.");
-//        feeService.deductListingFee(seller, listingFee);
-//
+        double listingFee = sellerFeeService.getListingFee(salePrice.doubleValue());
+        if (seller.isBalanceNotEnough(listingFee))
+            throw new InsufficientBalanceException("Cannot sale product! because you doesn't have enough balance to pay for the listing fee of " + Formatter.formatDouble(listingFee) + " which is " + RegularSellerFeeService.LISTING_FEE_PERCENTAGE + "%  of total price " + salePrice + ". Consider buying premium account to remove listing fee.");
+        feeService.deductListingFee(seller, listingFee);
+
         return sellerService.saleProduct(seller, wholeSaleProduct, salePrice);
     }
 
