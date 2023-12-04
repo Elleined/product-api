@@ -73,7 +73,7 @@ class RegularSellerProxyTest {
 
         // Calling the method
         // Assestions
-        assertDoesNotThrow(() -> regularSellerProxy.saleProduct(seller, new RetailProduct(), new SaleRetailProductRequest()));
+        assertDoesNotThrow(() -> regularSellerProxy.saleProduct(seller, new RetailProduct(), new SaleRetailProductRequest(), ));
         assertEquals(expectedUserBalance, seller.getBalance());
 
         // Behavior verification

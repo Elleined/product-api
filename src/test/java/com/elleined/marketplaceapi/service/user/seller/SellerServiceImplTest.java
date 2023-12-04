@@ -115,7 +115,7 @@ class SellerServiceImplTest {
 
         // Calling the method
         // Assertions
-        assertDoesNotThrow(() -> sellerService.saleProduct(seller, retailProduct, saleWholeSaleRequest));
+        assertDoesNotThrow(() -> sellerService.saleProduct(seller, retailProduct, saleWholeSaleRequest, ));
 
         // Behavior Verifications
         verify(retailProductService).calculateTotalPrice(any(RetailProduct.class), any(SaleRetailProductRequest.class));

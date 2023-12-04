@@ -2,8 +2,6 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
@@ -22,16 +20,17 @@ import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 public interface SellerService {
 
-    RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest)
+    RetailProduct saleProduct(User seller, RetailProduct retailProduct, int quantityPerUnit, int pricePerUnit)
             throws NotOwnedException,
             ProductSaleException,
             FieldException,
             ProductNotListedException;
 
-    WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest)
+    WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, BigDecimal salePrice)
             throws NotOwnedException,
             ProductSaleException,
             FieldException,

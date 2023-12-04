@@ -60,12 +60,12 @@ public class RetailSellerController {
         User seller = userService.getById(sellerId);
         RetailProduct retailProduct = retailProductService.getById(productId);
         if (seller.isPremiumAndNotExpired()) {
-            RetailProduct saleProduct = premiumSeller.saleProduct(seller, retailProduct, saleRetailProductRequest);
+            RetailProduct saleProduct = premiumSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
             double price = retailProductService.calculateTotalPrice(retailProduct);
             return retailProductMapper.toDTO(saleProduct, price);
         }
 
-        RetailProduct saleProduct = regularSeller.saleProduct(seller, retailProduct, saleRetailProductRequest);
+        RetailProduct saleProduct = regularSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
         double price = retailProductService.calculateTotalPrice(retailProduct);
         return retailProductMapper.toDTO(saleProduct, price);
     }

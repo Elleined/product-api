@@ -2,8 +2,6 @@ package com.elleined.marketplaceapi.service.user.seller;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.atm.InsufficientFundException;
 import com.elleined.marketplaceapi.exception.field.FieldException;
 import com.elleined.marketplaceapi.exception.field.NotValidBodyException;
@@ -58,6 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -97,42 +96,44 @@ public class SellerServiceImpl implements SellerService {
     private String cropTradeImgDirectory;
 
     @Override
-    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, SaleRetailProductRequest saleRetailProductRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        int salePercentage = saleRetailProductRequest.getSalePercentage();
-
-        if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
-        if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
-
-        double totalPrice = retailProductService.calculateTotalPrice(retailProduct, saleRetailProductRequest);
-        double salePrice = retailProductService.calculateSalePrice(totalPrice, salePercentage);
-        if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
-
-        SaleRetailProduct saleRetailProduct = saleRetailProductMapper.toEntity(saleRetailProductRequest, retailProduct);
-        retailProduct.setSaleRetailProduct(saleRetailProduct);
-
-        saleRetailProductRepository.save(saleRetailProduct);
-        retailProductRepository.save(retailProduct);
-        log.debug("Retail product with id of {} set as sale successfully", retailProduct.getId());
-        return retailProduct;
+    public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int quantityPerUnit, int pricePerUnit) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+//        int salePercentage = quantityPerUnit.getSalePercentage();
+//
+//        if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
+//        if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
+//
+//        double totalPrice = retailProductService.calculateTotalPrice(retailProduct, quantityPerUnit);
+//        double salePrice = retailProductService.calculateSalePrice(totalPrice, salePercentage);
+//        if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
+//
+//        SaleRetailProduct saleRetailProduct = saleRetailProductMapper.toEntity(quantityPerUnit, retailProduct);
+//        retailProduct.setSaleRetailProduct(saleRetailProduct);
+//
+//        saleRetailProductRepository.save(saleRetailProduct);
+//        retailProductRepository.save(retailProduct);
+//        log.debug("Retail product with id of {} set as sale successfully", retailProduct.getId());
+//        return retailProduct;
+        return null;
     }
 
     @Override
-    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, SaleWholeSaleRequest saleWholeSaleRequest) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
-        int salePercentage = saleWholeSaleRequest.getSalePercentage();
-        double totalPrice = Formatter.formatDouble(wholeSaleProduct.getPrice().doubleValue());
-
-        if (!seller.hasProduct(wholeSaleProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
-        if (!wholeSaleProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
-        double salePrice = wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
-        if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
-
-        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(wholeSaleProduct, salePercentage, totalPrice);
-        wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
-
-        saleWholeSaleProductRepository.save(saleWholeSaleProduct);
-        wholeSaleProductRepository.save(wholeSaleProduct);
-        log.debug("Whole sale product with id of {} set as sale successfully!", wholeSaleProduct.getId());
-        return wholeSaleProduct;
+    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, BigDecimal salePrice) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+//        int salePercentage = salePrice.getSalePercentage();
+//        double totalPrice = Formatter.formatDouble(wholeSaleProduct.getPrice().doubleValue());
+//
+//        if (!seller.hasProduct(wholeSaleProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
+//        if (!wholeSaleProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
+//        double salePrice = wholeSaleProductService.calculateSalePrice(totalPrice, salePercentage);
+//        if (salePrice >= totalPrice) throw new ProductSaleException("Cannot sale this product! the sale price " + salePrice + " you've entered does not result in a lower price than the previous price " + totalPrice + " after applying the specified sale percentage " + salePercentage + ". When setting a sale price, it should be lower than the original price to qualify as a discount.\nPlease enter a sale price that, after applying the sale percentage " + salePercentage + ", is lower than the previous price to apply a valid discount.");
+//
+//        SaleWholeSaleProduct saleWholeSaleProduct = saleWholeSaleProductMapper.toEntity(wholeSaleProduct, salePercentage, totalPrice);
+//        wholeSaleProduct.setSaleWholeSaleProduct(saleWholeSaleProduct);
+//
+//        saleWholeSaleProductRepository.save(saleWholeSaleProduct);
+//        wholeSaleProductRepository.save(wholeSaleProduct);
+//        log.debug("Whole sale product with id of {} set as sale successfully!", wholeSaleProduct.getId());
+//        return wholeSaleProduct;
+        return null;
     }
 
     @Override
