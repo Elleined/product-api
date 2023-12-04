@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.service.product.wholesale;
 
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.exception.resource.ResourceNotFoundException;
 import com.elleined.marketplaceapi.model.order.Order;
 import com.elleined.marketplaceapi.model.order.WholeSaleOrder;

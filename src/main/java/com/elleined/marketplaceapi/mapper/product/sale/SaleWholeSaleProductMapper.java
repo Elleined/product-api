@@ -1,6 +1,5 @@
 package com.elleined.marketplaceapi.mapper.product.sale;
 
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleWholeSaleRequest;
 import com.elleined.marketplaceapi.dto.product.sale.response.SaleWholeSaleResponse;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.product.sale.SaleWholeSaleProduct;
@@ -18,12 +17,10 @@ public interface SaleWholeSaleProductMapper {
             @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())"),
             @Mapping(target = "wholeSaleProduct", expression = "java(wholeSaleProduct)"),
-            @Mapping(target = "salePercentage", expression = "java(salePercentage)"),
             @Mapping(target = "salePrice", expression = "java(salePrice)")
     })
     SaleWholeSaleProduct toEntity(WholeSaleProduct wholeSaleProduct,
-                                  @Context int salePercentage,
                                   @Context double salePrice);
 
-    SaleWholeSaleResponse toDTO(SaleWholeSaleProduct saleWholeSaleProduct);
+    SaleWholeSaleResponse toDTO(SaleWholeSaleProduct saleWholeSaleProduct, int salePercentage);
 }

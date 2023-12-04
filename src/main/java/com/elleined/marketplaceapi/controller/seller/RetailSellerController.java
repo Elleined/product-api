@@ -3,7 +3,6 @@ package com.elleined.marketplaceapi.controller.seller;
 
 import com.elleined.marketplaceapi.dto.order.RetailOrderDTO;
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
-import com.elleined.marketplaceapi.dto.product.sale.request.SaleRetailProductRequest;
 import com.elleined.marketplaceapi.mapper.order.RetailOrderMapper;
 import com.elleined.marketplaceapi.mapper.product.RetailProductMapper;
 import com.elleined.marketplaceapi.model.order.Order.Status;
@@ -52,23 +51,23 @@ public class RetailSellerController {
         this.retailProductMapper = retailProductMapper;
     }
 
-    @PatchMapping("/{productId}/sale")
-    public RetailProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
-                                        @PathVariable("productId") int productId,
-                                        @Valid @RequestBody SaleRetailProductRequest saleRetailProductRequest) {
-
-        User seller = userService.getById(sellerId);
-        RetailProduct retailProduct = retailProductService.getById(productId);
-        if (seller.isPremiumAndNotExpired()) {
-            RetailProduct saleProduct = premiumSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
-            double price = retailProductService.calculateTotalPrice(retailProduct);
-            return retailProductMapper.toDTO(saleProduct, price);
-        }
-
-        RetailProduct saleProduct = regularSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
-        double price = retailProductService.calculateTotalPrice(retailProduct);
-        return retailProductMapper.toDTO(saleProduct, price);
-    }
+//    @PatchMapping("/{productId}/sale")
+//    public RetailProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
+//                                        @PathVariable("productId") int productId,
+//                                        @Valid @RequestBody SaleRetailProductRequest saleRetailProductRequest) {
+//
+//        User seller = userService.getById(sellerId);
+//        RetailProduct retailProduct = retailProductService.getById(productId);
+//        if (seller.isPremiumAndNotExpired()) {
+//            RetailProduct saleProduct = premiumSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
+//            double price = retailProductService.calculateTotalPrice(retailProduct);
+//            return retailProductMapper.toDTO(saleProduct, price);
+//        }
+//
+//        RetailProduct saleProduct = regularSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
+//        double price = retailProductService.calculateTotalPrice(retailProduct);
+//        return retailProductMapper.toDTO(saleProduct, price);
+//    }
 
     @GetMapping("/orders")
     public List<RetailOrderDTO> getAllSellerProductOrderByStatus(@PathVariable("currentUserId") int sellerId,
