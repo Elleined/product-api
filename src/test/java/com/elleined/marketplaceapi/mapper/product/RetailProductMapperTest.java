@@ -2,7 +2,6 @@ package com.elleined.marketplaceapi.mapper.product;
 
 import com.elleined.marketplaceapi.dto.product.RetailProductDTO;
 import com.elleined.marketplaceapi.dto.product.sale.response.SaleRetailProductResponse;
-import com.elleined.marketplaceapi.dto.product.sale.response.SaleWholeSaleResponse;
 import com.elleined.marketplaceapi.mapper.product.sale.SaleRetailProductMapper;
 import com.elleined.marketplaceapi.model.Crop;
 import com.elleined.marketplaceapi.model.Shop;
@@ -11,10 +10,12 @@ import com.elleined.marketplaceapi.model.product.sale.SaleRetailProduct;
 import com.elleined.marketplaceapi.model.unit.RetailUnit;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.model.user.UserDetails;
+import com.elleined.marketplaceapi.service.product.retail.RetailProductService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -79,6 +80,7 @@ class RetailProductMapperTest {
                 .retailCartItems(new ArrayList<>())
                 .privateChatRooms(new ArrayList<>())
                 .build();
+        saleRetailProduct.setRetailProduct(expected);
 
         SaleRetailProductResponse saleRetailProductResponse = SaleRetailProductResponse.saleRetailProductResponseBuilder()
                 .id(1)
@@ -89,7 +91,7 @@ class RetailProductMapperTest {
                 .build();
 
         double expectedTotalPrice = 5_000;
-        RetailProductDTO actual = retailProductMapper.toDTO(expected, expectedTotalPrice, saleRetailProductResponse);
+        RetailProductDTO actual = retailProductMapper.toDTO(expected, expectedTotalPrice);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getCrop().getName(), actual.getCropName());
