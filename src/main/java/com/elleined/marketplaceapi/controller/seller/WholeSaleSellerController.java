@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -52,21 +53,21 @@ public class WholeSaleSellerController {
         this.wholeSaleProductMapper = wholeSaleProductMapper;
     }
 
-//    @PatchMapping("/{productId}/sale")
-//    public WholeSaleProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
-//                                           @PathVariable("productId") int productId,
-//                                           @Valid @RequestBody SaleWholeSaleRequest saleWholeSaleRequest) {
-//
-//        User seller = userService.getById(sellerId);
-//        WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(productId);
-//        if (seller.isPremiumAndNotExpired()) {
-//            WholeSaleProduct saleProduct = premiumSeller.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
-//            return wholeSaleProductMapper.toDTO(saleProduct);
-//        }
-//
-//        WholeSaleProduct saleProduct = regularSeller.saleProduct(seller, wholeSaleProduct, saleWholeSaleRequest);
-//        return wholeSaleProductMapper.toDTO(saleProduct);
-//    }
+    @PatchMapping("/{productId}/sale")
+    public WholeSaleProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
+                                           @PathVariable("productId") int productId,
+                                           @RequestParam("salePrice") BigDecimal salePrice ) {
+
+        User seller = userService.getById(sellerId);
+        WholeSaleProduct wholeSaleProduct = wholeSaleProductService.getById(productId);
+        if (seller.isPremiumAndNotExpired()) {
+            WholeSaleProduct saleProduct = premiumSeller.saleProduct(seller, wholeSaleProduct, salePrice);
+            return wholeSaleProductMapper.toDTO(saleProduct);
+        }
+
+        WholeSaleProduct saleProduct = regularSeller.saleProduct(seller, wholeSaleProduct, salePrice);
+        return wholeSaleProductMapper.toDTO(saleProduct);
+    }
 
 
     @GetMapping("/orders")

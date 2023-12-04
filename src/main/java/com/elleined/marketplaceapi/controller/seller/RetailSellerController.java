@@ -51,23 +51,24 @@ public class RetailSellerController {
         this.retailProductMapper = retailProductMapper;
     }
 
-//    @PatchMapping("/{productId}/sale")
-//    public RetailProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
-//                                        @PathVariable("productId") int productId,
-//                                        @Valid @RequestBody SaleRetailProductRequest saleRetailProductRequest) {
-//
-//        User seller = userService.getById(sellerId);
-//        RetailProduct retailProduct = retailProductService.getById(productId);
-//        if (seller.isPremiumAndNotExpired()) {
-//            RetailProduct saleProduct = premiumSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
-//            double price = retailProductService.calculateTotalPrice(retailProduct);
-//            return retailProductMapper.toDTO(saleProduct, price);
-//        }
-//
-//        RetailProduct saleProduct = regularSeller.saleProduct(seller, retailProduct, saleRetailProductRequest, );
-//        double price = retailProductService.calculateTotalPrice(retailProduct);
-//        return retailProductMapper.toDTO(saleProduct, price);
-//    }
+    @PatchMapping("/{productId}/sale")
+    public RetailProductDTO saleProduct(@PathVariable("currentUserId") int sellerId,
+                                        @PathVariable("productId") int productId,
+                                        @RequestParam("quantityPerUnit") int quantityPerUnit,
+                                        @RequestParam("pricePerUnit") int pricePerUnit) {
+
+        User seller = userService.getById(sellerId);
+        RetailProduct retailProduct = retailProductService.getById(productId);
+        if (seller.isPremiumAndNotExpired()) {
+            RetailProduct saleProduct = premiumSeller.saleProduct(seller, retailProduct, quantityPerUnit, pricePerUnit);
+            double price = retailProductService.calculateTotalPrice(retailProduct);
+            return retailProductMapper.toDTO(saleProduct, price);
+        }
+
+        RetailProduct saleProduct = regularSeller.saleProduct(seller, retailProduct, quantityPerUnit, pricePerUnit);
+        double price = retailProductService.calculateTotalPrice(retailProduct);
+        return retailProductMapper.toDTO(saleProduct, price);
+    }
 
     @GetMapping("/orders")
     public List<RetailOrderDTO> getAllSellerProductOrderByStatus(@PathVariable("currentUserId") int sellerId,
