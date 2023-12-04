@@ -58,7 +58,7 @@ public class PremiumSellerProxy implements SellerService {
     }
 
     @Override
-    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, BigDecimal salePrice) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+    public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, double salePrice) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
         return sellerService.saleProduct(seller, wholeSaleProduct, salePrice);
     }
 

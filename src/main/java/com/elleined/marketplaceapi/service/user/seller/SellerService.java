@@ -20,7 +20,6 @@ import com.elleined.marketplaceapi.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 public interface SellerService {
 
@@ -30,7 +29,7 @@ public interface SellerService {
             FieldException,
             ProductNotListedException;
 
-    WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, BigDecimal salePrice)
+    WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, double salePrice)
             throws NotOwnedException,
             ProductSaleException,
             FieldException,
