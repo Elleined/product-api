@@ -55,12 +55,12 @@ public class RetailProductController {
                 }).toList();
     }
 
-    @GetMapping("/calculate-total-price")
-    public double calculateTotalPrice(@RequestParam("pricePerUnit") double pricePerUnit,
-                                      @RequestParam("quantityPerUnit") int quantityPerUnit,
-                                      @RequestParam("availableQuantity") int availableQuantity) {
-
-        return retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, availableQuantity);
+    @GetMapping("/{productId}/calculate-total-price")
+    public double calculateTotalPrice(@PathVariable("productId") int productId,
+                                      @RequestParam("pricePerUnit") double pricePerUnit,
+                                      @RequestParam("quantityPerUnit") int quantityPerUnit) {
+        RetailProduct retailProduct = retailProductService.getById(productId);
+        return retailProductService.calculateTotalPrice(pricePerUnit, quantityPerUnit, retailProduct.getAvailableQuantity());
     }
 
     @GetMapping("/{productId}/calculate-sale-percentage")
