@@ -95,6 +95,7 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public RetailProduct saleProduct(User seller, RetailProduct retailProduct, int quantityPerUnit, int pricePerUnit) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        if (retailProduct.isSale()) throw new ProductSaleException("Cannot sale this product! because this product is already on sale!");
         if (!seller.hasProduct(retailProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!retailProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
 
@@ -113,6 +114,7 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public WholeSaleProduct saleProduct(User seller, WholeSaleProduct wholeSaleProduct, double salePrice) throws NotOwnedException, ProductSaleException, FieldException, ProductNotListedException {
+        if (wholeSaleProduct.isSale()) throw new ProductSaleException("Cannot sale this product! because this product is already on sale!");
         if (!seller.hasProduct(wholeSaleProduct)) throw new NotOwnedException("Cannot sale this product! because You do not have ownership rights to update this product. Only the owner of the product can make changes.");
         if (!wholeSaleProduct.isListed()) throw new ProductNotListedException("Cannot sale this product! because you are trying to perform an action on a product that has not been listed in our system. This action is not permitted for products that are not yet listed.");
         if (salePrice >= wholeSaleProduct.getPrice().doubleValue()) throw new ProductSaleException("Cannot sale product! because sale price should be lower than the current price!");
