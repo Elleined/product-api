@@ -30,6 +30,7 @@ public interface ProductService<T extends Product> {
     boolean isRejectedBySeller(User buyer, T t);
 
     default int getSalePercentage(double totalPrice, double salePrice) {
-        return (int) ((salePrice / totalPrice) * 100);
+        double salePercentage = (int) ((salePrice / totalPrice) * 100);
+        return (int) (100 - salePercentage);
     }
 }
