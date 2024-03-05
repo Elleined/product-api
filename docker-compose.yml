@@ -1,0 +1,73 @@
+version: "3",
+services:
+  marketplace_api:
+    build: .
+    image: openjdk:17-alpine
+    container_name: marketplace_app
+    restart: always
+    ports:
+      - "8083:8083"
+    environment:
+      - MYSQL_HOST=marketplace_mysql_server
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=marketplace_db
+      - IMG_UPLOAD_DIRECTORY=./images
+    networks:
+      - marketplace_network
+  marketplace_mysql_server:
+    image: mysql:8.0.32
+    container_name: marketplace_mysql_server
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=marketplace_db
+    ports:
+      - "3307:3306"
+    networks:
+      - marketplace_network
+  sma:
+    image: sma:latest
+    container_name: marketplace_sma
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - MYSQL_HOST=marketplace_mysql_server
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=sma_db
+    networks:
+      - marketplace_network
+  pla:
+    image: pla:latest
+    container_name: "marketplace_pla"
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      - ENV MYSQL_HOST=marketplace_mysql_server
+      - ENV MYSQL_USER=root
+      - ENV MYSQL_PASSWORD=root
+      - ENV MYSQL_PORT=3306
+      - ENV MYSQL_DATABASE=pla_db
+    networks:
+      - marketplace_network
+  esa:
+    image: esa:latest
+    container_name: marketplace_esa
+    restart: always
+    ports:
+      - "8083:8083"
+    environment:
+      - MAIL_USERNAME=juandelacruz@gmail.com
+      - MAIL_PASSWORD=abcdefghijklmnop
+    networks:
+      - marketplace_network
+
+networks:
+  marketplace_network:
+    ipam:
+      driver: default
+    name: marketplace_network
