@@ -1,8 +1,7 @@
-version: "3",
+version: "3"
 services:
   marketplace_api:
     build: .
-    image: openjdk:17-alpine
     container_name: marketplace_app
     restart: always
     ports:
@@ -47,11 +46,11 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - ENV MYSQL_HOST=marketplace_mysql_server
-      - ENV MYSQL_USER=root
-      - ENV MYSQL_PASSWORD=root
-      - ENV MYSQL_PORT=3306
-      - ENV MYSQL_DATABASE=pla_db
+      - MYSQL_HOST=marketplace_mysql_server
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=pla_db
     networks:
       - marketplace_network
   esa:
@@ -60,14 +59,15 @@ services:
     restart: always
     ports:
       - "8083:8083"
+    networks:
+      - marketplace_network
     environment:
       - MAIL_USERNAME=juandelacruz@gmail.com
       - MAIL_PASSWORD=abcdefghijklmnop
-    networks:
-      - marketplace_network
-
 networks:
   marketplace_network:
+    name: marketplace_network
     ipam:
       driver: default
-    name: marketplace_network
+    external: false
+
