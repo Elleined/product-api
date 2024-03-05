@@ -53,7 +53,7 @@ public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidato
 
     private final ImageUploader imageUploader;
 
-    @Value("${cropTrade.img.directory}")
+    @Value("${img-directory}")
     private String cropTradeImgDirectory;
 
     public void deposit(User currentUser, BigDecimal depositedAmount) {

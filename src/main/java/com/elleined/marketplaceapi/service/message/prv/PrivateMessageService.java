@@ -43,7 +43,7 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
 
     private final ImageUploader imageUploader;
 
-    @Value("${cropTrade.img.directory}")
+    @Value("${img-directory}")
     private String cropTradeImgDirectory;
 
     @Override

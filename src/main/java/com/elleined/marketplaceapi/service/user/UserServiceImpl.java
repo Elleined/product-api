@@ -75,7 +75,7 @@ public class UserServiceImpl
     private final NumberValidator numberValidator;
     private final FullNameValidator fullNameValidator;
 
-    @Value("${cropTrade.img.directory}")
+    @Value("${img-directory}")
     private String cropTradeImgDirectory;
 
     @Override

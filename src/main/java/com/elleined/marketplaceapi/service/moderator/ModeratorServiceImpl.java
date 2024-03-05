@@ -60,7 +60,7 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     private final ImageUploader imageUploader;
 
-    @Value("${cropTrade.img.directory}")
+    @Value("${img-directory}")
     private String cropTradeImgDirectory;
 
     @Override

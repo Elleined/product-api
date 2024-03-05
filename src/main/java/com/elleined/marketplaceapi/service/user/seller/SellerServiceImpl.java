@@ -90,7 +90,7 @@ public class SellerServiceImpl implements SellerService {
     private final RetailUnitService retailUnitService;
     private final WholeSaleUnitService wholeSaleUnitService;
 
-    @Value("${cropTrade.img.directory}")
+    @Value("${img-directory}")
     private String cropTradeImgDirectory;
 
     @Override
