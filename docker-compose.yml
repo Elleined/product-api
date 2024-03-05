@@ -26,7 +26,7 @@ services:
     networks:
       - marketplace_network
   sma:
-    image: sma:latest
+    image: elleined/sma
     container_name: marketplace_sma
     restart: always
     ports:
@@ -40,7 +40,7 @@ services:
     networks:
       - marketplace_network
   pla:
-    image: pla:latest
+    image: elleined/pla
     container_name: "marketplace_pla"
     restart: always
     ports:
@@ -54,11 +54,11 @@ services:
     networks:
       - marketplace_network
   esa:
-    image: esa:latest
+    image: elleined/esa
     container_name: marketplace_esa
     restart: always
     ports:
-      - "8083:8083"
+      - "8091:8091"
     networks:
       - marketplace_network
     environment:
