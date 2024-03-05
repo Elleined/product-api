@@ -22,35 +22,9 @@ REST API for marketplace microservice
       - Postman
       - IntelliJ
    
-# Run with Docker
-1. Create Network
+# Run with Docker Compose
 ```
-docker network create marketplace_network
-```
-
-2. Docker Run MySQL Server Image
-```
-docker run -itd --rm -p 3307:3306 --network marketplace_network --name marketplace_mysql_server -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=marketplace_db mysql:8.0.32
-```
-
-3. Docker Run Social Media API
-```
-docker run -itd --rm -p 8081:8081 --network marketplace_network --name marketplace_sma --env-file ./src/java/resources/env/sma_env.txt  sma:latest
-```
-
-4. Docker Run Philippine Location API
-```
-docker run -itd --rm -p 8082:8082 --network marketplace_network --name marketplace_pla --env-file ./src/java/resources/env/pla_env.txt pla:latest
-```
-
-5. Docker Run Email Sender API
-```
-docker run -itd --rm -p 8091:8091 --network marketplace_network --name marketplace_esa --env-file ./src/java/resources/env/esa_env.txt esa:latest
-```
-
-6. Docker Run Marketplace API
-```
-docker run -itd --rm -p 8083:8083 --network marketplace_network --name marketplace_app marketplace:latest
+docker-compose up -d --build
 ```
 
 # Check api endpoints in Postman
