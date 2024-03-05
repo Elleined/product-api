@@ -127,6 +127,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>marketplace-api</finalName>
 	</build>
 
 </project>
