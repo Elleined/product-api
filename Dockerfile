@@ -2,8 +2,7 @@ FROM openjdk:17-alpine
 MAINTAINER Elleined
 
 RUN mkdir "images"
-RUN cd images
-RUN mkdir "PrivateChatPictures", "PROFILE_PICTURES_FOLDER", "VALID_IDS_FOLDER", "SHOP_PICTURES_FOLDER", "PRODUCT_PICTURES_FOLDER", "DEPOSIT_TRANSACTIONS_FOLDER", "WITHDRAW_TRANSACTIONS_FOLDER"
+RUN mkdir "./images/PrivateChatPictures", "./images/ProfilePictures", "ValidIds", "./images/ShopPictures", "./images/ProductPictures", "./images/DepositTransactionsPictures", "./images/WithdrawTransactionPictures"
 
 # MySQL Server Credential
 ENV MYSQL_HOST=marketplace_mysql_server
