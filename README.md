@@ -35,17 +35,17 @@ docker run -itd --rm -p 3307:3306 --network marketplace_network --name marketpla
 
 3. Docker Run Social Media API
 ```
-docker run -itd --rm -p 8081:8081 --network marketplace_network --name marketplace_sma sma:latest
+docker run -itd --rm -p 8081:8081 --network marketplace_network --name marketplace_sma --env-file ./src/java/resources/env/sma_env.txt  sma:latest
 ```
 
 4. Docker Run Philippine Location API
 ```
-docker run -itd --rm -p 8082:8082 --network marketplace_network --name marketplace_pla pla:latest
+docker run -itd --rm -p 8082:8082 --network marketplace_network --name marketplace_pla --env-file ./src/java/resources/env/pla_env.txt pla:latest
 ```
 
 5. Docker Run Email Sender API
 ```
-docker run -itd --rm -p 8091:8091 --network marketplace_network --name marketplace_esa -e MAIL_USERNAME=<gmail_account> -e MAIL_PASSWORD=<generated_app_password> esa:latest
+docker run -itd --rm -p 8091:8091 --network marketplace_network --name marketplace_esa --env-file ./src/java/resources/env/esa_env.txt esa:latest
 ```
 
 6. Docker Run Marketplace API
