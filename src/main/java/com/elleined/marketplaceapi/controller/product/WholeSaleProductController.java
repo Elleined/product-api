@@ -1,9 +1,7 @@
 package com.elleined.marketplaceapi.controller.product;
 
 import com.elleined.marketplaceapi.dto.product.WholeSaleProductDTO;
-import com.elleined.marketplaceapi.exception.product.ProductPriceException;
 import com.elleined.marketplaceapi.mapper.product.WholeSaleProductMapper;
-import com.elleined.marketplaceapi.model.product.RetailProduct;
 import com.elleined.marketplaceapi.model.product.WholeSaleProduct;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.service.product.wholesale.WholeSaleProductService;
