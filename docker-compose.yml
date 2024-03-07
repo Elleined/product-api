@@ -15,6 +15,11 @@ services:
       - IMG_UPLOAD_DIRECTORY=./images
     networks:
       - marketplace_network
+    depends_on:
+      - marketplace_mysql_server
+      - esa
+      - pla
+      - sma
   marketplace_mysql_server:
     image: mysql:8.0.32
     container_name: marketplace_mysql_server
@@ -39,6 +44,8 @@ services:
       - MYSQL_DATABASE=sma_db
     networks:
       - marketplace_network
+    depends_on:
+      - marketplace_mysql_server
   pla:
     image: elleined/pla
     container_name: "marketplace_pla"
@@ -53,6 +60,8 @@ services:
       - MYSQL_DATABASE=pla_db
     networks:
       - marketplace_network
+    depends_on:
+      - marketplace_mysql_server
   esa:
     image: elleined/esa
     container_name: marketplace_esa
