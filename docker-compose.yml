@@ -2,6 +2,7 @@ version: "3"
 services:
   marketplace_api:
     build: .
+    image: elleined/marketplace
     container_name: marketplace_app
     restart: always
     ports:
