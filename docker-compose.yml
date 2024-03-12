@@ -1,10 +1,12 @@
 version: "3"
 services:
-  marketplace_api:
+  marketplace_app:
     build: .
     image: elleined/marketplace
     container_name: marketplace_app
     restart: always
+    volumes:
+      - image_volume:./images
     ports:
       - "8083:8083"
     environment:
@@ -80,4 +82,7 @@ networks:
     ipam:
       driver: default
     external: false
-
+volumes:
+  image_volume:
+    driver: local
+    name: image_volume
