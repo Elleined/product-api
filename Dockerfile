@@ -4,6 +4,7 @@ MAINTAINER Elleined
 RUN mkdir "images"
 RUN mkdir "./images/PrivateChatPictures", "./images/ProfilePictures", "ValidIds", "./images/ShopPictures", "./images/ProductPictures", "./images/DepositTransactionsPictures", "./images/WithdrawTransactionPictures"
 
+
 # MySQL Server Credential
 ENV MYSQL_HOST=marketplace_mysql_server
 ENV MYSQL_USER=root
@@ -12,6 +13,8 @@ ENV MYSQL_PORT=3306
 ENV MYSQL_DATABASE=marketplace_db
 # App
 ENV IMG_UPLOAD_DIRECTORY=./images
+
+VOLUME ./init:/docker-entrypoint-initdb.d
 
 COPY ./target/*.jar marketplace-api.jar
 
