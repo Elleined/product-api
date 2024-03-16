@@ -1,12 +1,13 @@
-version: "3"
+version: "3.8"
 services:
-  marketplace_app:
+  ma_app:
     build: .
-    image: elleined/marketplace
-    container_name: marketplace_app
+    image: elleined/ma
+    container_name: ma_app
     restart: always
     volumes:
-      - image_volume:./images
+      - image_volume:/images
+      - ./src/main/resources/sql:/docker-entrypoint-initdb.d
     ports:
       - "8083:8083"
     environment:
@@ -19,10 +20,14 @@ services:
     networks:
       - marketplace_network
     depends_on:
-      - marketplace_mysql_server
-      - esa
-      - pla
-      - sma
+      marketplace_mysql_server:
+        condition: service_healthy
+      marketplace_esa:
+        condition: service_healthy
+      marketplace_pla:
+        condition: service_healthy
+      marketplace_sma:
+        condition: service_healthy
   marketplace_mysql_server:
     image: mysql:8.0.32
     container_name: marketplace_mysql_server
@@ -33,7 +38,9 @@ services:
       - "3307:3306"
     networks:
       - marketplace_network
-  sma:
+    healthcheck:
+      test: mysqladmin ping -h localhost -u root --password=$$MYSQL_ROOT_PASSWORD
+  marketplace_sma:
     image: elleined/sma
     container_name: marketplace_sma
     restart: always
@@ -47,11 +54,14 @@ services:
       - MYSQL_DATABASE=sma_db
     networks:
       - marketplace_network
+    healthcheck:
+      test: curl http://localhost:8081/api/v1/sma/actuator/health
     depends_on:
-      - marketplace_mysql_server
-  pla:
+      marketplace_mysql_server:
+        condition: service_healthy
+  marketplace_pla:
     image: elleined/pla
-    container_name: "marketplace_pla"
+    container_name: marketplace_pla
     restart: always
     ports:
       - "8082:8082"
@@ -63,9 +73,12 @@ services:
       - MYSQL_DATABASE=pla_db
     networks:
       - marketplace_network
+    healthcheck:
+      test: curl http://localhost:8082/api/v1/pla/actuator/health
     depends_on:
-      - marketplace_mysql_server
-  esa:
+      marketplace_mysql_server:
+        condition: service_healthy
+  marketplace_esa:
     image: elleined/esa
     container_name: marketplace_esa
     restart: always
@@ -74,8 +87,10 @@ services:
     networks:
       - marketplace_network
     environment:
-      - MAIL_USERNAME=juandelacruz@gmail.com
-      - MAIL_PASSWORD=abcdefghijklmnop
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    healthcheck:
+      test: curl http://localhost:8091/api/v1/esa/actuator/health
 networks:
   marketplace_network:
     name: marketplace_network

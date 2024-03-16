@@ -14,7 +14,6 @@ ENV MYSQL_DATABASE=marketplace_db
 ENV IMG_UPLOAD_DIRECTORY=./images
 
 COPY ./target/*.jar marketplace-api.jar
-COPY src/main/resources/sql/init.sql /docker-entrypoint-initdb.d/init.sql
 
 EXPOSE 8083
 CMD ["java", "-jar", "marketplace-api.jar"]
