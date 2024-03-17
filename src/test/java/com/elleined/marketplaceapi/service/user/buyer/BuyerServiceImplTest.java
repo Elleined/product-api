@@ -742,7 +742,7 @@ class BuyerServiceImplTest {
     }
 
     @Test
-    @DisplayName("cancel order validation 3: user cannot cancel an order's order is more than 1 day after the order date")
+    @DisplayName("cancel order validation 3: user cannot cancel an order's.yml order is more than 1 day after the order date")
     void cannotCancelOrderWhenOrderIsMoreThan1DayAfterTheOrderDAte() {
         // Mock data
         RetailOrder retailOrder = spy(RetailOrder.class);

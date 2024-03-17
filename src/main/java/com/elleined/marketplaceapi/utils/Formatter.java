@@ -19,7 +19,7 @@ public interface Formatter {
                 month.substring(1).toLowerCase();
 
         String day = String.valueOf(dateTime.getDayOfMonth());
-        return String.format("%s %s", finalMonth, day);
+        return String.format("%s.yml %s.yml", finalMonth, day);
     }
 
     static String formatTime(LocalDateTime dateTime) {
@@ -36,7 +36,7 @@ public interface Formatter {
 
         String day = String.valueOf(orderDate.getDayOfMonth());
         String year = String.valueOf(orderDate.getYear());
-        return String.format("%s %s, %s", finalMonth, day, year);
+        return String.format("%s.yml %s.yml, %s.yml", finalMonth, day, year);
     }
 
     static String formatDate(LocalDateTime orderDate) {
@@ -48,12 +48,12 @@ public interface Formatter {
 
         String day = String.valueOf(orderDate.getDayOfMonth());
         String year = String.valueOf(orderDate.getYear());
-        return String.format("%s %s, %s", finalMonth, day, year);
+        return String.format("%s.yml %s.yml, %s.yml", finalMonth, day, year);
     }
 
 
     static String formatDeliveryAddress(DeliveryAddress deliveryAddress) {
-        return String.format("%s %s %s, %s",
+        return String.format("%s.yml %s.yml %s.yml, %s.yml",
                 deliveryAddress.getDetails(),
                 deliveryAddress.getBaranggayName(),
                 deliveryAddress.getCityName(),

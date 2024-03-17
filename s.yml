@@ -2,7 +2,7 @@ version: "3.8"
 services:
   ma_app:
     build: .
-    image: elleined/ma:thesis
+    image: elleined/ma
     container_name: ma_app
     restart: always
     volumes:
@@ -18,10 +18,10 @@ services:
       - IMG_UPLOAD_DIRECTORY=./images
     networks:
       - marketplace_network
-    healthcheck:
-      test: curl http://localhost:8083/api/v1/marketplace/actuator/health
     depends_on:
       marketplace_mysql_server:
+        condition: service_healthy
+      marketplace_esa:
         condition: service_healthy
       marketplace_pla:
         condition: service_healthy
@@ -41,8 +41,12 @@ services:
       - ./init:/docker-entrypoint-initdb.d
     healthcheck:
       test: mysqladmin ping -h localhost -u root --password=$$MYSQL_ROOT_PASSWORD
+      interval: 1m
+      timeout: 15s
+      retries: 2
+      start_period: 10s
   marketplace_sma:
-    image: elleined/sma:thesis
+    image: elleined/sma
     container_name: marketplace_sma
     restart: always
     ports:
@@ -56,12 +60,16 @@ services:
     networks:
       - marketplace_network
     healthcheck:
-      test: curl http://localhost:8081/api/v1/forum/actuator/health
+      test: curl http://localhost:8081/api/v1/sma/actuator/health
+      interval: 1m
+      timeout: 15s
+      retries: 2
+      start_period: 10s
     depends_on:
       marketplace_mysql_server:
         condition: service_healthy
   marketplace_pla:
-    image: elleined/pla:thesis
+    image: elleined/pla
     container_name: marketplace_pla
     restart: always
     ports:
@@ -75,12 +83,16 @@ services:
     networks:
       - marketplace_network
     healthcheck:
-      test: curl http://localhost:8082/location/api/actuator/health
+      test: curl http://localhost:8082/api/v1/pla/actuator/health
+      interval: 1m
+      timeout: 15s
+      retries: 2
+      start_period: 10s
     depends_on:
       marketplace_mysql_server:
         condition: service_healthy
   marketplace_esa:
-    image: elleined/esa:thesis
+    image: elleined/esa
     container_name: marketplace_esa
     restart: always
     ports:
@@ -91,7 +103,11 @@ services:
       - MAIL_USERNAME=${MAIL_USERNAME}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
     healthcheck:
-      test: curl http://localhost:8091/api/v1/email-service-api/actuator/health
+      test: curl http://localhost:8091/api/v1/esa/actuator/health
+      interval: 1m
+      timeout: 15s
+      retries: 2
+      start_period: 10s
 networks:
   marketplace_network:
     name: marketplace_network
