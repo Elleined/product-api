@@ -26,7 +26,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(userToBeVerified.getUserCredential().getEmail())
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending verification email for user " + userToBeVerified.getId() + " success!");
     }
 
@@ -38,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(rejectedUser.getUserCredential().getEmail())
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending rejected verification to user with id of " + rejectedUser.getId() + " success!");
     }
 
@@ -51,7 +51,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(seller.getUserCredential().getEmail())
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending product listing for user {} success!", seller.getId());
     }
 
@@ -64,7 +64,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(seller.getUserCredential().getEmail())
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending product rejection email for seller with id {} of in his/her product with id of {} success", seller.getId(), product.getId());
     }
 
@@ -77,7 +77,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(receiverEmail)
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending release withdrawal request email for {} success", receiverEmail);
     }
 
@@ -90,7 +90,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(receiverEmail)
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending withdrawal rejection mail for {} success", receiverEmail);
     }
 
@@ -103,7 +103,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(receiverEmail)
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending release deposit request email for requesting user {} success", receiverEmail);
     }
 
@@ -116,7 +116,7 @@ public class EmailServiceImpl implements EmailService {
                 .messageBody(message)
                 .receiver(receiverEmail)
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending rejected deposit request email for requesting user {} success!", receiverEmail);
     }
 
@@ -128,7 +128,7 @@ public class EmailServiceImpl implements EmailService {
                 .subject("Welcome to CropTrade")
                 .messageBody(message)
                 .build();
-        // emailClient.sendSimpleMail(emailMessage);
+         emailClient.sendSimpleMail(emailMessage);
         log.debug("Sending registration email for user {} success", registrant.getId());
     }
 
