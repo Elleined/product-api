@@ -23,6 +23,8 @@ services:
     depends_on:
       marketplace_mysql_server:
         condition: service_healthy
+      marketplace_esa:
+        condition: service_healthy
       marketplace_pla:
         condition: service_healthy
       marketplace_sma:
