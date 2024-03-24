@@ -116,5 +116,6 @@ networks:
     external: false
 volumes:
   image_volume:
+    external: false
     driver: local
     name: image_volume
