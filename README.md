@@ -1,5 +1,5 @@
 # marketplace-api
-REST API for marketplace microservice
+API for agriculture e-commerce
 
 # Features
   - Moderator

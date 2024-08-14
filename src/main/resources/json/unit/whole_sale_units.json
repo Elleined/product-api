@@ -1,17 +1,7 @@
 [
-  {
-    "name": "Kilo"
-  },
-  {
-    "name": "Sako"
-  },
-  {
-    "name": "Bag"
-  },
-  {
-    "name": "Box"
-  },
-  {
-    "name": "Red Bag"
-  }
+  "Kilo",
+  "Sako",
+  "Bag",
+  "Box",
+  "Red Bag"
 ]
